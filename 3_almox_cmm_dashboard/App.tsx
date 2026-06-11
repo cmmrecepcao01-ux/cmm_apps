@@ -1,0 +1,326 @@
+import React, { useState, useEffect, useMemo } from 'react';
+import { 
+  LayoutDashboard, 
+  Settings, 
+  Users, 
+  Bell, 
+  Search, 
+  User,
+  LogOut,
+  ChevronRight,
+  Plus,
+  BarChart3,
+  Clock,
+  CheckCircle2,
+  AlertTriangle,
+  Menu,
+  X,
+  Package,
+  FileSpreadsheet
+} from 'lucide-react';
+import { APP_THEME } from './constants';
+import * as XLSX from 'xlsx';
+
+interface FleetcomItem {
+  id: string;
+  description: string;
+  category: string;
+  brand: string;
+  model: string;
+  quantity: number;
+  unitPrice: number;
+  totalValue: number;
+}
+
+const App: React.FC = () => {
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  
+  const [inventory, setInventory] = useState<FleetcomItem[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+
+  const GOOGLE_DRIVE_URL = "https://docs.google.com/spreadsheets/d/1eMSJT2nq2Vk12uBcK_Tcph0qLJjRbD1Q/export?format=xlsx";
+
+  const fetchInventory = async () => {
+    setLoading(true);
+    try {
+      const response = await fetch(GOOGLE_DRIVE_URL);
+      const arrayBuffer = await response.arrayBuffer();
+      const workbook = XLSX.read(arrayBuffer, { type: 'array' });
+      const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+      
+      const rows = XLSX.utils.sheet_to_json<any>(firstSheet, { range: 1 });
+
+      const mappedData = rows
+        .filter((row: any) => row['Descrição']) 
+        .map((row: any) => {
+          const qty = Number(row['Qt Atual']) || 0;
+          const totalValue = Number(row['Saldo Valor']) || 0;
+          
+          return {
+            id: String(row['Cód. Interno'] || Math.random().toString(36).substring(2, 9)),
+            description: String(row['Descrição']).toUpperCase().trim(),
+            category: String(row['Gr. Veicular'] || 'GERAL').toUpperCase().trim(),
+            brand: String(row['Marca Apl.'] || 'N/D').toUpperCase().trim(),
+            model: String(row['Modelo Apl.'] || 'N/D').toUpperCase().trim(),
+            quantity: qty,
+            totalValue: totalValue,
+            unitPrice: qty > 0 ? totalValue / qty : 0
+          };
+        });
+
+      setInventory(mappedData);
+    } catch (error) {
+      console.error("Erro ao carregar inventário:", error);
+      alert("Erro ao conectar com a folha de cálculo. Verifique a ligação.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchInventory();
+  }, []);
+
+  // FILTRO COM ORDENAÇÃO (Maior quantidade para a menor)
+  const filteredInventory = useMemo(() => {
+    const filtered = inventory.filter(item => 
+      item.description.includes(searchQuery.toUpperCase()) ||
+      item.brand.includes(searchQuery.toUpperCase()) ||
+      item.model.includes(searchQuery.toUpperCase()) ||
+      item.category.includes(searchQuery.toUpperCase())
+    );
+
+    // Esta é a mágica que ordena sempre do maior estoque para o menor
+    return filtered.sort((a, b) => b.quantity - a.quantity);
+  }, [inventory, searchQuery]);
+
+  const totalItems = inventory.length;
+  const totalValue = inventory.reduce((acc, item) => acc + item.totalValue, 0);
+  const totalQuantity = inventory.reduce((acc, item) => acc + item.quantity, 0);
+  const zeroStockItems = inventory.filter(i => i.quantity === 0).length;
+
+  return (
+    <div className={`min-h-screen ${APP_THEME.background} text-white flex font-sans`}>
+      <aside className={`${isSidebarOpen ? 'w-64' : 'w-20'} ${APP_THEME.surface} border-r ${APP_THEME.border} transition-all duration-300 flex flex-col`}>
+        <div className="p-6 flex items-center justify-between">
+          {/* NOME ATUALIZADO AQUI */}
+          {isSidebarOpen && <span className="font-black text-xl tracking-tighter uppercase text-amber-500">CMM ALMOX</span>}
+          <button onClick={() => setIsSidebarOpen(!isSidebarOpen)} className="p-2 hover:bg-zinc-900 rounded-sm">
+            <Menu className="w-5 h-5" />
+          </button>
+        </div>
+
+        <nav className="flex-1 px-4 space-y-2 mt-4">
+          <NavItem icon={<LayoutDashboard />} label="Dashboard" active isOpen={isSidebarOpen} />
+          <NavItem icon={<Package />} label="Estoque" isOpen={isSidebarOpen} />
+          <NavItem icon={<Users />} label="Equipe" isOpen={isSidebarOpen} />
+          <NavItem icon={<BarChart3 />} label="Relatórios" isOpen={isSidebarOpen} />
+          <NavItem icon={<Settings />} label="Configurações" isOpen={isSidebarOpen} />
+        </nav>
+
+        <div className="p-4 border-t border-zinc-900">
+          <button className="w-full flex items-center gap-3 p-3 text-rose-500 hover:bg-rose-500/10 rounded-sm transition-all">
+            <LogOut className="w-5 h-5" />
+            {isSidebarOpen && <span className="text-xs font-bold uppercase">Sair</span>}
+          </button>
+        </div>
+      </aside>
+
+      <main className="flex-1 flex flex-col overflow-hidden">
+        <header className={`${APP_THEME.surface} border-b ${APP_THEME.border} h-16 flex items-center justify-between px-8`}>
+          <div className="flex items-center gap-4 bg-zinc-900 px-4 py-2 rounded-sm border border-zinc-800 w-96 focus-within:border-amber-500 transition-colors">
+            <Search className="w-4 h-4 text-zinc-500" />
+            <input 
+              type="text" 
+              placeholder="Buscar peça, marca ou categoria..." 
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="bg-transparent border-none outline-none text-sm w-full uppercase placeholder:text-zinc-600"
+            />
+            {searchQuery && (
+              <button onClick={() => setSearchQuery('')} className="text-zinc-500 hover:text-white">
+                <X className="w-4 h-4" />
+              </button>
+            )}
+          </div>
+
+          <div className="flex items-center gap-6">
+            <button className="relative p-2 text-zinc-400 hover:text-white transition-all">
+              <Bell className="w-5 h-5" />
+              <span className="absolute top-1 right-1 w-2 h-2 bg-rose-600 rounded-full"></span>
+            </button>
+            <div className="flex items-center gap-3 pl-6 border-l border-zinc-800">
+              <div className="text-right hidden sm:block">
+                <p className="text-xs font-bold uppercase text-amber-500">Acesso Chefia</p>
+                <p className="text-[10px] text-zinc-500 uppercase">Gestão de Estoque</p>
+              </div>
+              <div className="w-10 h-10 bg-zinc-800 rounded-full flex items-center justify-center border border-zinc-700">
+                <User className="w-5 h-5 text-zinc-400" />
+              </div>
+            </div>
+          </div>
+        </header>
+
+        <div className="flex-1 overflow-y-auto p-8 space-y-8">
+          <div className="flex items-end justify-between">
+            <div>
+              <h1 className="text-4xl font-black uppercase tracking-tighter">Inventário Oficial</h1>
+              <p className="text-zinc-500 mt-1 uppercase text-xs font-bold tracking-widest">
+                Sincronizado via Fleetcom (Google Drive)
+              </p>
+            </div>
+            <button 
+              onClick={fetchInventory}
+              disabled={loading}
+              className={`px-6 py-3 ${APP_THEME.primary} font-black uppercase text-xs rounded-sm flex items-center gap-2 transition-all disabled:opacity-50`}
+            >
+              <Clock className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} /> 
+              {loading ? 'Sincronizando...' : 'Atualizar Base'}
+            </button>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <StatCard 
+              icon={<Package className="text-amber-500" />} 
+              label="Tipos de Peças" 
+              value={totalItems.toString()} 
+              trend="Cadastradas" 
+              trendColor="text-zinc-500"
+            />
+            <StatCard 
+              icon={<BarChart3 className="text-emerald-500" />} 
+              label="Total em Físico" 
+              value={`${totalQuantity} UN`} 
+              trend="Unidades" 
+              trendColor="text-emerald-500"
+            />
+            <StatCard 
+              icon={<CheckCircle2 className="text-blue-500" />} 
+              label="Capital em Estoque" 
+              // MOEDA FIXADA EM REAL (BRL)
+              value={totalValue.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })} 
+              trend="Financeiro" 
+              trendColor="text-blue-500"
+            />
+            <StatCard 
+              icon={<AlertTriangle className={zeroStockItems > 0 ? "text-rose-500" : "text-emerald-500"} />} 
+              label="Peças Zeradas" 
+              value={zeroStockItems.toString()} 
+              trend={zeroStockItems > 0 ? "Atenção Necessária" : "Estoque Saudável"} 
+              trendColor={zeroStockItems > 0 ? "text-rose-500" : "text-emerald-500"}
+            />
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div className={`${APP_THEME.card} lg:col-span-2 p-8 rounded-sm flex flex-col h-[600px]`}>
+              <div className="flex items-center justify-between mb-6 shrink-0 border-b border-zinc-800 pb-4">
+                <h3 className="text-lg font-black uppercase">Catálogo de Peças</h3>
+                <span className="text-[10px] font-bold uppercase text-zinc-500 bg-zinc-900 px-3 py-1 rounded-sm border border-zinc-800">
+                  {filteredInventory.length} encontrados
+                </span>
+              </div>
+              
+              <div className="space-y-2 overflow-y-auto pr-2 custom-scrollbar flex-1">
+                {loading && inventory.length === 0 ? (
+                  <div className="flex flex-col items-center justify-center h-full text-zinc-600 space-y-4">
+                    <Clock className="w-12 h-12 animate-spin" />
+                    <p className="text-xs uppercase font-black tracking-widest">A Carregar Planilha...</p>
+                  </div>
+                ) : filteredInventory.length === 0 ? (
+                  <div className="flex flex-col items-center justify-center h-full text-zinc-600 space-y-4">
+                    <Package className="w-12 h-12" />
+                    <p className="text-xs uppercase font-black tracking-widest">Nenhuma peça encontrada.</p>
+                  </div>
+                ) : (
+                  filteredInventory.map((item) => (
+                    <div key={item.id} className="flex items-center justify-between p-4 bg-black/40 border border-zinc-800/50 rounded-sm hover:border-zinc-600 transition-all group">
+                      <div className="flex items-center gap-4">
+                        <div className={`w-10 h-10 rounded-sm flex items-center justify-center transition-all ${item.quantity > 0 ? 'bg-zinc-800 text-emerald-500' : 'bg-rose-900/20 text-rose-500'}`}>
+                          <Package className="w-5 h-5" />
+                        </div>
+                        <div>
+                          <p className="text-sm font-bold uppercase text-white group-hover:text-amber-500 transition-colors">{item.description}</p>
+                          <p className="text-[9px] text-zinc-400 font-bold uppercase mt-1 tracking-wider">
+                            {item.category} • {item.brand !== 'N/D' ? item.brand : 'Genérico'} {item.model !== 'N/D' ? `• ${item.model}` : ''}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <span className={`block text-xl font-mono font-black ${item.quantity > 0 ? 'text-white' : 'text-rose-500'}`}>
+                          {item.quantity} UN
+                        </span>
+                        <span className="text-[10px] font-mono text-zinc-500 uppercase">
+                          {/* MOEDA FIXADA EM REAL (BRL) */}
+                          UN: {item.unitPrice.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
+                        </span>
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
+            </div>
+
+            <div className="space-y-8">
+              <div className={`${APP_THEME.card} p-8 rounded-sm`}>
+                <h3 className="text-lg font-black uppercase mb-6">Ações Rápidas</h3>
+                <div className="grid grid-cols-2 gap-4">
+                  <ActionButton icon={<Plus />} label="Lançar Saída" color={APP_THEME.success} />
+                  <ActionButton icon={<BarChart3 />} label="Relatório" color={APP_THEME.secondary} />
+                  <ActionButton icon={<Settings />} label="Ajustes" color={APP_THEME.secondary} />
+                  <ActionButton icon={<AlertTriangle />} label="Alertas" color={APP_THEME.danger} />
+                </div>
+              </div>
+
+              <div className="bg-gradient-to-br from-amber-500 to-amber-700 p-8 rounded-sm text-black">
+                <h3 className="text-lg font-black uppercase mb-2">Conexão Ativa</h3>
+                <p className="text-sm font-medium leading-tight mb-4">
+                  Os dados vêm da folha de cálculo oficial. Qualquer mudança no Fleetcom será refletida aqui.
+                </p>
+                <a 
+                  href="https://docs.google.com/spreadsheets/d/1eMSJT2nq2Vk12uBcK_Tcph0qLJjRbD1Q/edit" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="px-4 py-3 bg-black text-white text-[10px] font-black uppercase rounded-sm inline-flex items-center gap-2 hover:bg-zinc-900 transition-colors w-full justify-center"
+                >
+                  <FileSpreadsheet className="w-4 h-4" /> Abrir Original
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+  );
+};
+
+const NavItem: React.FC<{ icon: React.ReactNode, label: string, active?: boolean, isOpen: boolean }> = ({ icon, label, active, isOpen }) => (
+  <button className={`w-full flex items-center gap-3 p-3 rounded-sm transition-all ${active ? 'bg-amber-500 text-black' : 'text-zinc-400 hover:bg-zinc-900 hover:text-white'}`}>
+    <span className="w-5 h-5">{icon}</span>
+    {isOpen && <span className="text-xs font-bold uppercase tracking-wider">{label}</span>}
+  </button>
+);
+
+const StatCard: React.FC<{ icon: React.ReactNode, label: string, value: string, trend: string, trendColor: string }> = ({ icon, label, value, trend, trendColor }) => (
+  <div className={`${APP_THEME.card} p-6 rounded-sm hover:border-zinc-700 transition-colors`}>
+    <div className="flex items-center justify-between mb-4">
+      <div className="p-2 bg-black rounded-sm border border-zinc-800">
+        {icon}
+      </div>
+      <span className={`text-[9px] font-bold uppercase tracking-widest ${trendColor}`}>
+        {trend}
+      </span>
+    </div>
+    <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-widest">{label}</p>
+    <p className="text-3xl font-black mt-1 truncate">{value}</p>
+  </div>
+);
+
+const ActionButton: React.FC<{ icon: React.ReactNode, label: string, color: string }> = ({ icon, label, color }) => (
+  <button className={`flex flex-col items-center justify-center gap-2 p-4 rounded-sm transition-all ${color} border border-transparent hover:scale-[1.02] active:scale-[0.98]`}>
+    <span className="w-5 h-5">{icon}</span>
+    <span className="text-[9px] font-black uppercase">{label}</span>
+  </button>
+);
+
+export default App;

@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Produtividade Manfrota - CMM</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+    <style>
+        .note-icon { font-size: 1rem; margin-left: 8px; cursor: help; filter: drop-shadow(0px 0px 4px #ff8c00); }
+        *{margin:0;padding:0;box-sizing:border-box}
+        body{font-family:'Inter',sans-serif;background:#050505;color:#f0f0f0;min-height:100vh;padding-bottom:50px}
+        
+        header{background:#121212;border-bottom:1px solid #00ff9030;padding:20px 24px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
+        .header-title{font-size:1.1rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#fff}
+
+        /* ESTILO DO BOTÃO DO EXCEL NO CABEÇALHO */
+        .excel-btn {
+            display: flex; align-items: center; gap: 8px;
+            background: #107c41; color: #fff; text-decoration: none;
+            padding: 8px 16px; border-radius: 8px; font-size: 0.85rem;
+            font-weight: 600; letter-spacing: 1px; border: 1px solid #1f9e55;
+            transition: all 0.2s ease-in-out; box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+        }
+        .excel-btn:hover { background: #1f9e55; transform: translateY(-2px); box-shadow: 0 4px 10px rgba(16, 124, 65, 0.4); }
+        .excel-btn svg { width: 18px; height: 18px; fill: currentColor; }
+
+        /* ESTILO DOS BOTÕES DE NAVEGAÇÃO SUPERIOR (PADRÃO FOTO 2) */
+        .nav-btn {
+            display: flex; align-items: center; gap: 8px; color: #fff;
+            text-decoration: none; padding: 8px 16px; border-radius: 8px;
+            font-size: 0.8rem; font-weight: 600; letter-spacing: 0.5px;
+            border: 1px solid transparent; transition: all 0.2s ease-in-out;
+        }
+        .nav-btn i { font-size: 14px; }
+
+        .btn-manutencao { background: #2a2a2a; border-color: #555; }
+        .btn-manutencao:hover { background: #444; border-color: #777; transform: translateY(-2px); }
+
+        .btn-almox { background: #ff8c0020; border-color: #ff8c00; color: #ff8c00; }
+        .btn-almox:hover { background: #ff8c00; color: #000; transform: translateY(-2px); box-shadow: 0 4px 10px rgba(255,140,0,0.3); }
+
+        .btn-painel { background: #00ff9020; border-color: #00ff90; color: #00ff90; }
+        .btn-painel:hover { background: #00ff90; color: #000; transform: translateY(-2px); box-shadow: 0 4px 10px rgba(0,255,144,0.3); }
+
+        .btn-garantia { background: #00aaff20; border-color: #00aaff; color: #00aaff; }
+        .btn-garantia:hover { background: #00aaff; color: #000; transform: translateY(-2px); box-shadow: 0 4px 10px rgba(0,170,255,0.3); }
+
+        main{padding:24px;max-width:1400px;margin:0 auto}
+        
+        .section-label{font-size:0.85rem;letter-spacing:2px;color:#fff;text-transform:uppercase;margin:30px 0 15px;font-weight:600;border-left:4px solid #00ff90;padding-left:10px}
+        
+        .main-page-title {
+            font-size: 2rem; font-weight: 700; text-transform: uppercase;
+            color: #fff; margin: 20px 0 25px 0; letter-spacing: 1.5px;
+            border-left: 5px solid #00aaff; padding-left: 15px;
+        }
+
+        .kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:20px;margin-bottom:20px}
+        .kpi-card{background:#161616;border:1px solid #333;border-radius:12px;padding:24px;position:relative;box-shadow: 0 4px 15px rgba(0,0,0,0.5);cursor:pointer;transition:border-color 0.2s}
+        .kpi-card:hover{border-color:#00ff90}
+        .kpi-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--accent,#00ff90)}
+        
+        .kpi-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; }
+        .kpi-label{font-size:0.85rem;color:#ddd;text-transform:uppercase;font-weight:500;letter-spacing:1px}
+        .kpi-icon { font-size: 1.5rem; color: var(--accent); }
+        
+        .kpi-value{font-size:2.5rem;font-weight:700;color:#fff;margin-bottom:5px}
+        .kpi-sub{font-size:0.75rem;color:#aaa;margin-top:5px}
+
+        .dropdown-list{display:none;background:#222;margin-top:15px;border-radius:8px;padding:10px;font-size:0.85rem;max-height:180px;overflow-y:auto;border:1px solid #444;box-shadow:inset 0 0 10px rgba(0,0,0,0.5)}
+        .dropdown-item{display:flex;justify-content:space-between;padding:8px 5px;border-bottom:1px solid #333}
+
+        .charts-grid{display:grid;grid-template-columns:1.5fr 1fr;gap:20px}
+        .chart-card{background:#161616;border:1px solid #333;border-radius:12px;padding:24px;}
+        .card-title{font-size:0.95rem;font-weight:600;color:#fff;margin-bottom:20px;display:block;letter-spacing:1px}
+        .chart-wrapper { position: relative; height: 350px; width: 100%; }
+
+        .table-card{background:#161616;border:1px solid #333;border-radius:12px;padding:24px;margin-top:10px}
+        #searchInput{width:100%;padding:15px;margin-bottom:20px;background:#222;border:1px solid #444;color:#fff;border-radius:8px;outline:none;font-size:1rem}
+        
+        .table-wrapper {max-height: 500px; overflow-y: auto; border: 1px solid #222; border-radius: 8px;}
+        table{width:100%;border-collapse:collapse;font-size:0.9rem}
+        thead th {position: sticky; top: 0; background: #161616; z-index: 10; cursor: pointer; user-select: none;}
+        thead th:hover { background: #222; color: #00ff90; }
+        th{padding:15px;text-align:left;font-size:0.8rem;color:#fff;text-transform:uppercase;border-bottom:2px solid #333;letter-spacing:1px}
+        td{padding:15px;border-bottom:1px solid #222;color:#ccc;cursor:pointer}
+        tr:hover td{background:#ffffff08;color:#fff}
+
+        .tags-container { display: flex; gap: 5px; flex-wrap: wrap; }
+        .badge{padding:4px 10px;border-radius:6px;font-size:0.7rem;font-weight:700;letter-spacing:0.5px}
+        .badge-mec { background:#00aaff20; color:#00aaff; border:1px solid #00aaff50; }
+        .badge-pesado { background:#a855f720; color:#a855f7; border:1px solid #a855f750; }
+        .badge-graf { background:#00ff9020; color:#00ff90; border:1px solid #00ff9050; }
+        .badge-sin { background:#ffdd0020; color:#ffdd00; border:1px solid #ffdd0050; }
+        .badge-tec { background:#ff4d6d20; color:#ff4d6d; border:1px solid #ff4d6d50; }
+        .badge-bor { background:#22d3ee20; color:#22d3ee; border:1px solid #22d3ee50; }
+        .badge-outros { background:#ff8c0020; color:#ff8c00; border:1px solid #ff8c0050; }
+        .badge-descarga { background:#64748b20; color:#94a3b8; border:1px solid #64748b50; }
+
+        #detailsModal{display:none;position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);width:95%;max-width:550px;background:#1a1a1a;border:2px solid #00ff90;border-radius:16px;z-index:1000;padding:30px;box-shadow:0 0 60px rgba(0,0,0,0.9);max-height:90vh;overflow-y:auto}
+        #modalOverlay{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.85);z-index:999}
+        .modal-header{display:flex;justify-content:space-between;margin-bottom:25px;border-bottom:1px solid #333;padding-bottom:15px}
+        .detail-item{margin-bottom:15px;font-size:0.95rem; border-bottom: 1px solid #222; padding-bottom: 8px}
+        .detail-label{color:#00ff90;text-transform:uppercase;font-size:0.7rem;display:block;margin-bottom:4px;font-weight:600}
+        
+        #loader{display:flex;align-items:center;justify-content:center;height:80vh;color:#00ff90;font-weight:bold;letter-spacing:2px}
+        /* Estilo dos novos botões e Modais */
+        .title-container { display: flex; align-items: center; gap: 15px; margin: 20px 0 25px 0; }
+        .btn-intel {
+            background: #1a1a1a; border: 1px solid #333; color: #aaa;
+            padding: 8px 15px; border-radius: 6px; cursor: pointer;
+            font-size: 0.75rem; font-weight: 600; text-transform: uppercase;
+            display: flex; align-items: center; gap: 8px; transition: 0.3s;
+        }
+        .btn-intel:hover { border-color: #00aaff; color: #fff; }
+        .btn-aging-alert {
+            border-color: #ef4444; color: #ef4444;
+            animation: pulse-red 2s infinite;
+        }
+        @keyframes pulse-red {
+            0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); border-color: #ef4444; }
+            50% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); border-color: rgba(239, 68, 68, 0.1); }
+            100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); border-color: #ef4444; }
+        }
+        .modal-base { display:none; position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); width:90%; max-width:600px; background:#161616; border:2px solid #333; border-radius:16px; z-index:2000; padding:25px; box-shadow:0 0 100px #000; max-height:80vh; overflow-y:auto; }
+        .intel-item { display: flex; justify-content: space-between; padding: 12px; background: #222; border-radius: 8px; margin-bottom: 8px; cursor: pointer; border: 1px solid #333; }
+        .intel-item:hover { border-color: #00ff90; }
+    </style>
+</head>
+<body>
+
+<header style="flex-direction: column; align-items: stretch; gap: 15px;">
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+        <div class="header-title">CMM — Gestão e Produtividade (Manfrota)</div>
+        <div style="display: flex; gap: 15px; align-items: center;">
+            <a href="https://docs.google.com/spreadsheets/d/1Ga5eQ_AhuOUkgTut2pfkzaZf_6cRcHHXg2ylLUvVQEs/edit?gid=0#gid=0" target="_blank" class="excel-btn">
+                <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-9 14H6v-2h4v2zm0-4H6v-2h4v2zm0-4H6V7h4v2zm7 8h-5v-2h5v2zm0-4h-5v-2h5v2zm0-4h-5V7h5v2z"/></svg>
+                FONTE DE DADOS
+            </a>
+        </div>
+    </div>
+
+    <div id="top-nav-buttons" style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+        <a href="https://cmmlinhamecanicaapp.netlify.app/" target="_blank" class="nav-btn btn-manutencao">
+            <i class="fas fa-tools"></i> MANUTENÇÃO DE FROTA
+        </a>
+        <a href="https://cmmalmox.netlify.app/" target="_blank" class="nav-btn btn-almox">
+            <i class="fas fa-boxes"></i> ALMOX
+        </a>
+        <a href="https://painelbordocmm.netlify.app/" target="_blank" class="nav-btn btn-painel">
+            <i class="fas fa-desktop"></i> PAINEL DE BORDO CMM
+        </a>
+        <a href="https://garantiascontrolecmm.netlify.app/" target="_blank" class="nav-btn btn-garantia">
+            <i class="fas fa-shield-alt"></i> GARANTIA
+        </a>
+    </div>
+</header>
+
+<main>
+    <div id="loader"><i class="fas fa-cog fa-spin" style="margin-right:10px;"></i> CARREGANDO SISTEMA MANFROTA...</div>
+
+    <div id="dashboard" style="display:none">
+        <div class="title-container">
+            <div class="main-page-title">PRODUTIVIDADE 2026</div>
+            <button class="btn-intel" onclick="openModal('advancedModal')"><i class="fas fa-microchip"></i> Métricas Avançadas</button>
+            <button id="btn-aging" class="btn-intel btn-aging-alert" onclick="openModal('agingModal')" style="display:none;"><i class="fas fa-exclamation-triangle"></i> Alerta de Aging</button>
+        </div>
+
+        <div class="section-label">▸ VOLUMETRIA POR TIPO DE VEÍCULO (Clique no card para lista)</div>
+        <div class="kpi-grid" id="tipo-kpis"></div>
+
+        <div class="section-label">▸ PRODUTIVIDADE SETORIAL (Clique no card para lista)</div>
+        <div class="kpi-grid" id="servico-kpis"></div>
+
+        <div class="section-label">▸ ANÁLISE GRÁFICA GERAL</div>
+        <div class="charts-grid">
+            <div class="chart-card">
+                <span class="card-title">Produtividade Mensal por Seção (2026)</span>
+                <div class="chart-wrapper"><canvas id="chartProdMensal"></canvas></div>
+            </div>
+            <div class="chart-card">
+                <span class="card-title">Distribuição de Atendimentos</span>
+                <div class="chart-wrapper"><canvas id="chartDist"></canvas></div>
+            </div>
+        </div>
+
+        <div class="section-label">▸ VTRs ATENDIDAS E EM ESPERA (Clique nos títulos para ordenar)</div>
+        <div class="table-card">
+            <input type="text" id="searchInput" placeholder="Pesquisar por prefixo, placa, modelo, unidade...">
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th onclick="sortTable(0)">Data Entrada <i class="fas fa-sort"></i></th>
+                            <th onclick="sortTable(1)">Unidade <i class="fas fa-sort"></i></th>
+                            <th onclick="sortTable(2)">Prefixo <i class="fas fa-sort"></i></th>
+                            <th onclick="sortTable(3)">Placa <i class="fas fa-sort"></i></th>
+                            <th onclick="sortTable(4)">Marca/Modelo <i class="fas fa-sort"></i></th>
+                            <th onclick="sortTable(5)">Serviços <i class="fas fa-sort"></i></th>
+                            <th onclick="sortTable(6)">Dias <i class="fas fa-sort"></i></th>
+                        </tr>
+                    </thead>
+                    <tbody id="table-body"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</main>
+<div id="advancedModal" class="modal-base">
+        <div class="modal-header" style="display:flex; justify-content:space-between; margin-bottom:20px; border-bottom:1px solid #333; padding-bottom:10px;">
+            <h3 style="color:#00aaff">Métricas de Gestão</h3>
+            <span onclick="closeAllModals()" style="cursor:pointer; color:#ff4d6d">✕</span>
+        </div>
+        <div id="advancedContent"></div>
+    </div>
+
+    <div id="agingModal" class="modal-base">
+        <div class="modal-header" style="display:flex; justify-content:space-between; margin-bottom:20px; border-bottom:1px solid #333; padding-bottom:10px;">
+            <h3 style="color:#ef4444">VTRs Paradas > 15 Dias</h3>
+            <span onclick="closeAllModals()" style="cursor:pointer; color:#ff4d6d">✕</span>
+        </div>
+        <div id="agingContent"></div>
+    </div>
+
+<div id="modalOverlay" onclick="closeModal()"></div>
+<div id="detailsModal">
+    <div class="modal-header">
+        <h3 id="modalTitle">DETALHES DA VIATURA</h3>
+        <span onclick="closeModal()" style="cursor:pointer;color:#ff4d6d; font-weight:bold">✕ FECHAR</span>
+    </div>
+    <div id="modalContent"></div>
+</div>
+
+<script>
+Chart.defaults.color = '#ffffff';
+Chart.defaults.font.size = 12;
+
+const CSV_URL = "https://docs.google.com/spreadsheets/d/1Ga5eQ_AhuOUkgTut2pfkzaZf_6cRcHHXg2ylLUvVQEs/export?format=csv&gid=0";
+let allData = [];
+let charts = {};
+
+// INTELIGÊNCIA AVANÇADA: VARREDURA COMBINADA DA COLUNA 'PROBLEMA' E 'DESTINO'
+function classifyVtr(modelo, problema, destino) {
+    const m = (modelo || '').toUpperCase();
+    const p = (problema || '').toUpperCase();
+    const d = (destino || '').toUpperCase();
+    
+    // Concatena as duas colunas para o motor do regex não perder nada
+    const textToAnalyze = p + " " + d;
+    
+    let tipoVtr = 'LEVE';
+    if (/(LANDER|HONDA|YAMAHA|BMW|TRIUMPH|XRE|MOTO)/.test(m)) tipoVtr = 'MOTO';
+    if (/(IVECO|BUS|TRUCK|CAMINHÃO|SPRINTER|MICRO|ONIBUS|ÔNIBUS)/.test(m)) tipoVtr = 'PESADO';
+
+    let servicos = [];
+    
+    // Leitura conjunta de todas as áreas
+    if (/\b(MEC|MECÂNICA|MECANICA|MECÃNICA|MECÂNICO|MECANICO|VIDRAÇARIA|VIDRACARIA)\b/.test(textToAnalyze) || textToAnalyze.includes('EM ATENDIMENTO')) servicos.push('LINHA MECÂNICA');
+    if (/\b(TEC|TEC MEC|SET TEC|ST TÉCNICO|SETOR TÉCNICO|PERÍCIA|PERICIA)\b/.test(textToAnalyze)) servicos.push('SETOR TÉCNICO');
+    if (/\b(BOR|BORR|BORRACHARIA)\b/.test(textToAnalyze)) servicos.push('BORRACHARIA');
+    if (/\b(SIN|SINAL|SINALIZ|SINALIZADOR)\b/.test(textToAnalyze)) servicos.push('SINALIZADORES');
+    if (/\b(GRAF|GRA|GRAFIS|GRAFISMO)\b/.test(textToAnalyze)) servicos.push('GRAFISMO');
+    if (/\b(CONTR|CONT|EXEC\.|EXECUÇÃO|GARANT\.|GR|ACIONAMENTO|GARANTIA|CONTRATAÇÃO|CONTRATACAO)\b/.test(textToAnalyze) || textToAnalyze.includes('G. CONT')) servicos.push('CONTRATAÇÃO');
+    if (/\b(DESC|DESCARGA)\b/.test(textToAnalyze)) servicos.push('DESCARGA');
+
+    if (servicos.length === 0) servicos.push('LINHA MECÂNICA');
+    
+    // Adaptação para pesados
+    if (servicos.includes('LINHA MECÂNICA') && tipoVtr === 'PESADO') {
+        servicos = servicos.map(s => s === 'LINHA MECÂNICA' ? 'LINHA MECÂNICA PESADOS' : s);
+    }
+    
+    return { tipoVtr, servicos: [...new Set(servicos)] };
+}
+
+function getBadgeClass(servico) {
+    const map = { 'LINHA MECÂNICA': 'badge-mec', 'LINHA MECÂNICA PESADOS': 'badge-pesado', 'GRAFISMO': 'badge-graf', 'SINALIZADORES': 'badge-sin', 'SETOR TÉCNICO': 'badge-tec', 'BORRACHARIA': 'badge-bor', 'DESCARGA': 'badge-descarga' };
+    return map[servico] || 'badge-outros';
+}
+
+function renderKPIs(data) {
+    let stats = { leves: [], motos: [], pesados: [], mecanica: [], borracharia: [], grafismo: [], tecnico: [], sinaliza: [], contrata: [], descarga: [] };
+    
+    data.forEach(row => {
+        const info = classifyVtr(row['MARCA/MODELO'], row['PROBLEMA RELATADO'], row['DESTINO']);
+        
+        if (info.tipoVtr === 'LEVE') stats.leves.push(row);
+        if (info.tipoVtr === 'MOTO') stats.motos.push(row);
+        if (info.tipoVtr === 'PESADO') stats.pesados.push(row);
+        
+        info.servicos.forEach(serv => {
+            if (serv === 'LINHA MECÂNICA' || serv === 'LINHA MECÂNICA PESADOS') stats.mecanica.push(row);
+            if (serv === 'BORRACHARIA') stats.borracharia.push(row);
+            if (serv === 'GRAFISMO') stats.grafismo.push(row);
+            if (serv === 'SETOR TÉCNICO') stats.tecnico.push(row);
+            if (serv === 'SINALIZADORES') stats.sinaliza.push(row);
+            if (serv === 'CONTRATAÇÃO') stats.contrata.push(row);
+            if (serv === 'DESCARGA') stats.descarga.push(row);
+        });
+    });
+
+    // Lógica para Cálculo Percentual
+    let resolvidasCount = stats.mecanica.length + stats.borracharia.length + stats.grafismo.length + stats.tecnico.length + stats.sinaliza.length;
+    let contratadasCount = stats.contrata.length;
+    let descarregadasCount = stats.descarga.length;
+    let totalServicos = resolvidasCount + contratadasCount + descarregadasCount;
+
+    let percResolvido = totalServicos > 0 ? ((resolvidasCount / totalServicos) * 100).toFixed(1) : 0;
+    let percContratado = totalServicos > 0 ? ((contratadasCount / totalServicos) * 100).toFixed(1) : 0;
+    let percDescarregado = totalServicos > 0 ? ((descarregadasCount / totalServicos) * 100).toFixed(1) : 0;
+
+    const drop = (arr, color) => `<div class="dropdown-list">${arr.slice(0, 10).map(r => `<div class="dropdown-item"><span>${r['PREFIXO']}</span><strong style="color:${color}">${r['TEMPO PARADA'] || 0}d</strong></div>`).join('')}</div>`;
+
+    document.getElementById("tipo-kpis").innerHTML = `
+        <div class="kpi-card" style="--accent:#00aaff" onclick="toggleDropdown(event, 'l-leves')"><div class="kpi-header"><span class="kpi-label">VTR Leves</span><i class="fas fa-car kpi-icon"></i></div><div class="kpi-value">${stats.leves.length}</div>${drop(stats.leves, '#00aaff')}</div>
+        <div class="kpi-card" style="--accent:#00ff90" onclick="toggleDropdown(event, 'l-motos')"><div class="kpi-header"><span class="kpi-label">Motos</span><i class="fas fa-motorcycle kpi-icon"></i></div><div class="kpi-value">${stats.motos.length}</div>${drop(stats.motos, '#00ff90')}</div>
+        <div class="kpi-card" style="--accent:#a855f7" onclick="toggleDropdown(event, 'l-pesados')"><div class="kpi-header"><span class="kpi-label">Pesados</span><i class="fas fa-truck-moving kpi-icon"></i></div><div class="kpi-value">${stats.pesados.length}</div>${drop(stats.pesados, '#a855f7')}</div>
+    `;
+
+    document.getElementById("servico-kpis").innerHTML = `
+        <div class="kpi-card" style="--accent:#00aaff" onclick="toggleDropdown(event, 's-mec')"><div class="kpi-header"><span class="kpi-label">Linha Mecânica</span><i class="fas fa-wrench kpi-icon"></i></div><div class="kpi-value">${stats.mecanica.length}</div>${drop(stats.mecanica, '#00aaff')}</div>
+        <div class="kpi-card" style="--accent:#22d3ee" onclick="toggleDropdown(event, 's-bor')"><div class="kpi-header"><span class="kpi-label">Borracharia</span><i class="fas fa-dot-circle kpi-icon"></i></div><div class="kpi-value">${stats.borracharia.length}</div>${drop(stats.borracharia, '#22d3ee')}</div>
+        <div class="kpi-card" style="--accent:#00ff90" onclick="toggleDropdown(event, 's-graf')"><div class="kpi-header"><span class="kpi-label">Grafismo</span><i class="fas fa-pen-nib kpi-icon"></i></div><div class="kpi-value">${stats.grafismo.length}</div>${drop(stats.grafismo, '#00ff90')}</div>
+        <div class="kpi-card" style="--accent:#ff4d6d" onclick="toggleDropdown(event, 's-tec')"><div class="kpi-header"><span class="kpi-label">Setor Técnico</span><i class="fas fa-microchip kpi-icon"></i></div><div class="kpi-value">${stats.tecnico.length}</div>${drop(stats.tecnico, '#ff4d6d')}</div>
+        <div class="kpi-card" style="--accent:#ffdd00" onclick="toggleDropdown(event, 's-sin')"><div class="kpi-header"><span class="kpi-label">Sinalizadores</span><i class="fas fa-lightbulb kpi-icon"></i></div><div class="kpi-value">${stats.sinaliza.length}</div>${drop(stats.sinaliza, '#ffdd00')}</div>
+        <div class="kpi-card" style="--accent:#ff8c00" onclick="toggleDropdown(event, 's-con')"><div class="kpi-header"><span class="kpi-label">Contratação</span><i class="fas fa-file-contract kpi-icon"></i></div><div class="kpi-value">${stats.contrata.length}</div>${drop(stats.contrata, '#ff8c00')}</div>
+        <div class="kpi-card" style="--accent:#64748b" onclick="toggleDropdown(event, 's-des')"><div class="kpi-header"><span class="kpi-label">Descarga</span><i class="fas fa-trash-alt kpi-icon"></i></div><div class="kpi-value">${stats.descarga.length}</div>${drop(stats.descarga, '#94a3b8')}</div>
+        
+        <div class="kpi-card" style="--accent:#10b981; cursor:default;"><div class="kpi-header"><span class="kpi-label">Perc. Resolvido</span><i class="fas fa-check-circle kpi-icon"></i></div><div class="kpi-value">${percResolvido}%</div><div class="kpi-sub" style="color:#10b981; font-weight:bold">SERVIÇOS INTERNOS</div></div>
+        <div class="kpi-card" style="--accent:#f59e0b; cursor:default;"><div class="kpi-header"><span class="kpi-label">Perc. Contratado</span><i class="fas fa-handshake kpi-icon"></i></div><div class="kpi-value">${percContratado}%</div><div class="kpi-sub" style="color:#f59e0b; font-weight:bold">SERVIÇOS TERCEIRIZADOS</div></div>
+        <div class="kpi-card" style="--accent:#94a3b8; cursor:default;"><div class="kpi-header"><span class="kpi-label">Perc. Descarregado</span><i class="fas fa-arrow-down kpi-icon"></i></div><div class="kpi-value">${percDescarregado}%</div><div class="kpi-sub" style="color:#94a3b8; font-weight:bold">BAIXA / LEILÃO</div></div>
+    `;
+    // Lógica de Inteligência e Aging
+    let baixados = 0; let agingList = [];
+    data.forEach(r => {
+        if (!r['DATA DE SAÍDA'] || r['DATA DE SAÍDA'].trim() === '') {
+            baixados++;
+            if (parseInt(r['TEMPO PARADA'] || 0) > 15) agingList.push(r);
+        }
+    });
+
+    // Atualiza Botão de Aging
+    const btnAging = document.getElementById('btn-aging');
+    if (agingList.length > 0) {
+        btnAging.style.display = 'flex';
+        document.getElementById('agingContent').innerHTML = agingList.map(r => 
+            `<div class="intel-item" onclick="showDetails(${allData.indexOf(r)})">
+                <span>${r['PREFIXO']} - ${r['PLACA']}</span>
+                <b style="color:#ef4444">${r['TEMPO PARADA']} DIAS</b>
+            </div>`).join('');
+    }
+
+    // Conteúdo das Métricas Avançadas
+    const disp = (((941 - baixados) / 941) * 100).toFixed(1);
+    document.getElementById('advancedContent').innerHTML = `
+        <div style="background:#222; padding:15px; border-radius:10px; margin-bottom:15px; border-left:4px solid #10b981">
+            <small>DISPONIBILIDADE DA FROTA</small>
+            <h2>${disp}%</h2>
+            <small>${941 - baixados} VIATURAS OPERANDO (BASE 941)</small>
+        </div>
+        <p style="font-size:0.7rem; color:#aaa; margin-bottom:10px">REINCIDÊNCIAS RECENTES (PLACA/SETOR)</p>
+        <div id="recidiva-list"></div>
+    `;
+    return stats;
+}
+
+function parseDate(str) {
+    if(!str) return null;
+    const clean = str.split(' ')[0];
+    const p = clean.includes('-') ? clean.split('-') : clean.split('/');
+    return p.length < 3 ? null : (p[0].length === 4 ? new Date(p[0], p[1]-1, p[2]) : new Date(p[2], p[1]-1, p[0]));
+}
+
+function renderCharts(data, stats) {
+    if(charts.d) charts.d.destroy(); if(charts.p) charts.p.destroy();
+    const meses = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"];
+    let mProd = meses.reduce((acc, m) => ({...acc, [m]: { "LINHA MECÂNICA": 0, "LINHA MECÂNICA PESADOS": 0, "BORRACHARIA": 0, "GRAFISMO": 0, "SETOR TÉCNICO": 0, "SINALIZADORES": 0 }}), {});
+
+    data.forEach(row => {
+        const info = classifyVtr(row['MARCA/MODELO'], row['PROBLEMA RELATADO'], row['DESTINO']);
+        const dt = parseDate(row['DATA DE ENTRADA NA LINHA']);
+        if(dt && dt.getFullYear() === 2026) {
+            info.servicos.forEach(s => { if(mProd[meses[dt.getMonth()]][s] !== undefined) mProd[meses[dt.getMonth()]][s]++; });
+        }
+    });
+
+    charts.p = new Chart(document.getElementById("chartProdMensal"), {
+        type: 'bar',
+        data: { labels: meses, datasets: [
+            { label: 'Mecânica Leve', data: meses.map(m => mProd[m]["LINHA MECÂNICA"]), backgroundColor: '#00aaff' },
+            { label: 'Mecânica Pesados', data: meses.map(m => mProd[m]["LINHA MECÂNICA PESADOS"]), backgroundColor: '#a855f7' },
+            { label: 'Borracharia', data: meses.map(m => mProd[m]["BORRACHARIA"]), backgroundColor: '#22d3ee' },
+            { label: 'Grafismo', data: meses.map(m => mProd[m]["GRAFISMO"]), backgroundColor: '#00ff90' },
+            { label: 'Setor Técnico', data: meses.map(m => mProd[m]["SETOR TÉCNICO"]), backgroundColor: '#ff4d6d' },
+            { label: 'Sinalizadores', data: meses.map(m => mProd[m]["SINALIZADORES"]), backgroundColor: '#ffdd00' }
+        ]},
+        options: { responsive: true, maintainAspectRatio: false, scales: { x: { stacked: true }, y: { stacked: true, grid: { color: '#333' } } } }
+    });
+
+    charts.d = new Chart(document.getElementById("chartDist"), {
+        type: 'doughnut',
+        data: { labels: ['Leves', 'Motos', 'Pesados'], datasets: [{ data: [stats.leves.length, stats.motos.length, stats.pesados.length], backgroundColor: ['#00aaff', '#00ff90', '#a855f7'], borderWidth: 0 }]},
+        options: { responsive: true, maintainAspectRatio: false, cutout: '70%' }
+    });
+}
+
+function sortTable(n) {
+    const table = document.querySelector("table");
+    let rows, switching = true, i, x, y, shouldSwitch, dir = "asc", switchcount = 0;
+    while (switching) {
+        switching = false; rows = table.rows;
+        for (i = 1; i < (rows.length - 1); i++) {
+            shouldSwitch = false; x = rows[i].getElementsByTagName("TD")[n]; y = rows[i + 1].getElementsByTagName("TD")[n];
+            let cmpX = x.innerHTML.toLowerCase(), cmpY = y.innerHTML.toLowerCase();
+            if(!isNaN(parseInt(cmpX)) && !isNaN(parseInt(cmpY))) { cmpX = parseInt(cmpX); cmpY = parseInt(cmpY); }
+            if (dir == "asc" ? cmpX > cmpY : cmpX < cmpY) { shouldSwitch = true; break; }
+        }
+        if (shouldSwitch) { rows[i].parentNode.insertBefore(rows[i + 1], rows[i]); switching = true; switchcount ++; }
+        else if (switchcount == 0 && dir == "asc") { dir = "desc"; switching = true; }
+    }
+}
+
+function renderTable(data) {
+    document.getElementById("table-body").innerHTML = data.slice().reverse().map(row => {
+        const info = classifyVtr(row['MARCA/MODELO'], row['PROBLEMA RELATADO'], row['DESTINO']);
+        return `<tr onclick="showDetails(${allData.indexOf(row)})">
+            <td>${row['DATA DE ENTRADA NA LINHA'] || ''}</td>
+            <td>${row['UNIDADE'] || ''}</td>
+            <td style="color:#00aaff; font-weight:bold">${row['PREFIXO'] || ''}</td>
+            <td>${row['PLACA'] || ''}</td>
+            <td>${row['MARCA/MODELO'] || ''}</td>
+            <td><div class="tags-container">${info.servicos.map(s => `<span class="badge ${getBadgeClass(s)}">${s}</span>`).join('')}</div></td>
+            <td style="font-weight:bold">${row['TEMPO PARADA'] || 0} d</td>
+        </tr>`;
+    }).join("");
+}
+
+function showDetails(idx) {
+    const r = allData[idx], info = classifyVtr(r['MARCA/MODELO'], r['PROBLEMA RELATADO'], r['DESTINO']);
+    document.getElementById("modalTitle").innerText = `VTR: ${r['PREFIXO'] || r['PLACA']}`;
+    let h = `<div class="detail-item" style="border:1px solid #00aaff; padding:10px; border-radius:8px">${info.servicos.map(s => `<span class="badge ${getBadgeClass(s)}">${s}</span>`).join(' ')}</div><br>`;
+    ['PLACA', 'UNIDADE', 'MARCA/MODELO', 'DATA DE ENTRADA NA LINHA', 'TEMPO PARADA', 'DESTINO'].forEach(k => { if(r[k]) h += `<div class="detail-item"><span class="detail-label">${k}</span>${r[k]}</div>`; });
+    h += `<div style="margin-top:15px; padding:10px; background:#00ff9015; border-left:4px solid #00ff90"><span class="detail-label">PROBLEMA</span>${r['PROBLEMA RELATADO']}</div>`;
+    document.getElementById("modalContent").innerHTML = h;
+    document.getElementById("modalOverlay").style.display = "block";
+    document.getElementById("detailsModal").style.display = "block";
+}
+
+function closeModal() { document.getElementById("modalOverlay").style.display = "none"; document.getElementById("detailsModal").style.display = "none"; }
+function toggleDropdown(e, id) { e.stopPropagation(); document.querySelectorAll('.dropdown-list').forEach(d => { if(d.id !== id) d.style.display = 'none'; }); const el = document.getElementById(id); el.style.display = el.style.display === "block" ? "none" : "block"; }
+
+document.getElementById("searchInput").onkeyup = function() {
+    const t = this.value.toLowerCase();
+    renderTable(allData.filter(r => Object.values(r).some(v => String(v).toLowerCase().includes(t))));
+};
+
+function init() {
+    Papa.parse(CSV_URL, {
+        download: true, header: true, skipEmptyLines: true,
+        complete(res) {
+            allData = res.data.filter(r => (r['DATA DE ENTRADA NA LINHA'] || '').includes('2026') && !/LIBERADO/i.test(r['PROBLEMA RELATADO']));
+            document.getElementById("loader").style.display = "none";
+            document.getElementById("dashboard").style.display = "block";
+            const s = renderKPIs(allData); renderCharts(allData, s); renderTable(allData);
+        }
+    });
+}
+init();
+function openModal(id) { 
+    document.getElementById('modalOverlay').style.display = 'block'; 
+    document.getElementById(id).style.display = 'block'; 
+}
+function closeAllModals() { 
+    document.querySelectorAll('.modal-base, .modal-overlay').forEach(m => m.style.display = 'none'); 
+}
+// Adicione esta linha dentro da sua função showDetails(idx) existente, no topo dela:
+// closeAllModals();
+</script>
+</body>
+</html>

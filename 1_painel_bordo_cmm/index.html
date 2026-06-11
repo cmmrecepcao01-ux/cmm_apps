@@ -1,0 +1,731 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel de Bordo do CMM</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-main: #0b1116;
+            --bg-panel: #121921;
+            --bg-sidebar: #0f151b;
+            --border-color: #202c38;
+            
+            --color-text: #94a3b8;
+            --color-title: #f8fafc;
+            
+            --color-green: #22c55e;
+            --color-green-dark: #12281c;
+            --border-green: #1a422b;
+            --banner-green: #15803d;
+            
+            --color-blue: #3b82f6;
+            --color-blue-dark: #122136;
+            --border-blue: #1c3656;
+            
+            --color-red: #ef4444;
+            --color-red-dark: #2a1515;
+            --border-red: #451d1d;
+            
+            --color-orange: #f59e0b;
+            --color-orange-dark: #2d2112;
+            --border-orange: #453011;
+
+            --color-purple: #a855f7;
+            
+            --sidebar-width: 240px;
+            --sidebar-collapsed: 70px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Roboto', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-main);
+            color: var(--color-text);
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* SIDEBAR & TOGGLE */
+        .sidebar {
+            width: var(--sidebar-width);
+            background-color: var(--bg-sidebar);
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            padding-top: 20px;
+            transition: width 0.3s ease;
+            overflow-x: hidden;
+            flex-shrink: 0;
+        }
+
+        .sidebar.collapsed { width: var(--sidebar-collapsed); }
+
+        .logo-area {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 30px;
+            min-height: 80px;
+        }
+
+        /* Novas classes para as imagens personalizadas */
+        .logo-img {
+            max-height: 90px;
+            width: auto;
+            transition: 0.3s ease;
+        }
+
+        .sidebar.collapsed .logo-img {
+            max-height: 40px; /* Encolhe a imagem quando o menu retrai */
+        }
+
+        .wing-img {
+            height: 65px;
+            margin-left: 15px;
+            object-fit: contain;
+        }
+
+        .menu-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 20px;
+            color: var(--color-text);
+            text-decoration: none;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            transition: 0.3s;
+            white-space: nowrap;
+        }
+
+        .sidebar.collapsed .menu-item { justify-content: center; padding: 15px 0; }
+        .sidebar.collapsed .menu-item span { display: none; }
+
+        .menu-item.active { background-color: #1a2733; color: var(--color-green); border-left: 3px solid var(--color-green); }
+        .menu-item:hover:not(.active) { background-color: rgba(255, 255, 255, 0.05); color: var(--color-title); }
+        .menu-item i { width: 30px; font-size: 16px; text-align: center; }
+        .menu-item span small { display: block; font-size: 9px; font-weight: 400; color: #64748b; margin-top: 2px; }
+
+        /* MAIN CONTENT */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        /* HEADER */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 30px;
+            background-color: var(--bg-main);
+            border-bottom: 1px solid var(--border-color);
+            flex-shrink: 0;
+        }
+
+        .header-left { display: flex; align-items: center; gap: 20px; }
+        .menu-toggle { font-size: 22px; color: var(--color-text); cursor: pointer; transition: 0.2s; }
+        .menu-toggle:hover { color: var(--color-title); }
+
+        .header-titles h1 {
+            color: var(--color-title);
+            font-size: 24px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        /* Header Buttons */
+        .header-links { display: flex; gap: 15px; margin-left: 15px; }
+        
+        .btn-header {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 900;
+            text-decoration: none;
+            color: #fff;
+            transition: 0.2s;
+            text-transform: uppercase;
+        }
+        .btn-intranet { background: #4f46e5; border: 1px solid #4338ca; }
+        .btn-intranet:hover { background: #4338ca; }
+        .btn-sheets { background: #059669; border: 1px solid #047857; }
+        .btn-sheets:hover { background: #047857; }
+
+        .header-titles h2 { color: #64748b; font-size: 13px; font-weight: 500; letter-spacing: 1px; margin-top: 4px; }
+
+        .header-right { display: flex; align-items: center; gap: 15px; }
+        
+        .header-widget {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background-color: var(--bg-panel);
+            border: 1px solid var(--border-color);
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 11px;
+        }
+
+        .header-widget i { font-size: 20px; color: var(--color-green); }
+        .header-widget .info strong { display: block; color: var(--color-title); font-size: 13px; }
+
+        /* DASHBOARD LAYOUT */
+        .dashboard-container {
+            padding: 20px 30px;
+            display: grid;
+            grid-template-columns: minmax(0, 2.2fr) minmax(0, 1fr);
+            gap: 25px;
+            flex: 1;
+        }
+
+        .main-divisions { display: flex; flex-direction: column; gap: 15px; }
+        .side-column { display: flex; flex-direction: column; gap: 20px; height: 100%; }
+
+        /* BANNERS */
+        .section-banner {
+            background-color: var(--banner-green);
+            color: #fff;
+            border: 2px solid #22c55e;
+            padding: 14px;
+            text-align: center;
+            font-size: 16px;
+            font-weight: 900;
+            letter-spacing: 1px;
+            border-radius: 6px;
+            text-transform: uppercase;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+            text-decoration: none;
+            display: block;
+        }
+        
+        a.section-banner:hover { background-color: #166534; border-color: #4ade80; transition: 0.2s; }
+
+        /* INNER GRIDS */
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; flex: 1;}
+
+        /* PANELS */
+        .panel {
+            background-color: var(--bg-panel);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .panel-header {
+            padding: 14px 18px;
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--color-title);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-transform: uppercase;
+        }
+
+        .panel-body { padding: 18px; flex: 1; display: flex; flex-direction: column; justify-content: center;}
+
+        /* Panel Colors */
+        .panel.green { background-color: var(--color-green-dark); border-color: var(--border-green); }
+        .panel.green .panel-header { background-color: rgba(34, 197, 94, 0.1); }
+        .panel.blue { background-color: var(--color-blue-dark); border-color: var(--border-blue); }
+        .panel.blue .panel-header { background-color: rgba(59, 130, 246, 0.1); }
+        .panel.red { background-color: var(--color-red-dark); border-color: var(--border-red); }
+        .panel.red .panel-header { background-color: rgba(239, 68, 68, 0.1); }
+        .panel.orange { background-color: var(--color-orange-dark); border-color: var(--border-orange); }
+        .panel.orange .panel-header { background-color: rgba(245, 158, 11, 0.1); }
+        .panel.neutral { background-color: #1e293b; border-color: #334155; }
+        .panel.neutral .panel-header { background-color: rgba(255, 255, 255, 0.05); }
+
+        /* BUTTON GRIDS */
+        .btn-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .btn-grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
+
+        .btn-item {
+            background-color: rgba(0,0,0,0.3);
+            border: 1px solid rgba(255,255,255,0.05);
+            padding: 14px 12px;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--color-title);
+            cursor: pointer;
+            transition: 0.2s;
+            text-decoration: none;
+        }
+        
+        .btn-item:hover { background-color: rgba(255,255,255,0.1); border-color: var(--color-green); }
+        .btn-item i { color: var(--color-green); font-size: 16px; width: 18px; text-align: center; }
+
+        .sub-title-bar {
+            background-color: rgba(34, 197, 94, 0.15);
+            color: var(--color-title);
+            text-align: center;
+            padding: 10px;
+            font-size: 13px;
+            font-weight: 700;
+            border-radius: 4px;
+            margin: 18px 0 12px 0;
+            border: 1px solid var(--border-green);
+        }
+
+        /* LISTS */
+        .list-group { display: flex; flex-direction: column; gap: 8px; }
+
+        .list-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 14px 16px;
+            background-color: rgba(0,0,0,0.3);
+            border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--color-title);
+            text-decoration: none;
+            transition: 0.2s;
+        }
+
+        .list-item:hover { background-color: rgba(255,255,255,0.1); }
+        .list-item .left { display: flex; align-items: center; gap: 12px; }
+        .list-item .left i { color: #94a3b8; font-size: 16px; width: 18px; text-align: center;}
+        .list-item .right i { color: #64748b; font-size: 14px; }
+        .list-item .sub { display: block; font-size: 10px; color: #64748b; font-weight: 400; margin-top: 3px;}
+        
+        .list-item.green-icon .left i { color: var(--color-green); }
+        .list-item.red-icon .left i { color: var(--color-red); }
+        .list-item.blue-icon .left i { color: var(--color-blue); }
+
+        /* CHECKLIST */
+        .checklist { display: flex; flex-direction: column; gap: 10px; color: var(--color-text); }
+
+        .check-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+            color: var(--color-text);
+            padding: 5px 0;
+            transition: 0.2s;
+            font-size: 12px;
+        }
+        .check-item:hover { color: var(--color-title); }
+        .check-item i { color: var(--color-orange); font-size: 16px; }
+        .check-item.active { color: var(--color-orange); font-weight: 700; }
+        .check-item.active i { color: var(--color-orange); }
+
+        /* STATS BAR */
+        .stats-bar {
+            margin: 0 30px 20px 30px;
+            background-color: var(--bg-panel);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 25px;
+            flex-shrink: 0;
+        }
+
+        .stat-item { display: flex; align-items: center; gap: 15px; }
+        .stat-icon { font-size: 24px; }
+        .stat-info { display: flex; flex-direction: column; }
+        .stat-label { font-size: 10px; font-weight: 700; color: #64748b; letter-spacing: 0.5px; }
+        .stat-value { font-size: 24px; font-weight: 700; color: var(--color-title); line-height: 1.2; }
+        .stat-sub { font-size: 11px; font-weight: 500; }
+
+        .s-green .stat-icon, .s-green .stat-sub { color: var(--color-green); }
+        .s-orange .stat-icon, .s-orange .stat-sub { color: var(--color-orange); }
+        .s-blue .stat-icon, .s-blue .stat-sub { color: #38bdf8; }
+        .s-purple .stat-icon, .s-purple .stat-sub { color: var(--color-purple); }
+
+        .gauge-container { display: flex; align-items: center; gap: 15px; padding-left: 20px; border-left: 1px solid var(--border-color); }
+        .gauge-circle { width: 45px; height: 45px; border-radius: 50%; background: conic-gradient(var(--color-green) 92%, #1e293b 0); display: flex; align-items: center; justify-content: center; }
+        .gauge-inner { width: 35px; height: 35px; border-radius: 50%; background-color: var(--bg-panel); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; color: var(--color-green); }
+
+        .footer { text-align: center; padding: 10px 0 20px 0; font-size: 10px; color: #475569; letter-spacing: 0.5px; flex-shrink: 0; }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: var(--bg-main); }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #475569; }
+
+    </style>
+</head>
+<body>
+
+    <aside class="sidebar" id="sidebar">
+        <div class="logo-area">
+            <img src="cmmlogo.png" alt="Logo CMM" class="logo-img">
+        </div>
+        
+        <a href="#" class="menu-item active"><i class="fa-solid fa-house"></i><span>INÍCIO<small>VISÃO GERAL</small></span></a>
+        <a href="#" class="menu-item"><i class="fa-solid fa-briefcase"></i><span>RECEPÇÃO<small>SEÇÕES E SERVIÇOS</small></span></a>
+        <a href="#" class="menu-item"><i class="fa-solid fa-gauge-high"></i><span>MANUTENÇÃO<small>VEÍCULOS E EQUIPAMENTOS</small></span></a>
+        <a href="#" class="menu-item"><i class="fa-solid fa-truck"></i><span>TRANSPORTE<small>APOIO E LOGÍSTICA</small></span></a>
+        <a href="#" class="menu-item"><i class="fa-solid fa-bus"></i><span>FROTA<small>PLANEJAMENTO E MISSÕES</small></span></a>
+        <a href="#" class="menu-item"><i class="fa-solid fa-gear"></i><span>ADMINISTRAÇÃO<small>FINANÇAS E RECURSOS</small></span></a>
+        <a href="#" class="menu-item"><i class="fa-regular fa-file-lines"></i><span>DOCUMENTOS<small>MANUAIS E REFERÊNCIAS</small></span></a>
+        <a href="#" class="menu-item"><i class="fa-solid fa-chart-simple"></i><span>RELATÓRIOS<small>ANÁLISES E INDICADORES</small></span></a>
+        <a href="#" class="menu-item"><i class="fa-solid fa-gear"></i><span>CONFIGURAÇÕES<small>SISTEMA E ACESSOS</small></span></a>
+    </aside>
+
+    <main class="main-content">
+        
+        <header class="header">
+            <div class="header-left">
+                <i class="fa-solid fa-bars menu-toggle" id="sidebarToggle"></i>
+                <div class="header-titles">
+                    <h1>
+                        PAINEL DE BORDO DO CMM
+                        <div class="header-links">
+                            <a href="https://www9.intranet.policiamilitar.sp.gov.br/unidades/cmm/" target="_blank" class="btn-header btn-intranet">
+                                <i class="fa-solid fa-building-shield"></i> INTRANET
+                            </a>
+                            <a href="https://docs.google.com/spreadsheets/d/1sxVqCUfZPyMFaQS103da-mtSxy-VCX-83yX0Y52TyPQ/edit?gid=0#gid=0" target="_blank" class="btn-header btn-sheets">
+                                <i class="fa-solid fa-file-excel"></i> PLANO OPERACIONAL CMM
+                            </a>
+                        </div>
+                    </h1>
+                    <h2>CENTRO DE MANUTENÇÃO E MECÂNICA</h2>
+                </div>
+            </div>
+            
+            <div class="header-right">
+                <div class="header-widget">
+                    <i class="fa-regular fa-calendar-days"></i>
+                    <div class="info">
+                        <strong id="current-date">CARREGANDO...</strong>
+                        <span id="current-day-time"></span>
+                    </div>
+                </div>
+                <div class="header-widget">
+                    <i class="fa-solid fa-user"></i>
+                    <div class="info">
+                        <strong>USUÁRIO</strong>
+                        <span>ADM CMM <i class="fa-solid fa-caret-down" style="font-size: 10px; color: #64748b; margin-left: 5px;"></i></span>
+                    </div>
+                </div>
+                
+                <img src="cmmasa.png" alt="Wing Logo" class="wing-img">
+            </div>
+        </header>
+
+        <div class="dashboard-container">
+            
+            <div class="main-divisions">
+                
+                <div class="section-banner">DIVISÃO DE MANUTENÇÃO E TRANSPORTE</div>
+
+                <a href="https://docs.google.com/spreadsheets/d/1oo7Y40IlF34D5T_UOnzeF-yCeR6DX3ihUzjRUU_w25w/edit?usp=sharing" target="_blank" class="section-banner link" style="background-color: var(--color-green-dark); border-color: var(--color-green);">
+                    <i class="fa-solid fa-folder-open" style="margin-right: 8px;"></i> RECEPÇÃO
+                </a>
+
+                <div class="grid-2">
+                    
+                    <div class="panel green" style="height: 100%;">
+                        <div class="panel-header"><i class="fa-solid fa-wrench"></i> SEÇÃO DE MANUTENÇÃO</div>
+                        <div class="panel-body">
+                            <div class="btn-grid">
+                                <a href="#" class="btn-item"><i class="fa-solid fa-motorcycle"></i> LINHA 2 RODAS</a>
+                                <a href="#" class="btn-item"><i class="fa-solid fa-car"></i> LINHA 4 RODAS</a>
+                                <a href="#" class="btn-item"><i class="fa-solid fa-truck"></i> LINHA PESADOS</a>
+                                <a href="#" class="btn-item"><i class="fa-solid fa-traffic-light"></i> SINALIZADORES</a>
+                                <a href="#" class="btn-item"><i class="fa-solid fa-pen-ruler"></i> GRAFISMO</a>
+                                <a href="#" class="btn-item"><i class="fa-solid fa-gears"></i> TÉCNICA</a>
+                                <a href="#" class="btn-item"><i class="fa-solid fa-life-ring"></i> BORRACHARIA</a>
+                                <a href="#" class="btn-item"><i class="fa-solid fa-boxes-stacked"></i> ALMOXARIFADO</a>
+                            </div>
+
+                            <div class="sub-title-bar"><i class="fa-regular fa-calendar-check"></i> PEDIDOS DE AGENDAMENTO</div>
+
+                            <div class="btn-grid-3">
+                                <a href="#" class="btn-item" style="justify-content: center;"><i class="fa-solid fa-pen-nib"></i> GRAFISMO</a>
+                                <a href="#" class="btn-item" style="justify-content: center;"><i class="fa-solid fa-lightbulb"></i> SINALIZADOR</a>
+                                <a href="#" class="btn-item" style="justify-content: center;"><i class="fa-solid fa-circle-notch"></i> BORRACHARIA</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="display: flex; flex-direction: column; gap: 20px; height: 100%;">
+                        
+                        <div class="panel blue" style="flex: 1;">
+                            <div class="panel-header"><i class="fa-solid fa-file-signature"></i> SEÇÃO DE EXECUÇÃO CONTRATUAL</div>
+                            <div class="panel-body">
+                                <div class="list-group">
+                                    <a href="#" class="list-item blue-icon">
+                                        <div class="left"><i class="fa-regular fa-file"></i> GERAL</div>
+                                        <div class="right"><i class="fa-solid fa-chevron-right"></i></div>
+                                    </a>
+                                    <a href="#" class="list-item blue-icon">
+                                        <div class="left">
+                                            <i class="fa-solid fa-file-contract"></i> 
+                                            <div>ARP DE MANUTENÇÃO<span class="sub">2025-2026</span></div>
+                                        </div>
+                                        <div class="right"><i class="fa-solid fa-chevron-right"></i></div>
+                                    </a>
+                                    <a href="#" class="list-item blue-icon">
+                                        <div class="left"><i class="fa-solid fa-list-check"></i> CONTRATOS DE AQUISIÇÃO DE FROTA</div>
+                                        <div class="right"><i class="fa-solid fa-chevron-right"></i></div>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="panel blue" style="flex: 0 0 auto;">
+                            <div class="panel-header"><i class="fa-solid fa-truck-moving"></i> SEÇÃO DE APOIO E TRANSPORTE</div>
+                            <div class="panel-body">
+                                <div class="list-group">
+                                    <a href="#" class="list-item blue-icon">
+                                        <div class="left"><i class="fa-solid fa-map-location-dot"></i> MAPA DA SAT</div>
+                                        <div class="right"><i class="fa-solid fa-chevron-right"></i></div>
+                                    </a>
+                                    <a href="#" class="list-item blue-icon">
+                                        <div class="left">
+                                            <i class="fa-solid fa-id-card"></i> 
+                                            <div>MUDANÇA DE CATEGORIA<span class="sub">CLASSE C e D</span></div>
+                                        </div>
+                                        <div class="right"><i class="fa-solid fa-chevron-right"></i></div>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <div class="section-banner" style="margin-top: 10px;">DIVISÃO DE ADMINISTRAÇÃO E FINANÇAS</div>
+
+                <div class="grid-2">
+                    
+                    <div class="panel green">
+                        <div class="panel-header"><i class="fa-solid fa-car-side"></i> SEÇÃO DE ADM FROTA</div>
+                        <div class="panel-body">
+                            <div class="list-group">
+                                <a href="#" class="list-item green-icon">
+                                    <div class="left"><i class="fa-solid fa-map"></i> MAPA DA SAF</div>
+                                    <div class="right"><i class="fa-solid fa-chevron-right"></i></div>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="panel green">
+                        <div class="panel-header"><i class="fa-solid fa-coins"></i> SEÇÃO DE FINANÇAS</div>
+                        <div class="panel-body">
+                            <div class="list-group">
+                                <a href="#" class="list-item green-icon">
+                                    <div class="left"><i class="fa-solid fa-file-invoice-dollar"></i> ADIANTAMENTOS</div>
+                                    <div class="right"><i class="fa-solid fa-chevron-right"></i></div>
+                                </a>
+                                <a href="#" class="list-item green-icon">
+                                    <div class="left"><i class="fa-solid fa-handshake"></i> CONTRATAÇÕES</div>
+                                    <div class="right"><i class="fa-solid fa-chevron-right"></i></div>
+                                </a>
+                                <a href="#" class="list-item green-icon">
+                                    <div class="left"><i class="fa-solid fa-laptop-file"></i> PCA-E</div>
+                                    <div class="right"><i class="fa-solid fa-chevron-right"></i></div>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="panel green">
+                        <div class="panel-header"><i class="fa-solid fa-gas-pump"></i> SEÇ MATERIAL E COMBUSTÍVEL</div>
+                        <div class="panel-body">
+                            <div class="list-group">
+                                <a href="#" class="list-item green-icon">
+                                    <div class="left"><i class="fa-solid fa-plus"></i> ADICIONAR LINK</div>
+                                    <div class="right"><i class="fa-solid fa-chevron-right"></i></div>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="panel green">
+                        <div class="panel-header"><i class="fa-solid fa-building"></i> SEÇÃO ADMINISTRATIVA</div>
+                        <div class="panel-body">
+                            <div class="list-group">
+                                <a href="#" class="list-item green-icon">
+                                    <div class="left"><i class="fa-solid fa-plus"></i> ADICIONAR LINK</div>
+                                    <div class="right"><i class="fa-solid fa-chevron-right"></i></div>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="side-column">
+                
+                <div class="panel red">
+                    <div class="panel-header"><i class="fa-solid fa-file-pdf"></i> DOCUMENTOS E PLANEJAMENTO</div>
+                    <div class="panel-body">
+                        <div class="list-group">
+                            <a href="#" class="list-item red-icon">
+                                <div class="left"><i class="fa-solid fa-file-excel"></i> PLANILHA MÃE DA FROTA 19-24</div>
+                                <div class="right"><i class="fa-solid fa-chevron-right"></i></div>
+                            </a>
+                            <a href="#" class="list-item red-icon">
+                                <div class="left"><i class="fa-solid fa-file-excel"></i> PLANILHA MÃE DA FROTA 25-26</div>
+                                <div class="right"><i class="fa-solid fa-chevron-right"></i></div>
+                            </a>
+                            <a href="#" class="list-item red-icon">
+                                <div class="left"><i class="fa-solid fa-file-lines"></i> TERMOS DE REFERÊNCIA - DL</div>
+                                <div class="right"><i class="fa-solid fa-chevron-right"></i></div>
+                            </a>
+                            <a href="#" class="list-item red-icon">
+                                <div class="left"><i class="fa-solid fa-book"></i> BOOK TÉCNICO DA FROTA - DL</div>
+                                <div class="right"><i class="fa-solid fa-chevron-right"></i></div>
+                            </a>
+                            <a href="#" class="list-item red-icon">
+                                <div class="left"><i class="fa-solid fa-file-alt"></i> PNCP 2026</div>
+                                <div class="right"><i class="fa-solid fa-chevron-right"></i></div>
+                            </a>
+                            <a href="#" class="list-item red-icon">
+                                <div class="left"><i class="fa-solid fa-file-signature"></i> CLASSIFICAÇÃO GRUPO VIATURAS</div>
+                                <div class="right"><i class="fa-solid fa-chevron-right"></i></div>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="panel orange">
+                    <div class="panel-header"><i class="fa-solid fa-clipboard-check"></i> MISSÕES CMM</div>
+                    <div class="panel-body">
+                        <div class="checklist">
+                            <a href="#" class="check-item"><i class="fa-regular fa-circle-check"></i> AJUSTE DE FROTA 2022</a>
+                            <a href="#" class="check-item"><i class="fa-regular fa-circle-check"></i> AJUSTE DE FROTA 2023</a>
+                            <a href="#" class="check-item"><i class="fa-regular fa-circle-check"></i> OPERAÇÃO VERÃO 2022/2023</a>
+                            <a href="#" class="check-item"><i class="fa-regular fa-circle-check"></i> OPERAÇÃO VERÃO 2023/2024</a>
+                            <a href="#" class="check-item"><i class="fa-regular fa-circle-check"></i> REMANEJAMENTO FORÇA TÁTICA</a>
+                            <a href="#" class="check-item"><i class="fa-regular fa-circle-check"></i> REMANEJAMENTO MOTOS</a>
+                            <a href="#" class="check-item"><i class="fa-regular fa-circle-check"></i> CONSULTA ARP MANUTENÇÃO</a>
+                            <a href="#" class="check-item active"><i class="fa-solid fa-circle-check"></i> FORMULÁRIO SPIN</a>
+                            <a href="#" class="check-item active"><i class="fa-solid fa-circle-check"></i> RESULTADO VISTORIAS DE SPIN</a>
+                            <a href="#" class="check-item active"><i class="fa-solid fa-circle-check"></i> FORMULÁRIO OP VERÃO 2024</a>
+                            <a href="#" class="check-item active"><i class="fa-solid fa-circle-check"></i> RESULTADO OP VERÃO 2024</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="panel neutral" style="flex: 0 0 auto;">
+                    <div class="panel-header"><i class="fa-solid fa-folder"></i> PNCP 2025</div>
+                    <div class="panel-body" style="padding: 15px;">
+                         <div class="list-group">
+                            <a href="#" class="list-item">
+                                <div class="left"><i class="fa-solid fa-link"></i> ACESSAR DOCUMENTOS</div>
+                                <div class="right"><i class="fa-solid fa-chevron-right"></i></div>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="panel neutral" style="flex: 1; display: flex; flex-direction: column;">
+                    <div class="panel-header"><i class="fa-solid fa-magnifying-glass-chart"></i> SEÇ PESQUISA DE FROTA</div>
+                    <div class="panel-body" style="flex: 1;">
+                         <div class="list-group">
+                            <a href="#" class="list-item blue-icon" style="justify-content: center; background-color: var(--color-blue-dark); border-color: var(--color-blue);">
+                                <div class="left" style="color: var(--color-title);"><i class="fa-solid fa-file-contract" style="color: var(--color-blue);"></i> CONTROLE DE ATAS VIGENTES</div>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="stats-bar">
+            <div class="stat-item s-green">
+                <i class="fa-solid fa-truck stat-icon"></i>
+                <div class="stat-info"><span class="stat-label">VIATURAS ATIVAS</span><span class="stat-value">1.247</span><span class="stat-sub">+12 este mês</span></div>
+            </div>
+            <div class="stat-item s-orange">
+                <i class="fa-solid fa-screwdriver-wrench stat-icon"></i>
+                <div class="stat-info"><span class="stat-label">MANUTENÇÕES</span><span class="stat-value">86</span><span class="stat-sub">+8 este mês</span></div>
+            </div>
+            <div class="stat-item s-blue">
+                <i class="fa-regular fa-calendar-check stat-icon"></i>
+                <div class="stat-info"><span class="stat-label">AGENDAMENTOS</span><span class="stat-value">23</span><span class="stat-sub">+5 este mês</span></div>
+            </div>
+            <div class="stat-item s-purple">
+                <i class="fa-solid fa-file-signature stat-icon"></i>
+                <div class="stat-info"><span class="stat-label">CONTRATOS ATIVOS</span><span class="stat-value">12</span><span class="stat-sub">Em execução</span></div>
+            </div>
+            <div class="gauge-container">
+                <div class="gauge-circle"><div class="gauge-inner">92%</div></div>
+                <div class="gauge-text" style="display:flex; flex-direction:column;">
+                    <span class="stat-label">STATUS GERAL</span>
+                    <span style="color: var(--color-green); font-size: 11px; font-weight: 700;">OPERAÇÃO NORMAL</span>
+                </div>
+            </div>
+        </div>
+
+        <footer class="footer">
+            DIVISÃO DE MANUTENÇÃO E TRANSPORTE &nbsp;&nbsp;•&nbsp;&nbsp; DIVISÃO DE ADMINISTRAÇÃO E FINANÇAS 
+            &nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;&nbsp;
+            CMM - CENTRO DE MANUTENÇÃO E MECÂNICA &nbsp;&nbsp;•&nbsp;&nbsp; EXÉRCITO BRASILEIRO 🇧🇷
+        </footer>
+
+    </main>
+
+    <script>
+        // Lógica do Menu Retrátil
+        document.getElementById('sidebarToggle').addEventListener('click', function() {
+            document.getElementById('sidebar').classList.toggle('collapsed');
+        });
+
+        // Lógica do Relógio e Calendário Dinâmicos
+        function updateDateTime() {
+            const now = new Date();
+            const days = ['DOMINGO', 'SEGUNDA-FEIRA', 'TERÇA-FEIRA', 'QUARTA-FEIRA', 'QUINTA-FEIRA', 'SEXTA-FEIRA', 'SÁBADO'];
+            const months = ['JANEIRO', 'FEVEREIRO', 'MARÇO', 'ABRIL', 'MAIO', 'JUNHO', 'JULHO', 'AGOSTO', 'SETEMBRO', 'OUTUBRO', 'NOVEMBRO', 'DEZEMBRO'];
+            
+            const dayOfWeek = days[now.getDay()];
+            const day = now.getDate();
+            const month = months[now.getMonth()];
+            const year = now.getFullYear();
+            
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            const seconds = String(now.getSeconds()).padStart(2, '0');
+            
+            const dateStr = `${day} DE ${month} DE ${year}`;
+            const timeStr = `${dayOfWeek} • ${hours}:${minutes}:${seconds}`;
+            
+            document.getElementById('current-date').textContent = dateStr;
+            document.getElementById('current-day-time').textContent = timeStr;
+        }
+
+        updateDateTime();
+        setInterval(updateDateTime, 1000);
+    </script>
+</body>
+</html>

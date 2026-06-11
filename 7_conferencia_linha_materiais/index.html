@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Conferência de Ferramentas - CMM</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --bg-main: #0b1116;
+            --bg-panel: #121921;
+            --border-color: #202c38;
+            --color-text: #94a3b8;
+            --color-title: #f8fafc;
+            --color-green: #22c55e;
+            --color-red: #ef4444;
+            --color-blue: #3b82f6;
+            --color-orange: #f59e0b;
+            --color-purple: #a855f7;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Roboto', sans-serif; }
+        
+        body { 
+            background-color: var(--bg-main); 
+            color: var(--color-text); 
+            padding: 20px; 
+            line-height: 1.6;
+        }
+
+        .container { max-width: 1400px; margin: 0 auto; }
+
+        .header {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 20px; background-color: var(--bg-panel);
+            border: 1px solid var(--border-color); border-radius: 12px; margin-bottom: 20px;
+        }
+        .header h1 { color: var(--color-title); font-size: 22px; letter-spacing: 1px; }
+
+        .header-links { display: flex; gap: 12px; margin-top: 15px; }
+        .btn-nav {
+            display: inline-flex; align-items: center; gap: 8px;
+            padding: 10px 20px; border-radius: 8px; font-size: 11px;
+            font-weight: 900; text-decoration: none; color: #fff;
+            transition: 0.2s; text-transform: uppercase;
+        }
+        .btn-bordo { background: var(--color-purple); border: 1px solid #9333ea; }
+        .btn-bordo:hover { background: #9333ea; transform: scale(1.05); }
+        .btn-dados { background: var(--color-green); border: 1px solid #16a34a; }
+        .btn-dados:hover { background: #16a34a; transform: scale(1.05); }
+
+        .kpi-container { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); 
+            gap: 20px; 
+            margin-bottom: 20px; 
+        }
+        .card {
+            background-color: var(--bg-panel); border: 1px solid var(--border-color);
+            padding: 20px; border-radius: 12px; text-align: center; cursor: pointer; transition: 0.3s;
+            display: flex; flex-direction: column; justify-content: center;
+        }
+        .card:hover { border-color: var(--color-blue); background: #161f28; }
+        .card i { font-size: 28px; margin-bottom: 10px; }
+        .card h3 { font-size: 13px; color: var(--color-text); text-transform: uppercase; margin-bottom: 10px; }
+        .card .value { font-weight: 900; color: var(--color-title); }
+        .card .subtitle { margin-top: 5px; font-weight: bold; }
+
+        .main-grid { 
+            display: grid; 
+            grid-template-columns: 1fr 1fr;
+            gap: 20px; 
+            margin-bottom: 20px;
+        }
+        
+        .chart-box { 
+            background-color: var(--bg-panel); 
+            border: 1px solid var(--border-color); 
+            padding: 20px; 
+            border-radius: 12px; 
+            height: 450px; 
+            position: relative;
+        }
+        .chart-box.auto-height { height: auto; }
+        .chart-box h2 { font-size: 14px; color: var(--color-title); margin-bottom: 20px; text-transform: uppercase; border-left: 3px solid var(--color-blue); padding-left: 10px; }
+
+        .ai-item {
+            background-color: rgba(59, 130, 246, 0.05);
+            border: 1px solid #1c3656;
+            padding: 15px 20px;
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .ai-item strong { color: var(--color-title); font-size: 16px; }
+        .ai-badge { 
+            background-color: rgba(239, 68, 68, 0.2); 
+            color: var(--color-red); 
+            border: 1px solid var(--color-red);
+            padding: 6px 12px; 
+            border-radius: 20px; 
+            font-weight: 900; 
+            font-size: 13px; 
+        }
+
+        .details-container {
+            background-color: var(--bg-panel); border: 1px solid var(--border-color);
+            padding: 20px; border-radius: 12px; display: none; margin-top: 20px;
+        }
+        .details-container h2 { font-size: 16px; color: var(--color-title); margin-bottom: 15px; border-left: 3px solid var(--color-green); padding-left: 10px; }
+        .opinion-item {
+            padding: 15px; border-bottom: 1px solid var(--border-color); display: flex; gap: 20px; align-items: flex-start;
+        }
+        .status-tag { min-width: 100px; font-weight: bold; font-size: 12px; }
+        .opinion-text { color: var(--color-title); font-size: 14px; line-height: 1.4; }
+
+        #loader { text-align: center; padding: 100px; font-size: 20px; color: var(--color-blue); }
+
+        @media (max-width: 1000px) {
+            .main-grid { grid-template-columns: 1fr; }
+            .chart-box { height: 350px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div id="loader"><i class="fas fa-circle-notch fa-spin"></i> Sincronizando Inventário de Ferramentas...</div>
+
+        <div id="dashboard" style="display:none;">
+            <header class="header">
+                <div>
+                    <h1>CONFERÊNCIA DE FERRAMENTAS</h1>
+                    <div class="header-links">
+                        <a href="https://painelbordocmm.netlify.app/" target="_blank" class="btn-nav btn-bordo">
+                            <i class="fas fa-desktop"></i> PAINEL DE BORDO CMM
+                        </a>
+                        <a href="https://docs.google.com/spreadsheets/d/1LA7AOKZlumv3ySXiUI3PHnm_VwZqkHlnaqxY1uOXRuE/edit?usp=sharing" target="_blank" class="btn-nav btn-dados">
+                            <i class="fas fa-database"></i> FONTE DE DADOS
+                        </a>
+                    </div>
+                </div>
+                <div style="text-align: right;">
+                    <div id="total-respostas" style="font-size: 22px; font-weight: 900; color: var(--color-title);">0</div>
+                    <span style="font-size: 11px; color: var(--color-text);">CONFERÊNCIAS EFETIVADAS</span>
+                </div>
+            </header>
+
+            <div class="kpi-container">
+                <div class="card" onclick="showDetails('Geral')">
+                    <i class="fas fa-star" style="color: var(--color-orange);"></i>
+                    <h3>Nível de Conformidade</h3>
+                    <div class="value" id="kpi-conformidade" style="font-size: 26px;">0%</div>
+                    <div class="subtitle" style="font-size: 11px; color: var(--color-blue);">APENAS ITENS FINALIZADOS</div>
+                </div>
+                <div class="card" id="card-melhor">
+                    <i class="fas fa-users" style="color: var(--color-green);"></i>
+                    <h3>Principal Conferente</h3>
+                    <div class="value" id="melhor-nome" style="font-size: 24px; line-height: 1.2; margin-bottom: 5px;">---</div>
+                    <div class="subtitle" id="melhor-valor" style="font-size: 18px; color: var(--color-green);">0 CONFERÊNCIAS</div>
+                </div>
+                <div class="card" id="card-pior">
+                    <i class="fas fa-exclamation-triangle" style="color: var(--color-red);"></i>
+                    <h3>Inconformidades</h3>
+                    <div class="value" id="total-problemas" style="font-size: 26px; line-height: 1.2; margin-bottom: 5px;">0</div>
+                    <div class="subtitle" style="font-size: 18px; color: var(--color-red);">REPAROS / FALTAS REAIS</div>
+                </div>
+            </div>
+
+            <div class="main-grid">
+                <div class="chart-box">
+                    <h2>Ranking de Atividade</h2>
+                    <canvas id="barChart"></canvas>
+                </div>
+                <div class="chart-box">
+                    <h2>Status das Vistorias Realizadas</h2>
+                    <canvas id="pieChart"></canvas>
+                </div>
+            </div>
+
+            <div class="chart-box auto-height" style="margin-bottom: 20px;">
+                <h2><i class="fas fa-robot" style="color: var(--color-orange); margin-right: 8px;"></i> Assistente de Inventário (IA CMM)</h2>
+                <div id="ai-suggestions" style="display: flex; flex-direction: column;">
+                </div>
+            </div>
+
+            <div class="details-container" id="detailsSection">
+                <h2 id="detailsTitle"><i class="fas fa-history" style="margin-right: 8px;"></i> Histórico de Conferências (Últimas 15)</h2>
+                <div id="opinionsList">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const SHEET_URL = 'https://docs.google.com/spreadsheets/d/1LA7AOKZlumv3ySXiUI3PHnm_VwZqkHlnaqxY1uOXRuE/export?format=csv&gid=2094100731';
+        
+        let allData = [];
+
+        function init() {
+            Papa.parse(SHEET_URL, {
+                download: true,
+                header: true,
+                skipEmptyLines: true,
+                complete: function(results) {
+                    allData = results.data;
+                    document.getElementById('loader').style.display = 'none';
+                    document.getElementById('dashboard').style.display = 'block';
+                    processData(results.data);
+                }
+            });
+        }
+
+        function processData(data) {
+            let conforme = 0;
+            let inconforme = 0;
+            let userCounts = {};
+
+            data.forEach(row => {
+                const status = (row['STATUS_CONFERENCIA'] || '').toUpperCase();
+                const userRaw = row['CONFERENTES (chefe e auxiliar)'] || '';
+                
+                // Ignora linhas PENDENTES ou sem nome de conferente
+                if (status === 'PENDENTE' || status === '' || userRaw.trim() === '') return;
+
+                // SEPARA TODOS OS NOMES PELA VÍRGULA
+                const users = userRaw.split(',');
+                
+                const prob = (row['HÁ PROBLEMAS A RELATAR?'] || '').toUpperCase();
+
+                if(status === 'CONFORME') {
+                    conforme++;
+                } else {
+                    inconforme++;
+                }
+
+                // ADICIONA +1 PARA CADA PESSOA QUE PARTICIPOU DA CONFERÊNCIA
+                users.forEach(u => {
+                    let nomeLimpo = u.trim(); // Remove espaços em branco antes ou depois do nome
+                    if(nomeLimpo !== '') {
+                        userCounts[nomeLimpo] = (userCounts[nomeLimpo] || 0) + 1;
+                    }
+                });
+            });
+
+            let totalEfetivo = conforme + inconforme;
+
+            // KPIs baseados apenas no que foi efetivado
+            document.getElementById('kpi-conformidade').innerText = totalEfetivo > 0 ? ((conforme / totalEfetivo) * 100).toFixed(1) + "%" : "0%";
+            document.getElementById('total-respostas').innerText = totalEfetivo;
+            document.getElementById('total-problemas').innerText = inconforme;
+
+            let topUsers = Object.entries(userCounts).sort((a,b) => b[1] - a[1]);
+            if (topUsers.length > 0) {
+                document.getElementById('melhor-nome').innerText = topUsers[0][0];
+                document.getElementById('melhor-valor').innerText = topUsers[0][1] + " CONFERÊNCIAS";
+            }
+
+            renderCharts(userCounts, conforme, inconforme);
+            generateAIAnalysis(data);
+        }
+
+        function renderCharts(userCounts, conf, inconf) {
+            new Chart(document.getElementById('barChart'), {
+                type: 'bar',
+                data: {
+                    labels: Object.keys(userCounts).slice(0, 7),
+                    datasets: [{
+                        label: 'Conferências',
+                        data: Object.values(userCounts).slice(0, 7),
+                        backgroundColor: '#3b82f6',
+                        borderRadius: 5
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: { 
+                        x: { grid: { color: '#202c38' }, ticks: { color: '#94a3b8' } },
+                        y: { ticks: { color: '#f8fafc' }, grid: { display: false } }
+                    },
+                    plugins: { legend: { display: false } }
+                }
+            });
+
+            new Chart(document.getElementById('pieChart'), {
+                type: 'doughnut',
+                data: {
+                    labels: ['CONFORME', 'INCONFORME'],
+                    datasets: [{
+                        data: [conf, inconf],
+                        backgroundColor: ['#22c55e', '#ef4444'],
+                        borderWidth: 0
+                    }]
+                },
+                options: { 
+                    responsive: true, 
+                    maintainAspectRatio: false, 
+                    layout: { padding: 20 },
+                    plugins: { 
+                        legend: { 
+                            position: 'bottom', 
+                            labels: { color: '#f8fafc', font: { size: 13, weight: 'bold' } } 
+                        } 
+                    },
+                    cutout: '65%'
+                }
+            });
+        }
+
+        function generateAIAnalysis(data) {
+            let tools = {
+                "Sangrador de Freio": ["SANGRADOR", "FREIO"],
+                "Chave de Impacto": ["IMPACTO", "CHAVE"],
+                "Parafusadeira": ["PARAFUSADEIRA"],
+                "Scanner Automotivo": ["SCANNER"],
+                "Multímetro": ["MULTIMETRO"],
+                "Carregador de Bateria": ["CARREGADOR", "BATERIA"],
+                "Inflador de Pneus": ["INFLADOR", "PNEU"]
+            };
+
+            let toolIssues = {};
+            Object.keys(tools).forEach(k => toolIssues[k] = 0);
+
+            data.forEach(row => {
+                let text = (row['ITENS_FALTANDO'] || row['DESCREVA O PROBLEMA'] || "").toUpperCase();
+                Object.keys(tools).forEach(tool => {
+                    if(tools[tool].some(k => text.includes(k))) toolIssues[tool]++;
+                });
+            });
+
+            let sorted = Object.entries(toolIssues).filter(a => a[1] > 0).sort((a,b) => b[1] - a[1]);
+            let container = document.getElementById('ai-suggestions');
+            let html = "";
+
+            if(sorted.length > 0) {
+                sorted.forEach((item, index) => {
+                    html += `
+                    <div class="ai-item">
+                        <div>
+                            <span style="color: var(--color-orange); font-weight: 900; margin-right: 15px; font-size: 18px;">${index + 1}º</span>
+                            <strong>Repor / Revisar: ${item[0]}</strong>
+                        </div>
+                        <div class="ai-badge">${item[1]} OCORRÊNCIAS</div>
+                    </div>`;
+                });
+            } else {
+                html = `<div style="color: var(--color-green); font-weight: bold; padding: 10px;">A integridade do ferramental está garantida conforme os últimos registros.</div>`;
+            }
+            container.innerHTML = html;
+        }
+
+        function showDetails(tipo) {
+            const section = document.getElementById('detailsSection');
+            const list = document.getElementById('opinionsList');
+            section.style.display = 'block';
+            list.innerHTML = "";
+
+            // Filtra apenas o que não é pendente para o histórico
+            allData.filter(r => (r['STATUS_CONFERENCIA'] || '').toUpperCase() !== 'PENDENTE' && (r['CONFERENTES (chefe e auxiliar)'] || '').trim() !== '').reverse().slice(0, 15).forEach(row => {
+                const status = (row['STATUS_CONFERENCIA'] || 'PENDENTE').toUpperCase();
+                let div = document.createElement('div');
+                div.className = 'opinion-item';
+                div.innerHTML = `
+                    <div class="status-tag" style="color: ${status === 'CONFORME' ? '#22c55e' : '#ef4444'}">${status}</div>
+                    <div class="opinion-body">
+                        <div class="opinion-text"><strong>${row['DATA E HORÁRIO DE CONFERÊNCIA'] || 'Data N/A'}</strong> - Problemas: ${row['DESCREVA O PROBLEMA'] || 'Nenhum'}</div>
+                        <div style="font-size: 11px; color: var(--color-blue)">Faltando: ${row['ITENS_FALTANDO'] || 'Nada'}</div>
+                    </div>
+                `;
+                list.appendChild(div);
+            });
+            section.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        init();
+    </script>
+</body>
+</html>
