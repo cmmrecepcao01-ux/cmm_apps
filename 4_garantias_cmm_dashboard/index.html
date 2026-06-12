@@ -460,6 +460,7 @@ function toggleDropdown(event, id) {
 
 function renderKPIs(data) {
     const resolvidos = data.filter(row => String(findVal(row, MAP.situacao)).toLowerCase() === 'true').length;
+    const pendentes = data.length - resolvidos;
     const diasArray = data.map(r => getDias(r));
     const maxAtraso = Math.max(...diasArray, 0);
     const topAtrasos = [...data].sort((a,b) => getDias(b) - getDias(a)).slice(0,10);
@@ -471,7 +472,13 @@ function renderKPIs(data) {
     document.getElementById("main-kpis").innerHTML = `
         <div class="kpi-card" style="--accent:#00ff90" onclick="toggleDropdown(event, 'list-total')">
             <div class="kpi-label">Veículos reportados</div>
-            <div class="kpi-value">${data.length}</div>
+            <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 5px;">
+                <div class="kpi-value" style="margin-bottom: 0;">${data.length}</div>
+                <div style="text-align: center;">
+                    <div style="font-size: 1.25rem; font-weight: 700; color: #ff4d6d; line-height: 1;">${pendentes}</div>
+                    <div style="font-size: 0.65rem; color: #aaa; margin-top: 2px;">pendentes</div>
+                </div>
+            </div>
             <div class="kpi-sub" style="color:#00ff90; font-weight:bold">VER FROTA COMPLETA ▼</div>
             <div id="list-total" class="dropdown-list" onclick="event.stopPropagation()">
                 ${data.slice(0,15).map(r => `<div class="dropdown-item"><span>${findVal(r, MAP.placa)} - <span style="color:#aaa">${findVal(r, MAP.marca)}</span></span><strong>${getDias(r)} d</strong></div>`).join('')}
@@ -511,6 +518,7 @@ function renderKPIs(data) {
     document.getElementById("brand-kpis").innerHTML = marcas.map((m, i) => {
         const vtrs = data.filter(r => findVal(r, MAP.marca) === m);
         const maxM = Math.max(...vtrs.map(r => getDias(r)), 0);
+        const pendentesMarca = vtrs.filter(r => String(findVal(r, MAP.situacao)).toLowerCase() !== 'true').length;
         return `
             <div class="kpi-card" style="--accent:#00aaff" onclick="toggleDropdown(event, 'brand-${i}')">
                 
@@ -523,7 +531,13 @@ function renderKPIs(data) {
                     </button>
                 </div>
 
-                <div class="kpi-value">${vtrs.length} <small style="font-size:1rem">VTRs</small></div>
+                <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 5px;">
+                    <div class="kpi-value" style="margin-bottom: 0;">${vtrs.length} <small style="font-size:1rem">VTRs</small></div>
+                    <div style="text-align: center;">
+                        <div style="font-size: 1.25rem; font-weight: 700; color: #ff4d6d; line-height: 1;">${pendentesMarca}</div>
+                        <div style="font-size: 0.65rem; color: #aaa; margin-top: 2px;">pendentes</div>
+                    </div>
+                </div>
                 <div class="kpi-sub" style="color:#00aaff; font-weight:bold">Máximo: ${maxM} d ▼</div>
                 
                 <div id="brand-${i}" class="dropdown-list" onclick="event.stopPropagation()">

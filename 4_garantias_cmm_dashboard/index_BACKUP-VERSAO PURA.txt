@@ -169,6 +169,7 @@
         .btn-menor { background: #333; color: #fff; border: 1px solid #555; border-radius: 4px; padding: 4px 10px; cursor: pointer; font-size: 0.8rem; font-weight: bold; }
         .btn-menor:hover { background: #444; border-color: #ffdd00; }
     </style>
+<base target="_blank">
 </head>
 <body>
 
@@ -220,9 +221,9 @@
     <div id="dashboard" style="display:none">
         <div style="display: flex; justify-content: space-between; align-items: center; margin: 30px 0 15px;">
     <div class="section-label" style="margin: 0; border-left: 4px solid #00ff90; padding-left: 10px;">▸ INDICADORES GERAIS (Clique no card para abrir lista)</div>
-    <button onclick="abrirGeradorNotificacao()" class="nav-btn btn-notificacao" style="font-size: 0.75rem; padding: 6px 12px;">
-        📜 GERAR NOTIFICAÇÃO
-    </button>
+    <a href="https://drive.google.com/drive/folders/1XCuR_KFL9xGySxF4pOxlGgVGeOwSwWaK?usp=sharing" target="_blank" class="nav-btn btn-notificacao" style="font-size: 0.75rem; padding: 6px 12px; text-decoration: none;">
+        📁 PASTA DRIVE
+    </a>
 </div>
         
         <div class="kpi-grid" id="main-kpis"></div>
@@ -342,82 +343,6 @@
 </div>
 </div>
 
-<div id="notifModalOverlay" onclick="fecharGeradorNotificacao()" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.85);z-index:2000;"></div>
-<div id="notifModal" style="display:none;position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);width:95%;max-width:700px;background:#161616;border:2px solid #ffdd00;border-radius:12px;z-index:2001;padding:25px;box-shadow:0 0 40px rgba(255,221,0,0.2);max-height:90vh;flex-direction:column;">
-    <div style="display:flex;justify-content:space-between;margin-bottom:15px;border-bottom:1px solid #333;padding-bottom:10px;">
-        <h3 style="color:#ffdd00;letter-spacing:1px;text-transform:uppercase;">📜 MODELO DE NOTIFICAÇÃO OFICIAL</h3>
-        <span onclick="fecharGeradorNotificacao()" style="cursor:pointer;color:#fff;font-weight:bold;">✕ FECHAR</span>
-    </div>
-    <div id="formNotificacaocorpo" style="overflow-y:auto;flex:1;padding-right:10px;">
-        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:12px;">
-            <div class="form-group">
-                <label>Filtrar Viaturas por Marca</label>
-                <select id="notifFiltroMarca">
-                    <option value="RENAULT">RENAULT</option>
-                    <option value="TOYOTA">TOYOTA</option>
-                    <option value="GM">GM / CHEVROLET</option>
-                    <option value="TODAS">TODAS AS PENDENTES (MISTO)</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label>Número da Notificação</label>
-                <input type="text" id="notifNumero" placeholder="Ex: 025">
-            </div>
-        </div>
-        <div class="form-group">
-            <label>Autoridade Remetente (De:)</label>
-            <select id="notifRemetente">
-                <option value="Gestor do Contrato">Gestor do Contrato</option>
-                <option value="Fiscal do Contrato">Fiscal do Contrato</option>
-            </select>
-        </div>
-        <div class="form-group">
-            <label>Destinatário (Ao Sr./Sra.)</label>
-            <input type="text" id="notifDestinatario" value="Diretor de Relacionamento Institucional - Concessionária">
-        </div>
-        <div class="form-group">
-            <label>Assunto(s) <button class="btn-menor" onclick="adicionarCampoDinamico('container-assuntos', 'Assunto')">+ Adicionar</button></label>
-            <div id="container-assuntos">
-                <div class="dinamico-row"><input type="text" class="input-assunto" value="Notificação por negativa de atendimento de garantia e revisões obrigatórias"></div>
-            </div>
-        </div>
-        <div class="form-group">
-            <label>Referência(s) <button class="btn-menor" onclick="adicionarCampoDinamico('container-referencias', 'Referência')">+ Adicionar</button></label>
-            <div id="container-referencias">
-                <div class="dinamico-row"><input type="text" class="input-referencia" value="PREGÃO ELETRÔNICO Nº PR-90047/24"></div>
-                <div class="dinamico-row"><input type="text" class="input-referencia" value="PROCESSO SEI Nº 057.00394330/2024-67"></div>
-                <div class="dinamico-row"><input type="text" class="input-referencia" value="TR nº 86/2026"></div>
-                <div class="dinamico-row"><input type="text" class="input-referencia" value="CONTRATOS: DL-011/13/25 DL-021/13/25 DL-039/13/25 DL-041/13/25 DL-044/13/25 DL-045/13/25 DL-047/13/25 DL-053/13/25 DL-054/13/25 DL-056/13/25 DL-058/13/25 DL-059/13/25 DL-060/13/25 DL-061/13/25 DL-074/13/25 DL-083/13/25 DL-095/13/25 DL-103/13/25 DL-105/13/25 DL-119/13/25"></div>
-            </div>
-        </div>
-        <div class="form-group">
-            <label>Texto do Parágrafo 1 (Editável)</label>
-            <textarea id="notifParagrafo1" rows="3">Em razão das diversas ocorrências de negativas de revisão, pelas diversas concessionárias autorizadas, bem como da necessidade de garantir a plena disponibilidade da frota de viaturas, o Centro de Motomecanização, representado pelo Gestor de Contratos, informa:</textarea>
-        </div>
-        <div class="form-group">
-            <label>Texto do Parágrafo 1.1 e 1.2 (Editável)</label>
-            <textarea id="notifParagrafo1sub" rows="4">1.1. considerando a Cláusula 5.4. do Termo de Referência nº 86/2024, que trata de garantias, manutenção, assistência técnica e entrega;&#10;1.2. o termo de referência em seu item 5.4.6, impõe que todas as revisões previstas no manual do proprietário, em razão da quilometragem ou tempo de uso e obrigatórias para preservação da garantia, terão os custos decorrentes da mão-de-obra e substituição de peças previstas para as respectivas revisões, suportados exclusivamente pela fornecedora dos veículos, não cabendo quaisquer ônus à PMESP.</textarea>
-        </div>
-        <div class="form-group">
-            <label>Texto do Parágrafo 2 (Editável)</label>
-            <textarea id="notifParagrafo2" rows="3">O Gestor do Contrato vem NOTIFICAR oficialmente V.S.ª para que providencie a resolução imediata dos problemas de acionamento da garantia, visando a realização da revisão correspondente às quilometragens rodadas, das viaturas abaixo relacionadas:</textarea>
-        </div>
-        <div class="form-group">
-            <label>Texto do Parágrafo 3 e 3.1 (Editável)</label>
-            <textarea id="notifParagrafo3" rows="3">Conforme informado por diversas Concessionárias e relatado por diversas OPM detentoras dos veículos, houve negativa no atendimento por falta de pagamento das revisões, por parte da empresa contratada pela Polícia Militar;&#10;3.1. Havendo reincidência, medidas administrativas de sanção contratual serão aplicadas.</textarea>
-        </div>
-        <div class="form-group">
-            <label>Prazo Limite para Resposta</label>
-            <input type="text" id="notifPrazo" value="48 (quarenta e oito) horas úteis">
-        </div>
-    </div>
-    <div style="margin-top:15px; padding-top:10px; border-top:1px solid #333; display:flex; justify-content:flex-end;">
-        <button onclick="gerarDocumentoFinal()" style="background:#ffdd00; color:#000; border:none; padding:12px 24px; font-weight:bold; border-radius:6px; cursor:pointer; font-size:0.95rem; letter-spacing:0.5px;">
-            🖨️ GERAR DOCUMENTO E IMPRIMIR
-        </button>
-    </div>
-</div>
-
 <div id="modalOverlay" onclick="closeModal()"></div>
 <div id="detailsModal">
     <div class="modal-header" style="margin-bottom:15px; padding-bottom:10px;">
@@ -451,6 +376,10 @@ let cacheBancoDados = null;
 // BANCO DE DADOS DE LINKS DO PROCESSO SEI
 const MAPA_LINKS_SEI = {
     "057.00394330/2024-67": "https://sei.sp.gov.br/sei/controlador.php?acao=procedimento_trabalhar&acao_origem=procedimento_controlar&acao_retorno=procedimento_controlar&id_procedimento=46785914&infra_sistema=100000100&infra_unidade_atual=110023083&infra_hash=ca9b2786197603af32a275b62bc8e80f7f3844180f0cd14fe5749cef6126c72a",
+    "057.00075079/2025-15": "https://sei.sp.gov.br/sei/controlador.php?acao=procedimento_trabalhar&acao_origem=procedimento_controlar&acao_retorno=procedimento_controlar&id_procedimento=67078030&infra_sistema=100000100&infra_unidade_atual=110023083&infra_hash=1d4eb046e952a31a2d26136baae4b5bac8377888c288d32547c204b37cbb674d",
+    "057.00247829/2026-48": "https://sei.sp.gov.br/sei/controlador.php?acao=procedimento_trabalhar&acao_origem=procedimento_controlar&acao_retorno=procedimento_controlar&id_procedimento=126708230&infra_sistema=100000100&infra_unidade_atual=110023083&infra_hash=4954a6f6a962959fbce6b1786e0ec96dc3d39b388a1858e01d57aeb101a58c25",
+    "057.00019237/2023-95": "https://sei.sp.gov.br/sei/controlador.php?acao=procedimento_trabalhar&acao_origem=protocolo_pesquisa_rapida&id_protocolo=1952262&infra_sistema=100000100&infra_unidade_atual=110023083&infra_hash=cf3b5579b56e78a787132160ed612c25e539bfa0987d2e8dad29576b414ec17d",
+   
     // Para adicionar novos futuramente, basta colocar uma vírgula na linha de cima e escrever:
     // "NÚMERO_DO_SEI": "LINK_DO_SEI"
 };
@@ -531,6 +460,7 @@ function toggleDropdown(event, id) {
 
 function renderKPIs(data) {
     const resolvidos = data.filter(row => String(findVal(row, MAP.situacao)).toLowerCase() === 'true').length;
+    const pendentes = data.length - resolvidos;
     const diasArray = data.map(r => getDias(r));
     const maxAtraso = Math.max(...diasArray, 0);
     const topAtrasos = [...data].sort((a,b) => getDias(b) - getDias(a)).slice(0,10);
@@ -542,7 +472,13 @@ function renderKPIs(data) {
     document.getElementById("main-kpis").innerHTML = `
         <div class="kpi-card" style="--accent:#00ff90" onclick="toggleDropdown(event, 'list-total')">
             <div class="kpi-label">Veículos reportados</div>
-            <div class="kpi-value">${data.length}</div>
+            <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 5px;">
+                <div class="kpi-value" style="margin-bottom: 0;">${data.length}</div>
+                <div style="text-align: center;">
+                    <div style="font-size: 1.25rem; font-weight: 700; color: #fff; line-height: 1;">${pendentes}</div>
+                    <div style="font-size: 0.65rem; color: #aaa; margin-top: 2px;">pendentes</div>
+                </div>
+            </div>
             <div class="kpi-sub" style="color:#00ff90; font-weight:bold">VER FROTA COMPLETA ▼</div>
             <div id="list-total" class="dropdown-list" onclick="event.stopPropagation()">
                 ${data.slice(0,15).map(r => `<div class="dropdown-item"><span>${findVal(r, MAP.placa)} - <span style="color:#aaa">${findVal(r, MAP.marca)}</span></span><strong>${getDias(r)} d</strong></div>`).join('')}
@@ -582,6 +518,7 @@ function renderKPIs(data) {
     document.getElementById("brand-kpis").innerHTML = marcas.map((m, i) => {
         const vtrs = data.filter(r => findVal(r, MAP.marca) === m);
         const maxM = Math.max(...vtrs.map(r => getDias(r)), 0);
+        const pendentesMarca = vtrs.filter(r => String(findVal(r, MAP.situacao)).toLowerCase() !== 'true').length;
         return `
             <div class="kpi-card" style="--accent:#00aaff" onclick="toggleDropdown(event, 'brand-${i}')">
                 
@@ -594,7 +531,13 @@ function renderKPIs(data) {
                     </button>
                 </div>
 
-                <div class="kpi-value">${vtrs.length} <small style="font-size:1rem">VTRs</small></div>
+                <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 5px;">
+                    <div class="kpi-value" style="margin-bottom: 0;">${vtrs.length} <small style="font-size:1rem">VTRs</small></div>
+                    <div style="text-align: center;">
+                        <div style="font-size: 1.25rem; font-weight: 700; color: #fff; line-height: 1;">${pendentesMarca}</div>
+                        <div style="font-size: 0.65rem; color: #aaa; margin-top: 2px;">pendentes</div>
+                    </div>
+                </div>
                 <div class="kpi-sub" style="color:#00aaff; font-weight:bold">Máximo: ${maxM} d ▼</div>
                 
                 <div id="brand-${i}" class="dropdown-list" onclick="event.stopPropagation()">
