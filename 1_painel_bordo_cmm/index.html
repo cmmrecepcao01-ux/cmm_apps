@@ -375,6 +375,338 @@
         ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
         ::-webkit-scrollbar-thumb:hover { background: #475569; }
 
+
+        /* PAINEL RÁPIDO OVERLAY STYLES */
+        .painel-rapido-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: rgba(11, 17, 22, 0.4);
+            backdrop-filter: blur(10px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease-in-out;
+        }
+
+        .painel-rapido-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .painel-rapido-modal {
+            background-color: rgba(22, 101, 52, 0.85); /* Fundo verde translúcido */
+            border: 4px solid var(--color-green);
+            border-radius: 16px;
+            width: 80%;
+            max-width: 900px;
+            padding: 30px 40px 40px 40px;
+            position: relative;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+            transform: scale(0.85);
+            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 30px;
+        }
+
+        .painel-rapido-overlay.active .painel-rapido-modal {
+            transform: scale(1);
+        }
+
+        .painel-rapido-close {
+            position: absolute;
+            top: 20px;
+            right: 30px;
+            background: none;
+            border: none;
+            color: #fff;
+            font-size: 24px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+
+        .painel-rapido-close:hover {
+            color: var(--color-red);
+        }
+
+        .painel-rapido-title {
+            color: #fff;
+            font-size: 32px;
+            font-weight: 900;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            text-align: center;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+        }
+
+        .painel-rapido-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px 25px;
+            width: 100%;
+        }
+
+        /* Botões Azuis em Relevo 3D */
+        .btn-rapido {
+            background-color: #0f2d59; /* Azul escuro */
+            border: 2px solid #1c3d73;
+            color: #fff;
+            padding: 24px 15px;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 900;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            text-align: center;
+            cursor: pointer;
+            box-shadow: 0 8px 0 #07172e, 0 12px 20px rgba(0,0,0,0.4);
+            transition: all 0.1s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 85px;
+            user-select: none;
+        }
+
+        .btn-rapido:hover {
+            background-color: #12376d;
+            border-color: #22c55e;
+        }
+
+        .btn-rapido:active {
+            transform: translateY(6px);
+            box-shadow: 0 2px 0 #07172e, 0 4px 10px rgba(0,0,0,0.4);
+        }
+
+        /* Busca de Carro Modal Específico */
+        .busca-modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: rgba(11, 17, 22, 0.85);
+            backdrop-filter: blur(5px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease-in-out;
+        }
+
+        .busca-modal-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .busca-modal-content {
+            background-color: var(--bg-panel);
+            border: 2px solid var(--border-color);
+            border-left: 5px solid var(--color-green);
+            border-radius: 8px;
+            width: 90%;
+            max-width: 650px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            transform: translateY(-20px);
+            transition: transform 0.3s ease-out;
+            position: relative;
+        }
+
+        .busca-modal-overlay.active .busca-modal-content {
+            transform: translateY(0);
+        }
+
+        .busca-modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .busca-modal-title {
+            color: var(--color-title);
+            font-size: 18px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .busca-modal-title i {
+            color: var(--color-green);
+        }
+
+        .busca-modal-close {
+            background: none;
+            border: none;
+            color: var(--color-text);
+            font-size: 20px;
+            cursor: pointer;
+        }
+
+        .busca-modal-close:hover {
+            color: var(--color-title);
+        }
+
+        .busca-modal-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .busca-modal-field {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .busca-modal-field label {
+            font-size: 10px;
+            font-weight: 700;
+            color: #64748b;
+            text-transform: uppercase;
+        }
+
+        .busca-modal-input {
+            background-color: rgba(0,0,0,0.3);
+            border: 1px solid var(--border-color);
+            color: var(--color-title);
+            padding: 10px 12px;
+            border-radius: 4px;
+            font-size: 12px;
+            transition: all 0.2s ease;
+        }
+
+        .busca-modal-input:focus {
+            border-color: var(--color-green);
+            outline: none;
+        }
+
+        .busca-modal-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            border-top: 1px solid var(--border-color);
+            padding-top: 15px;
+        }
+
+        .busca-modal-results {
+            margin-top: 20px;
+            max-height: 250px;
+            overflow-y: auto;
+            display: none;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .busca-modal-results-header {
+            font-size: 11px;
+            font-weight: 700;
+            color: #64748b;
+            text-transform: uppercase;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 5px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        /* Reusable Results Styling */
+        .busca-result-card {
+            background-color: rgba(0,0,0,0.2);
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            padding: 10px 15px;
+            display: grid;
+            grid-template-columns: 100px 1fr 120px;
+            align-items: center;
+            gap: 15px;
+            font-size: 12px;
+        }
+
+        .busca-result-card .plate {
+            font-family: monospace;
+            background-color: #0b1116;
+            color: #fff;
+            padding: 4px 8px;
+            border-radius: 4px;
+            border: 1px solid #334155;
+            font-weight: 700;
+            text-align: center;
+        }
+
+        .busca-result-card .info {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .busca-result-card .info strong {
+            color: var(--color-title);
+        }
+
+        .busca-result-card .info span {
+            color: #64748b;
+            font-size: 10px;
+        }
+
+        .busca-result-card .status {
+            text-align: right;
+            font-size: 10px;
+            font-weight: 700;
+            color: var(--color-orange);
+        }
+
+        .busca-result-card .status.active {
+            color: var(--color-green);
+        }
+
+        /* Botão Hero Cadê o Carro destacado */
+        .btn-rapido-hero {
+            background-color: #0f2d59;
+            border: 2px solid var(--color-green);
+            color: #fff;
+            padding: 20px 30px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 900;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            cursor: pointer;
+            box-shadow: 0 8px 0 #07172e, 0 12px 20px rgba(0,0,0,0.4);
+            transition: all 0.1s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            min-height: 75px;
+            width: 100%;
+            max-width: 280px;
+            user-select: none;
+            margin-bottom: 5px;
+        }
+
+        .btn-rapido-hero:hover {
+            background-color: #12376d;
+            border-color: #4ade80;
+        }
+
+        .btn-rapido-hero:active {
+            transform: translateY(6px);
+            box-shadow: 0 2px 0 #07172e, 0 4px 10px rgba(0,0,0,0.4);
+        }
+
     </style>
 </head>
 <body>
@@ -448,8 +780,8 @@
 
                 <div class="grid-2">
                     
-                    <div class="panel green" style="height: 100%;">
-                        <div class="panel-header"><i class="fa-solid fa-wrench"></i> SEÇÃO DE MANUTENÇÃO</div>
+                    <div id="secao-manutencao" class="panel green" style="height: 100%;">
+                        <div class="panel-header"><i class="fa-solid fa-wrench"></i> SEÇÃO DE MANUTENÇÃO DE FROTA</div>
                         <div class="panel-body">
                             <div class="btn-grid">
                                 <a href="#" class="btn-item"><i class="fa-solid fa-motorcycle"></i> LINHA 2 RODAS</a>
@@ -460,6 +792,7 @@
                                 <a href="#" class="btn-item"><i class="fa-solid fa-gears"></i> TÉCNICA</a>
                                 <a href="#" class="btn-item"><i class="fa-solid fa-life-ring"></i> BORRACHARIA</a>
                                 <a href="#" class="btn-item"><i class="fa-solid fa-boxes-stacked"></i> ALMOXARIFADO</a>
+                                <a href="https://cmmpaineldebordo.netlify.app/4_garantias_cmm_dashboard/" target="_blank" class="btn-item" style="grid-column: span 2; justify-content: center;"><i class="fa-solid fa-shield-halved"></i> GARANTIA</a>
                             </div>
 
                             <div class="sub-title-bar"><i class="fa-regular fa-calendar-check"></i> PEDIDOS DE AGENDAMENTO</div>
@@ -474,7 +807,7 @@
 
                     <div style="display: flex; flex-direction: column; gap: 20px; height: 100%;">
                         
-                        <div class="panel blue" style="flex: 1;">
+                        <div id="secao-contratos" class="panel blue" style="flex: 1;">
                             <div class="panel-header"><i class="fa-solid fa-file-signature"></i> SEÇÃO DE EXECUÇÃO CONTRATUAL</div>
                             <div class="panel-body">
                                 <div class="list-group">
@@ -497,7 +830,7 @@
                             </div>
                         </div>
 
-                        <div class="panel blue" style="flex: 0 0 auto;">
+                        <div id="secao-sat" class="panel blue" style="flex: 0 0 auto;">
                             <div class="panel-header"><i class="fa-solid fa-truck-moving"></i> SEÇÃO DE APOIO E TRANSPORTE</div>
                             <div class="panel-body">
                                 <div class="list-group">
@@ -523,7 +856,7 @@
 
                 <div class="grid-2">
                     
-                    <div class="panel green">
+                    <div id="secao-saf" class="panel green">
                         <div class="panel-header"><i class="fa-solid fa-car-side"></i> SEÇÃO DE ADM FROTA</div>
                         <div class="panel-body">
                             <div class="list-group">
@@ -535,7 +868,7 @@
                         </div>
                     </div>
 
-                    <div class="panel green">
+                    <div id="secao-uge" class="panel green">
                         <div class="panel-header"><i class="fa-solid fa-coins"></i> SEÇÃO DE FINANÇAS</div>
                         <div class="panel-body">
                             <div class="list-group">
@@ -555,7 +888,7 @@
                         </div>
                     </div>
 
-                    <div class="panel green">
+                    <div id="secao-material" class="panel green">
                         <div class="panel-header"><i class="fa-solid fa-gas-pump"></i> SEÇ MATERIAL E COMBUSTÍVEL</div>
                         <div class="panel-body">
                             <div class="list-group">
@@ -567,7 +900,7 @@
                         </div>
                     </div>
 
-                    <div class="panel green">
+                    <div id="secao-adm" class="panel green">
                         <div class="panel-header"><i class="fa-solid fa-building"></i> SEÇÃO ADMINISTRATIVA</div>
                         <div class="panel-body">
                             <div class="list-group">
@@ -636,7 +969,7 @@
                     </div>
                 </div>
 
-                <div class="panel neutral" style="flex: 0 0 auto;">
+                <div id="secao-pncp" class="panel neutral" style="flex: 0 0 auto;">
                     <div class="panel-header"><i class="fa-solid fa-folder"></i> PNCP 2025</div>
                     <div class="panel-body" style="padding: 15px;">
                          <div class="list-group">
@@ -648,7 +981,7 @@
                     </div>
                 </div>
 
-                <div class="panel neutral" style="flex: 1; display: flex; flex-direction: column;">
+                <div id="secao-pesquisa" class="panel neutral" style="flex: 1; display: flex; flex-direction: column;">
                     <div class="panel-header"><i class="fa-solid fa-magnifying-glass-chart"></i> SEÇ PESQUISA DE FROTA</div>
                     <div class="panel-body" style="flex: 1;">
                          <div class="list-group">
@@ -691,15 +1024,310 @@
         <footer class="footer">
             DIVISÃO DE MANUTENÇÃO E TRANSPORTE &nbsp;&nbsp;•&nbsp;&nbsp; DIVISÃO DE ADMINISTRAÇÃO E FINANÇAS 
             &nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;&nbsp;
-            CMM - CENTRO DE MOTOMECANIZAÇÃO &nbsp;&nbsp;•&nbsp;&nbsp; EXÉRCITO BRASILEIRO 🇧🇷
+            CMM - CENTRO DE MOTOMECANIZAÇÃO &nbsp;&nbsp;•&nbsp;&nbsp; PMESP 🇧🇷
         </footer>
 
     </main>
+
+    <!-- TELA OVERLAY: PAINEL RÁPIDO -->
+    <div id="painel-rapido" class="painel-rapido-overlay active">
+        <div class="painel-rapido-modal">
+            <button class="painel-rapido-close" id="btnFecharPainel">X</button>
+            <h2 class="painel-rapido-title">PAINEL RÁPIDO</h2>
+            
+            <!-- Botão Cadê o Carro destacado acima da grade de botões -->
+            <button class="btn-rapido-hero" id="btnCadeOCarro">
+                <i class="fa-solid fa-magnifying-glass-car"></i> CADÊ O CARRO?
+            </button>
+            
+            <div class="painel-rapido-grid">
+                
+                <!-- Linha 1 -->
+                <button class="btn-rapido" data-section="secao-manutencao">
+                    <div style="display:flex; flex-direction:column; align-items:center; gap:8px;">
+                        <div style="display:flex; gap:6px; font-size: 20px;">
+                            <i class="fa-solid fa-screwdriver-wrench"></i>
+                            <i class="fa-solid fa-car"></i>
+                        </div>
+                        <span>MANUTENÇÃO DE FROTA</span>
+                    </div>
+                </button>
+                <button class="btn-rapido" data-section="secao-contratos">
+                    <div style="display:flex; flex-direction:column; align-items:center; gap:8px;">
+                        <div style="display:flex; gap:6px; font-size: 20px;">
+                            <i class="fa-solid fa-file-signature"></i>
+                            <i class="fa-solid fa-car"></i>
+                        </div>
+                        <span>EXECUÇÃO CONTRATUAL</span>
+                    </div>
+                </button>
+                <button class="btn-rapido" data-section="secao-sat">
+                    <div style="display:flex; flex-direction:column; align-items:center; gap:8px;">
+                        <div style="font-size: 20px;">
+                            <i class="fa-solid fa-truck"></i>
+                        </div>
+                        <span>SAT</span>
+                    </div>
+                </button>
+                
+                <!-- Linha 2 -->
+                <button class="btn-rapido" data-section="secao-saf">
+                    <div style="display:flex; flex-direction:column; align-items:center; gap:8px;">
+                        <div style="display:flex; gap:6px; font-size: 20px;">
+                            <i class="fa-solid fa-display"></i>
+                            <i class="fa-solid fa-car"></i>
+                        </div>
+                        <span>SAF</span>
+                    </div>
+                </button>
+                <button class="btn-rapido" data-section="secao-uge">
+                    <div style="display:flex; flex-direction:column; align-items:center; gap:8px;">
+                        <div style="font-size: 20px;">
+                            <i class="fa-solid fa-file-invoice-dollar"></i>
+                        </div>
+                        <span>UGE</span>
+                    </div>
+                </button>
+                <button class="btn-rapido" data-section="secao-material">
+                    <div style="display:flex; flex-direction:column; align-items:center; gap:8px;">
+                        <div style="display:flex; gap:6px; font-size: 20px;">
+                            <i class="fa-solid fa-boxes-stacked"></i>
+                            <i class="fa-solid fa-gas-pump"></i>
+                        </div>
+                        <span>MAT/COMB</span>
+                    </div>
+                </button>
+                
+                <!-- Linha 3 -->
+                <button class="btn-rapido" data-section="secao-adm">
+                    <div style="display:flex; flex-direction:column; align-items:center; gap:8px;">
+                        <div style="display:flex; gap:6px; font-size: 20px;">
+                            <i class="fa-solid fa-file-lines"></i>
+                            <i class="fa-solid fa-user-shield"></i>
+                        </div>
+                        <span>ADM</span>
+                    </div>
+                </button>
+                <button class="btn-rapido" data-section="secao-pesquisa">
+                    <div style="display:flex; flex-direction:column; align-items:center; gap:8px;">
+                        <div style="display:flex; gap:6px; font-size: 20px;">
+                            <i class="fa-solid fa-magnifying-glass"></i>
+                            <i class="fa-solid fa-car"></i>
+                        </div>
+                        <span>PESQUISA DE FROTA</span>
+                    </div>
+                </button>
+                <button class="btn-rapido" data-section="secao-pncp">
+                    <div style="display:flex; flex-direction:column; align-items:center; gap:8px;">
+                        <div style="font-size: 20px;">
+                            <i class="fa-solid fa-gavel"></i>
+                        </div>
+                        <span>PNCP</span>
+                    </div>
+                </button>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- OVERLAY DE BUSCA: CADÊ O CARRO? -->
+    <div id="busca-modal" class="busca-modal-overlay">
+        <div class="busca-modal-content">
+            <div class="busca-modal-header">
+                <h3 class="busca-modal-title">
+                    <i class="fa-solid fa-magnifying-glass-car"></i>
+                    CADÊ O CARRO? (PESQUISA UNIFICADA)
+                </h3>
+                <button class="busca-modal-close" id="btnFecharBusca">&times;</button>
+            </div>
+            
+            <div class="busca-modal-grid">
+                <div class="busca-modal-field">
+                    <label for="modal-search-plate">Placa</label>
+                    <input type="text" id="modal-search-plate" class="busca-modal-input" placeholder="Ex: EYB-4A12 ou DMO">
+                </div>
+                <div class="busca-modal-field">
+                    <label for="modal-search-prefix">Prefixo / Condutor</label>
+                    <input type="text" id="modal-search-prefix" class="busca-modal-input" placeholder="Ex: M-10145 ou Sgt Silva">
+                </div>
+                <div class="busca-modal-field">
+                    <label for="modal-search-chassis">Chassi / Modelo</label>
+                    <input type="text" id="modal-search-chassis" class="busca-modal-input" placeholder="Ex: 9BW ou Hilux">
+                </div>
+                <div class="busca-modal-field">
+                    <label for="modal-search-opm">Local / Batalhão (OPM)</label>
+                    <input type="text" id="modal-search-opm" class="busca-modal-input" placeholder="Ex: ROTA ou 4º BPM/I">
+                </div>
+            </div>
+
+            <div class="busca-modal-actions">
+                <button class="btn-search-clear" id="btnLimparBusca">LIMPAR</button>
+                <button class="btn-search-action" id="btnDispararBusca">
+                    <i class="fa-solid fa-magnifying-glass"></i> VASCULHAR
+                </button>
+            </div>
+
+            <div class="busca-modal-results" id="buscaResultadosContainer">
+                <div class="busca-modal-results-header">
+                    <span>Resultados Encontrados</span>
+                    <span id="buscaResultadosContador">0</span>
+                </div>
+                <div id="buscaResultadosLista" style="display:flex; flex-direction:column; gap:8px; margin-top:10px;">
+                    <!-- Resultados simulados injetados aqui -->
+                </div>
+            </div>
+        </div>
+    </div>
 
     <script>
         // Lógica do Menu Retrátil
         document.getElementById('sidebarToggle').addEventListener('click', function() {
             document.getElementById('sidebar').classList.toggle('collapsed');
+        });
+
+        // Lógica de Controle do Painel Rápido Overlay
+        const painelRapido = document.getElementById('painel-rapido');
+        const btnFecharPainel = document.getElementById('btnFecharPainel');
+        
+        btnFecharPainel.addEventListener('click', function() {
+            painelRapido.classList.remove('active');
+        });
+
+        // Fechar ao clicar fora do modal
+        painelRapido.addEventListener('click', function(e) {
+            if (e.target === painelRapido) {
+                painelRapido.classList.remove('active');
+            }
+        });
+
+        // Ouvir cliques nos botões do modal para fechar e rolar suavemente até a seção
+        const botoesRapidos = document.querySelectorAll('.btn-rapido[data-section]');
+        botoesRapidos.forEach(btn => {
+            btn.addEventListener('click', function() {
+                const sectionId = this.getAttribute('data-section');
+                painelRapido.classList.remove('active');
+                
+                const targetSec = document.getElementById(sectionId);
+                if (targetSec) {
+                    targetSec.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    // Adiciona um destaque visual temporário na seção selecionada
+                    targetSec.style.transition = 'outline 0.3s ease';
+                    targetSec.style.outline = '3px solid var(--color-green)';
+                    setTimeout(() => {
+                        targetSec.style.outline = 'none';
+                    }, 2000);
+                }
+            });
+        });
+
+        // Reabrir o Painel Rápido ao clicar no menu "INÍCIO" na sidebar
+        const menuInicio = document.querySelector('.sidebar .menu-item');
+        if (menuInicio) {
+            menuInicio.addEventListener('click', function(e) {
+                e.preventDefault();
+                painelRapido.classList.add('active');
+            });
+        }
+
+        // Lógica de Controle do Modal de Busca "Cadê o Carro?"
+        const btnCadeOCarro = document.getElementById('btnCadeOCarro');
+        const buscaModal = document.getElementById('busca-modal');
+        const btnFecharBusca = document.getElementById('btnFecharBusca');
+        
+        btnCadeOCarro.addEventListener('click', function() {
+            painelRapido.classList.remove('active');
+            buscaModal.classList.add('active');
+            document.getElementById('modal-search-plate').focus();
+        });
+        
+        btnFecharBusca.addEventListener('click', function() {
+            buscaModal.classList.remove('active');
+            painelRapido.classList.add('active'); // Opcionalmente reabre o painel rápido
+        });
+
+        // Fechar busca ao clicar fora
+        buscaModal.addEventListener('click', function(e) {
+            if (e.target === buscaModal) {
+                buscaModal.classList.remove('active');
+                painelRapido.classList.add('active');
+            }
+        });
+
+        // Simulação de Dados de Viaturas
+        const dbViaturas = [
+            { placa: 'EYB-4A12', prefixo: 'M-10145', modelo: 'Toyota Corolla Sedan', condutor: 'Cb PM Rodrigo', chassi: '9BW123456789012', opm: '10º BPM/M - 1ª Cia', status: 'EM OPERAÇÃO', statusClass: 'active' },
+            { placa: 'DMO-8G25', prefixo: 'M-04302', modelo: 'Chevrolet Spin 1.8', condutor: 'Sd PM Alencar', chassi: '9BW987654321098', opm: '4º BPM/I - 2ª Cia', status: 'EM MANUTENÇÃO (BORRACHARIA)', statusClass: '' },
+            { placa: 'GBS-9I10', prefixo: 'M-15214', modelo: 'Mitsubishi L200 Triton', condutor: 'Sgt PM Nogueira', chassi: '9BW111222333444', opm: '1º BPChq - ROTA', status: 'EM OPERAÇÃO', statusClass: 'active' },
+            { placa: 'FQX-5H88', prefixo: 'M-12220', modelo: 'Toyota Hilux 4x4', condutor: 'Ten PM Eduardo', chassi: '9BW555666777888', opm: '12º BPM/I - Cia Força Tática', status: 'AGUARDANDO PEÇAS (OFICINA)', statusClass: '' }
+        ];
+
+        const btnDispararBusca = document.getElementById('btnDispararBusca');
+        const btnLimparBusca = document.getElementById('btnLimparBusca');
+        const buscaResultadosContainer = document.getElementById('buscaResultadosContainer');
+        const buscaResultadosContador = document.getElementById('buscaResultadosContador');
+        const buscaResultadosLista = document.getElementById('buscaResultadosLista');
+
+        btnDispararBusca.addEventListener('click', function() {
+            const plateVal = document.getElementById('modal-search-plate').value.trim().toUpperCase();
+            const prefixVal = document.getElementById('modal-search-prefix').value.trim().toLowerCase();
+            const chassisVal = document.getElementById('modal-search-chassis').value.trim().toLowerCase();
+            const opmVal = document.getElementById('modal-search-opm').value.trim().toLowerCase();
+
+            if (!plateVal && !prefixVal && !chassisVal && !opmVal) {
+                alert('Por favor, preencha pelo menos um campo para vasculhar.');
+                return;
+            }
+
+            // Realiza filtro na base simulada
+            const resultados = dbViaturas.filter(viatura => {
+                let match = false;
+                if (plateVal && viatura.placa.toUpperCase().includes(plateVal)) match = true;
+                if (prefixVal && (viatura.prefixo.toLowerCase().includes(prefixVal) || viatura.condutor.toLowerCase().includes(prefixVal))) match = true;
+                if (chassisVal && (viatura.chassi.toLowerCase().includes(chassisVal) || viatura.modelo.toLowerCase().includes(chassisVal))) match = true;
+                if (opmVal && viatura.opm.toLowerCase().includes(opmVal)) match = true;
+                return match;
+            });
+
+            // Injeta resultados
+            buscaResultadosLista.innerHTML = '';
+            
+            if (resultados.length > 0) {
+                resultados.forEach(viatura => {
+                    const card = document.createElement('div');
+                    card.className = 'busca-result-card';
+                    card.innerHTML = `
+                        <div class="plate">${viatura.placa}</div>
+                        <div class="info">
+                            <strong>${viatura.prefixo} - ${viatura.modelo}</strong>
+                            <span>OPM: ${viatura.opm} | Condutor: ${viatura.condutor}</span>
+                        </div>
+                        <div class="status ${viatura.statusClass}">
+                            <i class="fa-solid fa-circle" style="font-size: 8px; margin-right: 5px;"></i>
+                            ${viatura.status}
+                        </div>
+                    `;
+                    buscaResultadosLista.appendChild(card);
+                });
+                buscaResultadosContador.textContent = `${resultados.length}`;
+            } else {
+                buscaResultadosLista.innerHTML = `
+                    <div style="text-align: center; padding: 15px; color: #64748b; font-size: 12px;">
+                        Nenhuma viatura localizada nas planilhas com estes parâmetros.
+                    </div>
+                `;
+                buscaResultadosContador.textContent = '0';
+            }
+
+            buscaResultadosContainer.style.display = 'flex';
+        });
+
+        btnLimparBusca.addEventListener('click', function() {
+            document.getElementById('modal-search-plate').value = '';
+            document.getElementById('modal-search-prefix').value = '';
+            document.getElementById('modal-search-chassis').value = '';
+            document.getElementById('modal-search-opm').value = '';
+            buscaResultadosContainer.style.display = 'none';
+            buscaResultadosLista.innerHTML = '';
         });
 
         // Lógica do Relógio e Calendário Dinâmicos
