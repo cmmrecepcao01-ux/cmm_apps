@@ -1,0 +1,124 @@
+no código html deste projeto, existem vários links a serem implementados, links de google sheets e outros sites nossos de uso interno. Preciso agora inserir todos os links abaixo, vide foto1 e foto2 da página completa, somente insira o link no código, não mude nenhuma funcionalidade nem layout agora.
+
+o site principal da página é: https://cmmpaineldebordo.netlify.app/1_painel_bordo_cmm/
+
+ao criar a página intermediária dentro de sua pasta numerada, a página intermediária deve conter os botões das seções que acessam seus links, e a seguinte mensagem
+bem visível: PÁGINA EM CONSTRUÇÃO
+
+O padrão de descrição adotado será: NOME DO BOTÃO: link a acessar;
+
+INTRANET: (já possui link, não altere nada)
+PLANO OPERACIONAL CMM: (já possui link, não altere nada)
+RECEPÇÃO: (já possui link, não altere nada)
+
+SEÇÃO DE MANUTENÇÃO DE FROTA (CRIAR UM HTML PÁGINA INTERMEDIÁRIA)
+
+LINHA 2 RODAS: https://docs.google.com/spreadsheets/d/1Ga5eQ_AhuOUkgTut2pfkzaZf_6cRcHHXg2ylLUvVQEs/edit?usp=sharing
+
+LINHA 4 RODAS: https://docs.google.com/spreadsheets/d/1Ga5eQ_AhuOUkgTut2pfkzaZf_6cRcHHXg2ylLUvVQEs/edit?usp=sharing
+
+LINHA PESADOS: https://docs.google.com/spreadsheets/d/1Ga5eQ_AhuOUkgTut2pfkzaZf_6cRcHHXg2ylLUvVQEs/edit?usp=sharing
+
+SINALIZADORES: https://docs.google.com/spreadsheets/d/1IX-OKAfMYUnPuJ9RYLTHokWP5Phmkk-zSjYg0TcF39Q/edit?usp=sharing
+
+GRAFISMO: https://docs.google.com/spreadsheets/d/1J_G5LPRwjCDkR5mN82ArHgL3AbL-SwD2vV9UWTHZt0A/edit?usp=sharing 	
+
+TÉCNICA: https://docs.google.com/spreadsheets/d/1KGU1kmudb16Zm-C0kZ_AcqHTixAp0IXoMzRRxV51rTY/edit?gid=1490018640#gid=1490018640
+
+BORRACHARIA: https://docs.google.com/spreadsheets/d/1HVafYVr1u2IFSBJ-JDFiQZn1Mcyd4H51WyXv_xSZ79Q/edit?usp=sharing
+
+ALMOXARIFADO: https://cmmlinhamecanicaapp.netlify.app/
+
+GARANTIA: https://cmmpaineldebordo.netlify.app/4_garantias_cmm_dashboard/ (link já existente, não alterar nada)
+
+INSIRA UM BOTÃO AQUI AO LADO DIREITO DE GARANTIA: PRODUTIVIDADE: https://cmmpaineldebordo.netlify.app/8_produtividade_manfrota/
+
+PEDIDOS DE AGENDAMENTO
+
+GRAFISMO (botão inferior): https://docs.google.com/spreadsheets/d/1DU6DZa8j1ViTBashQYHmEPXJcXqt-a_qfGQl8vZbE6A/edit?usp=sharing
+
+SINALIZADOR (botão inferior): https://docs.google.com/spreadsheets/u/2/d/1eyM-P2ovncbcAEpCzDHeMiVSUFuR6SDW_AE-fJ0te8g/edit
+
+BORRACHARIA (botão inferior): https://docs.google.com/spreadsheets/u/2/d/1lgGfaOIdNrU9wZyo0VtTJpdquskaXk8qNMBGGOv-lEw/edit
+
+SEÇÃO DE EXECUÇÃO CONTRATUAL (CRIAR UM HTML PÁGINA INTERMEDIÁRIA)
+
+GERAL: https://docs.google.com/spreadsheets/d/1ws6_IffVkDIK1N1KbuMQoNzjl0bYDL3AqHyd1z_ZW5g/edit?usp=sharing
+
+ARP DE MANUTENÇÃO 2025-2026: https://drive.google.com/drive/folders/1xoXvWeN9t4NXdnc2Fe99UJtRwWfMjADX?usp=drive_link
+
+CONTRATOS DE AQUISIÇÃO DE FROTA: https://docs.google.com/spreadsheets/d/14ZEpIh_OwWrL3hytz3TDNhVdzhnuSF4L/edit?gid=106833622#gid=106833622
+
+SEÇÃO DE APOIO E TRANSPORTE (CRIAR UM HTML, PÁGINA INTERMEDIÁRIA)
+
+MAPA DA SAT: https://docs.google.com/spreadsheets/d/1dD0mgd0T3_QASjWhnDqmy84KQ17NLghydFbwq9rPQ0I/edit?gid=1223447522#gid=1223447522
+
+MUDANÇA DE CATEGORIA CLASSE C e D: https://docs.google.com/spreadsheets/d/1qfHFs3_1FxvGlEQyYTkSTmnfZyqGTpjF/edit?gid=1575809673#gid=1575809673
+
+DIVISÃO DE ADMINISTRAÇÃO E FINANÇAS
+
+SEÇÃO DE ADM FROTA (CRIAR UM HTML PÁGINA INTERMEDIÁRIA)
+
+MAPA DA SAF: https://docs.google.com/spreadsheets/d/1Gj75Jowg1OywiGF_H3MkwAVNhyqytoT7/edit#gid=1138940612
+
+SEÇÃO DE FINANÇAS (CRIAR UM HTML PÁGINA INTERMEDIÁRIA)
+
+ADIANTAMENTOS: https://docs.google.com/spreadsheets/d/1JiKW5rjCPir2Qa0fj36pU0SFw0IFNPF_qArTuVA5joo/edit?usp=sharing
+
+CONTRATAÇÕES: https://docs.google.com/spreadsheets/d/1JiKW5rjCPir2Qa0fj36pU0SFw0IFNPF_qArTuVA5joo/edit?usp=sharing
+
+PCA-E: https://docs.google.com/spreadsheets/d/1y5wWSUauJzoQTj-FQfcTjmd0SdREpS85lVKhmHR5-Go/edit?usp=drivesdk
+
+SEÇ MATERIAL E COMBUSTÍVEL (CRIAR UM HTML PÁGINA INTERMEDIÁRIA)
+
+ADICIONAR LINK: sem link por enquanto
+
+SEÇÃO ADMINISTRATIVA (CRIAR UM HTML PÁGINA INTERMEDIÁRIA)
+
+ADICIONAR LINK: sem link por enquanto
+
+DOCUMENTOS E PLANEJAMENTO (CRIAR UM HTML PÁGINA INTERMEDIÁRIA)
+
+PLANILHA MÃE DA FROTA 19-24: https://drive.google.com/drive/folders/1Qv8Q99nRCCNqKLu88tWvkhIiUQqDsCt1?usp=sharing
+
+PLANILHA MÃE DA FROTA 25-26: https://docs.google.com/spreadsheets/d/1gI0uSUl7ioSUDo8x_xDKxBum0o7QwSEXOD_9bSUH3hY/edit?pli=1&gid=971139551#gid=971139551
+
+TERMOS DE REFERÊNCIA - DL: https://drive.google.com/drive/folders/1VFBgTougSH_mCjOtfozWtvMNDmT4lX7g?usp=sharing
+
+BOOK TÉCNICO DA FROTA - DL: https://drive.google.com/drive/folders/160lz0GObkxHIhz7RZn70Xn-vIraL_PIb?usp=sharing
+
+PNCP 2026: SEM LINK POR ENQUANTO
+
+CLASSIFICAÇÃO GRUPO VIATURAS: https://docs.google.com/spreadsheets/d/1RwpGuh350_rpFingXdjRiOlcB3583GWB/edit?usp=sharing&ouid=108923284406351896638&rtpof=true&sd=true
+
+MISSÕES CMM (CRIAR UM HTML PÁGINA INTERMEDIÁRIA)
+
+AJUSTE DE FROTA 2022: https://docs.google.com/spreadsheets/u/2/d/14OxJHCpFsc8fvH_Yk4y5nhbFx4VsX3ZYSVVxZK45k40/edit
+
+AJUSTE DE FROTA 2023: https://docs.google.com/spreadsheets/u/2/d/1jw9nYDykLoo4ZgPXbARMyDDkystH8izt8g1MkB6JPLM/edit
+
+OPERAÇÃO VERÃO 2022/2023: https://docs.google.com/spreadsheets/u/2/d/1j4wC6DuOy5dALEbRI_TJ_0J_pFJjZ6PNOuUxQr4wF6g/edit
+
+OPERAÇÃO VERÃO 2023/2024: https://docs.google.com/spreadsheets/u/2/d/1gZoO-NxFbj66yKqGwTvxV4om6tRyZOrYyGkzmzk9YpA/edit
+
+REMANEJAMENTO FORÇA TÁTICA: https://docs.google.com/spreadsheets/d/1pjTL98hQTj5KK4ga_JMqwQ_pd99Vfm88/edit?usp=sharing&ouid=115368947494003604537&rtpof=true&sd=true
+
+REMANEJAMENTO MOTOS: https://docs.google.com/spreadsheets/d/1LSTNL6YHgZmVYodRQTrsb6a-tcY8h2Wf/edit?usp=sharing&ouid=115368947494003604537&rtpof=true&sd=true
+
+CONSULTA ARP MANUTENÇÃO: https://docs.google.com/spreadsheets/d/18iRQf4WcfFtUMvywmxi5Yib5DoBbiF8QYqGAJJA9B34/edit?gid=722783766#gid=722783766&fvid=1291986192
+
+FORMULÁRIO SPIN: https://docs.google.com/forms/d/e/1FAIpQLScIfxXfaZRgVMluyfkqgdbJ6tw2liWdi-KtEYz9m4ixKaFW2A/viewform?usp=sharing
+
+RESULTADO VISTORIAS DE SPIN: https://docs.google.com/spreadsheets/d/1tIt-b9Reeg-iem6QRP_MUNaKg6wuO_h9wHojovNRCpM/edit?usp=sharing
+
+FORMULÁRIO OP VERÃO 2024: https://docs.google.com/forms/d/1J2K2C2W5rekUXcfGwS8LGkI4FhlrL9qrEiFefo2LHOU/edit
+
+RESULTADO OP VERÃO 2024: https://docs.google.com/spreadsheets/d/1bxa79B6hUEfcB4iEL8qWTgWMh_eqpsqNZqzwWvLuTIg/edit?resourcekey=&gid=901215155#gid=901215155
+
+PNCP 2025 (NÃO CRIAR PÁGINA INTERMEDIÁRIA) 
+
+ACESSAR DOCUMENTOS: https://docs.google.com/spreadsheets/d/1cKh820Coaiv9QgRuTAZA37NYAG54kHwq/edit?gid=1257296451#gid=1257296451
+
+SEÇ PESQUISA DE FROTA (CRIAR UM HTML PÁGINA INTERMEDIÁRIA)
+
+CONTROLE DE ATAS VIGENTES: https://docs.google.com/spreadsheets/d/1AUKzu_BAvyX95X885UN_E-R4TNuYCQSPLRmjQLGlWkE/edit?gid=693849765#gid=693849765

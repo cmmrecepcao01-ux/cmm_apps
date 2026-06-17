@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Missões CMM - Painel de Bordo</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-main: #0b1116;
+            --bg-panel: #121921;
+            --border-color: #202c38;
+            --color-text: #94a3b8;
+            --color-title: #f8fafc;
+            --color-orange: #f59e0b;
+            --color-orange-dark: #2d2112;
+            --border-orange: #453011;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Roboto', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-main);
+            color: var(--color-text);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 900px;
+            background-color: var(--bg-panel);
+            border: 1px solid var(--border-color);
+            border-top: 5px solid var(--color-orange);
+            border-radius: 8px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 20px;
+            margin-bottom: 25px;
+        }
+
+        .header-title h1 {
+            color: var(--color-title);
+            font-size: 24px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-transform: uppercase;
+        }
+
+        .header-title h1 i {
+            color: var(--color-orange);
+        }
+
+        .header-title h2 {
+            color: #64748b;
+            font-size: 13px;
+            font-weight: 500;
+            margin-top: 5px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-back {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background-color: rgba(255,255,255,0.05);
+            border: 1px solid var(--border-color);
+            color: var(--color-title);
+            padding: 10px 16px;
+            border-radius: 4px;
+            font-size: 13px;
+            font-weight: 700;
+            text-decoration: none;
+            transition: 0.2s;
+        }
+
+        .btn-back:hover {
+            background-color: rgba(255,255,255,0.1);
+            border-color: var(--color-orange);
+        }
+
+        /* BANNER EM CONSTRUÇÃO */
+        .construction-banner {
+            background-color: var(--color-orange-dark);
+            border: 1px solid var(--border-orange);
+            border-left: 5px solid var(--color-orange);
+            color: var(--color-title);
+            padding: 15px 20px;
+            border-radius: 6px;
+            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            font-weight: 500;
+            animation: pulse 2s infinite ease-in-out;
+        }
+
+        .construction-banner i {
+            color: var(--color-orange);
+            font-size: 22px;
+        }
+
+        .construction-banner .text {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .construction-banner .title {
+            font-weight: 900;
+            font-size: 15px;
+            letter-spacing: 0.5px;
+            margin-bottom: 2px;
+        }
+
+        .construction-banner .desc {
+            font-size: 12px;
+            color: #cbd5e1;
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.4); }
+            70% { box-shadow: 0 0 0 8px rgba(245, 158, 11, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0); }
+        }
+
+        /* GRID SECTIONS */
+        .section-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--color-title);
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            text-transform: uppercase;
+        }
+
+        .section-title i {
+            color: var(--color-orange);
+        }
+
+        .grid-buttons {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .btn-link {
+            background-color: rgba(0,0,0,0.3);
+            border: 1px solid rgba(255,255,255,0.05);
+            padding: 16px 18px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            text-decoration: none;
+            color: var(--color-title);
+            font-weight: 700;
+            font-size: 13px;
+            transition: all 0.2s ease;
+        }
+
+        .btn-link .btn-content {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .btn-link i.icon {
+            color: var(--color-orange);
+            font-size: 18px;
+            width: 24px;
+            text-align: center;
+        }
+
+        .btn-link i.arrow {
+            color: #475569;
+            font-size: 12px;
+            transition: transform 0.2s ease;
+        }
+
+        .btn-link:hover {
+            background-color: rgba(255,255,255,0.08);
+            border-color: var(--color-orange);
+            transform: translateY(-2px);
+        }
+
+        .btn-link:hover i.arrow {
+            color: var(--color-orange);
+            transform: translateX(4px);
+        }
+
+        @media (max-width: 768px) {
+            .grid-buttons {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        
+        <header class="header">
+            <div class="header-title">
+                <h1><i class="fa-solid fa-clipboard-check"></i> Missões CMM</h1>
+                <h2>Painel de Bordo do CMM • Controle de Missões e Operações</h2>
+            </div>
+            <a href="../1_painel_bordo_cmm/index.html" class="btn-back">
+                <i class="fa-solid fa-arrow-left"></i> Voltar
+            </a>
+        </header>
+
+        <div class="construction-banner">
+            <i class="fa-solid fa-triangle-exclamation"></i>
+            <div class="text">
+                <span class="title">PÁGINA EM CONSTRUÇÃO</span>
+                <span class="desc">Este painel está sendo desenvolvido. Por enquanto, utilize os botões abaixo para acessar os arquivos oficiais.</span>
+            </div>
+        </div>
+
+        <div class="section-title">
+            <i class="fa-solid fa-flag"></i> Ajustes de Frota e Operações
+        </div>
+
+        <div class="grid-buttons">
+            <a href="https://docs.google.com/spreadsheets/u/2/d/14OxJHCpFsc8fvH_Yk4y5nhbFx4VsX3ZYSVVxZK45k40/edit" target="_blank" class="btn-link">
+                <div class="btn-content">
+                    <i class="fa-regular fa-circle-check icon"></i>
+                    <span>AJUSTE DE FROTA 2022</span>
+                </div>
+                <i class="fa-solid fa-chevron-right arrow"></i>
+            </a>
+
+            <a href="https://docs.google.com/spreadsheets/u/2/d/1jw9nYDykLoo4ZgPXbARMyDDkystH8izt8g1MkB6JPLM/edit" target="_blank" class="btn-link">
+                <div class="btn-content">
+                    <i class="fa-regular fa-circle-check icon"></i>
+                    <span>AJUSTE DE FROTA 2023</span>
+                </div>
+                <i class="fa-solid fa-chevron-right arrow"></i>
+            </a>
+
+            <a href="https://docs.google.com/spreadsheets/u/2/d/1j4wC6DuOy5dALEbRI_TJ_0J_pFJjZ6PNOuUxQr4wF6g/edit" target="_blank" class="btn-link">
+                <div class="btn-content">
+                    <i class="fa-solid fa-sun icon"></i>
+                    <span>OPERAÇÃO VERÃO 2022/2023</span>
+                </div>
+                <i class="fa-solid fa-chevron-right arrow"></i>
+            </a>
+
+            <a href="https://docs.google.com/spreadsheets/u/2/d/1gZoO-NxFbj66yKqGwTvxV4om6tRyZOrYyGkzmzk9YpA/edit" target="_blank" class="btn-link">
+                <div class="btn-content">
+                    <i class="fa-solid fa-sun icon"></i>
+                    <span>OPERAÇÃO VERÃO 2023/2024</span>
+                </div>
+                <i class="fa-solid fa-chevron-right arrow"></i>
+            </a>
+
+            <a href="https://docs.google.com/spreadsheets/d/1pjTL98hQTj5KK4ga_JMqwQ_pd99Vfm88/edit?usp=sharing&ouid=115368947494003604537&rtpof=true&sd=true" target="_blank" class="btn-link">
+                <div class="btn-content">
+                    <i class="fa-solid fa-shield-halved icon"></i>
+                    <span>REMANEJAMENTO FORÇA TÁTICA</span>
+                </div>
+                <i class="fa-solid fa-chevron-right arrow"></i>
+            </a>
+
+            <a href="https://docs.google.com/spreadsheets/d/1LSTNL6YHgZmVYodRQTrsb6a-tcY8h2Wf/edit?usp=sharing&ouid=115368947494003604537&rtpof=true&sd=true" target="_blank" class="btn-link">
+                <div class="btn-content">
+                    <i class="fa-solid fa-motorcycle icon"></i>
+                    <span>REMANEJAMENTO MOTOS</span>
+                </div>
+                <i class="fa-solid fa-chevron-right arrow"></i>
+            </a>
+
+            <a href="https://docs.google.com/spreadsheets/d/18iRQf4WcfFtUMvywmxi5Yib5DoBbiF8QYqGAJJA9B34/edit?gid=722783766#gid=722783766&fvid=1291986192" target="_blank" class="btn-link">
+                <div class="btn-content">
+                    <i class="fa-solid fa-magnifying-glass icon"></i>
+                    <span>CONSULTA ARP MANUTENÇÃO</span>
+                </div>
+                <i class="fa-solid fa-chevron-right arrow"></i>
+            </a>
+
+            <a href="https://docs.google.com/forms/d/e/1FAIpQLScIfxXfaZRgVMluyfkqgdbJ6tw2liWdi-KtEYz9m4ixKaFW2A/viewform?usp=sharing" target="_blank" class="btn-link">
+                <div class="btn-content">
+                    <i class="fa-solid fa-file-signature icon"></i>
+                    <span>FORMULÁRIO SPIN</span>
+                </div>
+                <i class="fa-solid fa-chevron-right arrow"></i>
+            </a>
+
+            <a href="https://docs.google.com/spreadsheets/d/1tIt-b9Reeg-iem6QRP_MUNaKg6wuO_h9wHojovNRCpM/edit?usp=sharing" target="_blank" class="btn-link">
+                <div class="btn-content">
+                    <i class="fa-solid fa-square-poll-vertical icon"></i>
+                    <span>RESULTADO VISTORIAS DE SPIN</span>
+                </div>
+                <i class="fa-solid fa-chevron-right arrow"></i>
+            </a>
+
+            <a href="https://docs.google.com/forms/d/1J2K2C2W5rekUXcfGwS8LGkI4FhlrL9qrEiFefo2LHOU/edit" target="_blank" class="btn-link">
+                <div class="btn-content">
+                    <i class="fa-solid fa-file-signature icon"></i>
+                    <span>FORMULÁRIO OP VERÃO 2024</span>
+                </div>
+                <i class="fa-solid fa-chevron-right arrow"></i>
+            </a>
+
+            <a href="https://docs.google.com/spreadsheets/d/1bxa79B6hUEfcB4iEL8qWTgWMh_eqpsqNZqzwWvLuTIg/edit?resourcekey=&gid=901215155#gid=901215155" target="_blank" class="btn-link" style="grid-column: span 2;">
+                <div class="btn-content">
+                    <i class="fa-solid fa-square-poll-vertical icon"></i>
+                    <span>RESULTADO OP VERÃO 2024</span>
+                </div>
+                <i class="fa-solid fa-chevron-right arrow"></i>
+            </a>
+        </div>
+
+    </div>
+
+</body>
+</html>

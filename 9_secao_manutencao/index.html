@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manutenção de Frota - Painel de Bordo</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-main: #0b1116;
+            --bg-panel: #121921;
+            --border-color: #202c38;
+            --color-text: #94a3b8;
+            --color-title: #f8fafc;
+            --color-green: #22c55e;
+            --color-green-dark: #12281c;
+            --border-green: #1a422b;
+            --color-orange: #f59e0b;
+            --color-orange-dark: #2d2112;
+            --border-orange: #453011;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Roboto', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-main);
+            color: var(--color-text);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 900px;
+            background-color: var(--bg-panel);
+            border: 1px solid var(--border-color);
+            border-top: 5px solid var(--color-green);
+            border-radius: 8px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 20px;
+            margin-bottom: 25px;
+        }
+
+        .header-title h1 {
+            color: var(--color-title);
+            font-size: 24px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-transform: uppercase;
+        }
+
+        .header-title h1 i {
+            color: var(--color-green);
+        }
+
+        .header-title h2 {
+            color: #64748b;
+            font-size: 13px;
+            font-weight: 500;
+            margin-top: 5px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-back {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background-color: rgba(255,255,255,0.05);
+            border: 1px solid var(--border-color);
+            color: var(--color-title);
+            padding: 10px 16px;
+            border-radius: 4px;
+            font-size: 13px;
+            font-weight: 700;
+            text-decoration: none;
+            transition: 0.2s;
+        }
+
+        .btn-back:hover {
+            background-color: rgba(255,255,255,0.1);
+            border-color: var(--color-green);
+        }
+
+        /* BANNER EM CONSTRUÇÃO */
+        .construction-banner {
+            background-color: var(--color-orange-dark);
+            border: 1px solid var(--border-orange);
+            border-left: 5px solid var(--color-orange);
+            color: var(--color-title);
+            padding: 15px 20px;
+            border-radius: 6px;
+            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            font-weight: 500;
+            animation: pulse 2s infinite ease-in-out;
+        }
+
+        .construction-banner i {
+            color: var(--color-orange);
+            font-size: 22px;
+        }
+
+        .construction-banner .text {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .construction-banner .title {
+            font-weight: 900;
+            font-size: 15px;
+            letter-spacing: 0.5px;
+            margin-bottom: 2px;
+        }
+
+        .construction-banner .desc {
+            font-size: 12px;
+            color: #cbd5e1;
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.4); }
+            70% { box-shadow: 0 0 0 8px rgba(245, 158, 11, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0); }
+        }
+
+        /* GRID SECTIONS */
+        .section-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--color-title);
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            text-transform: uppercase;
+        }
+
+        .section-title i {
+            color: var(--color-green);
+        }
+
+        .grid-buttons {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 35px;
+        }
+
+        .grid-buttons-3 {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .btn-link {
+            background-color: rgba(0,0,0,0.3);
+            border: 1px solid rgba(255,255,255,0.05);
+            padding: 16px 18px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            text-decoration: none;
+            color: var(--color-title);
+            font-weight: 700;
+            font-size: 13px;
+            transition: all 0.2s ease;
+        }
+
+        .btn-link .btn-content {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .btn-link i.icon {
+            color: var(--color-green);
+            font-size: 18px;
+            width: 24px;
+            text-align: center;
+        }
+
+        .btn-link i.arrow {
+            color: #475569;
+            font-size: 12px;
+            transition: transform 0.2s ease;
+        }
+
+        .btn-link:hover {
+            background-color: rgba(255,255,255,0.08);
+            border-color: var(--color-green);
+            transform: translateY(-2px);
+        }
+
+        .btn-link:hover i.arrow {
+            color: var(--color-green);
+            transform: translateX(4px);
+        }
+
+        @media (max-width: 768px) {
+            .grid-buttons, .grid-buttons-3 {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        
+        <header class="header">
+            <div class="header-title">
+                <h1><i class="fa-solid fa-wrench"></i> Seção de Manutenção de Frota</h1>
+                <h2>Painel de Bordo do CMM • Divisão de Manutenção e Transporte</h2>
+            </div>
+            <a href="../1_painel_bordo_cmm/index.html" class="btn-back">
+                <i class="fa-solid fa-arrow-left"></i> Voltar
+            </a>
+        </header>
+
+        <div class="construction-banner">
+            <i class="fa-solid fa-triangle-exclamation"></i>
+            <div class="text">
+                <span class="title">PÁGINA EM CONSTRUÇÃO</span>
+                <span class="desc">Este painel está sendo desenvolvido. Por enquanto, utilize os botões abaixo para acessar as planilhas oficiais.</span>
+            </div>
+        </div>
+
+        <div class="section-title">
+            <i class="fa-solid fa-list-check"></i> Planilhas de Controle
+        </div>
+
+        <div class="grid-buttons">
+            <a href="https://docs.google.com/spreadsheets/d/1Ga5eQ_AhuOUkgTut2pfkzaZf_6cRcHHXg2ylLUvVQEs/edit?usp=sharing" target="_blank" class="btn-link">
+                <div class="btn-content">
+                    <i class="fa-solid fa-motorcycle icon"></i>
+                    <span>LINHA 2 RODAS</span>
+                </div>
+                <i class="fa-solid fa-chevron-right arrow"></i>
+            </a>
+
+            <a href="https://docs.google.com/spreadsheets/d/1Ga5eQ_AhuOUkgTut2pfkzaZf_6cRcHHXg2ylLUvVQEs/edit?usp=sharing" target="_blank" class="btn-link">
+                <div class="btn-content">
+                    <i class="fa-solid fa-car icon"></i>
+                    <span>LINHA 4 RODAS</span>
+                </div>
+                <i class="fa-solid fa-chevron-right arrow"></i>
+            </a>
+
+            <a href="https://docs.google.com/spreadsheets/d/1Ga5eQ_AhuOUkgTut2pfkzaZf_6cRcHHXg2ylLUvVQEs/edit?usp=sharing" target="_blank" class="btn-link">
+                <div class="btn-content">
+                    <i class="fa-solid fa-truck icon"></i>
+                    <span>LINHA PESADOS</span>
+                </div>
+                <i class="fa-solid fa-chevron-right arrow"></i>
+            </a>
+
+            <a href="https://docs.google.com/spreadsheets/d/1IX-OKAfMYUnPuJ9RYLTHokWP5Phmkk-zSjYg0TcF39Q/edit?usp=sharing" target="_blank" class="btn-link">
+                <div class="btn-content">
+                    <i class="fa-solid fa-traffic-light icon"></i>
+                    <span>SINALIZADORES</span>
+                </div>
+                <i class="fa-solid fa-chevron-right arrow"></i>
+            </a>
+
+            <a href="https://docs.google.com/spreadsheets/d/1J_G5LPRwjCDkR5mN82ArHgL3AbL-SwD2vV9UWTHZt0A/edit?usp=sharing" target="_blank" class="btn-link">
+                <div class="btn-content">
+                    <i class="fa-solid fa-pen-ruler icon"></i>
+                    <span>GRAFISMO</span>
+                </div>
+                <i class="fa-solid fa-chevron-right arrow"></i>
+            </a>
+
+            <a href="https://docs.google.com/spreadsheets/d/1KGU1kmudb16Zm-C0kZ_AcqHTixAp0IXoMzRRxV51rTY/edit?gid=1490018640#gid=1490018640" target="_blank" class="btn-link">
+                <div class="btn-content">
+                    <i class="fa-solid fa-gears icon"></i>
+                    <span>TÉCNICA</span>
+                </div>
+                <i class="fa-solid fa-chevron-right arrow"></i>
+            </a>
+
+            <a href="https://docs.google.com/spreadsheets/d/1HVafYVr1u2IFSBJ-JDFiQZn1Mcyd4H51WyXv_xSZ79Q/edit?usp=sharing" target="_blank" class="btn-link">
+                <div class="btn-content">
+                    <i class="fa-solid fa-life-ring icon"></i>
+                    <span>BORRACHARIA</span>
+                </div>
+                <i class="fa-solid fa-chevron-right arrow"></i>
+            </a>
+
+            <a href="https://cmmlinhamecanicaapp.netlify.app/" target="_blank" class="btn-link">
+                <div class="btn-content">
+                    <i class="fa-solid fa-boxes-stacked icon"></i>
+                    <span>ALMOXARIFADO</span>
+                </div>
+                <i class="fa-solid fa-chevron-right arrow"></i>
+            </a>
+
+            <a href="https://cmmpaineldebordo.netlify.app/4_garantias_cmm_dashboard/" target="_blank" class="btn-link">
+                <div class="btn-content">
+                    <i class="fa-solid fa-shield-halved icon"></i>
+                    <span>GARANTIA</span>
+                </div>
+                <i class="fa-solid fa-chevron-right arrow"></i>
+            </a>
+
+            <a href="https://cmmpaineldebordo.netlify.app/8_produtividade_manfrota/" target="_blank" class="btn-link">
+                <div class="btn-content">
+                    <i class="fa-solid fa-chart-line icon"></i>
+                    <span>PRODUTIVIDADE</span>
+                </div>
+                <i class="fa-solid fa-chevron-right arrow"></i>
+            </a>
+        </div>
+
+        <div class="section-title">
+            <i class="fa-regular fa-calendar-check"></i> Pedidos de Agendamento
+        </div>
+
+        <div class="grid-buttons-3">
+            <a href="https://docs.google.com/spreadsheets/d/1DU6DZa8j1ViTBashQYHmEPXJcXqt-a_qfGQl8vZbE6A/edit?usp=sharing" target="_blank" class="btn-link">
+                <div class="btn-content">
+                    <i class="fa-solid fa-pen-nib icon"></i>
+                    <span>GRAFISMO</span>
+                </div>
+                <i class="fa-solid fa-chevron-right arrow"></i>
+            </a>
+
+            <a href="https://docs.google.com/spreadsheets/u/2/d/1eyM-P2ovncbcAEpCzDHeMiVSUFuR6SDW_AE-fJ0te8g/edit" target="_blank" class="btn-link">
+                <div class="btn-content">
+                    <i class="fa-solid fa-lightbulb icon"></i>
+                    <span>SINALIZADOR</span>
+                </div>
+                <i class="fa-solid fa-chevron-right arrow"></i>
+            </a>
+
+            <a href="https://docs.google.com/spreadsheets/u/2/d/1lgGfaOIdNrU9wZyo0VtTJpdquskaXk8qNMBGGOv-lEw/edit" target="_blank" class="btn-link">
+                <div class="btn-content">
+                    <i class="fa-solid fa-circle-notch icon"></i>
+                    <span>BORRACHARIA</span>
+                </div>
+                <i class="fa-solid fa-chevron-right arrow"></i>
+            </a>
+        </div>
+
+    </div>
+
+</body>
+</html>

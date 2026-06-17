@@ -475,7 +475,7 @@ function renderKPIs(data) {
             <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 5px;">
                 <div class="kpi-value" style="margin-bottom: 0;">${data.length}</div>
                 <div style="text-align: center;">
-                    <div style="font-size: 1.25rem; font-weight: 700; color: #fff; line-height: 1;">${pendentes}</div>
+                    <div style="font-size: 1.25rem; font-weight: 700; color: #ff4d6d; line-height: 1;">${pendentes}</div>
                     <div style="font-size: 0.65rem; color: #aaa; margin-top: 2px;">pendentes</div>
                 </div>
             </div>
@@ -534,7 +534,7 @@ function renderKPIs(data) {
                 <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 5px;">
                     <div class="kpi-value" style="margin-bottom: 0;">${vtrs.length} <small style="font-size:1rem">VTRs</small></div>
                     <div style="text-align: center;">
-                        <div style="font-size: 1.25rem; font-weight: 700; color: #fff; line-height: 1;">${pendentesMarca}</div>
+                        <div style="font-size: 1.25rem; font-weight: 700; color: #ff4d6d; line-height: 1;">${pendentesMarca}</div>
                         <div style="font-size: 0.65rem; color: #aaa; margin-top: 2px;">pendentes</div>
                     </div>
                 </div>

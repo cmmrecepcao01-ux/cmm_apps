@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pesquisa de Frota - Painel de Bordo</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-main: #0b1116;
+            --bg-panel: #121921;
+            --border-color: #202c38;
+            --color-text: #94a3b8;
+            --color-title: #f8fafc;
+            --color-blue: #3b82f6;
+            --color-blue-dark: #122136;
+            --border-blue: #1c3656;
+            --color-orange: #f59e0b;
+            --color-orange-dark: #2d2112;
+            --border-orange: #453011;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Roboto', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-main);
+            color: var(--color-text);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 900px;
+            background-color: var(--bg-panel);
+            border: 1px solid var(--border-color);
+            border-top: 5px solid var(--color-blue);
+            border-radius: 8px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 20px;
+            margin-bottom: 25px;
+        }
+
+        .header-title h1 {
+            color: var(--color-title);
+            font-size: 24px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-transform: uppercase;
+        }
+
+        .header-title h1 i {
+            color: var(--color-blue);
+        }
+
+        .header-title h2 {
+            color: #64748b;
+            font-size: 13px;
+            font-weight: 500;
+            margin-top: 5px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-back {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background-color: rgba(255,255,255,0.05);
+            border: 1px solid var(--border-color);
+            color: var(--color-title);
+            padding: 10px 16px;
+            border-radius: 4px;
+            font-size: 13px;
+            font-weight: 700;
+            text-decoration: none;
+            transition: 0.2s;
+        }
+
+        .btn-back:hover {
+            background-color: rgba(255,255,255,0.1);
+            border-color: var(--color-blue);
+        }
+
+        /* BANNER EM CONSTRUÇÃO */
+        .construction-banner {
+            background-color: var(--color-orange-dark);
+            border: 1px solid var(--border-orange);
+            border-left: 5px solid var(--color-orange);
+            color: var(--color-title);
+            padding: 15px 20px;
+            border-radius: 6px;
+            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            font-weight: 500;
+            animation: pulse 2s infinite ease-in-out;
+        }
+
+        .construction-banner i {
+            color: var(--color-orange);
+            font-size: 22px;
+        }
+
+        .construction-banner .text {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .construction-banner .title {
+            font-weight: 900;
+            font-size: 15px;
+            letter-spacing: 0.5px;
+            margin-bottom: 2px;
+        }
+
+        .construction-banner .desc {
+            font-size: 12px;
+            color: #cbd5e1;
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.4); }
+            70% { box-shadow: 0 0 0 8px rgba(245, 158, 11, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0); }
+        }
+
+        /* GRID SECTIONS */
+        .section-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--color-title);
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            text-transform: uppercase;
+        }
+
+        .section-title i {
+            color: var(--color-blue);
+        }
+
+        .grid-buttons {
+            display: grid;
+            grid-template-columns: repeat(1, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .btn-link {
+            background-color: rgba(0,0,0,0.3);
+            border: 1px solid rgba(255,255,255,0.05);
+            padding: 16px 18px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            text-decoration: none;
+            color: var(--color-title);
+            font-weight: 700;
+            font-size: 13px;
+            transition: all 0.2s ease;
+        }
+
+        .btn-link .btn-content {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .btn-link i.icon {
+            color: var(--color-blue);
+            font-size: 18px;
+            width: 24px;
+            text-align: center;
+        }
+
+        .btn-link i.arrow {
+            color: #475569;
+            font-size: 12px;
+            transition: transform 0.2s ease;
+        }
+
+        .btn-link:hover {
+            background-color: rgba(255,255,255,0.08);
+            border-color: var(--color-blue);
+            transform: translateY(-2px);
+        }
+
+        .btn-link:hover i.arrow {
+            color: var(--color-blue);
+            transform: translateX(4px);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        
+        <header class="header">
+            <div class="header-title">
+                <h1><i class="fa-solid fa-magnifying-glass-chart"></i> Seção Pesquisa de Frota</h1>
+                <h2>Painel de Bordo do CMM • Controle de Pesquisas</h2>
+            </div>
+            <a href="../1_painel_bordo_cmm/index.html" class="btn-back">
+                <i class="fa-solid fa-arrow-left"></i> Voltar
+            </a>
+        </header>
+
+        <div class="construction-banner">
+            <i class="fa-solid fa-triangle-exclamation"></i>
+            <div class="text">
+                <span class="title">PÁGINA EM CONSTRUÇÃO</span>
+                <span class="desc">Este painel está sendo desenvolvido. Por enquanto, utilize os botões abaixo para acessar as planilhas oficiais.</span>
+            </div>
+        </div>
+
+        <div class="section-title">
+            <i class="fa-solid fa-list-check"></i> Planilhas de Controle
+        </div>
+
+        <div class="grid-buttons">
+            <a href="https://docs.google.com/spreadsheets/d/1AUKzu_BAvyX95X885UN_E-R4TNuYCQSPLRmjQLGlWkE/edit?gid=693849765#gid=693849765" target="_blank" class="btn-link">
+                <div class="btn-content">
+                    <i class="fa-solid fa-file-contract icon"></i>
+                    <span>CONTROLE DE ATAS VIGENTES</span>
+                </div>
+                <i class="fa-solid fa-chevron-right arrow"></i>
+            </a>
+        </div>
+
+    </div>
+
+</body>
+</html>

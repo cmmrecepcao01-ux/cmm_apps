@@ -150,7 +150,7 @@
         }
 
         /* Header Buttons */
-        .header-links { display: flex; gap: 15px; margin-left: 15px; }
+        .header-links { display: flex; gap: 15px; margin-left: 15px; align-items: center; }
         
         .btn-header {
             display: inline-flex;
@@ -169,6 +169,34 @@
         .btn-intranet:hover { background: #4338ca; }
         .btn-sheets { background: #059669; border: 1px solid #047857; }
         .btn-sheets:hover { background: #047857; }
+
+        .btn-old-panel { background: #334155; border: 1px solid #475569; margin-top: 10px; display: inline-flex; padding: 10px 20px; font-size: 12px; }
+        .btn-old-panel:hover { background: #475569; }
+
+        .old-panel-container {
+            padding: 0 20px 20px 20px;
+            text-align: center;
+        }
+        .sidebar.collapsed .old-panel-container {
+            display: none !important;
+        }
+
+
+        .btn-sei {
+            display: inline-flex;
+            align-items: center;
+            transition: all 0.2s ease-in-out;
+        }
+        .btn-sei:hover {
+            transform: translateY(-2px);
+        }
+        .btn-sei img {
+            height: 42px;
+            width: auto;
+            border-radius: 8px;
+            display: block;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+        }
 
         .header-titles h2 { color: #64748b; font-size: 13px; font-weight: 500; letter-spacing: 1px; margin-top: 4px; }
 
@@ -514,9 +542,9 @@
             border: 2px solid var(--border-color);
             border-left: 5px solid var(--color-green);
             border-radius: 8px;
-            width: 90%;
-            max-width: 650px;
-            padding: 25px;
+            width: 95%;
+            max-width: 1000px;
+            padding: 35px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.5);
             transform: translateY(-20px);
             transition: transform 0.3s ease-out;
@@ -531,16 +559,16 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 20px;
+            margin-bottom: 25px;
         }
 
         .busca-modal-title {
             color: var(--color-title);
-            font-size: 18px;
+            font-size: 24px;
             font-weight: 700;
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 12px;
         }
 
         .busca-modal-title i {
@@ -551,8 +579,9 @@
             background: none;
             border: none;
             color: var(--color-text);
-            font-size: 20px;
+            font-size: 32px;
             cursor: pointer;
+            line-height: 1;
         }
 
         .busca-modal-close:hover {
@@ -562,18 +591,18 @@
         .busca-modal-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 15px;
-            margin-bottom: 20px;
+            gap: 20px;
+            margin-bottom: 25px;
         }
 
         .busca-modal-field {
             display: flex;
             flex-direction: column;
-            gap: 6px;
+            gap: 8px;
         }
 
         .busca-modal-field label {
-            font-size: 10px;
+            font-size: 13px;
             font-weight: 700;
             color: #64748b;
             text-transform: uppercase;
@@ -583,9 +612,9 @@
             background-color: rgba(0,0,0,0.3);
             border: 1px solid var(--border-color);
             color: var(--color-title);
-            padding: 10px 12px;
+            padding: 12px 16px;
             border-radius: 4px;
-            font-size: 12px;
+            font-size: 15px;
             transition: all 0.2s ease;
         }
 
@@ -597,27 +626,62 @@
         .busca-modal-actions {
             display: flex;
             justify-content: flex-end;
-            gap: 10px;
+            gap: 15px;
             border-top: 1px solid var(--border-color);
-            padding-top: 15px;
+            padding-top: 20px;
+        }
+
+        .btn-search-clear, .btn-search-action {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 12px 28px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 900;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-transform: uppercase;
+            border: none;
+        }
+
+        .btn-search-clear {
+            background-color: #1e293b;
+            color: #f8fafc;
+            border: 1px solid #334155;
+        }
+
+        .btn-search-clear:hover {
+            background-color: #334155;
+        }
+
+        .btn-search-action {
+            background-color: var(--color-green);
+            color: #fff;
+            border: 1px solid var(--border-green);
+        }
+
+        .btn-search-action:hover {
+            background-color: #166534;
         }
 
         .busca-modal-results {
-            margin-top: 20px;
-            max-height: 250px;
+            margin-top: 25px;
+            max-height: 450px;
             overflow-y: auto;
             display: none;
             flex-direction: column;
-            gap: 10px;
+            gap: 12px;
         }
 
         .busca-modal-results-header {
-            font-size: 11px;
+            font-size: 14px;
             font-weight: 700;
             color: #64748b;
             text-transform: uppercase;
             border-bottom: 1px solid var(--border-color);
-            padding-bottom: 5px;
+            padding-bottom: 8px;
             display: flex;
             justify-content: space-between;
         }
@@ -627,49 +691,96 @@
             background-color: rgba(0,0,0,0.2);
             border: 1px solid var(--border-color);
             border-radius: 4px;
-            padding: 10px 15px;
+            padding: 16px 20px;
             display: grid;
-            grid-template-columns: 100px 1fr 120px;
+            grid-template-columns: 120px 1fr 180px;
             align-items: center;
-            gap: 15px;
-            font-size: 12px;
+            gap: 20px;
+            font-size: 15px;
         }
 
         .busca-result-card .plate {
             font-family: monospace;
             background-color: #0b1116;
             color: #fff;
-            padding: 4px 8px;
+            padding: 6px 12px;
             border-radius: 4px;
             border: 1px solid #334155;
             font-weight: 700;
             text-align: center;
+            font-size: 16px;
         }
 
         .busca-result-card .info {
             display: flex;
             flex-direction: column;
-            gap: 2px;
+            gap: 4px;
         }
 
         .busca-result-card .info strong {
             color: var(--color-title);
+            font-size: 17px;
         }
 
         .busca-result-card .info span {
             color: #64748b;
-            font-size: 10px;
+            font-size: 12px;
         }
 
         .busca-result-card .status {
             text-align: right;
-            font-size: 10px;
+            font-size: 14px;
             font-weight: 700;
             color: var(--color-orange);
         }
 
         .busca-result-card .status.active {
             color: var(--color-green);
+        }
+
+        /* Responsividade para Telas Menores e Smartphones */
+        @media (max-width: 768px) {
+            .busca-modal-content {
+                width: 95%;
+                padding: 20px;
+            }
+            .busca-modal-title {
+                font-size: 18px;
+            }
+            .busca-modal-close {
+                font-size: 26px;
+            }
+            .busca-modal-grid {
+                grid-template-columns: 1fr;
+                gap: 12px;
+            }
+            .busca-modal-input {
+                font-size: 14px;
+                padding: 10px 12px;
+            }
+            .busca-result-card {
+                grid-template-columns: 1fr;
+                gap: 12px;
+                text-align: center;
+                padding: 12px;
+            }
+            .busca-result-card .plate {
+                width: fit-content;
+                margin: 0 auto;
+            }
+            .busca-result-card .status {
+                align-items: center !important;
+                text-align: center !important;
+            }
+            .busca-modal-actions {
+                justify-content: space-between;
+                gap: 10px;
+            }
+            .btn-search-clear, .btn-search-action {
+                flex: 1;
+                padding: 10px 15px;
+                font-size: 13px;
+            }
         }
 
         /* Botão Hero Cadê o Carro destacado */
@@ -716,6 +827,13 @@
             <img src="cmmlogo.png" alt="Logo CMM" class="logo-img">
         </div>
         
+        <!-- Botão Painel Antigo -->
+        <div class="old-panel-container">
+            <a href="https://docs.google.com/spreadsheets/d/1TWXs6cXo0rqMnqHXOJa8UyIxcfV8M8gBo32fgkQO-UU/edit?gid=0#gid=0" target="_blank" class="btn-header btn-old-panel" style="width: 100%; justify-content: center; margin-top: 0;">
+                <i class="fa-solid fa-file-excel"></i> PAINEL ANTIGO
+            </a>
+        </div>
+        
         <a href="#" class="menu-item active"><i class="fa-solid fa-house"></i><span>INÍCIO<small>VISÃO GERAL</small></span></a>
         <a href="#" class="menu-item"><i class="fa-solid fa-briefcase"></i><span>RECEPÇÃO<small>SEÇÕES E SERVIÇOS</small></span></a>
         <a href="#" class="menu-item"><i class="fa-solid fa-gauge-high"></i><span>MANUTENÇÃO<small>VEÍCULOS E EQUIPAMENTOS</small></span></a>
@@ -741,6 +859,9 @@
                             </a>
                             <a href="https://docs.google.com/spreadsheets/d/1sxVqCUfZPyMFaQS103da-mtSxy-VCX-83yX0Y52TyPQ/edit?gid=0#gid=0" target="_blank" class="btn-header btn-sheets">
                                 <i class="fa-solid fa-file-excel"></i> PLANO OPERACIONAL CMM
+                            </a>
+                            <a href="https://minhaarea.sp.gov.br/plataformasp" target="_blank" class="btn-sei">
+                                <img src="seibutton.png" alt="SEI">
                             </a>
                         </div>
                     </h1>
@@ -781,25 +902,27 @@
                 <div class="grid-2">
                     
                     <div id="secao-manutencao" class="panel green" style="height: 100%;">
-                        <div class="panel-header"><i class="fa-solid fa-wrench"></i> SEÇÃO DE MANUTENÇÃO</div>
+                        <div class="panel-header"><i class="fa-solid fa-wrench"></i> SEÇÃO DE MANUTENÇÃO DE FROTA</div>
                         <div class="panel-body">
                             <div class="btn-grid">
-                                <a href="#" class="btn-item"><i class="fa-solid fa-motorcycle"></i> LINHA 2 RODAS</a>
-                                <a href="#" class="btn-item"><i class="fa-solid fa-car"></i> LINHA 4 RODAS</a>
-                                <a href="#" class="btn-item"><i class="fa-solid fa-truck"></i> LINHA PESADOS</a>
-                                <a href="#" class="btn-item"><i class="fa-solid fa-traffic-light"></i> SINALIZADORES</a>
-                                <a href="#" class="btn-item"><i class="fa-solid fa-pen-ruler"></i> GRAFISMO</a>
-                                <a href="#" class="btn-item"><i class="fa-solid fa-gears"></i> TÉCNICA</a>
-                                <a href="#" class="btn-item"><i class="fa-solid fa-life-ring"></i> BORRACHARIA</a>
-                                <a href="#" class="btn-item"><i class="fa-solid fa-boxes-stacked"></i> ALMOXARIFADO</a>
+                                <a href="../9_secao_manutencao/index.html" class="btn-item"><i class="fa-solid fa-motorcycle"></i> LINHA 2 RODAS</a>
+                                <a href="../9_secao_manutencao/index.html" class="btn-item"><i class="fa-solid fa-car"></i> LINHA 4 RODAS</a>
+                                <a href="../9_secao_manutencao/index.html" class="btn-item"><i class="fa-solid fa-truck"></i> LINHA PESADOS</a>
+                                <a href="../9_secao_manutencao/index.html" class="btn-item"><i class="fa-solid fa-traffic-light"></i> SINALIZADORES</a>
+                                <a href="../9_secao_manutencao/index.html" class="btn-item"><i class="fa-solid fa-pen-ruler"></i> GRAFISMO</a>
+                                <a href="../9_secao_manutencao/index.html" class="btn-item"><i class="fa-solid fa-gears"></i> TÉCNICA</a>
+                                <a href="../9_secao_manutencao/index.html" class="btn-item"><i class="fa-solid fa-life-ring"></i> BORRACHARIA</a>
+                                <a href="https://cmmlinhamecanicaapp.netlify.app/" target="_blank" class="btn-item"><i class="fa-solid fa-boxes-stacked"></i> ALMOXARIFADO</a>
+                                <a href="https://cmmpaineldebordo.netlify.app/4_garantias_cmm_dashboard/" target="_blank" class="btn-item"><i class="fa-solid fa-shield-halved"></i> GARANTIA</a>
+                                <a href="https://cmmpaineldebordo.netlify.app/8_produtividade_manfrota/" target="_blank" class="btn-item"><i class="fa-solid fa-chart-line"></i> PRODUTIVIDADE</a>
                             </div>
 
                             <div class="sub-title-bar"><i class="fa-regular fa-calendar-check"></i> PEDIDOS DE AGENDAMENTO</div>
 
                             <div class="btn-grid-3">
-                                <a href="#" class="btn-item" style="justify-content: center;"><i class="fa-solid fa-pen-nib"></i> GRAFISMO</a>
-                                <a href="#" class="btn-item" style="justify-content: center;"><i class="fa-solid fa-lightbulb"></i> SINALIZADOR</a>
-                                <a href="#" class="btn-item" style="justify-content: center;"><i class="fa-solid fa-circle-notch"></i> BORRACHARIA</a>
+                                <a href="../9_secao_manutencao/index.html" class="btn-item" style="justify-content: center;"><i class="fa-solid fa-pen-nib"></i> GRAFISMO</a>
+                                <a href="../9_secao_manutencao/index.html" class="btn-item" style="justify-content: center;"><i class="fa-solid fa-lightbulb"></i> SINALIZADOR</a>
+                                <a href="../9_secao_manutencao/index.html" class="btn-item" style="justify-content: center;"><i class="fa-solid fa-circle-notch"></i> BORRACHARIA</a>
                             </div>
                         </div>
                     </div>
@@ -810,18 +933,18 @@
                             <div class="panel-header"><i class="fa-solid fa-file-signature"></i> SEÇÃO DE EXECUÇÃO CONTRATUAL</div>
                             <div class="panel-body">
                                 <div class="list-group">
-                                    <a href="#" class="list-item blue-icon">
+                                    <a href="../10_secao_contratos/index.html" class="list-item blue-icon">
                                         <div class="left"><i class="fa-regular fa-file"></i> GERAL</div>
                                         <div class="right"><i class="fa-solid fa-chevron-right"></i></div>
                                     </a>
-                                    <a href="#" class="list-item blue-icon">
+                                    <a href="../10_secao_contratos/index.html" class="list-item blue-icon">
                                         <div class="left">
                                             <i class="fa-solid fa-file-contract"></i> 
                                             <div>ARP DE MANUTENÇÃO<span class="sub">2025-2026</span></div>
                                         </div>
                                         <div class="right"><i class="fa-solid fa-chevron-right"></i></div>
                                     </a>
-                                    <a href="#" class="list-item blue-icon">
+                                    <a href="../10_secao_contratos/index.html" class="list-item blue-icon">
                                         <div class="left"><i class="fa-solid fa-list-check"></i> CONTRATOS DE AQUISIÇÃO DE FROTA</div>
                                         <div class="right"><i class="fa-solid fa-chevron-right"></i></div>
                                     </a>
@@ -833,11 +956,11 @@
                             <div class="panel-header"><i class="fa-solid fa-truck-moving"></i> SEÇÃO DE APOIO E TRANSPORTE</div>
                             <div class="panel-body">
                                 <div class="list-group">
-                                    <a href="#" class="list-item blue-icon">
+                                    <a href="../11_secao_transporte/index.html" class="list-item blue-icon">
                                         <div class="left"><i class="fa-solid fa-map-location-dot"></i> MAPA DA SAT</div>
                                         <div class="right"><i class="fa-solid fa-chevron-right"></i></div>
                                     </a>
-                                    <a href="#" class="list-item blue-icon">
+                                    <a href="../11_secao_transporte/index.html" class="list-item blue-icon">
                                         <div class="left">
                                             <i class="fa-solid fa-id-card"></i> 
                                             <div>MUDANÇA DE CATEGORIA<span class="sub">CLASSE C e D</span></div>
@@ -859,7 +982,7 @@
                         <div class="panel-header"><i class="fa-solid fa-car-side"></i> SEÇÃO DE ADM FROTA</div>
                         <div class="panel-body">
                             <div class="list-group">
-                                <a href="#" class="list-item green-icon">
+                                <a href="../12_secao_adm_frota/index.html" class="list-item green-icon">
                                     <div class="left"><i class="fa-solid fa-map"></i> MAPA DA SAF</div>
                                     <div class="right"><i class="fa-solid fa-chevron-right"></i></div>
                                 </a>
@@ -871,15 +994,15 @@
                         <div class="panel-header"><i class="fa-solid fa-coins"></i> SEÇÃO DE FINANÇAS</div>
                         <div class="panel-body">
                             <div class="list-group">
-                                <a href="#" class="list-item green-icon">
+                                <a href="../13_secao_financas/index.html" class="list-item green-icon">
                                     <div class="left"><i class="fa-solid fa-file-invoice-dollar"></i> ADIANTAMENTOS</div>
                                     <div class="right"><i class="fa-solid fa-chevron-right"></i></div>
                                 </a>
-                                <a href="#" class="list-item green-icon">
+                                <a href="../13_secao_financas/index.html" class="list-item green-icon">
                                     <div class="left"><i class="fa-solid fa-handshake"></i> CONTRATAÇÕES</div>
                                     <div class="right"><i class="fa-solid fa-chevron-right"></i></div>
                                 </a>
-                                <a href="#" class="list-item green-icon">
+                                <a href="../13_secao_financas/index.html" class="list-item green-icon">
                                     <div class="left"><i class="fa-solid fa-laptop-file"></i> PCA-E</div>
                                     <div class="right"><i class="fa-solid fa-chevron-right"></i></div>
                                 </a>
@@ -891,7 +1014,7 @@
                         <div class="panel-header"><i class="fa-solid fa-gas-pump"></i> SEÇ MATERIAL E COMBUSTÍVEL</div>
                         <div class="panel-body">
                             <div class="list-group">
-                                <a href="#" class="list-item green-icon">
+                                <a href="../14_secao_material_combustivel/index.html" class="list-item green-icon">
                                     <div class="left"><i class="fa-solid fa-plus"></i> ADICIONAR LINK</div>
                                     <div class="right"><i class="fa-solid fa-chevron-right"></i></div>
                                 </a>
@@ -903,7 +1026,7 @@
                         <div class="panel-header"><i class="fa-solid fa-building"></i> SEÇÃO ADMINISTRATIVA</div>
                         <div class="panel-body">
                             <div class="list-group">
-                                <a href="#" class="list-item green-icon">
+                                <a href="../15_secao_administrativa/index.html" class="list-item green-icon">
                                     <div class="left"><i class="fa-solid fa-plus"></i> ADICIONAR LINK</div>
                                     <div class="right"><i class="fa-solid fa-chevron-right"></i></div>
                                 </a>
@@ -921,27 +1044,27 @@
                     <div class="panel-header"><i class="fa-solid fa-file-pdf"></i> DOCUMENTOS E PLANEJAMENTO</div>
                     <div class="panel-body">
                         <div class="list-group">
-                            <a href="#" class="list-item red-icon">
+                            <a href="../16_documentos_planejamento/index.html" class="list-item red-icon">
                                 <div class="left"><i class="fa-solid fa-file-excel"></i> PLANILHA MÃE DA FROTA 19-24</div>
                                 <div class="right"><i class="fa-solid fa-chevron-right"></i></div>
                             </a>
-                            <a href="#" class="list-item red-icon">
+                            <a href="../16_documentos_planejamento/index.html" class="list-item red-icon">
                                 <div class="left"><i class="fa-solid fa-file-excel"></i> PLANILHA MÃE DA FROTA 25-26</div>
                                 <div class="right"><i class="fa-solid fa-chevron-right"></i></div>
                             </a>
-                            <a href="#" class="list-item red-icon">
+                            <a href="../16_documentos_planejamento/index.html" class="list-item red-icon">
                                 <div class="left"><i class="fa-solid fa-file-lines"></i> TERMOS DE REFERÊNCIA - DL</div>
                                 <div class="right"><i class="fa-solid fa-chevron-right"></i></div>
                             </a>
-                            <a href="#" class="list-item red-icon">
+                            <a href="../16_documentos_planejamento/index.html" class="list-item red-icon">
                                 <div class="left"><i class="fa-solid fa-book"></i> BOOK TÉCNICO DA FROTA - DL</div>
                                 <div class="right"><i class="fa-solid fa-chevron-right"></i></div>
                             </a>
-                            <a href="#" class="list-item red-icon">
+                            <a href="../16_documentos_planejamento/index.html" class="list-item red-icon">
                                 <div class="left"><i class="fa-solid fa-file-alt"></i> PNCP 2026</div>
                                 <div class="right"><i class="fa-solid fa-chevron-right"></i></div>
                             </a>
-                            <a href="#" class="list-item red-icon">
+                            <a href="../16_documentos_planejamento/index.html" class="list-item red-icon">
                                 <div class="left"><i class="fa-solid fa-file-signature"></i> CLASSIFICAÇÃO GRUPO VIATURAS</div>
                                 <div class="right"><i class="fa-solid fa-chevron-right"></i></div>
                             </a>
@@ -953,17 +1076,17 @@
                     <div class="panel-header"><i class="fa-solid fa-clipboard-check"></i> MISSÕES CMM</div>
                     <div class="panel-body">
                         <div class="checklist">
-                            <a href="#" class="check-item"><i class="fa-regular fa-circle-check"></i> AJUSTE DE FROTA 2022</a>
-                            <a href="#" class="check-item"><i class="fa-regular fa-circle-check"></i> AJUSTE DE FROTA 2023</a>
-                            <a href="#" class="check-item"><i class="fa-regular fa-circle-check"></i> OPERAÇÃO VERÃO 2022/2023</a>
-                            <a href="#" class="check-item"><i class="fa-regular fa-circle-check"></i> OPERAÇÃO VERÃO 2023/2024</a>
-                            <a href="#" class="check-item"><i class="fa-regular fa-circle-check"></i> REMANEJAMENTO FORÇA TÁTICA</a>
-                            <a href="#" class="check-item"><i class="fa-regular fa-circle-check"></i> REMANEJAMENTO MOTOS</a>
-                            <a href="#" class="check-item"><i class="fa-regular fa-circle-check"></i> CONSULTA ARP MANUTENÇÃO</a>
-                            <a href="#" class="check-item active"><i class="fa-solid fa-circle-check"></i> FORMULÁRIO SPIN</a>
-                            <a href="#" class="check-item active"><i class="fa-solid fa-circle-check"></i> RESULTADO VISTORIAS DE SPIN</a>
-                            <a href="#" class="check-item active"><i class="fa-solid fa-circle-check"></i> FORMULÁRIO OP VERÃO 2024</a>
-                            <a href="#" class="check-item active"><i class="fa-solid fa-circle-check"></i> RESULTADO OP VERÃO 2024</a>
+                            <a href="../17_missoes_cmm/index.html" class="check-item"><i class="fa-regular fa-circle-check"></i> AJUSTE DE FROTA 2022</a>
+                            <a href="../17_missoes_cmm/index.html" class="check-item"><i class="fa-regular fa-circle-check"></i> AJUSTE DE FROTA 2023</a>
+                            <a href="../17_missoes_cmm/index.html" class="check-item"><i class="fa-regular fa-circle-check"></i> OPERAÇÃO VERÃO 2022/2023</a>
+                            <a href="../17_missoes_cmm/index.html" class="check-item"><i class="fa-regular fa-circle-check"></i> OPERAÇÃO VERÃO 2023/2024</a>
+                            <a href="../17_missoes_cmm/index.html" class="check-item"><i class="fa-regular fa-circle-check"></i> REMANEJAMENTO FORÇA TÁTICA</a>
+                            <a href="../17_missoes_cmm/index.html" class="check-item"><i class="fa-regular fa-circle-check"></i> REMANEJAMENTO MOTOS</a>
+                            <a href="../17_missoes_cmm/index.html" class="check-item"><i class="fa-regular fa-circle-check"></i> CONSULTA ARP MANUTENÇÃO</a>
+                            <a href="../17_missoes_cmm/index.html" class="check-item active"><i class="fa-solid fa-circle-check"></i> FORMULÁRIO SPIN</a>
+                            <a href="../17_missoes_cmm/index.html" class="check-item active"><i class="fa-solid fa-circle-check"></i> RESULTADO VISTORIAS DE SPIN</a>
+                            <a href="../17_missoes_cmm/index.html" class="check-item active"><i class="fa-solid fa-circle-check"></i> FORMULÁRIO OP VERÃO 2024</a>
+                            <a href="../17_missoes_cmm/index.html" class="check-item active"><i class="fa-solid fa-circle-check"></i> RESULTADO OP VERÃO 2024</a>
                         </div>
                     </div>
                 </div>
@@ -972,7 +1095,7 @@
                     <div class="panel-header"><i class="fa-solid fa-folder"></i> PNCP 2025</div>
                     <div class="panel-body" style="padding: 15px;">
                          <div class="list-group">
-                            <a href="#" class="list-item">
+                            <a href="https://docs.google.com/spreadsheets/d/1cKh820Coaiv9QgRuTAZA37NYAG54kHwq/edit?gid=1257296451#gid=1257296451" target="_blank" class="list-item">
                                 <div class="left"><i class="fa-solid fa-link"></i> ACESSAR DOCUMENTOS</div>
                                 <div class="right"><i class="fa-solid fa-chevron-right"></i></div>
                             </a>
@@ -984,7 +1107,7 @@
                     <div class="panel-header"><i class="fa-solid fa-magnifying-glass-chart"></i> SEÇ PESQUISA DE FROTA</div>
                     <div class="panel-body" style="flex: 1;">
                          <div class="list-group">
-                            <a href="#" class="list-item blue-icon" style="justify-content: center; background-color: var(--color-blue-dark); border-color: var(--color-blue);">
+                            <a href="../18_pesquisa_frota/index.html" class="list-item blue-icon" style="justify-content: center; background-color: var(--color-blue-dark); border-color: var(--color-blue);">
                                 <div class="left" style="color: var(--color-title);"><i class="fa-solid fa-file-contract" style="color: var(--color-blue);"></i> CONTROLE DE ATAS VIGENTES</div>
                             </a>
                         </div>
@@ -1178,6 +1301,7 @@
         </div>
     </div>
 
+    <script src="saf_data.js"></script>
     <script>
         // Lógica do Menu Retrátil
         document.getElementById('sidebarToggle').addEventListener('click', function() {
@@ -1252,13 +1376,196 @@
             }
         });
 
-        // Simulação de Dados de Viaturas
-        const dbViaturas = [
-            { placa: 'EYB-4A12', prefixo: 'M-10145', modelo: 'Toyota Corolla Sedan', condutor: 'Cb PM Rodrigo', chassi: '9BW123456789012', opm: '10º BPM/M - 1ª Cia', status: 'EM OPERAÇÃO', statusClass: 'active' },
-            { placa: 'DMO-8G25', prefixo: 'M-04302', modelo: 'Chevrolet Spin 1.8', condutor: 'Sd PM Alencar', chassi: '9BW987654321098', opm: '4º BPM/I - 2ª Cia', status: 'EM MANUTENÇÃO (BORRACHARIA)', statusClass: '' },
-            { placa: 'GBS-9I10', prefixo: 'M-15214', modelo: 'Mitsubishi L200 Triton', condutor: 'Sgt PM Nogueira', chassi: '9BW111222333444', opm: '1º BPChq - ROTA', status: 'EM OPERAÇÃO', statusClass: 'active' },
-            { placa: 'FQX-5H88', prefixo: 'M-12220', modelo: 'Toyota Hilux 4x4', condutor: 'Ten PM Eduardo', chassi: '9BW555666777888', opm: '12º BPM/I - Cia Força Tática', status: 'AGUARDANDO PEÇAS (OFICINA)', statusClass: '' }
+        // Mapeamento das planilhas do Google Sheets para pesquisa unificada
+        const SHEET_CONFIGS = [
+            { name: "Recepção", id: "1oo7Y40IlF34D5T_UOnzeF-yCeR6DX3ihUzjRUU_w25w" },
+            { name: "Linha de Manutenção", id: "1Ga5eQ_AhuOUkgTut2pfkzaZf_6cRcHHXg2ylLUvVQEs" },
+            { name: "Borracharia", id: "1HVafYVr1u2IFSBJ-JDFiQZn1Mcyd4H51WyXv_xSZ79Q" },
+            { name: "Sinalizadores", id: "1IX-OKAfMYUnPuJ9RYLTHokWP5Phmkk-zSjYg0TcF39Q" },
+            { name: "Técnica (Pareceres)", id: "1KGU1kmudb16Zm-C0kZ_AcqHTixAp0IXoMzRRxV51rTY", gid: "1490018640" },
+            { name: "Garantia", id: "1r53K1aiaV1ShKcxatov1R3Mu_LfS1tWbtWvCS5NPCDY" },
+            { name: "Mapa SAT", id: "1dD0mgd0T3_QASjWhnDqmy84KQ17NLghydFbwq9rPQ0I", gid: "1223447522" },
+            { name: "Planilha Mãe Frota", id: "1gI0uSUl7ioSUDo8x_xDKxBum0o7QwSEXOD_9bSUH3hY", gid: "971139551" },
+            { name: "Vistorias Spin", id: "1tIt-b9Reeg-iem6QRP_MUNaKg6wuO_h9wHojovNRCpM" },
+            { name: "Resultado Op Verão", id: "1bxa79B6hUEfcB4iEL8qWTgWMh_eqpsqNZqzwWvLuTIg", gid: "901215155" },
+            { name: "Remanejamento Força Tática", id: "1pjTL98hQTj5KK4ga_JMqwQ_pd99Vfm88" },
+            { name: "Remanejamento Motos", id: "1LSTNL6YHgZmVYodRQTrsb6a-tcY8h2Wf" }
         ];
+
+        // Parser robusto de CSV com detecção de delimitador e escape de aspas
+        function parseCSV(text) {
+            if (!text) return [];
+            let delimiter = ',';
+            const firstLine = text.split('\n')[0] || '';
+            const commas = (firstLine.match(/,/g) || []).length;
+            const semicolons = (firstLine.match(/;/g) || []).length;
+            if (semicolons > commas) {
+                delimiter = ';';
+            }
+            
+            const lines = [];
+            let row = [""];
+            let inQuotes = false;
+            for (let i = 0; i < text.length; i++) {
+                let c = text[i];
+                let next = text[i+1];
+                if (c === '"') {
+                    if (inQuotes && next === '"') {
+                        row[row.length - 1] += '"';
+                        i++;
+                    } else {
+                        inQuotes = !inQuotes;
+                    }
+                } else if (c === delimiter && !inQuotes) {
+                    row.push("");
+                } else if ((c === '\r' || c === '\n') && !inQuotes) {
+                    if (c === '\r' && next === '\n') { i++; }
+                    lines.push(row);
+                    row = [""];
+                } else {
+                    row[row.length - 1] += c;
+                }
+            }
+            if (row.length > 1 || row[0] !== "") {
+                lines.push(row);
+            }
+            return lines;
+        }
+
+        // Auxiliar para parsing de datas em múltiplos formatos para ordenação
+        function parseDateStr(dateStr) {
+            if (!dateStr || dateStr === "N/D") return new Date(0);
+            
+            // Ex: 17/06/2026 14:30:22 ou 17/06/2026
+            const dmyMatch = dateStr.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})(?:\s+(\d{1,2}):(\d{1,2})(?::(\d{1,2}))?)?/);
+            if (dmyMatch) {
+                const [_, day, month, year, hour, minute, second] = dmyMatch;
+                return new Date(
+                    parseInt(year, 10),
+                    parseInt(month, 10) - 1,
+                    parseInt(day, 10),
+                    hour ? parseInt(hour, 10) : 0,
+                    minute ? parseInt(minute, 10) : 0,
+                    second ? parseInt(second, 10) : 0
+                );
+            }
+            
+            const parsed = Date.parse(dateStr);
+            if (!isNaN(parsed)) return new Date(parsed);
+            return new Date(0);
+        }
+
+        // Pesquisa dinâmica baseada em colunas identificadas automaticamente por palavras-chave
+        function searchSheet(sheetName, csvText, queries) {
+            const rows = parseCSV(csvText);
+            if (rows.length === 0) return [];
+            
+            let headerRowIndex = -1;
+            for (let r = 0; r < Math.min(rows.length, 5); r++) {
+                const row = rows[r];
+                const hasPlaca = row.some(cell => cell.toLowerCase().includes("placa"));
+                const hasPrefixo = row.some(cell => cell.toLowerCase().includes("prefixo") || cell.toLowerCase().includes("vtr"));
+                if (hasPlaca || hasPrefixo) {
+                    headerRowIndex = r;
+                    break;
+                }
+            }
+            
+            if (headerRowIndex === -1) headerRowIndex = 0;
+            const headers = rows[headerRowIndex].map(h => h.trim());
+            
+            const colIdx = {
+                plate: headers.findIndex(h => h.toLowerCase().includes("placa") || h.toLowerCase() === "vtr"),
+                prefix: headers.findIndex(h => h.toLowerCase().includes("prefixo") || h.toLowerCase() === "prefix"),
+                model: headers.findIndex(h => h.toLowerCase().includes("modelo") || h.toLowerCase().includes("marca") || h.toLowerCase() === "vtr"),
+                opm: headers.findIndex(h => h.toLowerCase().includes("opm") || h.toLowerCase().includes("unidade") || h.toLowerCase().includes("batalhão") || h.toLowerCase() === "local"),
+                date: headers.findIndex(h => h.toLowerCase().includes("data") || h.toLowerCase().includes("carimbo") || h.toLowerCase().includes("entrada")),
+                driver: headers.findIndex(h => h.toLowerCase().includes("condutor") || h.toLowerCase().includes("responsável") || h.toLowerCase().includes("vistoriador") || h.toLowerCase().includes("motorista"))
+            };
+            
+            const results = [];
+            const { plateQ, prefixQ, modelQ, opmQ } = queries;
+            
+            const cleanPlateQ = plateQ ? plateQ.replace(/[^a-zA-Z0-9]/g, "").toUpperCase() : "";
+            const cleanPrefixQ = prefixQ ? prefixQ.toLowerCase() : "";
+            const cleanModelQ = modelQ ? modelQ.toLowerCase() : "";
+            const cleanOpmQ = opmQ ? opmQ.toLowerCase() : "";
+            
+            for (let r = headerRowIndex + 1; r < rows.length; r++) {
+                const row = rows[r];
+                if (row.length === 0 || row.every(cell => cell.trim() === "")) continue;
+                
+                let matchesSearch = false;
+                
+                if (cleanPlateQ) {
+                    const rowPlateVal = colIdx.plate !== -1 && row[colIdx.plate] ? row[colIdx.plate].replace(/[^a-zA-Z0-9]/g, "").toUpperCase() : "";
+                    const plateMatched = rowPlateVal.includes(cleanPlateQ) || row.some(cell => cell.replace(/[^a-zA-Z0-9]/g, "").toUpperCase().includes(cleanPlateQ));
+                    if (plateMatched) matchesSearch = true;
+                    else continue;
+                }
+                
+                if (cleanPrefixQ) {
+                    let prefMatched = false;
+                    if (colIdx.prefix !== -1 && row[colIdx.prefix] && row[colIdx.prefix].toLowerCase().includes(cleanPrefixQ)) prefMatched = true;
+                    if (colIdx.driver !== -1 && row[colIdx.driver] && row[colIdx.driver].toLowerCase().includes(cleanPrefixQ)) prefMatched = true;
+                    if (!prefMatched && row.some(cell => cell.toLowerCase().includes(cleanPrefixQ))) prefMatched = true;
+                    
+                    if (prefMatched) matchesSearch = true;
+                    else continue;
+                }
+                
+                if (cleanModelQ) {
+                    let modelMatched = false;
+                    if (colIdx.model !== -1 && row[colIdx.model] && row[colIdx.model].toLowerCase().includes(cleanModelQ)) modelMatched = true;
+                    if (!modelMatched && row.some(cell => cell.toLowerCase().includes(cleanModelQ))) modelMatched = true;
+                    
+                    if (modelMatched) matchesSearch = true;
+                    else continue;
+                }
+                
+                if (cleanOpmQ) {
+                    let opmMatched = false;
+                    if (colIdx.opm !== -1 && row[colIdx.opm] && row[colIdx.opm].toLowerCase().includes(cleanOpmQ)) opmMatched = true;
+                    if (!opmMatched && row.some(cell => cell.toLowerCase().includes(cleanOpmQ))) opmMatched = true;
+                    
+                    if (opmMatched) matchesSearch = true;
+                    else continue;
+                }
+                
+                if (matchesSearch) {
+                    const valPlate = colIdx.plate !== -1 ? row[colIdx.plate].trim() : "";
+                    const valPrefix = colIdx.prefix !== -1 ? row[colIdx.prefix].trim() : "";
+                    const valModel = colIdx.model !== -1 ? row[colIdx.model].trim() : "";
+                    const valOpm = colIdx.opm !== -1 ? row[colIdx.opm].trim() : "";
+                    const valDate = colIdx.date !== -1 ? row[colIdx.date].trim() : "";
+                    const valDriver = colIdx.driver !== -1 ? row[colIdx.driver].trim() : "";
+                    
+                    // Extrai outras colunas não vazias como detalhes adicionais
+                    const detailsList = [];
+                    row.forEach((cell, idx) => {
+                        const cleanedCell = cell.trim();
+                        if (cleanedCell && idx !== colIdx.plate && idx !== colIdx.prefix && idx !== colIdx.model && idx !== colIdx.opm && idx !== colIdx.date && idx !== colIdx.driver) {
+                            const headerName = headers[idx] ? headers[idx].trim() : `Coluna ${idx}`;
+                            if (headerName && !headerName.startsWith("Col") && cleanedCell.toLowerCase() !== "false" && cleanedCell.toLowerCase() !== "true" && cleanedCell.length < 150) {
+                                detailsList.push(`<strong>${headerName}:</strong> ${cleanedCell}`);
+                            }
+                        }
+                    });
+                    
+                    results.push({
+                        sheet: sheetName,
+                        plate: valPlate || "N/D",
+                        prefix: valPrefix || "N/D",
+                        model: valModel || "N/D",
+                        opm: valOpm || "N/D",
+                        date: valDate || "N/D",
+                        driver: valDriver || "N/D",
+                        details: detailsList.join(" | ")
+                    });
+                }
+            }
+            return results;
+        }
 
         const btnDispararBusca = document.getElementById('btnDispararBusca');
         const btnLimparBusca = document.getElementById('btnLimparBusca');
@@ -1266,58 +1573,145 @@
         const buscaResultadosContador = document.getElementById('buscaResultadosContador');
         const buscaResultadosLista = document.getElementById('buscaResultadosLista');
 
-        btnDispararBusca.addEventListener('click', function() {
-            const plateVal = document.getElementById('modal-search-plate').value.trim().toUpperCase();
-            const prefixVal = document.getElementById('modal-search-prefix').value.trim().toLowerCase();
-            const chassisVal = document.getElementById('modal-search-chassis').value.trim().toLowerCase();
-            const opmVal = document.getElementById('modal-search-opm').value.trim().toLowerCase();
+        btnDispararBusca.addEventListener('click', async function() {
+            const plateVal = document.getElementById('modal-search-plate').value.trim();
+            const prefixVal = document.getElementById('modal-search-prefix').value.trim();
+            const chassisVal = document.getElementById('modal-search-chassis').value.trim();
+            const opmVal = document.getElementById('modal-search-opm').value.trim();
 
             if (!plateVal && !prefixVal && !chassisVal && !opmVal) {
                 alert('Por favor, preencha pelo menos um campo para vasculhar.');
                 return;
             }
 
-            // Realiza filtro na base simulada
-            const resultados = dbViaturas.filter(viatura => {
-                let match = false;
-                if (plateVal && viatura.placa.toUpperCase().includes(plateVal)) match = true;
-                if (prefixVal && (viatura.prefixo.toLowerCase().includes(prefixVal) || viatura.condutor.toLowerCase().includes(prefixVal))) match = true;
-                if (chassisVal && (viatura.chassi.toLowerCase().includes(chassisVal) || viatura.modelo.toLowerCase().includes(chassisVal))) match = true;
-                if (opmVal && viatura.opm.toLowerCase().includes(opmVal)) match = true;
-                return match;
+            // Exibir indicador de progresso inicial
+            buscaResultadosLista.innerHTML = `
+                <div style="text-align: center; padding: 25px; color: var(--color-green); font-size: 13px;">
+                    <i class="fa-solid fa-spinner fa-spin" style="margin-right: 8px; font-size: 16px;"></i>
+                    <span id="buscaProgressoTexto">Carregando dados das planilhas...</span>
+                </div>
+            `;
+            buscaResultadosContador.textContent = '0';
+            buscaResultadosContainer.style.display = 'flex';
+
+            const queries = {
+                plateQ: plateVal,
+                prefixQ: prefixVal,
+                modelQ: chassisVal, // Chassi/Modelo
+                opmQ: opmVal
+            };
+
+            let completedCount = 0;
+            let totalResults = [];
+
+            // Disparar requisições em paralelo
+            const fetchPromises = SHEET_CONFIGS.map(async (sheet) => {
+                const url = `https://docs.google.com/spreadsheets/d/${sheet.id}/export?format=csv${sheet.gid ? `&gid=${sheet.gid}` : ''}`;
+                try {
+                    const response = await fetch(url);
+                    if (!response.ok) throw new Error(`Status ${response.status}`);
+                    const text = await response.text();
+                    
+                    const sheetResults = searchSheet(sheet.name, text, queries);
+                    totalResults = totalResults.concat(sheetResults);
+                } catch (err) {
+                    console.warn(`Erro ao consultar planilha [${sheet.name}]:`, err);
+                } finally {
+                    completedCount++;
+                    const progressText = document.getElementById('buscaProgressoTexto');
+                    if (progressText) {
+                        progressText.textContent = `Vasculhando planilhas: ${completedCount} de ${SHEET_CONFIGS.length} lidas...`;
+                    }
+                }
             });
 
-            // Injeta resultados
+            await Promise.allSettled(fetchPromises);
+
+            // Consultar dados locais da SAF (tenta fetch direto e cai para saf_data.js se falhar/CORS)
+            let localSafVtrText = "";
+            let localSafCorollasText = "";
+            let localSafCmmText = "";
+
+            try {
+                const response = await fetch("../12_secao_adm_frota/dados_saf.csv");
+                if (response.ok) {
+                    localSafVtrText = await response.text();
+                }
+            } catch (e) {
+                // Silencioso - cai para fallback
+            }
+
+            try {
+                const response = await fetch("../12_secao_adm_frota/MAPA FORÇA - SAF 2025.xlsx - CONTROLE VTR 2026 (1).csv");
+                if (response.ok) {
+                    localSafCorollasText = await response.text();
+                }
+            } catch (e) {
+                // Silencioso
+            }
+
+            const activeSafVtr = localSafVtrText || (typeof SAF_VTR_CSV !== 'undefined' ? SAF_VTR_CSV : "");
+            const activeSafCorollas = localSafCorollasText || (typeof SAF_COROLLAS_CSV !== 'undefined' ? SAF_COROLLAS_CSV : "");
+            const activeSafCmm = localSafCmmText || (typeof SAF_CMM_CSV !== 'undefined' ? SAF_CMM_CSV : "");
+
+            if (activeSafVtr && activeSafVtr.trim() !== "") {
+                try {
+                    const sheetResults = searchSheet("SAF - Controle VTR", activeSafVtr, queries);
+                    totalResults = totalResults.concat(sheetResults);
+                } catch (err) {
+                    console.warn("Erro ao consultar SAF - Controle VTR:", err);
+                }
+            }
+            if (activeSafCorollas && activeSafCorollas.trim() !== "") {
+                try {
+                    const sheetResults = searchSheet("SAF - Trailblazers/Corollas", activeSafCorollas, queries);
+                    totalResults = totalResults.concat(sheetResults);
+                } catch (err) {
+                    console.warn("Erro ao consultar SAF - Trailblazers/Corollas:", err);
+                }
+            }
+            if (activeSafCmm && activeSafCmm.trim() !== "") {
+                try {
+                    const sheetResults = searchSheet("SAF - CMM", activeSafCmm, queries);
+                    totalResults = totalResults.concat(sheetResults);
+                } catch (err) {
+                    console.warn("Erro ao consultar SAF - CMM:", err);
+                }
+            }
+
+            // Injetar resultados na listagem
             buscaResultadosLista.innerHTML = '';
-            
-            if (resultados.length > 0) {
-                resultados.forEach(viatura => {
+
+            if (totalResults.length > 0) {
+                // Ordenar cronologicamente decrescente (mais recentes primeiro)
+                totalResults.sort((a, b) => parseDateStr(b.date) - parseDateStr(a.date));
+
+                totalResults.forEach(vtr => {
                     const card = document.createElement('div');
                     card.className = 'busca-result-card';
                     card.innerHTML = `
-                        <div class="plate">${viatura.placa}</div>
+                        <div class="plate">${vtr.plate}</div>
                         <div class="info">
-                            <strong>${viatura.prefixo} - ${viatura.modelo}</strong>
-                            <span>OPM: ${viatura.opm} | Condutor: ${viatura.condutor}</span>
+                            <strong>${vtr.prefix} - ${vtr.model}</strong>
+                            <span>OPM: ${vtr.opm} ${vtr.driver && vtr.driver !== "N/D" ? `| Condutor: ${vtr.driver}` : ''}</span>
+                            ${vtr.details ? `<span style="margin-top: 4px; color: #94a3b8; font-size: 10px; line-height: 1.4;">${vtr.details}</span>` : ''}
                         </div>
-                        <div class="status ${viatura.statusClass}">
-                            <i class="fa-solid fa-circle" style="font-size: 8px; margin-right: 5px;"></i>
-                            ${viatura.status}
+                        <div class="status" style="display:flex; flex-direction:column; align-items:flex-end; gap:4px; text-align:right;">
+                            <span style="color: var(--color-green); font-weight: 900; font-size: 11px; white-space: nowrap;">${vtr.sheet.toUpperCase()}</span>
+                            <span style="color: #64748b; font-size: 10px; font-weight: 500;">${vtr.date}</span>
                         </div>
                     `;
                     buscaResultadosLista.appendChild(card);
                 });
-                buscaResultadosContador.textContent = `${resultados.length}`;
+                buscaResultadosContador.textContent = `${totalResults.length}`;
             } else {
                 buscaResultadosLista.innerHTML = `
-                    <div style="text-align: center; padding: 15px; color: #64748b; font-size: 12px;">
+                    <div style="text-align: center; padding: 25px; color: #64748b; font-size: 12px;">
                         Nenhuma viatura localizada nas planilhas com estes parâmetros.
                     </div>
                 `;
                 buscaResultadosContador.textContent = '0';
             }
-
-            buscaResultadosContainer.style.display = 'flex';
         });
 
         btnLimparBusca.addEventListener('click', function() {
