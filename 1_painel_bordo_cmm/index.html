@@ -1669,18 +1669,30 @@
             let localSafCmmText = "";
 
             try {
-                const response = await fetch("../12_secao_adm_frota/dados_saf.csv");
+                const response = await fetch("../12_secao_adm_frota/MAPA FORÇA - SAF 2025.xlsx - CONTROLE VTR 2026.csv");
                 if (response.ok) {
                     localSafVtrText = await response.text();
+                } else {
+                    const fallback = await fetch("../12_secao_adm_frota/dados_saf.csv");
+                    if (fallback.ok) localSafVtrText = await fallback.text();
                 }
             } catch (e) {
                 // Silencioso - cai para fallback
             }
 
             try {
-                const response = await fetch("../12_secao_adm_frota/MAPA FORÇA - SAF 2025.xlsx - CONTROLE VTR 2026 (1).csv");
+                const response = await fetch("../12_secao_adm_frota/MAPA FORÇA - SAF 2025.xlsx - Trailblazers e Corollas 2026.csv");
                 if (response.ok) {
                     localSafCorollasText = await response.text();
+                }
+            } catch (e) {
+                // Silencioso
+            }
+
+            try {
+                const response = await fetch("../12_secao_adm_frota/MAPA FORÇA - SAF 2025.xlsx - CMM.csv");
+                if (response.ok) {
+                    localSafCmmText = await response.text();
                 }
             } catch (e) {
                 // Silencioso

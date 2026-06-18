@@ -1,5 +1,5 @@
-// ARQUIVO GERADO AUTOMATICAMENTE A PARTIR DE DADOS_SAF.CSV
-// NÃO EDITE ESTE ARQUIVO DIRETAMENTE. ATUALIZE DADOS_SAF.CSV E EXECUTE A CONVERSÃO.
+// ARQUIVO GERADO AUTOMATICAMENTE A PARTIR DOS CSVs DA SAF
+// NÃO EDITE ESTE ARQUIVO DIRETAMENTE. ATUALIZE OS CSVs E EXECUTE A CONVERSÃO.
 
 const SAF_VTR_CSV = `Data/Entrada,Motivo,Pertence,Informação Adicional,Macro Grupo,Tipo de Tração,Marca/Modelo,Cor,Câmbio,Placa,Ano,Km,Licenciamento,Restrições,1ª Consulta,2ª Consulta,Apresentação,Estribo (Trail Cel),Rádio,Grafismo,Monocela,TRD (Termo de Recebimento Definitivo),Revisão,Realizada?,Carga SIPL,Grupo,Prefixo no SIPL,Prefixo na Vtr,STATUS,Última Revisão,Localização,Início,Término,Observações,Histórico,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
 17/10/2022,Viatura de Coronel,Reserva do Comando,Viatura recolhida para compor reserva do Comando,4 rodas,4x4,GM/Trail Blazer,Preta,Automático,FDE9E51,2022,0Km,2025,-------,25/03/2025,,Descaracterizada,não possui,222019521-J,não possui,não possui,,,,CMM,1,1-42,não possui,Emprestada,17/10/2022,CMIL,01/08/2023,até outra determinação,Ten Cel Figueiredo ciente sobre essa demanda,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
@@ -64,6 +64,112 @@ GKH3I25,Viatura de Coronel,Reserva do Comando,Viatura recolhida para compor rese
 08/08/2024,Ajuste de frota 2024,Reserva do Comando,Ajuste de frota 2023,4 rodas,4x4,GM/Trail Blazer,Branca,Automático,FSK1C14,2022,23563,2026,-------,,,Descaracterizada,sim,217034702-B,não possui,sim,,,,CMM,15,15-300,Não Possui,Emprestada,08/04/26,DTIC,12/06/2026,,SOMENTE PARA USO DE CORONÉIS // Possui estribo // Cel PM Beatriz,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
 12/06/2026,Recolha detentor anterior Cel PM Roldan- APMAL,Reserva do Comando,Recolha detentor anterior Cel PM Roldan- APMAL,4 rodas,4x4,GM/Trail Blazer,Preta,Automático,EQW6C41,2022,54432,2026,-------,12/01/2026,,Descaracterizada,sim,222019535-K,não possui,não possui,,,,APMAL,1,1-56,não possui,disponível,15/06/2026,Pavimento Superior,,,SOMENTE PARA USO DE CORONÉIS // Possui apenas estribo,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,`;
 
-const SAF_COROLLAS_CSV = ``;
+const SAF_COROLLAS_CSV = `,DETENTOR ATUAL,UNIDADE,PLACA TRAILBLAZER,PLACA COROLLA,OBSERVAÇÕES,,,
+1,Glauce Anselmo Cavalli (97),CMT GERAL, GHK0D92/ BZF1A37 ,EEF9581 / EEF8712 / EEF9063 ,(Grupo 1),,,
+2,Mario Kitsuwa (97),SUBCMT PM,FZY9F24,,Não tem Corolla ,,,
+3,Emerson Massera Ribeiro (94),DEC,EXW2E26,EEF9078,(Grupo 1),,,
+4,Alexandre Merlin (94),CCB-CMT,GKE2E82,,EEF9077 (emprestado para Cel PM Pollete),,,
+5,Daniela Pollete Costa Pereira Merlin (94),EEF,DEI7I96,EEF9077,,,,
+6,Marcelo dos Santos Sançana (94),CAJ,FPI3C61,,não tem corolla,,,
+7,Sandro Roberto Rondini (94),CPM,FOH8D21,,não tem corolla (Emprestado o Corolla de placa EEF9076),,,
+8,João Henrique Coste (94),CCB - SUBCMT,FOL8E16,EEF8699,(Grupo 1),,,
+9,Leandro Pereira Lima (94),DP,FNX4A94,,não tem corolla,,,
+10,Rodrigo Quintino (94),CPI-3,EJH8F92,,não tem corolla,,,
+11,Ronaldo Barreto de Oliveira (94),CAvPM,FYB4G23,EEF9605,(Grupo 1),,,
+12,Leandro Carlos Navarro (94),CPAmb,GJU6I23,,não tem corolla,,,
+13,Gentil Epaminondas de Carvalho Junior (94),APMPMSP,CEN0F64,,não tem corolla,,,
+14,Hugo Araujo Santos (94),CPRv,EVD0F41,EEF8713,(Grupo 1),,,
+15,Alexandre Vilariço Alves de Oliveira (96),COORDOP,FWU2D55,,não tem corolla,,,
+16,Adriana Roledo Belluzzo (96),DPCDH-SUBDIR,CUJ9C77,,não tem corolla,,,
+17,Paulo Sérgio de Melo (96),CAES,EFQ8J43,,não tem corolla,,,
+18,Fabio Sérgio do Amaral (96),PMRG,EXN8I43,,não tem corolla,,,
+19,Pedro Luís de Souza Lopes (96),CPA/M-9,FIP0I47,,não tem corolla,,,
+20,Luiz Fernando Alves (96),CPC,FWM1D23,EEF9596,"não tem corolla, o corolla EEF9596 (Grupo 1) está com o coronel em caráter de empréstimo ",,,
+21,Andre Mauricio de Melo Bastos (96),DF,FCR2F61,EEF8812,(Grupo 1),,,
+22,Renato Lopes Gomes da Silva (96),ESSd,FPT9F57,,não tem corolla,,,
+23,Marco Antônio Pimentel Pires (96),APMTJ,CJJ7F93,,não tem corolla,,,
+24,Marcos Rogério da Cunha (96),CPTran,ELI8I62,,não tem corolla,,,
+25,Alexandre Vitorino Roldan (96),APMAL,,,não tem corolla,,,
+26,Alex dos Reis Asaka (96),ESSgt,FPK7E51,EEF8811,não tem corolla,,,
+27,Cleotheos Sabino de Souza Filho (96),CPI-9,EDS2J24,,não tem corolla,,,
+28,Rogerio Nery Machado,CPChq,EXV9E11,,não tem corolla,,,
+29,Marcos Rogério Lemes (96),CPI-10,BYW2A71,EEF8671,"não tem corolla, está com o EEF8671 em caráter de empréstimo.",,,
+30, Thiago Baston Theodoro de Souza (96),ESB,FBD0G83,,não tem corolla,,,
+31,Carlos Alberto Rodrigues Sanches Júnior (96),DL,GGS9F71,,não tem corolla,,,
+32,Max Alexandre Schroeder (96),CBM,FPC6I23,,não tem corolla ,,,
+33,Diogenes Martins Munhoz (96),CBI-1,FSI2B52,,não tem corolla,,,
+34,Allan Marques Bueno (97),Gab Cmt Geral,GHH6B47,,não tem corolla,,,
+35,Nilson César Pereira (97),CPI-4,DGY4J91,,não tem corolla,,,
+36,Paulo Henrique Beltrami (97),CPI-5,EYN8D91,,não tem corolla,,,
+37,Beatriz de Assis Bastos Morassi (97),DTIC,DSK5H81,EEF8814,(Grupo 1),,,
+38,Leandro Garcia Souza (97),CORREG PM,FPZ3H33,,não tem corolla,,,
+39,Alessandro Gregorim Silva (97),APMSSP,GCO7D92,,não tem corolla,,,
+40,Adalberto Gil Lima Mendonça (97),APMBB,GIQ5D76 ,,não tem corolla,,,
+41,Carlos Alexandre Marques (97),COPOM,EQV8A52,,não tem corolla  ,,,
+42,Leonardo Akira Takahashi (97),CPI-2,DYH7J51,,não tem corolla,,,
+43,Clodoaldo Donizetti da Cruz (97),CPA/M-4,FCH9J72 ,,não tem corolla,,,
+44,Alexandre Coelho Boggi (97),CBI-3,BZL3I46,,não tem corolla ,,,
+45,Luciana Bachiega Boggi (97),EM/PM,FPF0B04,,não tem corolla ,,,
+46,Alexandre Andrade dos Santos (98),PMRG,BYY8E41,,não tem corolla ,,,
+47,Mauro Carreira dos Santos (98),CPA/M-8,FZC6I36,,não tem corolla ,,,
+48,Edmilson Mendes Ribeiro (98),CPI-1,FNW5G94,,não tem corolla ,,,
+49, Rinaldo de Araújo Monteiro (96),C MIL,DCG2E51,,não tem corolla,,,
+50,Ivan Gonzaga de Oliveira (97),CCOMSOC,FZG4H04 ,,não tem corolla ,,,
+51,Fábio Antunes Possato (98),CPI-6,GFB9D21 ,,não tem corolla ,,,
+52,Paulo Augusto Aguilar (98),CPA/M-3,GAA8H54,,não tem corolla ,,,
+53,Rodrigo de Oliveira Carneiro (98),CPA/M-12,GDA4D57,,não tem corolla,,,
+54,Marisa de Oliveira (97),CPA/M-11,FCP1F63,,não tem corolla,,,
+55,Alessandro Lima de Freitas (98),CBI-2,GCP4F05,,não tem corolla ,,,
+56,André Frisene (98),CPA/M-5,FWR7D06,,não tem corolla ,,,
+57,Nicanor Barry Komata (99),CIPM,FXZ1E37,,não tem corolla,,,
+58,Ricardo Lopes de Souza Salomão (99),CPI-7,FXL0F73,,não tem corolla,,,
+59,Luis Fernando Megda Nascimento ,CPA/M-7,FUG6C63,,não tem corolla ,,,
+60,Andrei Gonçalves Vieira,CPI-8,FJC1F92,,não tem corolla ,,,
+61,Vergílio Correa Mariano,CPA/M-1,FDV9G46,,não tem corolla ,,,
+62,Rodrigo Pezato,CPA/M-2,EXR9D53,,não tem corolla ,,,
+63,Fernando Carvalho Ricardo,CPA/M-6,EQW6C41,,não tem corolla ,,,
+64,Fernando Signorelli,CPA/M-10,GAN2I26,,não tem corolla,,,
+,,,,,,,,
+,,,,,,,,
+XX,Tim de Lima Mauro,DS,FCE3B73,,,,,
+,,,,,,,,
+,TURMA 1993 - II,,,PLACA (COROLLAS),SITUAÇÃO,,,
+,TURMA 1994,,,EEF8670,À DISPOSIÇÃO DA APMPGE (Grupo 1),,,
+,TURMA 1996,,,EEF9593,À DISPOSIÇÃO DO CCB (Grupo 1),,,
+,TURMA 1997,,,EEF9063,BAIXADO PELO CMDO GERAL (Grupo 1),,,
+,TURMA 1998,,,EEF9576,BAIXADO PELO CMDO GERAL (Grupo 1),,,
+,TURMA 1999,,,,,,,
+,,,,,,,,
+,,,,,,,,
+,,,,,,,,
+ ,,,,,,,,
+,TRAILBLAZER GRUPO 01 PRETAS - BAIXADAS ATUALIZADA EM 16JUN26,,,,,,,
+,,,,,,,,
+,PLACA,ANO,KM,SITUAÇÃO,MULTIMÍDIA,ESTRIBO,CÂMERA DE RÉ,LOCAL
+,FVO8F54,2022,161166,Baixada,SIM,SIM,SIM,MANUTENÇÃO
+,GKH3I25,2022,Baixada direto na Manutenção,,,,,
+,GHR4I45,2022,109467,Baixada,SIM,SIM,SIM,MANUTENÇÃO`;
 
-const SAF_CMM_CSV = ``;
+const SAF_CMM_CSV = `Seção de Administração de Frota,,,,,,,,,,,,,,,,
+SUBDETENTOR,MARCA/MODELO,CÂMBIO,PLACA,ANO,Tipo de Tração,2ª Consulta,APRESENTAÇÃO,GRAFISMO,Rádio,Disponível,Carga SIPL,GRUPO,ENCONTRA-SE,INÍCIO,TÉRMINO,OBSERVAÇÕES
+Chefe CMM (SAF),GM/SPIN,Manual,29/04/2026,2020,4X2,,Caracterizada,Adesivo,,Emprestada,CMM,22,Guarda,06/02/2023,,Emprestada para a Guarda do CMM
+Chefe CMM (SAF),GM/Vectra,Manual,CMW7378,2011,4X2,,Descaracterizada,Não Possui,214007014-J,Emprestada,CMM,15,DP,15/05/2025,,"Emprestado para a DP, determinação Maj Demetrius."
+Seç Mat e Comb,GM/BLAZER,Manual,DJL7765,2011,4X2,,Descaracterizada,Não Possui,214006261-P,Baixada,CMM,15,P/4 CMM,10/07/2024,,Enchente - será descarregada (esta emprestada para o P/4)
+Chefe CMM (SAF),GM/Cruze,Manual,FZV0B15,2022,4X2,,Descaracterizada,Não Possui,219047295-K,Disponível,CMM,15,CMM,21/02/2025,,USO DA CH CMM. Chaves com os motoristas
+St Técnico,GM/BLAZER,Manual,CMW6288,2005,4X2,,Descaracterizada,Não Possui,,,CMM,15,St Técnico,,,Veículo sob responsabilidade do St Técnico da manutenção
+SAT,GM/BLAZER,Manual,DJL7424,2011,4X2,,Descaracterizada,Não Possui,,,CMM,15,SAT,,,Veículo sob responsabilidade da SAT
+Auto Escola,GM/BLAZER,Manual,CDV9594,2002,4X2,,Caracterizada,Adesivo,,,CMM,3,Auto Escola,,,Veículo sob responsabilidade da Auto Escola
+Auto Escola,Honda/XRE 300,-----,DSV7808,2012,-----,,Caracterizada,Adesivo,-----,,CMM,19,Auto Escola,,,Veículo sob responsabilidade da Auto Escola
+Auto Escola,GM/Trail Blazer,Automático,FNR2582,2015,4x4,,Caracterizada,Adesivo,,,CMM,3,Auto Escola,,,Veículo sob responsabilidade da Auto Escola
+Auto Escola,GM/Spin,Manual,CAG3711,2020,4X2,,Caracterizada,Adesivo,,,CMM,22,Auto Escola,,,Veículo sob responsabilidade da Auto Escola
+Auto Escola,Yamaha/Lander,-----,CUH2J98,2022,-----,,Caracterizada,Adesivo,-----,,CMM,19,Auto Escola,11/03/24,,Veículo sob responsabilidade da Auto Escola
+Auto Escola,Yamaha/Lander,-----,DYF3H91,2022,-----,,Caracterizada,Adesivo,-----,,CMM,19,Auto Escola,11/03/24,,Veículo sob responsabilidade da Auto Escola
+Auto Escola,Yamaha/Lander,-----,CUI0G83,2022,-----,,Caracterizada,Adesivo,-----,,CMM,19,Auto Escola,11/03/24,,Veículo sob responsabilidade da Auto Escola
+Auto Escola,Yamaha/Lander,-----,BOT5I18,2022,-----,,Caracterizada,Adesivo,-----,,CMM,19,Auto Escola,11/03/24,,Veículo sob responsabilidade da Auto Escola
+Auto Escola,BMW/F850 GS,-----,FWE6J01,2022,-----,,Caracterizada,Adesivo,-----,,CMM,19,Auto Escola,11/03/24,,Veículo sob responsabilidade da Auto Escola
+Auto Escola,VW/Gol,Manual,BTZ0876,2019,4X2,,Caracterizada,Adesivo,,,CMM,22,Auto Escola,,,Veículo sob responsabilidade da Auto Escola
+Autoescola,Vw/Parati,Manual,DJM0137,2012,4X2,,Caracterizada,Adesivo,,Baixada,CMM,22,SAT,,,Veículo sob responsabilidade da SAT (possível DESCARGA)
+,Yamaha Lander XTZ250,-----,BYZ0330,2010,-----,,Caracterizada,Adesivo,-----,Baixada,CMM,19,Auto Escola,,,Veículo sob responsabilidade da Auto Escola (possível DESCARGA)
+SAF,Toyota/Hilux,Automático,CFY5436,2009,4x4,,Descaracterizada,Não possui,----------,Baixada,CMM,15,Manutenção,,,Troca de óleo
+St Técnico,Toyota/Hilux cinza,Automático,CFY5701,2013,4x2,,Descaracterizada,Não possui,,-------,CMM,15,St Técnico,22/01/2025,,
+Autoescola,GM/SPIN,Automático,FBV9H43,2022,4x3,,Caracterizada,não possui,221034194-E,Emprestada,CMM,22,Autoescola,27/02/2025,,Determinação Ch CMM.`;
