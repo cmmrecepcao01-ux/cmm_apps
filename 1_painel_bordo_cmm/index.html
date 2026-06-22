@@ -1308,19 +1308,19 @@
             
             <div class="busca-modal-grid">
                 <div class="busca-modal-field">
-                    <label for="modal-search-plate">Placa</label>
+                    <label for="modal-search-plate">PLACA</label>
                     <input type="text" id="modal-search-plate" class="busca-modal-input" placeholder="Ex: EYB-4A12 ou DMO">
                 </div>
                 <div class="busca-modal-field">
-                    <label for="modal-search-prefix">Prefixo / Condutor</label>
-                    <input type="text" id="modal-search-prefix" class="busca-modal-input" placeholder="Ex: M-10145 ou Sgt Silva">
+                    <label for="modal-search-prefix">PREFIXO / CONDUTOR / (NOME DO CORONEL *SEM POSTO)</label>
+                    <input type="text" id="modal-search-prefix" class="busca-modal-input" placeholder="Ex: M-10145, Sgt Silva ou Caio">
                 </div>
                 <div class="busca-modal-field">
-                    <label for="modal-search-chassis">Chassi / Modelo</label>
-                    <input type="text" id="modal-search-chassis" class="busca-modal-input" placeholder="Ex: 9BW ou Hilux">
+                    <label for="modal-search-chassis">CHASSI / MARCA / MODELO</label>
+                    <input type="text" id="modal-search-chassis" class="busca-modal-input" placeholder="Ex: 9BW, GM ou Hilux">
                 </div>
                 <div class="busca-modal-field">
-                    <label for="modal-search-opm">Local / Batalhão (OPM)</label>
+                    <label for="modal-search-opm">LOCAL / OPM</label>
                     <input type="text" id="modal-search-opm" class="busca-modal-input" placeholder="Ex: ROTA ou 4º BPM/I">
                 </div>
             </div>
@@ -1427,6 +1427,7 @@
             { name: "Sinalizadores", id: "1IX-OKAfMYUnPuJ9RYLTHokWP5Phmkk-zSjYg0TcF39Q" },
             { name: "Técnica (Pareceres)", id: "1KGU1kmudb16Zm-C0kZ_AcqHTixAp0IXoMzRRxV51rTY", gid: "1490018640" },
             { name: "Garantia", id: "1r53K1aiaV1ShKcxatov1R3Mu_LfS1tWbtWvCS5NPCDY" },
+            { name: "Frota SP", id: "1r53K1aiaV1ShKcxatov1R3Mu_LfS1tWbtWvCS5NPCDY", gid: "451613906" },
             { name: "Mapa SAT", id: "1dD0mgd0T3_QASjWhnDqmy84KQ17NLghydFbwq9rPQ0I", gid: "1223447522" },
             { name: "Planilha Mãe Frota", id: "1gI0uSUl7ioSUDo8x_xDKxBum0o7QwSEXOD_9bSUH3hY", gid: "971139551" },
             { name: "Vistorias Spin", id: "1tIt-b9Reeg-iem6QRP_MUNaKg6wuO_h9wHojovNRCpM" },
@@ -1521,8 +1522,8 @@
                 plate: headers.findIndex(h => h.toLowerCase().includes("placa") || h.toLowerCase() === "vtr"),
                 prefix: headers.findIndex(h => h.toLowerCase().includes("prefixo") || h.toLowerCase() === "prefix"),
                 model: headers.findIndex(h => h.toLowerCase().includes("modelo") || h.toLowerCase().includes("marca") || h.toLowerCase() === "vtr"),
-                opm: headers.findIndex(h => h.toLowerCase().includes("opm") || h.toLowerCase().includes("unidade") || h.toLowerCase().includes("batalhão") || h.toLowerCase() === "local"),
-                date: headers.findIndex(h => h.toLowerCase().includes("data") || h.toLowerCase().includes("carimbo") || h.toLowerCase().includes("entrada")),
+                opm: headers.findIndex(h => h.toLowerCase() === "opm" || h.toLowerCase().includes("unidade") || h.toLowerCase().includes("batalhão") || h.toLowerCase() === "local" || (h.toLowerCase().includes("opm") && !h.toLowerCase().includes("cod"))),
+                date: headers.findIndex(h => h.toLowerCase().includes("data") || h.toLowerCase().includes("carimbo") || h.toLowerCase().includes("entrada") || h.toLowerCase().includes("aquisição") || h.toLowerCase().includes("aquisicao")),
                 driver: headers.findIndex(h => h.toLowerCase().includes("condutor") || h.toLowerCase().includes("responsável") || h.toLowerCase().includes("vistoriador") || h.toLowerCase().includes("motorista"))
             };
             
