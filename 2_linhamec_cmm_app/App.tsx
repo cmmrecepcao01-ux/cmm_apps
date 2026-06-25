@@ -1,35 +1,29 @@
-import React, { useState, useEffect, useMemo, useRef } from 'react';
+/// <reference types="vite/client" />
+import React, { useState, useEffect, useMemo } from 'react';
 import {
   Mechanic,
   AppState,
   ServiceRecord,
   ServiceStatus,
-  WorkLog,
   UserRole,
   Vehicle,
   UsedPart,
   Department,
+  WorkLog,
 } from './types';
 import {
   MECHANICS as INITIAL_DATA,
-  PART_KEYWORDS,
-  PART_CATEGORY_COLORS,
 } from './constants';
 import {
   Wrench,
   Play,
   Search,
-  ChevronRight,
   Clock,
   User,
   FileSpreadsheet,
   CheckCircle2,
-  ArrowLeft,
   LogOut,
   Eye,
-  History,
-  Lock,
-  Pause,
   BarChart3,
   TrendingUp,
   Car,
@@ -37,82 +31,37 @@ import {
   ClipboardList,
   Loader2,
   AlertTriangle,
-  Mic,
-  Save,
-  Upload,
   Database,
-  X,
   UserCog,
   Power,
-  Key,
   Bell,
   Brush,
   Cpu,
   Truck,
   Package,
+  ArrowLeft,
+  Lock,
 } from 'lucide-react';
 import * as XLSX from 'xlsx';
 import { createClient } from '@supabase/supabase-js';
 
-// CONFIGURAÇÃO DA IA (PADRÃO OPENAI - 2026)
-const AI_CONFIG = {
-  apiKey:
-    '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',
-  baseUrl: 'https://api.openai.com/v1',
-  modelName: 'gpt-5.4-nano',
-};
-
-const askCMM_AI = async (userPrompt: string, appData: any) => {
-  try {
-    const response = await fetch(`${AI_CONFIG.baseUrl}/chat/completions`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${AI_CONFIG.apiKey}`,
-      },
-      body: JSON.stringify({
-        model: AI_CONFIG.modelName,
-        messages: [
-          {
-            role: 'system',
-            content: `Você é o Analista de Dados Master do CMM. 
-            DADOS DO SISTEMA: ${JSON.stringify(appData)}.
-        
-            REGRAS DE NEGÓCIO OBRIGATÓRIAS:
-            1. STATUS (Situação: EM_ANDAMENTO ou RESOLVIDO) é diferente de SEÇÃO (Setor: LINHA MECÂNICA, SINALIZADOR, GRAFISMO, etc).
-            2. PROBLEMA INICIAL é o que o militar relatou na entrada. DIAGNÓSTICO é o que o mecânico escreveu depois.
-            3. TEMPO PARADA: Calcule a diferença entre 'Agora' e a 'Data de Entrada'.
-            4. MÃO DE OBRA: Some os valores de 'custo_acumulado' informados nos dados.
-            5. PÁTIO ATIVO: é a quantidade soma total dos veículos das seções (LINHA MECÂNICA, SINALIZADOR, GRAFISMO, SETOR TÉCNICO, LINHA MECÂNICA PESADA, BORRACHARIA).
-        
-            REGRAS DE FORMATAÇÃO:
-            - NÃO USE NEGRITO (**), ITÁLICO (*) OU MARKDOWN.
-            Use apenas texto puro.
-            - Para tabelas, use caracteres simples (| e -).
-            - Respostas diretas e limpas.
-            Se não souber, diga "Informação não localizada".`,
-          },
-          { role: 'user', content: userPrompt },
-        ],
-        temperature: 0.1,
-      }),
-    });
-
-    const data = await response.json();
-    if (data.error) throw new Error(data.error.message);
-
-    const content = data.choices?.[0]?.message?.content || 'Sem resposta.';
-    return content.replace(/[*#]/g, '').trim();
-  } catch (error: any) {
-    console.error('Erro IA:', error);
-    return `Falha ao conectar: ${error.message}`;
-  }
-};
+// Importação dos Componentes Modulares
+import { PreAuthView } from './components/PreAuthView';
+import { AuthView } from './components/AuthView';
+import { NewServiceForm } from './components/NewServiceForm';
+import { ConsultServiceView } from './components/ConsultServiceView';
+import { ActiveServiceTimer } from './components/ActiveServiceTimer';
+import { ServiceDetailsView } from './components/ServiceDetailsView';
+import { ChiefStatsDashboard, RecurrenceExpansion } from './components/ChiefStatsDashboard';
+import { ClientConsultView } from './components/ClientConsultView';
+import { ImportVehiclesView } from './components/ImportVehiclesView';
+import { SearchResultsView } from './components/SearchResultsView';
+import { ActiveMechanicsModal } from './components/ActiveMechanicsModal';
+import { formatMS } from './components/utils';
 
 // ========== CONFIGURAÇÕES ==========
-const SUPABASE_URL = 'https://rrqxcehfsbfoblqmxxkh.supabase.co';
-const SUPABASE_ANON_KEY =
-  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJycXhjZWhmc2Jmb2JscW14eGtoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjkwNzEzNDMsImV4cCI6MjA4NDY0NzM0M30.0sy9oWpr1xYCa0wiDzva9EfwDlVZYRBA6IpyHUdOPek';
+const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL || '';
+const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY || '';
 
 const MASTER_PASS_DEFAULT = 'cmm2026';
 
@@ -120,21 +69,59 @@ const MASTER_USER: Mechanic = {
   id: 'master-999',
   name: 'ADMINISTRADOR MASTER',
   role: UserRole.CHIEF,
-  department: 'CHEFES',
+  department: Department.CHIEFS,
   passwordSet: true,
+  hourlyRate: 0,
 };
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-const GOOGLE_SHEETS_URL =
-  'https://script.google.com/macros/s/AKfycbypsiBdeEXPLpcdzlPN_7-JoJWY1BO--6VA-J1Zi72hAUErGP8oFQGW8ieDZy3u-7ek-A/exec';
+const GOOGLE_SHEETS_URL = import.meta.env.VITE_GOOGLE_SHEETS_URL || '';
+const GOOGLE_NOTIFY_URL = import.meta.env.VITE_GOOGLE_NOTIFY_URL || '';
+const GOOGLE_SHEETS_CONTROLE_URL = import.meta.env.VITE_GOOGLE_SHEETS_CONTROLE_URL || '';
 
-const GOOGLE_NOTIFY_URL =
-  'https://script.google.com/macros/s/AKfycbwOt_Mny0Anq19CxRTGAfDQywHj7CzmKgRE7rrbPWGTLp4823CkF2I4vY4gR51lh7x4jw/exec';
-
-const GOOGLE_SHEETS_CONTROLE_URL =
-  'https://script.google.com/macros/s/AKfycbwrkXE9nkCtzv_40RVyPBl8qpN-DrgnCogzzgvz2zcKcU1ZDHyKgYb2-iSAsdYeH3tQ/exec';
+// ========== FUTURA INTEGRAÇÃO DE ASSISTENTE IA ==========
+/*
+// Para reativar o assistente de IA da frota no futuro:
+// 1. Crie uma variável VITE_GEMINI_API_KEY no arquivo .env.local
+// 2. Descomente e adeque a função abaixo chamando a API oficial da Google AI.
+//
+// const handleAiAskFuture = async (prompt: string, yardData: any) => {
+//   try {
+//     const response = await fetch("https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=" + import.meta.env.VITE_GEMINI_API_KEY, {
+//       method: "POST",
+//       headers: { "Content-Type": "application/json" },
+//       body: JSON.stringify({
+//         contents: [{ parts: [{ text: prompt }] }]
+//       })
+//     });
+//     const data = await response.json();
+//     return data.candidates[0].content.parts[0].text;
+//   } catch(e) {
+//     console.error("Erro IA:", e);
+//     return "Falha ao conectar com o assistente.";
+//   }
+// };
+*/
 
 // ========== FUNÇÕES AUXILIARES ==========
+const getDestinationHistoryText = (logs: WorkLog[]): string => {
+  const sections: string[] = [];
+  (logs || []).forEach((log) => {
+    if (log.destination) {
+      sections.push(log.destination);
+    }
+  });
+
+  const uniqueSections: string[] = [];
+  sections.forEach((sec) => {
+    if (uniqueSections.length === 0 || uniqueSections[uniqueSections.length - 1] !== sec) {
+      uniqueSections.push(sec);
+    }
+  });
+
+  return uniqueSections.join('\n');
+};
+
 const sendToGoogleSheets = async (data: {
   os: string;
   plate: string;
@@ -190,2883 +177,6 @@ const INITIAL_MECHANICS: Mechanic[] = INITIAL_DATA.map((m) => ({
   passwordSet: false,
 }));
 
-const formatMS = (ms: number) => {
-  const x = Math.floor(ms / 1000);
-  const ss = x % 60;
-  const mm = Math.floor(x / 60) % 60;
-  const hh = Math.floor(x / 3600);
-  return `${hh.toString().padStart(2, '0')}:${mm
-    .toString()
-    .padStart(2, '0')}:${ss.toString().padStart(2, '0')}`;
-};
-
-const formatServiceList = (text: string): string => {
-  if (!text) return '';
-  const keywords = [
-    'TROCA DE',
-    'TROCA DO',
-    'TROCA DA',
-    'TROCAR',
-    'VERIFICAÇÃO DE',
-    'VERIFICAÇÃO DO',
-    'VERIFICAÇÃO DA',
-    'VERIFICAR',
-    'REPARO DE',
-    'REPARO DO',
-    'REPARO DA',
-    'REPARAR',
-    'SUBSTITUIÇÃO DE',
-    'SUBSTITUIÇÃO DO',
-    'SUBSTITUIÇÃO DA',
-    'SUBSTITUIR',
-    'AJUSTE DE',
-    'AJUSTE DO',
-    'AJUSTE DA',
-    'AJUSTAR',
-    'LIMPEZA DE',
-    'LIMPEZA DO',
-    'LIMPEZA DA',
-    'LIMPAR',
-    'REVISÃO DE',
-    'REVISÃO DO',
-    'REVISÃO DA',
-    'REVISAR',
-    'INSTALAÇÃO DE',
-    'INSTALAÇÃO DO',
-    'INSTALAÇÃO DA',
-    'INSTALAR',
-    'REMOÇÃO DE',
-    'REMOÇÃO DO',
-    'REMOÇÃO DA',
-    'REMOVER',
-    'DESMONTAGEM DE',
-    'DESMONTAGEM DO',
-    'DESMONTAGEM DA',
-    'DESMONTAR',
-    'MONTAGEM DE',
-    'MONTAGEM DO',
-    'MONTAGEM DA',
-    'MONTAR',
-    'ALINHAMENTO DE',
-    'ALINHAMENTO DO',
-    'ALINHAMENTO DA',
-    'ALINHAR',
-    'BALANCEAMENTO DE',
-    'BALANCEAMENTO DO',
-    'BALANCEAMENTO DA',
-    'BALANCEAR',
-    'DIAGNÓSTICO DE',
-    'DIAGNÓSTICO DO',
-    'DIAGNÓSTICO DA',
-    'DIAGNOSTICAR',
-    'INSPEÇÃO DE',
-    'INSPEÇÃO DO',
-    'INSPEÇÃO DA',
-    'INSPECIONAR',
-    'REGULAGEM DE',
-    'REGULAGEM DO',
-    'REGULAGEM DA',
-    'REGULAR',
-    'SANGRIA DE',
-    'SANGRIA DO',
-    'SANGRIA DA',
-    'SANGRAR',
-    'RECARGA DE',
-    'RECARGA DO',
-    'RECARGA DA',
-    'RECARREGAR',
-    'CALIBRAGEM DE',
-    'CALIBRAGEM DO',
-    'CALIBRAGEM DA',
-    'CALIBRAR',
-    'LUBRIFICAÇÃO DE',
-    'LUBRIFICAÇÃO DO',
-    'LUBRIFICAÇÃO DA',
-    'LUBRIFICAR',
-    'APERTO DE',
-    'APERTO DO',
-    'APERTO DA',
-    'APERTAR',
-    'TESTE DE',
-    'TESTE DO',
-    'TESTE DA',
-    'TESTAR',
-  ];
-
-  let formatted = text
-    .toUpperCase()
-    .trim()
-    .replace(/^[•\-\*]\s*/gm, '');
-  const sortedKeywords = keywords.sort((a, b) => b.length - a.length);
-  sortedKeywords.forEach((keyword) => {
-    const regex = new RegExp(`([^\\n])\ (${keyword})`, 'gi');
-    formatted = formatted.replace(regex, '$1\n$2');
-  });
-
-  return formatted
-    .split('\n')
-    .map((line) => line.trim())
-    .filter((line) => line.length > 0)
-    .map((line) => '• ' + (!/[.;,!?]$/.test(line) ? line + '.' : line))
-    .join('\n');
-};
-
-// ========== COMPONENTES AUXILIARES ==========
-
-const VoiceInput: React.FC<{ onResult: (text: string) => void }> = ({
-  onResult,
-}) => {
-  const [isListening, setIsListening] = useState(false);
-  const toggleListen = () => {
-    const SpeechRecognition =
-      (window as any).SpeechRecognition ||
-      (window as any).webkitSpeechRecognition;
-    if (!SpeechRecognition) {
-      alert('Navegador não suporta reconhecimento de voz.');
-      return;
-    }
-    const recognition = new SpeechRecognition();
-    recognition.lang = 'pt-BR';
-    recognition.interimResults = false;
-    recognition.onstart = () => setIsListening(true);
-    recognition.onend = () => setIsListening(false);
-    recognition.onresult = (event: any) =>
-      onResult(event.results[0][0].transcript);
-    if (isListening) recognition.stop();
-    else recognition.start();
-  };
-  return (
-    <button
-      type="button"
-      onClick={toggleListen}
-      className={`p-2 rounded-sm transition-all ${
-        isListening
-          ? 'bg-rose-600 animate-pulse'
-          : 'bg-zinc-800 hover:bg-zinc-700'
-      }`}
-    >
-      <Mic className="w-4 h-4 text-white" />
-    </button>
-  );
-};
-
-const ActiveMechanicsModal: React.FC<{
-  service: ServiceRecord;
-  mechanics: Mechanic[];
-  onClose: () => void;
-  onPauseMechanic: (serviceId: string, mechanicId: string) => void;
-}> = ({ service, mechanics, onClose, onPauseMechanic }) => {
-  const [now, setNow] = useState(Date.now());
-  useEffect(() => {
-    const i = setInterval(() => setNow(Date.now()), 1000);
-    return () => clearInterval(i);
-  }, []);
-
-  const activeMechanics = Object.entries(service.activeWorkSessions || {}).map(
-    ([mechanicId, startTime]) => {
-      const mechanic = mechanics.find((m) => m.id === mechanicId);
-      return {
-        id: mechanicId,
-        name: mechanic?.name || 'DESCONHECIDO',
-        role: mechanic?.role || UserRole.MECHANIC,
-        elapsed: now - startTime,
-        totalTime:
-          ((service.individualTimes || {})[mechanicId] || 0) +
-          (now - startTime),
-      };
-    }
-  );
-
-  return (
-    <div className="fixed inset-0 bg-black/90 flex items-center justify-center z-50 p-4">
-      <div className="bg-zinc-950 border border-zinc-800 p-10 rounded-sm max-w-2xl w-full space-y-6 max-h-[90vh] overflow-y-auto">
-        <div className="flex justify-between items-center border-b border-zinc-800 pb-4">
-          <div>
-            <h3 className="text-2xl font-black uppercase text-white">
-              Mecânicos em Serviço
-            </h3>
-            <p className="text-sm text-zinc-400 mt-1">
-              Viatura{' '}
-              <span className="font-mono font-bold text-amber-500">
-                {service.plate}
-              </span>
-            </p>
-          </div>
-          <button
-            onClick={onClose}
-            className="p-2 hover:bg-zinc-900 rounded-sm"
-          >
-            <X className="w-5 h-5 text-white" />
-          </button>
-        </div>
-        {activeMechanics.length === 0 ? (
-          <p className="text-center text-zinc-500 py-8 italic uppercase text-xs">
-            Nenhum mecânico trabalhando nesta viatura.
-          </p>
-        ) : (
-          <div className="space-y-4">
-            {activeMechanics.map((mech) => (
-              <div
-                key={mech.id}
-                className="bg-zinc-900 border border-zinc-800 p-6 rounded-sm flex items-center justify-between"
-              >
-                <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-full bg-zinc-800 flex items-center justify-center">
-                    <User className="w-6 h-6 text-white" />
-                  </div>
-                  <div>
-                    <span className="block text-lg font-black uppercase text-white">
-                      {mech.name}
-                    </span>
-                    <span className="text-xs text-zinc-400 uppercase">
-                      {mech.role}
-                    </span>
-                    <div className="mt-2 space-y-1">
-                      <div className="flex items-center gap-2">
-                        <span className="text-[9px] text-zinc-500 uppercase">
-                          Sessão:
-                        </span>
-                        <span className="text-sm font-mono font-bold text-amber-500">
-                          {formatMS(mech.elapsed)}
-                        </span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <span className="text-[9px] text-zinc-500 uppercase">
-                          Total:
-                        </span>
-                        <span className="text-sm font-mono font-bold text-emerald-500">
-                          {formatMS(mech.totalTime)}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <button
-                  onClick={() => {
-                    if (confirm(`Pausar ${mech.name}?`))
-                      onPauseMechanic(service.id, mech.id);
-                  }}
-                  className="px-6 py-3 bg-rose-600 text-white font-black uppercase text-xs rounded-sm hover:bg-rose-700 flex items-center gap-2"
-                >
-                  <Pause className="w-4 h-4" /> Pausar
-                </button>
-              </div>
-            ))}
-          </div>
-        )}
-        <button
-          onClick={onClose}
-          className="w-full py-4 bg-white text-black font-black uppercase text-xs rounded-sm"
-        >
-          Fechar
-        </button>
-      </div>
-    </div>
-  );
-};
-
-// Modal de Liberação de Veículo
-const ReleaseVehicleModal: React.FC<{
-  onClose: () => void;
-  onConfirm: (token: string) => void;
-  plate: string;
-}> = ({ onClose, onConfirm, plate }) => {
-  const [token, setToken] = useState('');
-  return (
-    <div className="fixed inset-0 bg-black/90 flex items-center justify-center z-50 p-4">
-      <div className="bg-zinc-950 border border-zinc-800 p-8 rounded-sm max-w-md w-full space-y-6">
-        <div className="flex justify-between items-center border-b border-zinc-800 pb-4">
-          <h3 className="text-xl font-black uppercase text-white">
-            Liberar Saída
-          </h3>
-          <button onClick={onClose} className="text-zinc-400 hover:text-white">
-            <X className="w-5 h-5" />
-          </button>
-        </div>
-
-        <div className="space-y-2">
-          <p className="text-sm text-zinc-400">
-            Digite o código de 6 dígitos gerado pela pesquisa de satisfação para
-            a viatura <span className="font-bold text-white">{plate}</span>.
-          </p>
-          <input
-            type="text"
-            value={token}
-            onChange={(e) => setToken(e.target.value.toUpperCase().trim())}
-            placeholder="EX: A1B2C3"
-            maxLength={6}
-            className="w-full bg-zinc-900 border border-zinc-700 text-white p-4 text-3xl font-mono text-center font-bold uppercase rounded-sm focus:border-amber-500 outline-none"
-            autoFocus
-          />
-        </div>
-
-        <button
-          onClick={() => {
-            if (token.length < 6) return alert('Digite o código completo!');
-            onConfirm(token);
-          }}
-          className="w-full py-4 bg-emerald-600 hover:bg-emerald-500 text-white font-black uppercase text-sm rounded-sm"
-        >
-          Validar e Liberar
-        </button>
-      </div>
-    </div>
-  );
-};
-
-// Função para detectar peças
-const detectPartsFromDiagnosis = (
-  diagnosis: string,
-  vehicleInfo: string,
-  existingParts: UsedPart[]
-) => {
-  if (!diagnosis) return [];
-  const lines = diagnosis
-    .toUpperCase()
-    .split('\n')
-    .filter((l) => l.trim());
-
-  const detected: {
-    keyword: string;
-    partName: string;
-    defaultQty: number;
-    detectedFrom: string;
-  }[] = [];
-
-  const alreadyDetected = new Set(existingParts.map((p) => p.keyword));
-  lines.forEach((line) => {
-    PART_KEYWORDS.forEach((pk) => {
-      const found = pk.keywords.some((kw) => line.includes(kw.toUpperCase()));
-      if (found && !alreadyDetected.has(pk.partName)) {
-        alreadyDetected.add(pk.partName);
-        detected.push({
-          keyword: pk.partName,
-          partName: `${pk.partName} (${vehicleInfo})`,
-          defaultQty: pk.defaultQty,
-          detectedFrom: line.replace(/^[•\-\*]\s*/, '').trim(),
-        });
-      }
-    });
-  });
-
-  return detected;
-};
-
-// Componente para editar peça
-const PartItemEditor: React.FC<{
-  part: UsedPart;
-  onUpdate: (id: string, updates: Partial<UsedPart>) => void;
-  onRemove: (id: string) => void;
-}> = ({ part, onUpdate, onRemove }) => (
-  <div className="bg-zinc-900 border border-zinc-800 rounded-sm p-4 space-y-3">
-    <div className="flex items-start justify-between gap-4">
-      <div className="flex-1">
-        <span className="text-[9px] text-zinc-500 uppercase font-bold block mb-1">
-          Detectado de:
-        </span>
-        <span className="text-[11px] text-amber-500 italic">
-          "{part.detectedFrom}"
-        </span>
-      </div>
-      <button
-        type="button"
-        onClick={() => onRemove(part.id)}
-        className="p-1 text-zinc-600 hover:text-rose-500"
-      >
-        <X className="w-4 h-4" />
-      </button>
-    </div>
-    <div className="flex items-center gap-3">
-      <div className="flex items-center gap-1 bg-zinc-800 rounded-sm">
-        <button
-          type="button"
-          onClick={() =>
-            onUpdate(part.id, { quantity: Math.max(1, part.quantity - 1) })
-          }
-          className="px-3 py-2 text-zinc-400 hover:text-white hover:bg-zinc-700"
-        >
-          -
-        </button>
-        <input
-          type="number"
-          min="1"
-          max="99"
-          value={part.quantity}
-          onChange={(e) =>
-            onUpdate(part.id, {
-              quantity: Math.min(
-                99,
-                Math.max(1, parseInt(e.target.value) || 1)
-              ),
-            })
-          }
-          className="w-12 bg-transparent text-center text-white font-mono font-bold text-lg focus:outline-none"
-        />
-        <button
-          type="button"
-          onClick={() =>
-            onUpdate(part.id, { quantity: Math.min(99, part.quantity + 1) })
-          }
-          className="px-3 py-2 text-zinc-400 hover:text-white hover:bg-zinc-700"
-        >
-          +
-        </button>
-      </div>
-      <input
-        type="text"
-        value={part.partName}
-        onChange={(e) =>
-          onUpdate(part.id, { partName: e.target.value.toUpperCase() })
-        }
-        className="flex-1 bg-zinc-800 border border-zinc-700 text-white px-4 py-2 text-sm font-bold uppercase focus:border-amber-500 focus:outline-none rounded-sm"
-      />
-    </div>
-  </div>
-);
-
-// Seletor de peças (Versão com Memória de Exclusão)
-const PartsSelector: React.FC<{
-  diagnosis: string;
-  vehicleInfo: string;
-  parts: UsedPart[];
-  onPartsChange: (parts: UsedPart[]) => void;
-  mechanicName: string;
-}> = ({ diagnosis, vehicleInfo, parts, onPartsChange, mechanicName }) => {
-  const [showAddManual, setShowAddManual] = useState(false);
-  const [manualPartName, setManualPartName] = useState('');
-  const [ignoredKeywords, setIgnoredKeywords] = useState<Set<string>>(
-    new Set()
-  );
-
-  useEffect(() => {
-    const detected = detectPartsFromDiagnosis(diagnosis, vehicleInfo, parts);
-    const trulyNew = detected.filter((d) => !ignoredKeywords.has(d.keyword));
-
-    if (trulyNew.length > 0) {
-      const newParts: UsedPart[] = trulyNew.map((d) => ({
-        id: crypto.randomUUID(),
-        keyword: d.keyword,
-        partName: d.partName,
-        vehicleInfo,
-        quantity: d.defaultQty,
-        detectedFrom: d.detectedFrom,
-        timestamp: Date.now(),
-        mechanicName,
-      }));
-      onPartsChange([...parts, ...newParts]);
-    }
-  }, [
-    diagnosis,
-    vehicleInfo,
-    parts,
-    onPartsChange,
-    mechanicName,
-    ignoredKeywords,
-  ]);
-
-  const handleUpdatePart = (id: string, updates: Partial<UsedPart>) => {
-    onPartsChange(parts.map((p) => (p.id === id ? { ...p, ...updates } : p)));
-  };
-
-  const handleRemovePart = (id: string) => {
-    const partToRemove = parts.find((p) => p.id === id);
-    if (partToRemove && partToRemove.keyword !== 'MANUAL') {
-      setIgnoredKeywords((prev) => {
-        const next = new Set(prev);
-        next.add(partToRemove.keyword);
-        return next;
-      });
-    }
-    onPartsChange(parts.filter((p) => p.id !== id));
-  };
-
-  const handleAddManualPart = () => {
-    if (!manualPartName.trim()) return;
-    onPartsChange([
-      ...parts,
-      {
-        id: crypto.randomUUID(),
-        keyword: 'MANUAL',
-        partName: `${manualPartName.toUpperCase()} (${vehicleInfo})`,
-        vehicleInfo,
-        quantity: 1,
-        detectedFrom: 'ADICIONADO MANUALMENTE',
-        timestamp: Date.now(),
-        mechanicName,
-      },
-    ]);
-    setManualPartName('');
-    setShowAddManual(false);
-  };
-
-  if (parts.length === 0 && !showAddManual) {
-    return (
-      <div className="bg-zinc-900/50 border border-dashed border-zinc-700 rounded-sm p-6 text-center">
-        <p className="text-sm text-zinc-500 italic uppercase mb-4">
-          Nenhuma peça detectada
-        </p>
-        <button
-          type="button"
-          onClick={() => setShowAddManual(true)}
-          className="text-xs font-bold text-amber-500 hover:text-amber-400 uppercase underline"
-        >
-          + Adicionar peça manualmente
-        </button>
-      </div>
-    );
-  }
-
-  return (
-    <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <span className="text-[10px] font-black uppercase text-emerald-500">
-          Peças Utilizadas ({parts.length}) • {vehicleInfo}
-        </span>
-        <button
-          type="button"
-          onClick={() => setShowAddManual(!showAddManual)}
-          className="text-[10px] font-bold text-amber-500 uppercase"
-        >
-          {showAddManual ? 'Cancelar' : '+ Adicionar'}
-        </button>
-      </div>
-      <div className="space-y-3 max-h-64 overflow-y-auto">
-        {parts.map((part) => (
-          <PartItemEditor
-            key={part.id}
-            part={part}
-            onUpdate={handleUpdatePart}
-            onRemove={handleRemovePart}
-          />
-        ))}
-      </div>
-      {showAddManual && (
-        <div className="flex gap-2">
-          <input
-            type="text"
-            placeholder="NOME DA PEÇA..."
-            value={manualPartName}
-            onChange={(e) => setManualPartName(e.target.value.toUpperCase())}
-            onKeyDown={(e) => e.key === 'Enter' && handleAddManualPart()}
-            className="flex-1 bg-zinc-800 border border-zinc-700 text-white px-4 py-3 text-sm font-bold uppercase focus:border-amber-500 focus:outline-none rounded-sm"
-            autoFocus
-          />
-          <button
-            type="button"
-            onClick={handleAddManualPart}
-            className="px-6 py-3 bg-emerald-600 text-white font-black uppercase text-xs rounded-sm"
-          >
-            Adicionar
-          </button>
-        </div>
-      )}
-    </div>
-  );
-};
-// ========== GRÁFICO DE PIZZA DESTINOS ==========
-const DestinationPieChart: React.FC<{
-  data: Array<{
-    label: string;
-    count: number;
-    percentage: number;
-    color: string;
-  }>;
-}> = ({ data }) => {
-  const filteredData = data.filter((d) => d.count > 0);
-  if (filteredData.length === 0) {
-    return (
-      <div className="flex items-center justify-center h-64 text-zinc-500 italic text-sm uppercase">
-        Nenhum serviço finalizado
-      </div>
-    );
-  }
-  let currentAngle = 0;
-  const segments = filteredData.map((item) => {
-    const angle = (item.percentage / 100) * 360;
-    const startAngle = currentAngle;
-    currentAngle += angle;
-    return { ...item, startAngle, endAngle: currentAngle };
-  });
-
-  const polarToCartesian = (
-    cx: number,
-    cy: number,
-    r: number,
-    angle: number
-  ) => {
-    const rad = ((angle - 90) * Math.PI) / 180;
-    return { x: cx + r * Math.cos(rad), y: cy + r * Math.sin(rad) };
-  };
-
-  const createArcPath = (
-    cx: number,
-    cy: number,
-    r: number,
-    startAngle: number,
-    endAngle: number
-  ) => {
-    const start = polarToCartesian(cx, cy, r, endAngle);
-    const end = polarToCartesian(cx, cy, r, startAngle);
-    const largeArcFlag = endAngle - startAngle <= 180 ? 0 : 1;
-    return `M ${cx} ${cy} L ${start.x} ${start.y} A ${r} ${r} 0 ${largeArcFlag} 0 ${end.x} ${end.y} Z`;
-  };
-
-  return (
-    <div className="flex flex-col lg:flex-row items-center gap-8">
-      <div className="relative">
-        <svg width="200" height="200" viewBox="0 0 200 200">
-          {segments.map((segment, idx) => (
-            <path
-              key={idx}
-              d={createArcPath(
-                100,
-                100,
-                80,
-                segment.startAngle,
-                segment.endAngle
-              )}
-              fill={segment.color}
-              stroke="#000"
-              strokeWidth="2"
-              className="hover:opacity-80 transition-opacity cursor-pointer"
-            >
-              <title>
-                {segment.label}: {segment.count}x (
-                {segment.percentage.toFixed(1)}%)
-              </title>
-            </path>
-          ))}
-          <circle cx="100" cy="100" r="40" fill="#09090b" />
-          <text
-            x="100"
-            y="95"
-            textAnchor="middle"
-            className="fill-white text-xs font-bold uppercase"
-          >
-            Total
-          </text>
-          <text
-            x="100"
-            y="115"
-            textAnchor="middle"
-            className="fill-white text-2xl font-mono font-bold"
-          >
-            {filteredData.reduce((acc, d) => acc + d.count, 0)}
-          </text>
-        </svg>
-      </div>
-      <div className="flex-1 grid grid-cols-2 gap-3">
-        {filteredData.map((item, idx) => (
-          <div
-            key={idx}
-            className="flex items-center gap-3 bg-zinc-900 p-3 rounded-sm border border-zinc-800"
-          >
-            <div
-              className="w-4 h-4 rounded-sm flex-shrink-0"
-              style={{ backgroundColor: item.color }}
-            ></div>
-            <div className="flex-1 min-w-0">
-              <span className="block text-[10px] font-bold uppercase text-white truncate">
-                {item.label}
-              </span>
-              <span className="block text-[9px] text-zinc-400">
-                {item.percentage.toFixed(1)}%
-              </span>
-            </div>
-            <span className="text-sm font-mono font-bold text-white">
-              {item.count}x
-            </span>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-};
-
-// ========== CARD ESTATÍSTICAS SEÇÕES ==========
-const SectionStatsCard: React.FC<{
-  sectionRanking: Array<{
-    status: string;
-    label: string;
-    count: number;
-    percentage: number;
-    color: string;
-  }>;
-  totalWithSection: number;
-}> = ({ sectionRanking, totalWithSection }) => (
-  <div className="bg-zinc-950 border border-zinc-900 p-8 rounded-sm shadow-xl space-y-8">
-    <div className="flex items-center justify-between border-b border-zinc-900 pb-6">
-      <h3 className="text-xs font-black uppercase tracking-widest text-white flex items-center gap-3">
-        <ClipboardList className="w-5 h-5 text-emerald-500" /> Porta de Entrada
-        (Decisão da Recepção)
-      </h3>
-      <span className="text-sm font-mono text-zinc-400">
-        {totalWithSection} viaturas recebidas
-      </span>
-    </div>
-    <DestinationPieChart data={sectionRanking} />
-    <div className="border-t border-zinc-900 pt-6">
-      <h4 className="text-[10px] font-black uppercase tracking-widest text-zinc-400 mb-4">
-        Ranking de Encaminhamento Inicial
-      </h4>
-      <div className="space-y-3">
-        {sectionRanking.map((dest, idx) => (
-          <div key={dest.status} className="flex items-center gap-4">
-            <span className="text-lg font-black italic text-zinc-700 w-8">
-              #{idx + 1}
-            </span>
-            <div
-              className="w-3 h-3 rounded-full flex-shrink-0"
-              style={{ backgroundColor: dest.color }}
-            ></div>
-            <div className="flex-1">
-              <div className="flex justify-between items-center mb-1">
-                <span className="text-sm font-bold uppercase text-white">
-                  {dest.label}
-                </span>
-                <div className="flex items-center gap-3">
-                  <span
-                    className="text-sm font-mono font-bold"
-                    style={{ color: dest.color }}
-                  >
-                    {dest.count}x
-                  </span>
-                  <span className="text-xs font-mono text-zinc-500">
-                    ({dest.percentage.toFixed(1)}%)
-                  </span>
-                </div>
-              </div>
-              <div className="h-1.5 bg-zinc-900 rounded-full overflow-hidden">
-                <div
-                  className="h-full rounded-full transition-all duration-500"
-                  style={{
-                    width: `${dest.percentage}%`,
-                    backgroundColor: dest.color,
-                  }}
-                ></div>
-              </div>
-            </div>
-          </div>
-        ))}
-      </div>
-    </div>
-  </div>
-);
-
-// ========== CARD ESTATÍSTICAS DESTINOS ==========
-const DestinationStatsCard: React.FC<{
-  destinationRanking: Array<{
-    status: string;
-    label: string;
-    count: number;
-    percentage: number;
-    color: string;
-  }>;
-  totalFinalized: number;
-}> = ({ destinationRanking, totalFinalized }) => (
-  <div className="bg-zinc-950 border border-zinc-900 p-8 rounded-sm shadow-xl space-y-8">
-    <div className="flex items-center justify-between border-b border-zinc-900 pb-6">
-      <h3 className="text-xs font-black uppercase tracking-widest text-white flex items-center gap-3">
-        <TrendingUp className="w-5 h-5 text-amber-500" /> Porta de Saída
-        (Resultados da Oficina)
-      </h3>
-      <span className="text-sm font-mono text-zinc-400">
-        {totalFinalized} fichas encerradas
-      </span>
-    </div>
-    <DestinationPieChart data={destinationRanking} />
-    <div className="border-t border-zinc-900 pt-6">
-      <h4 className="text-[10px] font-black uppercase tracking-widest text-zinc-400 mb-4">
-        Ranking de Resultados Finais / Transferências
-      </h4>
-      <div className="space-y-3">
-        {destinationRanking.map((dest, idx) => (
-          <div key={dest.status} className="flex items-center gap-4">
-            <span className="text-lg font-black italic text-zinc-700 w-8">
-              #{idx + 1}
-            </span>
-            <div
-              className="w-3 h-3 rounded-full flex-shrink-0"
-              style={{ backgroundColor: dest.color }}
-            ></div>
-            <div className="flex-1">
-              <div className="flex justify-between items-center mb-1">
-                <span className="text-sm font-bold uppercase text-white">
-                  {dest.label}
-                </span>
-                <div className="flex items-center gap-3">
-                  <span
-                    className="text-sm font-mono font-bold"
-                    style={{ color: dest.color }}
-                  >
-                    {dest.count}x
-                  </span>
-                  <span className="text-xs font-mono text-zinc-500">
-                    ({dest.percentage.toFixed(1)}%)
-                  </span>
-                </div>
-              </div>
-              <div className="h-1.5 bg-zinc-900 rounded-full overflow-hidden">
-                <div
-                  className="h-full rounded-full transition-all duration-500"
-                  style={{
-                    width: `${dest.percentage}%`,
-                    backgroundColor: dest.color,
-                  }}
-                ></div>
-              </div>
-            </div>
-          </div>
-        ))}
-      </div>
-    </div>
-  </div>
-);
-
-// ========== CARD ESTATÍSTICAS PEÇAS ==========
-const PartsStatsCard: React.FC<{ services: ServiceRecord[] }> = ({
-  services,
-}) => {
-  const partsStats = useMemo(() => {
-    const allParts: UsedPart[] = [];
-    services.forEach((s) => {
-      if (s.usedParts) allParts.push(...s.usedParts);
-    });
-    const grouped: Record<
-      string,
-      {
-        partName: string;
-        totalQty: number;
-        byVehicle: Record<string, number>;
-        category: string;
-      }
-    > = {};
-    allParts.forEach((part) => {
-      const baseName = part.partName.split('(')[0].trim();
-      if (!grouped[baseName]) {
-        const pkMatch = PART_KEYWORDS.find(
-          (pk) => pk.partName === part.keyword
-        );
-        grouped[baseName] = {
-          partName: baseName,
-          totalQty: 0,
-          byVehicle: {},
-          category: pkMatch?.category || 'OUTROS',
-        };
-      }
-      grouped[baseName].totalQty += part.quantity;
-      grouped[baseName].byVehicle[part.vehicleInfo] =
-        (grouped[baseName].byVehicle[part.vehicleInfo] || 0) + part.quantity;
-    });
-    const ranking = Object.values(grouped).sort(
-      (a, b) => b.totalQty - a.totalQty
-    );
-    const totalParts = ranking.reduce((acc, p) => acc + p.totalQty, 0);
-    const categoryStats: Record<string, number> = {};
-    ranking.forEach((p) => {
-      categoryStats[p.category] = (categoryStats[p.category] || 0) + p.totalQty;
-    });
-    return { ranking, totalParts, categoryStats };
-  }, [services]);
-
-  if (partsStats.totalParts === 0) {
-    return (
-      <div className="bg-zinc-950 border border-zinc-900 p-8 rounded-sm shadow-xl">
-        <h3 className="text-xs font-black uppercase tracking-widest text-white flex items-center gap-3 mb-6">
-          <ClipboardList className="w-5 h-5 text-amber-500" /> Controle de Peças
-        </h3>
-        <p className="text-center py-10 text-zinc-600 italic uppercase text-[10px]">
-          Nenhuma peça registrada ainda
-        </p>
-      </div>
-    );
-  }
-
-  return (
-    <div className="bg-zinc-950 border border-zinc-900 p-8 rounded-sm shadow-xl space-y-8">
-      <div className="flex items-center justify-between border-b border-zinc-900 pb-6">
-        <h3 className="text-xs font-black uppercase tracking-widest text-white flex items-center gap-3">
-          <ClipboardList className="w-5 h-5 text-amber-500" /> Controle de Peças
-        </h3>
-        <span className="text-sm font-mono text-zinc-400">
-          {partsStats.totalParts} peças utilizadas
-        </span>
-      </div>
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        {Object.entries(partsStats.categoryStats)
-          .sort((a, b) => b[1] - a[1])
-          .slice(0, 8)
-          .map(([category, qty]) => (
-            <div
-              key={category}
-              className="bg-zinc-900 border border-zinc-800 p-4 rounded-sm text-center"
-              style={{
-                borderLeftColor: PART_CATEGORY_COLORS[category] || '#64748b',
-                borderLeftWidth: '3px',
-              }}
-            >
-              <span className="block text-2xl font-mono font-bold text-white">
-                {qty}
-              </span>
-              <span className="block text-[9px] text-zinc-400 uppercase font-bold mt-1">
-                {category}
-              </span>
-            </div>
-          ))}
-      </div>
-      <div className="space-y-3">
-        <h4 className="text-[10px] font-black uppercase tracking-widest text-zinc-400">
-          Top 10 Peças Mais Utilizadas
-        </h4>
-        <div className="space-y-2">
-          {partsStats.ranking.slice(0, 10).map((part, idx) => (
-            <div
-              key={part.partName}
-              className="flex items-center gap-4 bg-zinc-900 border border-zinc-800 p-4 rounded-sm"
-            >
-              <span className="text-lg font-black italic text-zinc-700 w-8">
-                #{idx + 1}
-              </span>
-              <div
-                className="w-3 h-3 rounded-full flex-shrink-0"
-                style={{
-                  backgroundColor:
-                    PART_CATEGORY_COLORS[part.category] || '#64748b',
-                }}
-              ></div>
-              <div className="flex-1">
-                <span className="block text-sm font-bold uppercase text-white">
-                  {part.partName}
-                </span>
-                <span className="text-[9px] text-zinc-500 uppercase">
-                  {part.category}
-                </span>
-              </div>
-              <div className="text-right">
-                <span className="block text-xl font-mono font-bold text-amber-500">
-                  {part.totalQty}x
-                </span>
-                <span className="text-[9px] text-zinc-500">
-                  {((part.totalQty / partsStats.totalParts) * 100).toFixed(1)}%
-                </span>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-    </div>
-  );
-};
-
-// ========== RECURRENCE EXPANSION ==========
-const RecurrenceExpansion: React.FC<{ stats: any; onBack: () => void }> = ({
-  stats,
-  onBack,
-}) => (
-  <div className="space-y-8 animate-in slide-in-from-right duration-500">
-    <div className="flex items-center gap-4">
-      <button
-        onClick={onBack}
-        className="p-4 bg-white text-black font-black uppercase text-xs rounded-sm hover:bg-zinc-200 flex items-center gap-2"
-      >
-        <ArrowLeft className="w-4 h-4" /> Voltar
-      </button>
-      <h2 className="text-2xl font-black uppercase tracking-widest italic">
-        Análise de Recorrência Técnica
-      </h2>
-    </div>
-    <div className="bg-zinc-950 border border-zinc-900 p-10 rounded-sm">
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-12 gap-y-8">
-        {Object.entries(stats.frequency || {})
-          .sort((a: any, b: any) => b[1] - a[1])
-          .map(([label, value]: any) => (
-            <div
-              key={label}
-              className="space-y-2 border-b border-zinc-900 pb-4"
-            >
-              <div className="flex justify-between text-[11px] font-black uppercase italic tracking-wider">
-                <span className={value > 0 ? 'text-white' : 'text-zinc-400'}>
-                  {label}
-                </span>
-                <span
-                  className={value > 0 ? 'text-amber-500' : 'text-zinc-600'}
-                >
-                  {value}
-                </span>
-              </div>
-              <div className="h-0.5 bg-zinc-900 rounded-full overflow-hidden">
-                <div
-                  className="h-full bg-white"
-                  style={{
-                    width: `${Math.min(
-                      100,
-                      (value / (stats.mechanicStats?.[0]?.vtrs?.length || 1)) *
-                        100
-                    )}%`,
-                  }}
-                ></div>
-              </div>
-            </div>
-          ))}
-      </div>
-    </div>
-  </div>
-);
-
-// ========== CHIEF STATS DASHBOARD ==========
-const ChiefStatsDashboard: React.FC<{
-  stats: any;
-  services: ServiceRecord[];
-  mechanics: Mechanic[];
-  onBack: () => void;
-  onViewServiceDetails: (id: string) => void;
-  onResetMechanic: (id: string) => void;
-  onViewRecurrence: () => void;
-}> = ({
-  stats,
-  services,
-  mechanics,
-  onBack,
-  onViewServiceDetails,
-  onResetMechanic,
-  onViewRecurrence,
-}) => {
-  const [tab, setTab] = useState<'OFICINA' | 'EQUIPE'>('OFICINA');
-  const [selectedMechanicId, setSelectedMechanicId] = useState<string | null>(null);
-
-  const selectedMech = stats.mechanicStats.find(
-    (m: any) => m.id === selectedMechanicId
-  );
-
-  return (
-    <div className="space-y-8 animate-in fade-in">
-      <div className="flex items-center justify-between mb-8">
-        <button
-          onClick={selectedMechanicId ? () => setSelectedMechanicId(null) : onBack}
-          className="px-6 py-4 bg-white text-black font-black uppercase text-xs rounded-sm hover:bg-zinc-200 flex items-center gap-2 shadow-lg"
-        >
-          <ArrowLeft className="w-4 h-4" /> Voltar
-        </button>
-        <div className="flex bg-zinc-900 p-1 rounded-sm border border-zinc-800 shadow-lg">
-          <button
-            onClick={() => {
-              setTab('OFICINA');
-              setSelectedMechanicId(null);
-            }}
-            className={`px-6 py-3 text-[10px] font-black uppercase tracking-widest transition-all ${
-              tab === 'OFICINA'
-                ? 'bg-white text-black'
-                : 'text-zinc-500 hover:text-white'
-            }`}
-          >
-            Oficina
-          </button>
-          <button
-            onClick={() => {
-              setTab('EQUIPE');
-              setSelectedMechanicId(null);
-            }}
-            className={`px-6 py-3 text-[10px] font-black uppercase tracking-widest transition-all ${
-              tab === 'EQUIPE'
-                ? 'bg-white text-black'
-                : 'text-zinc-500 hover:text-white'
-            }`}
-          >
-            Equipe
-          </button>
-          
-          {/* --- BOTÃO EXTERNO PARA O ALMOXARIFADO --- */}
-          <button
-            onClick={() => window.open('https://cmmalmox.netlify.app/', '_blank')}
-            className="px-6 py-3 text-[10px] font-black uppercase tracking-widest transition-all text-amber-500 hover:text-amber-400 hover:bg-zinc-800 flex items-center gap-2 rounded-sm ml-2 border-l border-zinc-800 pl-4"
-          >
-            <Package className="w-3 h-3" /> Almox
-          </button>
-        </div>
-      </div>
-      {tab === 'OFICINA' ? (
-        <div className="space-y-10">
-          <div className="bg-zinc-950 border border-zinc-900 p-8 rounded-sm shadow-xl">
-            <h3 className="text-xs font-black uppercase tracking-widest mb-6 flex items-center gap-2 border-b border-zinc-900 pb-4 text-white">
-              <Car className="w-4 h-4 text-amber-500" /> Viaturas em Atendimento no Pátio
-            </h3>
-            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
-              {services.filter(s => s.status === ServiceStatus.IN_PROGRESS).map((s) => (
-                <button
-                  key={s.id}
-                  onClick={() => onViewServiceDetails(s.id)}
-                  className="bg-zinc-900 border border-zinc-800 p-4 text-center hover:border-white transition-all group rounded-sm"
-                >
-                  <span className="block font-mono font-bold text-white text-lg group-hover:text-amber-500">
-                    {s.plate}
-                  </span>
-                  <span className="block text-[9px] text-zinc-400 uppercase font-black mt-1">
-                    {s.opm}
-                  </span>
-                  {s.delegatedTo && (
-                    <span className="block text-[7px] text-amber-400 uppercase font-bold mt-1">
-                      Delegado
-                    </span>
-                  )}
-                </button>
-              ))}
-              {services.filter(s => s.status === ServiceStatus.IN_PROGRESS).length === 0 && (
-                <p className="col-span-full text-center py-6 text-zinc-600 italic uppercase text-[10px]">
-                  Pátio Vazio
-                </p>
-              )}
-            </div>
-          </div>
-          <DestinationStatsCard
-            destinationRanking={stats.destinationRanking}
-            totalFinalized={stats.totalFinalized}
-          />
-          <SectionStatsCard
-            sectionRanking={stats.sectionRanking}
-            totalWithSection={stats.totalWithSection}
-          />
-          <PartsStatsCard services={services} />
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            
-            {/* NOVO CARD DE TEMPO MÉDIO (MTTR) */}
-            <div className="bg-zinc-950 border border-zinc-900 p-8 rounded-sm shadow-xl flex flex-col justify-center">
-              <h3 className="text-[10px] font-black uppercase text-zinc-400 mb-4 tracking-widest">
-                Tempo Médio de Resolução
-              </h3>
-              <div className="flex items-baseline gap-2">
-                <span className="text-4xl font-mono font-black text-amber-500">
-                  {stats.avgTime > 0 ? Math.floor(stats.avgTime / (1000 * 60 * 60 * 24)) : 0}
-                </span>
-                <span className="text-xs text-zinc-500 font-bold uppercase mr-2">Dias</span>
-                
-                <span className="text-4xl font-mono font-black text-amber-500">
-                  {stats.avgTime > 0 ? Math.floor((stats.avgTime / (1000 * 60 * 60)) % 24) : 0}
-                </span>
-                <span className="text-xs text-zinc-500 font-bold uppercase">Horas</span>
-              </div>
-              <p className="text-[9px] text-zinc-600 uppercase mt-6 italic border-t border-zinc-900 pt-4">
-                Média desde a entrada até a finalização do serviço
-              </p>
-            </div>
-
-            <button
-              onClick={onViewRecurrence}
-              className="bg-zinc-950 border border-zinc-900 p-8 rounded-sm text-left hover:border-white transition-all group shadow-xl"
-            >
-              <Settings className="w-8 h-8 text-zinc-400 mb-4 group-hover:text-amber-500" />
-              <h3 className="text-lg font-black uppercase italic tracking-tighter text-white">
-                Recorrência Técnica
-              </h3>
-            </button>
-          </div>
-          <div className="bg-zinc-950 border border-zinc-900 p-8 rounded-sm shadow-xl">
-            <h3 className="text-xs font-black uppercase tracking-widest mb-8 border-b border-zinc-900 pb-4 text-white">
-              Ranking de Incidência (Placas Repetidas)
-            </h3>
-            <div className="space-y-4">
-              {stats.ranking?.map(([plate, data]: any, idx: number) => (
-                <div
-                  key={plate}
-                  onClick={() => onViewServiceDetails(data.lastServiceId)}
-                  className="flex justify-between items-center p-6 bg-zinc-900/40 border border-zinc-800 hover:border-white transition-colors rounded-sm cursor-pointer group"
-                >
-                  <div className="flex items-center gap-6">
-                    <span className="text-2xl font-black italic text-zinc-800 group-hover:text-zinc-600">
-                      #{idx + 1}
-                    </span>
-                    <div className="flex flex-col">
-                      <span className="font-mono font-bold text-2xl text-white tracking-tighter group-hover:text-amber-500">
-                        {plate}
-                      </span>
-                      <span className="text-[10px] text-zinc-400 uppercase font-bold tracking-widest">
-                        {data.brand} {data.model} | {data.opm}
-                      </span>
-                    </div>
-                  </div>
-                  <div className="text-right">
-                    <span className="block text-2xl font-mono font-bold text-amber-500">
-                      {data.count}x
-                    </span>
-                    <span className="block text-[8px] text-white uppercase font-black">
-                      Entradas
-                    </span>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      ) : selectedMechanicId && selectedMech ? (
-        <div className="space-y-8 animate-in slide-in-from-right duration-300">
-          <div className="bg-zinc-950 border border-zinc-900 p-8 rounded-sm shadow-xl flex items-center justify-between">
-            <div className="flex items-center gap-6">
-              <div className="w-16 h-16 rounded-full bg-white flex items-center justify-center text-black">
-                <User className="w-8 h-8" />
-              </div>
-              <div>
-                <h3 className="text-2xl font-black uppercase tracking-tighter text-white">
-                  {selectedMech.name}
-                </h3>
-                <p className="text-xs text-zinc-400 font-bold uppercase">
-                  {selectedMech.role}
-                </p>
-              </div>
-            </div>
-            <div className="text-right">
-              <p className="text-xs text-zinc-500 uppercase font-black mb-1">
-                Mão de Obra Acumulada
-              </p>
-              <p className="text-3xl font-mono font-bold text-emerald-500">
-                {formatMS(selectedMech.totalTime)}
-              </p>
-            </div>
-          </div>
-          <div className="space-y-4">
-            <h4 className="text-[10px] font-black uppercase tracking-[0.4em] text-white ml-2">
-              Viaturas Atendidas
-            </h4>
-            <div className="grid gap-3">
-              {selectedMech.vtrs.map((v: any, idx: number) => (
-                <div
-                  key={idx}
-                  className="bg-zinc-900 border border-zinc-800 p-6 rounded-sm flex items-center justify-between group hover:border-white transition-all"
-                >
-                  <div>
-                    <span className="block font-mono font-bold text-2xl text-white tracking-tighter uppercase">
-                      {v.plate}
-                    </span>
-                    <span className="text-[9px] text-zinc-500 uppercase font-bold">
-                      {v.brand} {v.model}
-                    </span>
-                  </div>
-                  <div className="text-right">
-                    <span className="block text-[8px] text-emerald-500 uppercase font-black mb-1">
-                      Mão de Obra Sessão
-                    </span>
-                    <span className="text-xl font-mono font-bold text-white">
-                      {formatMS(v.individualTime)}
-                    </span>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      ) : (
-        <div className="space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {stats.mechanicStats.map((m: any) => (
-              <button
-                key={m.id}
-                onClick={() => setSelectedMechanicId(m.id)}
-                className={`bg-zinc-950 border p-8 space-y-4 rounded-sm shadow-xl text-left hover:border-white transition-all group ${
-                  m.resetRequested
-                    ? 'border-rose-500 animate-pulse'
-                    : 'border-zinc-800'
-                }`}
-              >
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-4">
-                    <div className="w-10 h-10 rounded-full border border-zinc-800 flex items-center justify-center text-zinc-500 group-hover:bg-white group-hover:text-black transition-colors">
-                      <User className="w-5 h-5" />
-                    </div>
-                    <div>
-                      <span className="block text-sm font-black uppercase text-white">
-                        {m.name}
-                      </span>
-                      <span className="text-[9px] text-zinc-400 uppercase font-bold">
-                        {m.role}
-                      </span>
-                    </div>
-                  </div>
-                  <ChevronRight className="w-4 h-4 text-zinc-700 group-hover:text-white" />
-                </div>
-                <div className="pt-4 border-t border-zinc-900 grid grid-cols-2 gap-4">
-                  <div>
-                    <span className="block text-[8px] text-zinc-500 uppercase font-black mb-1">
-                      Tempo Total
-                    </span>
-                    <span className="text-emerald-500 font-mono text-lg font-bold">
-                      {Math.floor(m.totalTime / 3600000)}h
-                    </span>
-                  </div>
-                  <div>
-                    <span className="block text-[8px] text-amber-500 uppercase font-black mb-1">
-                      Custo de Mão de Obra
-                    </span>
-                    <span className="text-white font-mono text-lg font-bold">
-                      {m.totalCost.toLocaleString('pt-BR', {
-                        style: 'currency',
-                        currency: 'BRL',
-                      })}
-                    </span>
-                  </div>
-                </div>
-
-                <div className="mt-4 pt-2 border-t border-zinc-900/50 flex justify-between items-center">
-                  <span className="text-[7px] text-zinc-500 uppercase font-bold">
-                    Produtividade: {m.count} vtrs
-                  </span>
-                  <span className="text-[7px] text-zinc-600 uppercase font-black italic">
-                    Custo Hora:{' '}
-                    {m.hourlyRate.toLocaleString('pt-BR', {
-                      style: 'currency',
-                      currency: 'BRL',
-                    })}
-                  </span>
-                </div>
-                {m.resetRequested && (
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onResetMechanic(m.id);
-                    }}
-                    className="w-full py-2 bg-rose-600 text-white font-black uppercase text-[10px] rounded-sm mt-4"
-                  >
-                    Autorizar Reset
-                  </button>
-                )}
-              </button>
-            ))}
-          </div>
-        </div>
-      )}
-    </div>
-  );
-};
-
-// ========== PRE-AUTH VIEW (PORTARIA) ==========
-const PreAuthView: React.FC<{
-  mechanics: Mechanic[];
-  onSuccess: () => void;
-  onUpdatePass: (m: Mechanic, p: string) => Promise<void>;
-}> = ({ mechanics, onSuccess, onUpdatePass }) => {
-  const [typedName, setTypedName] = useState('');
-  const [typedPass, setTypedPass] = useState('');
-  const [confirmPass, setConfirmPass] = useState('');
-  const [step, setStep] = useState<'NAME' | 'PASS'>('NAME');
-  const [foundMech, setFoundMech] = useState<Mechanic | null>(null);
-
-  const handleIdentify = () => {
-    const mech = mechanics.find(
-      (m) => m.name.toUpperCase() === typedName.toUpperCase().trim()
-    );
-    if (!mech) return alert('NOME NÃO ENCONTRADO NO EFETIVO.');
-    setFoundMech(mech);
-    setStep('PASS');
-  };
-
-  const handleFinalAuth = async () => {
-    if (!foundMech) return;
-    if (!foundMech.passwordSet) {
-      if (typedPass.length < 4)
-        return alert('SENHA DEVE TER NO MÍNIMO 4 DÍGITOS.');
-      if (typedPass !== confirmPass) return alert('AS SENHAS NÃO CONFEREM.');
-      await onUpdatePass(foundMech, typedPass);
-      onSuccess();
-    } else {
-      if (typedPass === foundMech.password) {
-        onSuccess();
-      } else {
-        alert('SENHA INCORRETA.');
-      }
-    }
-  };
-
-  return (
-    <div className="max-w-md mx-auto py-20 animate-in fade-in duration-500">
-      <div className="bg-zinc-950 border border-zinc-900 p-8 space-y-6 shadow-2xl rounded-sm text-center">
-        <h2 className="text-xl font-black uppercase text-white italic border-b border-zinc-900 pb-4">
-          Identificação do Efetivo
-        </h2>
-
-        {step === 'NAME' ? (
-          <div className="space-y-4">
-            <input
-              type="text"
-              placeholder="NOME (EX: CB MIKE)"
-              value={typedName}
-              onChange={(e) => setTypedName(e.target.value.toUpperCase())}
-              className="w-full bg-zinc-900 border border-zinc-800 text-white p-4 font-mono font-bold text-center uppercase focus:border-white outline-none"
-              autoFocus
-            />
-            <button
-              onClick={handleIdentify}
-              className="w-full py-5 bg-white text-black font-black uppercase tracking-widest text-sm rounded-sm"
-            >
-              Avançar
-            </button>
-          </div>
-        ) : (
-          <div className="space-y-4">
-            <p className="text-[10px] text-zinc-500 uppercase font-black tracking-widest">
-              {foundMech.name}
-            </p>
-            <input
-              type="password"
-              placeholder="DIGITE SUA SENHA"
-              value={typedPass}
-              onChange={(e) => setTypedPass(e.target.value)}
-              className="w-full bg-zinc-900 border border-zinc-800 text-white p-4 font-mono text-center focus:border-white outline-none"
-              autoFocus
-            />
-            {!foundMech.passwordSet && (
-              <input
-                type="password"
-                placeholder="CONFIRME SUA SENHA"
-                value={confirmPass}
-                onChange={(e) => setConfirmPass(e.target.value)}
-                className="w-full bg-zinc-900 border border-zinc-800 text-white p-4 font-mono text-center focus:border-white outline-none"
-              />
-            )}
-            <button
-              onClick={handleFinalAuth}
-              className="w-full py-5 bg-emerald-600 text-white font-black uppercase tracking-widest text-sm rounded-sm"
-            >
-              {foundMech.passwordSet
-                ? 'Entrar na Oficina'
-                : 'Cadastrar e Entrar'}
-            </button>
-            <button
-              onClick={() => setStep('NAME')}
-              className="text-[10px] text-zinc-600 uppercase underline"
-            >
-              Voltar
-            </button>
-          </div>
-        )}
-      </div>
-    </div>
-  );
-};
-
-// ========== AUTH VIEW ==========
-const AuthView: React.FC<{
-  mechanic: Mechanic;
-  onSuccess: (m: Mechanic, p?: string) => void;
-  onCancel: () => void;
-  onRequestReset: () => void;
-}> = ({ mechanic, onSuccess, onCancel, onRequestReset }) => {
-  const [p1, setP1] = useState('');
-  const [p2, setP2] = useState('');
-  const [err, setErr] = useState('');
-
-  const handleAuth = (e: any) => {
-    e.preventDefault();
-    if (!mechanic.passwordSet) {
-      if (p1.length < 4) return setErr('MÍNIMO 4 CARACTERES');
-      if (p1 !== p2) return setErr('SENHAS DIFERENTES');
-      onSuccess(mechanic, p1);
-    } else {
-      if (p1 === mechanic.password) onSuccess(mechanic);
-      else setErr('SENHA INCORRETA');
-    }
-  };
-  return (
-    <form onSubmit={handleAuth} className="max-w-md mx-auto py-20 space-y-6">
-      <div className="bg-zinc-950 border border-zinc-900 p-8 space-y-4 shadow-2xl rounded-sm">
-        <h2 className="text-xl font-black text-center uppercase text-white">
-          {mechanic.name}
-        </h2>
-        <input
-          type="password"
-          value={p1}
-          onChange={(e) => setP1(e.target.value)}
-          placeholder="****"
-          className="w-full bg-zinc-900 border border-zinc-800 text-white text-center py-4 text-4xl font-mono focus:border-white focus:outline-none"
-          autoFocus
-        />
-        {!mechanic.passwordSet && (
-          <input
-            type="password"
-            value={p2}
-            onChange={(e) => setP2(e.target.value)}
-            placeholder="CONFIRMAR SENHA"
-            className="w-full bg-zinc-900 border border-zinc-800 text-white text-center py-4 text-4xl font-mono focus:border-white focus:outline-none"
-          />
-        )}
-        {err && (
-          <p className="text-rose-600 text-[10px] font-bold text-center uppercase">
-            {err}
-          </p>
-        )}
-      </div>
-      <button
-        type="submit"
-        className="w-full py-6 bg-white text-black font-black uppercase text-xs tracking-widest shadow-xl rounded-sm"
-      >
-        Validar Acesso
-      </button>
-      {mechanic.passwordSet && (
-        <button
-          type="button"
-          onClick={onRequestReset}
-          className="w-full py-2 text-rose-500 uppercase font-black text-[10px] hover:text-rose-400 text-center underline decoration-dotted"
-        >
-          Esqueci minha senha / Solicitar Reset
-        </button>
-      )}
-      <button
-        type="button"
-        onClick={onCancel}
-        className="w-full py-4 text-zinc-500 uppercase font-black text-[10px] hover:text-white"
-      >
-        Voltar
-      </button>
-    </form>
-  );
-};
-
-// ========== NEW SERVICE FORM ==========
-const NewServiceForm: React.FC<{
-  allServices: ServiceRecord[];
-  vehicles: Vehicle[];
-  currentMechanic: Mechanic | null;
-  mechanics: Mechanic[];
-  onCancel: () => void;
-  onStart: (
-    os: string,
-    p: string,
-    p_prefix: string,
-    c_email: string,
-    b: string,
-    m: string,
-    y: string,
-    o: string,
-    km: string,
-    defect: string,
-    section: string,
-    delegatedTo?: string
-  ) => void;
-}> = ({
-  allServices,
-  vehicles,
-  currentMechanic,
-  mechanics,
-  onCancel,
-  onStart,
-}) => {
-  const [os, setOs] = useState('');
-  const [prefix, setPrefix] = useState('');
-  const [clientEmail, setClientEmail] = useState('');
-  const [p, setP] = useState('');
-  const [b, setB] = useState('');
-  const [m, setM] = useState('');
-  const [y, setY] = useState('');
-  const [o, setO] = useState('');
-  const [km, setKm] = useState('');
-  const [defect, setDefect] = useState('');
-  const [delegateTo, setDelegateTo] = useState<string>('');
-  const [section, setSection] = useState<string>('LINHA MECÂNICA');
-
-  const sectionOptions = [
-    {
-      value: 'LINHA MECÂNICA',
-      label: 'Linha Mecânica',
-      color: 'bg-emerald-600',
-      textColor: 'text-emerald-500',
-      icon: '🔧',
-    },
-    {
-      value: 'SINALIZADOR',
-      label: 'Sinalizador',
-      color: 'bg-blue-600',
-      textColor: 'text-blue-500',
-      icon: '🚨',
-    },
-    {
-      value: 'GRAFISMO',
-      label: 'Grafismo',
-      color: 'bg-purple-600',
-      textColor: 'text-purple-500',
-      icon: '🖌️',
-    },
-    {
-      value: 'BORRACHARIA',
-      label: 'Borracharia',
-      color: 'bg-orange-600',
-      textColor: 'text-orange-500',
-      icon: '✇',
-    },
-    {
-      value: ServiceStatus.HEAVY_MECHANICAL,
-      label: 'PESADOS - LINHA MECÂNICA',
-      icon: '🚛',
-      color: '#f59e0b',
-      textColor: 'text-amber-500',
-    },
-    {
-      value: 'DESCARGA',
-      label: 'Descarga',
-      color: 'bg-rose-600',
-      textColor: 'text-rose-500',
-      icon: '📉',
-    },
-    {
-      value: 'GARANTIA',
-      label: 'Garantia',
-      color: 'bg-cyan-600',
-      textColor: 'text-cyan-500',
-      icon: '🛡️',
-    },
-    {
-      value: 'SETOR TÉCNICO',
-      label: 'Setor Técnico',
-      color: 'bg-red-600',
-      textColor: 'text-pink-500',
-      icon: '📋',
-    },
-    {
-      value: 'CONTRATAÇÃO',
-      label: 'Contratação',
-      color: 'bg-amber-600',
-      textColor: 'text-amber-500',
-      icon: '📝',
-    },
-  ];
-
-  const isSergeant = currentMechanic?.name.startsWith('SGT ');
-  useEffect(() => {
-    if (p.length >= 7) {
-      const vehicle = vehicles.find(
-        (v) => v.plate.toUpperCase() === p.toUpperCase()
-      );
-      if (vehicle) {
-        setB(vehicle.brand);
-        setM(vehicle.model);
-        setY(vehicle.year);
-        setO(vehicle.opm);
-        return;
-      }
-      const prev = allServices.find(
-        (s) => s.plate.toUpperCase() === p.toUpperCase()
-      );
-      if (prev) {
-        setB(prev.brand);
-        setM(prev.model);
-        setY(prev.year);
-        setO(prev.opm);
-      }
-    }
-  }, [p, allServices, vehicles]);
-
-  const handleStart = () => {
-    if (!os?.trim()) {
-      alert('OS é obrigatória!');
-      return;
-    }
-    if (!km?.trim()) {
-      alert('KM é obrigatório!');
-      return;
-    }
-    if (!defect?.trim()) {
-      alert('Defeito informado é obrigatório!');
-      return;
-    }
-    onStart(
-      os,
-      p,
-      prefix,
-      clientEmail,
-      b,
-      m,
-      y,
-      o,
-      km,
-      defect,
-      section,
-      delegateTo || undefined
-    );
-  };
-  return (
-    <div className="max-w-lg mx-auto space-y-6 bg-zinc-950 p-10 border border-zinc-900 rounded-sm shadow-2xl">
-      <button
-        onClick={onCancel}
-        className="p-4 bg-white text-black font-black uppercase text-xs flex items-center gap-2 rounded-sm shadow-lg"
-      >
-        <ArrowLeft className="w-4 h-4" /> Voltar
-      </button>
-      <div className="space-y-2">
-        <label className="text-xs font-black uppercase text-amber-400">
-          Ordem de Serviço (OS) *
-        </label>
-        <input
-          type="text"
-          value={os}
-          onChange={(e) => setOs(e.target.value.toUpperCase())}
-          placeholder="EX: 001/2025"
-          className="w-full bg-zinc-900 border border-amber-600 text-white p-4 text-2xl font-mono text-center focus:border-amber-400 uppercase rounded-sm"
-          autoFocus
-        />
-      </div>
-      <input
-        type="text"
-        value={p}
-        onChange={(e) => setP(e.target.value.toUpperCase())}
-        placeholder="PLACA *"
-        className="w-full bg-zinc-900 border border-zinc-800 text-white p-5 text-4xl font-mono text-center focus:border-white uppercase rounded-sm"
-      />
-      <input
-        type="text"
-        value={prefix}
-        onChange={(e) => setPrefix(e.target.value.toUpperCase())}
-        placeholder="PREFIXO (Ex: VTR-01)"
-        className="w-full bg-zinc-900 border border-zinc-800 text-white p-4 uppercase font-bold rounded-sm"
-      />
-      <input
-        type="email"
-        value={clientEmail}
-        onChange={(e) => setClientEmail(e.target.value.toLowerCase())}
-        placeholder="E-MAIL PARA NOTIFICAÇÃO (OPCIONAL)"
-        className="w-full bg-zinc-900 border border-zinc-800 text-white p-4 font-bold rounded-sm"
-      />
-      {isSergeant && (
-        <div className="space-y-2">
-          <label className="text-xs font-black uppercase text-amber-400">
-            Delegar para:
-          </label>
-          <select
-            value={delegateTo}
-            onChange={(e) => setDelegateTo(e.target.value)}
-            className="w-full bg-zinc-900 border border-zinc-800 text-white p-4 rounded-sm"
-          >
-            <option value="">— Executar eu mesmo —</option>
-            {mechanics
-              .filter(
-                (m) =>
-                  m.role === UserRole.MECHANIC && !m.name.startsWith('SGT ')
-              )
-              .map((m) => (
-                <option key={m.id} value={m.id}>
-                  {m.name}
-                </option>
-              ))}
-          </select>
-        </div>
-      )}
-      <input
-        type="text"
-        value={o}
-        onChange={(e) => setO(e.target.value.toUpperCase())}
-        placeholder="OPM / UNIDADE"
-        className="w-full bg-zinc-900 border border-zinc-800 text-white p-4 uppercase font-bold rounded-sm"
-      />
-      <div className="grid grid-cols-2 gap-4">
-        <input
-          type="text"
-          value={b}
-          onChange={(e) => setB(e.target.value.toUpperCase())}
-          placeholder="MARCA"
-          className="w-full bg-zinc-900 border border-zinc-800 text-white p-4 uppercase font-bold rounded-sm"
-        />
-        <input
-          type="text"
-          value={m}
-          onChange={(e) => setM(e.target.value.toUpperCase())}
-          placeholder="MODELO"
-          className="w-full bg-zinc-900 border border-zinc-800 text-white p-4 uppercase font-bold rounded-sm"
-        />
-      </div>
-      <input
-        type="text"
-        value={y}
-        onChange={(e) => setY(e.target.value.toUpperCase())}
-        placeholder="ANO"
-        className="w-full bg-zinc-900 border border-zinc-800 text-white p-4 uppercase font-bold rounded-sm"
-      />
-      <input
-        type="text"
-        value={km}
-        onChange={(e) => setKm(e.target.value.replace(/[^0-9]/g, ''))}
-        placeholder="KM (SOMENTE NÚMEROS) *"
-        className="w-full bg-zinc-900 border border-zinc-800 text-white p-4 font-bold rounded-sm font-mono text-center text-xl"
-        inputMode="numeric"
-      />
-      <div className="space-y-2">
-        <label className="text-xs font-black uppercase text-emerald-400">
-          📍 Destino / Seção *
-        </label>
-        <select
-          value={section}
-          onChange={(e) => setSection(e.target.value)}
-          className="w-full bg-zinc-900 border border-zinc-800 text-white p-4 rounded-sm font-bold uppercase"
-        >
-          {sectionOptions.map((opt) => (
-            <option key={opt.value} value={opt.value}>
-              {opt.icon} {opt.label}
-            </option>
-          ))}
-        </select>
-        {section && (
-          <div className="flex items-center gap-2 mt-2">
-            <div
-              className={`w-3 h-3 rounded-full ${
-                sectionOptions.find((o) => o.value === section)?.color
-              }`}
-            ></div>
-            <span
-              className={`text-xs font-black uppercase ${
-                sectionOptions.find((o) => o.value === section)?.textColor
-              }`}
-            >
-              {sectionOptions.find((o) => o.value === section)?.icon}{' '}
-              {sectionOptions.find((o) => o.value === section)?.label}
-            </span>
-          </div>
-        )}
-      </div>
-      <div className="space-y-2">
-        <label className="text-xs font-black uppercase text-rose-400">
-          ⚠️ Defeito Informado *
-        </label>
-        <textarea
-          value={defect}
-          onChange={(e) => setDefect(e.target.value.toUpperCase())}
-          placeholder="EX: VEÍCULO NÃO LIGA, BARULHO NO MOTOR, FREIO FALHANDO, LUZ DO PAINEL ACESA..."
-          className="w-full h-24 bg-zinc-900 border border-rose-600 text-white p-4 text-sm focus:border-rose-400 uppercase rounded-sm resize-none"
-        />
-      </div>
-      <button
-        onClick={handleStart}
-        disabled={p.length < 7 || !km || !os || !defect}
-        className="w-full py-6 bg-white text-black font-black uppercase tracking-widest shadow-xl rounded-sm disabled:opacity-30"
-      >
-        {isSergeant && delegateTo ? 'Delegar Viatura' : 'Autorizar Entrada'}
-      </button>
-    </div>
-  );
-};
-
-// ========== CONSULT SERVICE VIEW ==========
-const ConsultServiceView: React.FC<{
-  services: ServiceRecord[];
-  searchPlate: string;
-  setSearchPlate: (s: string) => void;
-  onBack: () => void;
-  onContinue: (id: string) => void;
-  onViewDetails: (id: string) => void;
-  currentMechanic: Mechanic | null;
-}> = ({
-  services,
-  searchPlate,
-  setSearchPlate,
-  onBack,
-  onContinue,
-  onViewDetails,
-  currentMechanic,
-}) => {
-  const filtered = services.filter(
-    (s) =>
-      s.plate.toLowerCase().includes(searchPlate.toLowerCase()) ||
-      s.model.toLowerCase().includes(searchPlate.toLowerCase()) ||
-      s.brand.toLowerCase().includes(searchPlate.toLowerCase())
-  );
-  return (
-    <div className="space-y-6">
-      <div className="flex items-center gap-4">
-        <button
-          onClick={onBack}
-          className="p-4 bg-white text-black font-black uppercase text-xs rounded-sm shadow-lg flex items-center gap-2"
-        >
-          <ArrowLeft className="w-4 h-4" /> Voltar
-        </button>
-        <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-zinc-400" />
-          <input
-            type="text"
-            placeholder="PESQUISAR PLACA OU MODELO..."
-            value={searchPlate}
-            onChange={(e) => setSearchPlate(e.target.value.toUpperCase())}
-            className="w-full bg-black border border-zinc-800 text-white pl-10 pr-4 py-4 font-mono text-xl focus:border-white rounded-sm"
-          />
-        </div>
-      </div>
-      <div className="grid gap-4">
-        {filtered.map((s) => (
-          <div
-            key={s.id}
-            className="bg-zinc-950 border border-zinc-900 p-8 rounded-sm flex flex-wrap items-center justify-between gap-6 hover:border-white transition-all shadow-xl"
-          >
-            <div>
-              <span className="text-3xl font-mono font-bold text-white tracking-tighter uppercase">
-                {s.plate}
-              </span>
-              <p className="text-white text-[10px] font-bold uppercase">
-                {s.brand} {s.model}
-              </p>
-              <div className="mt-2 flex items-center gap-2">
-                <Clock className="w-3 h-3 text-amber-500" />
-                <span className="text-[10px] font-mono text-zinc-400">
-                  Tempo Oficina:{' '}
-                  {formatMS((s.endTime || Date.now()) - s.globalStartTime)}
-                </span>
-              </div>
-              <div className="mt-3">
-                <span className="text-[9px] text-white uppercase block mb-1">
-                  KM
-                </span>
-                <span className="text-sm font-mono font-bold text-white">
-                  {s.km
-                    ? `${Number(s.km).toLocaleString('pt-BR')} KM`
-                    : 'NÃO INFORMADO'}
-                </span>
-              </div>
-              {s.reportedDefect && (
-                <div className="mt-3 p-2 bg-rose-950 border border-rose-800 rounded-sm">
-                  <span className="text-[9px] text-rose-400 uppercase">
-                    ⚠️ Defeito:{' '}
-                  </span>
-                  <span className="text-[10px] text-white uppercase">
-                    {s.reportedDefect.substring(0, 40)}
-                    {s.reportedDefect.length > 40 ? '...' : ''}
-                  </span>
-                </div>
-              )}
-            </div>
-            <div className="flex items-center gap-3">
-              <button
-                onClick={() => onViewDetails(s.id)}
-                className="px-6 py-3 border border-zinc-800 text-white font-black text-[9px] rounded-sm hover:bg-zinc-900"
-              >
-                Ver Ficha
-              </button>
-              {s.status === ServiceStatus.IN_PROGRESS &&
-                currentMechanic?.role !== UserRole.CHIEF && (
-                  <button
-                    onClick={() => onContinue(s.id)}
-                    className="px-10 py-3 bg-white text-black font-black text-xs rounded-sm shadow-lg"
-                  >
-                    Retomar Atendimento
-                  </button>
-                )}
-            </div>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-};
-
-// ========== ACTIVE SERVICE TIMER ==========
-const ActiveServiceTimer: React.FC<{
-  service: ServiceRecord;
-  currentMechanic: Mechanic;
-  onFinish: (
-    id: string,
-    diag: string,
-    status: ServiceStatus,
-    work: string,
-    rem: string,
-    sessionDur: number,
-    parts: UsedPart[]
-  ) => void;
-  onSaveDraft: (
-    id: string,
-    work: string,
-    rem: string,
-    diag: string,
-    sessionDur: number
-  ) => void;
-  onSyncDrafts: (id: string, work: string, rem: string, diag: string) => void;
-  onBack: () => void;
-}> = ({
-  service,
-  currentMechanic,
-  onFinish,
-  onSaveDraft,
-  onSyncDrafts,
-  onBack,
-}) => {
-  const [now, setNow] = useState(Date.now());
-  const startTime = service.activeWorkSessions?.[currentMechanic.id] || now;
-  const elapsed = now - startTime;
-  const accum = (service.individualTimes || {})[currentMechanic.id] || 0;
-  const [w, setW] = useState(service.draftWorkDone || '');
-  const [d, setD] = useState(service.draftDiagnosis || '');
-  const [p, setP] = useState(service.draftRemaining || '');
-  const [s, setS] = useState<ServiceStatus>(ServiceStatus.RESOLVED);
-  const [showOthers, setShowOthers] = useState(false);
-  const [usedParts, setUsedParts] = useState<UsedPart[]>(
-    service.usedParts || []
-  );
-  const isSergeant = currentMechanic.name.startsWith('SGT ');
-  const canPause =
-    isSergeant || !!service.activeWorkSessions?.[currentMechanic.id];
-  const vehicleInfo = `${service.brand}/${service.model} ${service.year}`;
-
-  const otherDestinations = [
-    {
-      status: ServiceStatus.SIGNALING,
-      label: 'Sinalizador',
-      color: 'text-blue-500',
-    },
-    {
-      status: ServiceStatus.GRAPHICS,
-      label: 'Grafismo',
-      color: 'text-purple-500',
-    },
-    {
-      status: ServiceStatus.UNLOADING,
-      label: 'Descarga',
-      color: 'text-rose-500',
-    },
-    {
-      status: ServiceStatus.TIRE_SHOP,
-      label: 'Borracharia',
-      color: 'text-orange-500',
-    },
-    {
-      status: ServiceStatus.WARRANTY,
-      label: 'Garantia',
-      color: 'text-cyan-500',
-    },
-    {
-      status: ServiceStatus.TECHNICAL,
-      label: 'Setor Técnico',
-      color: 'text-pink-500',
-    },
-    {
-      status: ServiceStatus.HEAVY_MECHANICAL,
-      label: 'L. Mec. Pesados',
-      color: 'text-emerald-900',
-    },
-  ];
-
-  const isOtherStatus = otherDestinations.some((dest) => dest.status === s);
-  const selectedOther = otherDestinations.find((dest) => dest.status === s);
-
-  useEffect(() => {
-    const int = setInterval(() => setNow(Date.now()), 1000);
-    return () => clearInterval(int);
-  }, []);
-
-  const handleVoiceInput = (
-    field: 'work' | 'pending' | 'diagnosis',
-    text: string
-  ) => {
-    const newItem = '• ' + text.toUpperCase().trim() + '.';
-    if (field === 'work') {
-      const updated = w ? w + '\n' + newItem : newItem;
-      setW(updated);
-    } else if (field === 'pending') {
-      setP(p ? p + '\n' + newItem : newItem);
-    } else {
-      setD(d ? d + '\n' + newItem : newItem);
-    }
-  };
-
-  const handleBlur = (field: 'work' | 'pending' | 'diagnosis') => {
-    if (field === 'work') {
-      const formatted = formatServiceList(w);
-      setW(formatted);
-    } else if (field === 'pending') {
-      setP(formatServiceList(p));
-    } else {
-      setD(formatServiceList(d));
-    }
-  };
-
-  const handleKeyDown = (
-    e: React.KeyboardEvent<HTMLTextAreaElement>,
-    field: 'work' | 'pending' | 'diagnosis'
-  ) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      if (field === 'work') {
-        setW((prev) => prev + '\n• ');
-      } else if (field === 'pending') {
-        setP((prev) => prev + '\n• ');
-      } else {
-        setD((prev) => prev + '\n• ');
-      }
-    }
-  };
-  const handleSelectOther = (status: ServiceStatus) => {
-    setS(status);
-    setShowOthers(false);
-  };
-
-  return (
-    <div className="grid grid-cols-1 lg:grid-cols-3 gap-10 animate-in fade-in slide-in-from-bottom-4 duration-500">
-      <div className="space-y-4">
-        {canPause && (
-          <button
-            onClick={() => onSaveDraft(service.id, w, p, d, elapsed)}
-            className="w-full py-6 bg-rose-600 text-white font-black uppercase text-xs tracking-widest flex items-center justify-center gap-3 shadow-xl rounded-sm"
-          >
-            <Pause className="w-5 h-5" />{' '}
-            {isSergeant && !service.activeWorkSessions?.[currentMechanic.id]
-              ? 'SGT - Pausar'
-              : 'Pausar Sessão'}
-          </button>
-        )}
-        <button
-          onClick={() => onSyncDrafts(service.id, w, p, d)}
-          className="w-full py-4 bg-zinc-800 text-white font-black uppercase text-[10px] tracking-widest flex items-center justify-center gap-3 shadow-xl rounded-sm border border-zinc-700 hover:bg-zinc-700"
-        >
-          <Save className="w-4 h-4" /> Salvar Rascunho
-        </button>
-        <div className="bg-zinc-950 border border-zinc-900 p-12 text-center rounded-sm shadow-xl space-y-6">
-          <div>
-            <span className="text-[9px] text-white uppercase tracking-widest block mb-4 italic">
-              Seu Trabalho Atual
-            </span>
-            <span className="text-5xl font-mono font-bold text-white block">
-              {formatMS(accum + elapsed)}
-            </span>
-          </div>
-          <div className="pt-6 border-t border-zinc-900">
-            <span className="text-[9px] text-zinc-500 uppercase tracking-widest block mb-2 italic">
-              Total na Oficina
-            </span>
-            <span className="text-2xl font-mono font-bold text-amber-500 block">
-              {formatMS(Date.now() - service.globalStartTime)}
-            </span>
-          </div>
-        </div>
-        <button
-          onClick={onBack}
-          className="w-full py-5 bg-white text-black border border-white font-black uppercase text-xs rounded-sm shadow-lg"
-        >
-          Voltar
-        </button>
-      </div>
-      <div className="lg:col-span-2 space-y-8 bg-zinc-950 border border-zinc-900 p-10 rounded-sm shadow-xl">
-        <h3 className="text-lg font-black border-b border-zinc-900 pb-6 uppercase italic text-white flex items-center gap-3">
-          <Clock className="w-6 h-6 text-amber-500" /> Registro Técnico da
-          Sessão
-        </h3>
-        {service.reportedDefect && (
-          <div className="bg-rose-950 border border-rose-800 p-4 rounded-sm">
-            <span className="text-[9px] text-rose-400 uppercase font-black block mb-1">
-              ⚠️ Defeito Informado na Entrada:
-            </span>
-            <span className="text-sm text-white uppercase font-bold">
-              {service.reportedDefect}
-            </span>
-          </div>
-        )}
-        <div className="bg-zinc-900 border border-zinc-800 p-4 rounded-sm">
-          <p className="text-[10px] text-zinc-400 uppercase">
-            💡 Pressione <span className="text-white font-bold">ENTER</span>{' '}
-            para novo item • Use o{' '}
-            <span className="text-white font-bold">microfone</span> para ditar
-          </p>
-        </div>
-        <div className="space-y-10">
-          <div>
-            <div className="flex justify-between mb-4">
-              <label className="text-[10px] font-black uppercase text-white">
-                Serviços Executados Agora
-              </label>
-              <VoiceInput onResult={(t) => handleVoiceInput('work', t)} />
-            </div>
-            <textarea
-              value={w}
-              onChange={(e) => {
-                const v = e.target.value.toUpperCase();
-                setW(v);
-                setD(v);
-              }}
-              onBlur={() => handleBlur('work')}
-              onKeyDown={(e) => handleKeyDown(e, 'work')}
-              placeholder="• TROCA DE ÓLEO.
-• SUBSTITUIÇÃO DO FILTRO."
-              className="w-full h-32 bg-zinc-900 border border-zinc-800 text-white p-5 focus:border-white focus:outline-none uppercase text-sm rounded-sm leading-relaxed"
-            />
-          </div>
-          {s === ServiceStatus.RESOLVED && (
-            <PartsSelector
-              diagnosis={d}
-              vehicleInfo={vehicleInfo}
-              parts={usedParts}
-              onPartsChange={setUsedParts}
-              mechanicName={currentMechanic.name}
-            />
-          )}
-          <div>
-            <div className="flex justify-between mb-4">
-              <label className="text-[10px] font-black uppercase text-rose-500">
-                Serviços Pendentes
-              </label>
-              <VoiceInput onResult={(t) => handleVoiceInput('pending', t)} />
-            </div>
-            <textarea
-              value={p}
-              onChange={(e) => setP(e.target.value.toUpperCase())}
-              onBlur={() => handleBlur('pending')}
-              onKeyDown={(e) => handleKeyDown(e, 'pending')}
-              placeholder="• AGUARDANDO PEÇA."
-              className="w-full h-32 bg-zinc-900 border border-zinc-800 text-white p-5 focus:border-rose-500 focus:outline-none uppercase text-sm rounded-sm leading-relaxed"
-            />
-          </div>
-          <div>
-            <div className="flex justify-between mb-4">
-              <label className="text-[10px] font-black uppercase text-white">
-                Diagnóstico Consolidado
-              </label>
-              <VoiceInput onResult={(t) => handleVoiceInput('diagnosis', t)} />
-            </div>
-            <textarea
-              value={d}
-              onChange={(e) => setD(e.target.value.toUpperCase())}
-              onBlur={() => handleBlur('diagnosis')}
-              onKeyDown={(e) => handleKeyDown(e, 'diagnosis')}
-              placeholder="• TROCA DE ÓLEO REALIZADA."
-              className="w-full h-32 bg-zinc-900 border border-zinc-800 text-white p-5 focus:border-white focus:outline-none font-bold uppercase text-sm rounded-sm leading-relaxed"
-            />
-          </div>
-          {/* Seleção de destino */}
-          <div className="space-y-4">
-            <label className="text-[10px] font-black uppercase text-zinc-400">
-              Destino da Viatura
-            </label>
-            <div className="flex flex-wrap gap-4">
-              <label
-                className={`flex items-center gap-3 cursor-pointer font-black text-xs uppercase px-6 py-4 rounded-sm border transition-all ${
-                  s === ServiceStatus.RESOLVED
-                    ? 'bg-emerald-600 border-emerald-500 text-white'
-                    : 'bg-zinc-900 border-zinc-800 text-emerald-500 hover:border-emerald-500'
-                }`}
-              >
-                <input
-                  type="radio"
-                  checked={s === ServiceStatus.RESOLVED}
-                  onChange={() => setS(ServiceStatus.RESOLVED)}
-                  className="hidden"
-                />
-                <CheckCircle2 className="w-4 h-4" /> Resolvido
-              </label>
-              <label
-                className={`flex items-center gap-3 cursor-pointer font-black text-xs uppercase px-6 py-4 rounded-sm border transition-all ${
-                  s === ServiceStatus.OUTSOURCED
-                    ? 'bg-amber-600 border-amber-500 text-white'
-                    : 'bg-zinc-900 border-zinc-800 text-amber-500 hover:border-amber-500'
-                }`}
-              >
-                <input
-                  type="radio"
-                  checked={s === ServiceStatus.OUTSOURCED}
-                  onChange={() => setS(ServiceStatus.OUTSOURCED)}
-                  className="hidden"
-                />
-                <FileSpreadsheet className="w-4 h-4" /> Contratação
-              </label>
-              <div className="relative">
-                <button
-                  type="button"
-                  onClick={() => setShowOthers(!showOthers)}
-                  className={`flex items-center gap-3 font-black text-xs uppercase px-6 py-4 rounded-sm border transition-all ${
-                    isOtherStatus
-                      ? 'bg-zinc-700 border-zinc-500 text-white'
-                      : 'bg-zinc-900 border-zinc-800 text-zinc-400 hover:border-zinc-600 hover:text-white'
-                  }`}
-                >
-                  <ChevronRight
-                    className={`w-4 h-4 transition-transform ${
-                      showOthers ? 'rotate-90' : ''
-                    }`}
-                  />
-                  {isOtherStatus ? selectedOther?.label : 'Outros'}
-                </button>
-                {showOthers && (
-                  <div className="absolute top-full left-0 mt-2 bg-zinc-900 border border-zinc-700 rounded-sm shadow-2xl z-50 min-w-[200px] overflow-hidden">
-                    {otherDestinations.map((dest) => (
-                      <button
-                        key={dest.status}
-                        type="button"
-                        onClick={() => handleSelectOther(dest.status)}
-                        className={`w-full text-left px-5 py-4 font-bold text-xs uppercase transition-all flex items-center gap-3 hover:bg-zinc-800 ${dest.color}`}
-                      >
-                        <div className="w-2 h-2 rounded-full bg-current"></div>
-                        {dest.label}
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
-            </div>
-            {isOtherStatus && (
-              <div
-                className={`flex items-center gap-2 text-xs font-bold uppercase bg-zinc-900 px-4 py-2 rounded-sm border border-zinc-800 ${selectedOther?.color}`}
-              >
-                <span className="text-zinc-400">Destino:</span>{' '}
-                <span className="text-white">{selectedOther?.label}</span>
-              </div>
-            )}
-          </div>
-          <button
-            disabled={w.length < 3}
-            onClick={() => onFinish(service.id, d, s, w, p, elapsed, usedParts)}
-            className={`w-full py-8 disabled:opacity-20 font-black uppercase tracking-widest text-2xl shadow-2xl rounded-sm active:scale-95 transition-all ${
-              s === ServiceStatus.RESOLVED
-                ? 'bg-emerald-600 text-white'
-                : 'bg-blue-700 text-white'
-            }`}
-          >
-            {s === ServiceStatus.RESOLVED
-              ? 'Finalizar Atendimento'
-              : 'Encaminhar VTR'}
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-};
-// ========== IMPORT VEHICLES VIEW ==========
-const ImportVehiclesView: React.FC<{
-  onBack: () => void;
-  onImport: (vehicles: Vehicle[]) => void;
-  currentVehicles: Vehicle[];
-}> = ({ onBack, onImport, currentVehicles }) => {
-  const [importing, setImporting] = useState(false);
-  const [preview, setPreview] = useState<Vehicle[]>([]);
-  const [error, setError] = useState('');
-  const fileInputRef = useRef<HTMLInputElement>(null);
-
-  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    setError('');
-    setImporting(true);
-    const reader = new FileReader();
-    reader.onload = (evt) => {
-      try {
-        const data = evt.target?.result;
-        const workbook = XLSX.read(data, { type: 'binary' });
-        const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
-        const rows = XLSX.utils.sheet_to_json<any>(firstSheet);
-
-        const vehicles: Vehicle[] = rows
-          .map((row, index) => {
-            const plate = (
-              row.PLACA ||
-              row.placa ||
-              row.Placa ||
-              row.plate ||
-              ''
-            )
-              .toString()
-              .toUpperCase()
-              .trim();
-            const brand = (
-              row.MARCA ||
-              row.marca ||
-              row.Marca ||
-              row.brand ||
-              ''
-            )
-              .toString()
-              .toUpperCase()
-              .trim();
-            const model = (
-              row.MODELO ||
-              row.modelo ||
-              row.Modelo ||
-              row.model ||
-              ''
-            )
-              .toString()
-              .toUpperCase()
-              .trim();
-            const year = (row.ANO || row.ano || row.Ano || row.year || '')
-              .toString()
-              .trim();
-            const opm = (row.OPM || row.opm || row.UNIDADE || row.unidade || '')
-              .toString()
-              .toUpperCase()
-              .trim();
-
-            if (!plate || plate.length < 7)
-              throw new Error(`Linha ${index + 2}: Placa inválida`);
-
-            return { plate, brand, model, year, opm };
-          })
-          .filter((v) => v.plate);
-
-        setPreview(vehicles);
-        setImporting(false);
-      } catch (err: any) {
-        setError(err.message || 'Erro ao processar arquivo.');
-        setImporting(false);
-        setPreview([]);
-      }
-    };
-    reader.readAsBinaryString(file);
-  };
-  return (
-    <div className="max-w-5xl mx-auto space-y-8">
-      <div className="flex items-center justify-between">
-        <button
-          onClick={onBack}
-          className="p-4 bg-white text-black font-black uppercase text-xs flex items-center gap-2 rounded-sm shadow-lg"
-        >
-          <ArrowLeft className="w-4 h-4" /> Voltar
-        </button>
-        <h2 className="text-2xl font-black text-white uppercase">
-          Importar Frota
-        </h2>
-      </div>
-      <div className="bg-zinc-950 border border-zinc-900 p-10 rounded-sm space-y-6">
-        <div className="flex items-start gap-6">
-          <Database className="w-12 h-12 text-amber-500 flex-shrink-0" />
-          <div className="flex-1 space-y-4">
-            <h3 className="text-lg font-black text-white uppercase">
-              Banco de Dados da Frota
-            </h3>
-            <p className="text-sm text-zinc-400">
-              Importe um arquivo Excel (.xlsx ou .xls) contendo os dados da
-              frota.
-            </p>
-          </div>
-        </div>
-        <div className="border-t border-zinc-800 pt-6">
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept=".xlsx,.xls"
-            onChange={handleFileUpload}
-            className="hidden"
-          />
-          <button
-            onClick={() => fileInputRef.current?.click()}
-            disabled={importing}
-            className="w-full py-6 bg-white text-black font-black uppercase text-sm tracking-widest flex items-center justify-center gap-3 rounded-sm shadow-xl disabled:opacity-50"
-          >
-            {importing ? (
-              <>
-                <Loader2 className="w-5 h-5 animate-spin" /> Processando...
-              </>
-            ) : (
-              <>
-                <Upload className="w-5 h-5" /> Selecionar Arquivo Excel
-              </>
-            )}
-          </button>
-        </div>
-        {error && (
-          <div className="bg-rose-950 border border-rose-800 p-4 rounded-sm flex items-start gap-3">
-            <AlertTriangle className="w-5 h-5 text-rose-500 flex-shrink-0 mt-0.5" />
-            <p className="text-sm text-rose-200">{error}</p>
-          </div>
-        )}
-      </div>
-      {preview.length > 0 && (
-        <div className="bg-zinc-950 border border-zinc-900 p-10 rounded-sm space-y-6">
-          <div className="flex items-center justify-between">
-            <h3 className="text-lg font-black text-white uppercase">
-              Preview - {preview.length} veículos
-            </h3>
-            <button
-              onClick={async () => {
-                setImporting(true);
-                await onImport(preview);
-                setImporting(false);
-              }}
-              disabled={importing}
-              className="px-8 py-4 bg-emerald-600 text-white font-black uppercase text-xs rounded-sm shadow-xl disabled:opacity-50"
-            >
-              {importing ? 'Importando...' : `Confirmar (${preview.length})`}
-            </button>
-          </div>
-          <div className="max-h-96 overflow-y-auto border border-zinc-800 rounded-sm">
-            <table className="w-full text-xs">
-              <thead className="bg-zinc-900 sticky top-0">
-                <tr>
-                  <th className="text-left p-3 font-black text-white uppercase">
-                    #
-                  </th>
-                  <th className="text-left p-3 font-black text-white uppercase">
-                    Placa
-                  </th>
-                  <th className="text-left p-3 font-black text-white uppercase">
-                    Marca
-                  </th>
-                  <th className="text-left p-3 font-black text-white uppercase">
-                    Modelo
-                  </th>
-                  <th className="text-left p-3 font-black text-white uppercase">
-                    Ano
-                  </th>
-                  <th className="text-left p-3 font-black text-white uppercase">
-                    OPM
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {preview.map((v, idx) => (
-                  <tr
-                    key={idx}
-                    className="border-b border-zinc-800 hover:bg-zinc-900"
-                  >
-                    <td className="p-3 text-zinc-500">{idx + 1}</td>
-                    <td className="p-3 font-mono font-bold text-white">
-                      {v.plate}
-                    </td>
-                    <td className="p-3 text-zinc-300">{v.brand}</td>
-                    <td className="p-3 text-zinc-300">{v.model}</td>
-                    <td className="p-3 text-zinc-300">{v.year}</td>
-                    <td className="p-3 text-zinc-300">{v.opm}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      )}
-      {currentVehicles.length > 0 && (
-        <div className="bg-zinc-950 border border-zinc-900 p-6 rounded-sm">
-          <p className="text-sm text-zinc-400">
-            <span className="font-bold text-white">
-              {currentVehicles.length} veículos
-            </span>{' '}
-            já cadastrados
-          </p>
-        </div>
-      )}
-    </div>
-  );
-};
-
-// ========== SERVICE DETAILS VIEW ==========
-const ServiceDetailsView: React.FC<{
-  service: ServiceRecord;
-  allServices: ServiceRecord[];
-  mechanics: Mechanic[];
-  currentMechanic: Mechanic;
-  onBack: () => void;
-  onContinue: (id: string) => void;
-  onRelease: () => void;
-}> = ({
-  service,
-  allServices,
-  mechanics,
-  onBack,
-  onContinue,
-  currentMechanic,
-  onRelease,
-}) => {
-  const history = useMemo(
-    () =>
-      allServices
-        .filter((s) => s.plate === service.plate)
-        .sort((a, b) => b.globalStartTime - a.globalStartTime),
-    [allServices, service.plate]
-  );
-
-  const totalLaborHours = useMemo(() => {
-    const times = service?.individualTimes || {};
-    const totalMs = Object.values(times).reduce(
-      (acc, t) => acc + (Number(t) || 0),
-      0
-    );
-    return totalMs / 3600000;
-  }, [service?.individualTimes]);
-
-  const totalLaborCost = useMemo(() => {
-    const times = service?.individualTimes || {};
-    return Object.entries(times).reduce((acc, [mId, timeMs]) => {
-      const mech = mechanics.find((m) => m.id === mId);
-      const rate =
-        mech?.hourlyRate ||
-        INITIAL_DATA.find((me) => me.id === mId)?.hourlyRate ||
-        0;
-      return acc + ((Number(timeMs) || 0) / 3600000) * rate;
-    }, 0);
-  }, [service?.individualTimes, mechanics]);
-
-  const totalPartsCost = useMemo(() => {
-    const parts = service?.usedParts || [];
-    return parts.reduce((acc, p) => {
-      const price = Number(p.unit_price) || 0;
-      const qty = Number(p.quantity) || 1;
-      return acc + price * qty;
-    }, 0);
-  }, [service?.usedParts]);
-
-  const grandTotal = totalLaborCost + totalPartsCost;
-  const statusColor =
-    service.status === ServiceStatus.RESOLVED
-      ? 'text-emerald-500'
-      : service.status === ServiceStatus.OUTSOURCED
-      ? 'text-amber-500'
-      : service.status === ServiceStatus.SIGNALING
-      ? 'text-blue-500'
-      : service.status === ServiceStatus.GRAPHICS
-      ? 'text-purple-500'
-      : service.status === ServiceStatus.UNLOADING
-      ? 'text-rose-500'
-      : service.status === ServiceStatus.TIRE_SHOP
-      ? 'text-orange-500'
-      : service.status === ServiceStatus.WARRANTY
-      ? 'text-cyan-500'
-      : service.status === ServiceStatus.TECHNICAL
-      ? 'text-red-600'
-      : service.status === ServiceStatus.HEAVY_MECHANICAL
-      ? 'text-emerald-900'
-      : service.status === ServiceStatus.STORES
-      ? 'text-zinc-500'
-      : 'text-zinc-400';
-
-  return (
-    <div className="grid grid-cols-1 lg:grid-cols-3 gap-10 animate-in fade-in slide-in-from-right duration-500">
-      <div className="space-y-4">
-        {service.status === ServiceStatus.IN_PROGRESS &&
-          currentMechanic?.role !== UserRole.CHIEF && (
-            <button
-              onClick={() => onContinue(service.id)}
-              className="w-full py-6 bg-white text-black font-black uppercase text-xs tracking-widest active:scale-95 shadow-2xl rounded-sm"
-            >
-              Assumir Viatura
-            </button>
-          )}
-        {currentMechanic?.department === 'RECEPÇÃO' &&
-          (service.status === ServiceStatus.RESOLVED ||
-            service.status === ServiceStatus.OUTSOURCED ||
-            service.status === ServiceStatus.WARRANTY) && (
-            <div className="space-y-4">
-              {!service.releaseToken ? (
-                <>
-                  <div className="bg-white p-6 rounded-sm flex flex-col items-center text-center gap-3 shadow-lg">
-                    <span className="text-black font-black uppercase text-xs">
-                      Peça para o cliente escanear
-                    </span>
-                    <img
-                      src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(
-                        'https://docs.google.com/forms/d/e/1FAIpQLSe3I6q89HKmkKLERj2IkBzEx7iDQ_YFVxEpBkj_D46dnzC6jA/viewform?usp=header'
-                      )}`}
-                      alt="QR Code Pesquisa"
-                      className="w-40 h-40 mix-blend-multiply"
-                    />
-                    <span className="text-zinc-500 font-bold text-[10px] uppercase">
-                      Para gerar o código de liberação
-                    </span>
-                  </div>
-
-                  <button
-                    onClick={onRelease}
-                    className="w-full py-6 bg-emerald-600 text-white font-black uppercase text-xs tracking-widest active:scale-95 shadow-2xl rounded-sm flex items-center justify-center gap-2"
-                  >
-                    <Key className="w-5 h-5" /> Liberar Saída
-                  </button>
-                </>
-              ) : (
-                <div className="w-full py-6 bg-zinc-900 border border-emerald-500 text-emerald-500 font-black uppercase text-xs tracking-widest rounded-sm text-center flex flex-col items-center gap-2">
-                  <span className="flex items-center gap-2">
-                    <CheckCircle2 className="w-5 h-5" /> SAÍDA AUTORIZADA
-                  </span>
-                  <span className="text-[10px] text-zinc-400">
-                    Token: {service.releaseToken}
-                  </span>
-                </div>
-              )}
-            </div>
-          )}
-
-        <div className="bg-zinc-950 border border-zinc-900 p-10 text-center rounded-sm shadow-xl space-y-8">
-          <History className="w-12 h-12 text-white mx-auto" />
-          {service.os && (
-            <div className="bg-amber-600/20 border border-amber-600 p-4 rounded-sm">
-              <span className="text-[9px] text-amber-400 uppercase block mb-1">
-                Ordem de Serviço
-              </span>
-              <span className="text-2xl font-mono font-black text-amber-500">
-                {service.os}
-              </span>
-            </div>
-          )}
-          <span className="text-4xl font-mono font-bold text-amber-500 uppercase">
-            {service.plate}
-          </span>
-          {service.reportedDefect && (
-            <div className="bg-rose-950 border border-rose-800 p-4 rounded-sm text-left">
-              <span className="text-[9px] text-rose-400 uppercase block mb-2 font-black">
-                ⚠️ Defeito Informado na Entrada
-              </span>
-              <span className="text-sm font-bold text-white uppercase leading-relaxed">
-                {service.reportedDefect}
-              </span>
-            </div>
-          )}
-          <div className="text-left space-y-4 pt-6 border-t border-zinc-900">
-            <div>
-              <span className="text-[9px] text-white uppercase block mb-1">
-                Status Final
-              </span>
-              <span className={`text-sm font-black uppercase ${statusColor}`}>
-                {service.status}
-              </span>
-            </div>
-            <div>
-              <span className="text-[9px] text-white uppercase block mb-1">
-                Data de Entrada
-              </span>
-              <span className="text-sm font-mono font-bold text-white">
-                {service.entryDate || 'NÃO REGISTRADA'}
-              </span>
-            </div>
-            {service.exitDate && (
-              <div>
-                <span className="text-[9px] text-white uppercase block mb-1">
-                  Data de Saída
-                </span>
-                <span className="text-sm font-mono font-bold text-emerald-500">
-                  {service.exitDate}
-                </span>
-              </div>
-            )}
-            <div>
-              <span className="text-[9px] text-white uppercase block mb-1">
-                Permanência Total
-              </span>
-              <span className="text-sm font-mono font-bold text-amber-500">
-                {formatMS(
-                  (service.endTime || Date.now()) - service.globalStartTime
-                )}
-              </span>
-            </div>
-
-            <div className="pt-2 border-t border-zinc-900">
-              <span className="text-[9px] text-emerald-500 uppercase block mb-1 font-black">
-                Custo Mão de Obra (Acumulado)
-              </span>
-              <span className="text-lg font-mono font-bold text-white">
-                {totalLaborCost.toLocaleString('pt-BR', {
-                  style: 'currency',
-                  currency: 'BRL',
-                })}
-              </span>
-            </div>
-
-            <div>
-              <span className="text-[9px] text-white uppercase block mb-1">
-                Unidade
-              </span>
-              <span className="text-xs font-bold text-white uppercase italic">
-                {service.opm}
-              </span>
-            </div>
-            <div>
-              <span className="text-[9px] text-white uppercase block mb-1">
-                KM
-              </span>
-              <span className="text-sm font-mono font-bold text-white">
-                {service.km
-                  ? `${Number(service.km).toLocaleString('pt-BR')} KM`
-                  : 'NÃO INFORMADO'}
-              </span>
-            </div>
-            {service.delegatedBy && (
-              <div>
-                <span className="text-[9px] text-white uppercase block mb-1">
-                  Delegado por
-                </span>
-                <span className="text-sm font-mono font-bold text-amber-400 uppercase italic">
-                  {service.delegatedBy}
-                </span>
-              </div>
-            )}
-          </div>
-        </div>
-        <button
-          onClick={onBack}
-          className="w-full py-5 bg-white text-black border border-white font-black uppercase text-xs rounded-sm shadow-lg"
-        >
-          Voltar
-        </button>
-      </div>
-      <div className="lg:col-span-2 space-y-6">
-        <div className="bg-zinc-950 border border-zinc-900 p-10 rounded-sm shadow-xl">
-          <h3 className="text-lg font-black border-b border-zinc-900 pb-6 uppercase italic text-white flex items-center justify-between">
-            <span>Prontuário Consolidado</span>
-            {service.os && (
-              <span className="text-sm font-mono text-amber-500">
-                OS: {service.os}
-              </span>
-            )}
-          </h3>
-          <div className="mt-8 bg-black border border-zinc-800 p-8 text-sm text-white uppercase font-bold italic shadow-inner rounded-sm min-h-[100px] leading-relaxed">
-            {service.finalDiagnosis ||
-              service.draftDiagnosis ||
-              'VIATURA EM DIAGNÓSTICO.'}
-          </div>
-        </div>
-        {service.usedParts && service.usedParts.length > 0 && (
-          <div className="bg-zinc-950 border border-zinc-900 p-10 rounded-sm shadow-xl">
-            <h3 className="text-lg font-black border-b border-zinc-900 pb-6 uppercase italic text-white flex items-center gap-3">
-              <ClipboardList className="w-6 h-6 text-emerald-500" /> Peças
-              Utilizadas ({service.usedParts.length})
-            </h3>
-            <div className="mt-6 space-y-3">
-              {service.usedParts.map((part, idx) => (
-                <div
-                  key={idx}
-                  className="flex items-center justify-between bg-zinc-900 border border-zinc-800 p-4 rounded-sm"
-                >
-                  <div>
-                    <span className="block text-sm font-bold uppercase text-white">
-                      {part.partName}
-                    </span>
-                    <span className="text-[9px] text-zinc-500">
-                      Por: {part.mechanicName} •{' '}
-                      {new Date(part.timestamp).toLocaleDateString('pt-BR')}
-                    </span>
-                  </div>
-                  <span className="text-xl font-mono font-bold text-emerald-500">
-                    {part.quantity}x
-                  </span>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-        <div className="space-y-4">
-          <h4 className="text-[10px] font-black uppercase text-white tracking-widest ml-2">
-            Histórico Técnico
-          </h4>
-          <div className="space-y-4">
-            {history
-              .flatMap((s) =>
-                s.logs.map((log) => ({ ...log, serviceOs: s.os }))
-              )
-              .sort((a, b) => b.timestamp - a.timestamp)
-              .map((log, i) => (
-                <div
-                  key={i}
-                  className="bg-zinc-950 border border-zinc-900 p-6 border-l-2 border-l-white rounded-sm shadow-md"
-                >
-                  <div className="flex justify-between mb-2">
-                    <div className="flex flex-col">
-                      <span className="font-black text-xs text-white uppercase italic">
-                        {log.mechanicName}
-                      </span>
-                      <span className="text-[9px] text-zinc-400 font-mono">
-                        {new Date(log.timestamp).toLocaleString('pt-BR')}
-                      </span>
-                    </div>
-                    {log.serviceOs && (
-                      <span className="text-[9px] font-mono text-amber-500">
-                        OS: {log.serviceOs}
-                      </span>
-                    )}
-                  </div>
-                  <p className="text-sm text-white uppercase bg-zinc-900 p-4 rounded-sm">
-                    {log.description}
-                  </p>
-                  {log.remainingTasks && (
-                    <p className="text-[10px] text-rose-500 uppercase italic mt-2">
-                      Pendência: {log.remainingTasks}
-                    </p>
-                  )}
-                </div>
-              ))}
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-};
-
 // ========== APP PRINCIPAL ==========
 const App: React.FC = () => {
   const [mechanics, setMechanics] = useState<Mechanic[]>([]);
@@ -3088,62 +198,8 @@ const App: React.FC = () => {
   const [showActiveMechanicsModal, setShowActiveMechanicsModal] = useState<
     string | null
   >(null);
-  const [showReleaseModal, setShowReleaseModal] = useState(false);
-
-  // ESTADOS DA IA
-  const [isAiThinking, setIsAiThinking] = useState(false);
-  const [aiChat, setAiChat] = useState<{
-    question: string;
-    answer: string;
-  } | null>(null);
-
-  const handleAiAsk = async (prompt: string) => {
-    if (!prompt.trim() || isAiThinking) return;
-    setIsAiThinking(true);
-
-    try {
-      const sectionCounts = services.reduce((acc: any, s) => {
-        const sec = s.assignedSection || 'RECEPÇÃO';
-        acc[sec] = (acc[sec] || 0) + 1;
-        return acc;
-      }, {});
-
-      const yardData = {
-        resumo_secoes: sectionCounts,
-        total_vtrs: services.length,
-        lista_vtrs: services.map((s) => ({
-          placa: s.plate,
-          prefixo: s.prefix,
-          modelo: s.model,
-          opm: s.opm,
-          km: s.km,
-          secao: s.assignedSection,
-          status: s.status,
-          problema: s.reportedDefect,
-          chegada: s.entryDate,
-          tempo_total:
-            ((Date.now() - s.globalStartTime) / 3600000).toFixed(1) + ' horas',
-          custo_mo: Object.entries(s.individualTimes || {})
-            .reduce((acc, [mId, time]) => {
-              const rate = mechanics.find((m) => m.id === mId)?.hourlyRate || 0;
-              return acc + (Number(time) / 3600000) * rate;
-            }, 0)
-            .toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }),
-          logs: s.logs.map((l) => `${l.mechanicName}: ${l.description}`),
-        })),
-      };
-
-      const answer = await askCMM_AI(prompt, yardData);
-      setAiChat({ question: prompt.toUpperCase(), answer });
-    } catch (e) {
-      setAiChat({
-        question: prompt,
-        answer: 'Erro ao acessar dados do pátio.',
-      });
-    } finally {
-      setIsAiThinking(false);
-    }
-  };
+  const [isOnline, setIsOnline] = useState(navigator.onLine);
+  const [activeSectionFilter, setActiveSectionFilter] = useState<string>('TODOS');
 
   const activeServices = services
     .filter((s) => {
@@ -3162,7 +218,7 @@ const App: React.FC = () => {
         'ALMOXARIFADO',
       ];
 
-      return setoresInternos.includes(s.assignedSection);
+      return setoresInternos.includes(s.assignedSection || '');
     })
     .sort((a, b) => {
       const nameA = `${a.brand || ''} ${a.model || ''}`.toUpperCase();
@@ -3174,19 +230,14 @@ const App: React.FC = () => {
       if (!isTrailA && isTrailB) return 1;
 
       const timeA = a.globalStartTime
-        ? new Date(a.globalStartTime).getTime()
-        : 0;
+          ? new Date(a.globalStartTime).getTime()
+          : 0;
       const timeB = b.globalStartTime
-        ? new Date(b.globalStartTime).getTime()
-        : 0;
+          ? new Date(b.globalStartTime).getTime()
+          : 0;
 
       return timeB - timeA;
     });
-
-  useEffect(() => {
-    const i = setInterval(() => {}, 1000);
-    return () => clearInterval(i);
-  }, []);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -3213,6 +264,20 @@ const App: React.FC = () => {
     };
     fetchData();
   }, []);
+
+  useEffect(() => {
+    const handleOnline = () => setIsOnline(true);
+    const handleOffline = () => setIsOnline(false);
+
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
+
+    return () => {
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
+    };
+  }, []);
+
   const persistService = async (service: ServiceRecord) => {
     try {
       const { error } = await supabase.from('services').upsert(service);
@@ -3239,7 +304,7 @@ const App: React.FC = () => {
   const handleGlobalSearch = (query: string) => {
     if (!query.trim()) return;
     setSearchQuery(query.toUpperCase());
-    setView('SEARCH_RESULTS' as any);
+    setView('SEARCH_RESULTS' as AppState);
   };
 
   const persistMechanic = async (mechanic: Mechanic) => {
@@ -3263,8 +328,8 @@ const App: React.FC = () => {
     setCurrentMechanic(finalMechanic);
     setSelectedServiceId(null);
     
-    // --- NOVO: REDIRECIONAMENTO DIRETO PARA O APP DO ALMOXARIFADO ---
-    if (finalMechanic.department === 'ALMOXARIFADO') {
+    // REDIRECIONAMENTO DIRETO PARA O APP DO ALMOXARIFADO
+    if (finalMechanic.department === Department.STORES) {
       window.location.href = 'https://cmmalmox.netlify.app/';
       return;
     }
@@ -3329,6 +394,7 @@ const App: React.FC = () => {
           remainingTasks: '',
           timestamp: entryTimestamp,
           durationInSession: 0,
+          destination: section,
         },
       ],
       ...(delegatedTo && {
@@ -3353,7 +419,7 @@ const App: React.FC = () => {
       entryDate: new Date().toLocaleDateString('pt-BR'),
       problem: defect,
       km: km,
-      destination: 'EM ATENDIMENTO',
+      destination: section,
     });
   };
 
@@ -3442,7 +508,7 @@ const App: React.FC = () => {
   ) => {
     const srv = services.find((s) => s.id === serviceId);
     if (!srv || !srv.activeWorkSessions?.[mechanicId]) return;
-    const sessionDuration = Date.now() - srv.activeWorkSessions[mechanicId];
+    const sessionDuration = Date.now() - (srv.activeWorkSessions[mechanicId] as number);
     const mechanic = mechanics.find((m) => m.id === mechanicId);
     const activeSessions = { ...(srv.activeWorkSessions || {}) };
     delete activeSessions[mechanicId];
@@ -3471,10 +537,10 @@ const App: React.FC = () => {
   };
 
   const handleEndShift = async () => {
-    const activeServices = services.filter(
+    const activeServicesList = services.filter(
       (s) => s.status === ServiceStatus.IN_PROGRESS
     );
-    const totalActiveSessions = activeServices.reduce(
+    const totalActiveSessions = activeServicesList.reduce(
       (acc, s) => acc + Object.keys(s.activeWorkSessions || {}).length,
       0
     );
@@ -3484,23 +550,23 @@ const App: React.FC = () => {
     }
     if (
       !confirm(
-        `Pausar ${totalActiveSessions} sessões em ${activeServices.length} viatura(s)?`
+        `Pausar ${totalActiveSessions} sessões em ${activeServicesList.length} viatura(s)?`
       )
     )
       return;
     setIsLoading(true);
     const now = Date.now();
-    for (const service of activeServices) {
+    for (const service of activeServicesList) {
       if (
         !service.activeWorkSessions ||
         Object.keys(service.activeWorkSessions).length === 0
       )
         continue;
-      const newLogs: WorkLog[] = [...service.logs];
+      const newLogs = [...service.logs];
       const newIndividualTimes = { ...(service.individualTimes || {}) };
       Object.entries(service.activeWorkSessions).forEach(
         ([mechanicId, startTime]) => {
-          const sessionDuration = now - startTime;
+          const sessionDuration = now - (startTime as number);
           const mechanic = mechanics.find((m) => m.id === mechanicId);
           newIndividualTimes[mechanicId] =
             (newIndividualTimes[mechanicId] || 0) + sessionDuration;
@@ -3532,7 +598,6 @@ const App: React.FC = () => {
   ) => {
     const srv = services.find((s) => s.id === id);
     if (srv) {
-      // Concatenar diagnóstico com o que já existe
       const previousDiag = srv.draftDiagnosis || '';
       const newDiag = diag ? (previousDiag && previousDiag !== diag ? previousDiag + '\n' + diag : diag) : previousDiag;
       
@@ -3568,7 +633,7 @@ const App: React.FC = () => {
           minute: '2-digit',
         }
       );
-      const destinationMap: Record<ServiceStatus, string> = {
+      const destinationMap: Record<string, string> = {
         [ServiceStatus.RESOLVED]: 'LIBERADO',
         [ServiceStatus.OUTSOURCED]: 'CONTRATAÇÃO',
         [ServiceStatus.SIGNALING]: 'SINALIZADOR',
@@ -3582,7 +647,6 @@ const App: React.FC = () => {
       };
 
       const isResolved = status === ServiceStatus.RESOLVED;
-      // Concatenar todo o histórico de diagnóstico
       const previousDiag = srv.draftDiagnosis || srv.finalDiagnosis || '';
       const finalDiag = diagnosis ? (previousDiag && previousDiag !== diagnosis ? previousDiag + '\n' + diagnosis : diagnosis) : previousDiag;
       
@@ -3603,6 +667,7 @@ const App: React.FC = () => {
             remainingTasks: remaining,
             timestamp: exitTimestamp,
             durationInSession: sessionDuration,
+            destination: destinationMap[status],
           },
         ],
         individualTimes: {
@@ -3617,6 +682,8 @@ const App: React.FC = () => {
 
       await persistService(updated);
 
+      const destHistoryText = getDestinationHistoryText(updated.logs);
+
       sendToGoogleSheets({
         os: srv.os || '',
         plate: srv.plate,
@@ -3627,9 +694,9 @@ const App: React.FC = () => {
         opm: srv.opm,
         entryDate: new Date(srv.globalStartTime).toLocaleDateString('pt-BR'),
         exitDate: new Date().toLocaleDateString('pt-BR'),
-        destination: destinationMap[status],
+        destination: destHistoryText,
         km: srv.km,
-        problem: diagnosis,
+        problem: finalDiag,
       }).catch((err) => console.error('Erro Planilha Saída:', err));
     }
 
@@ -3648,50 +715,126 @@ const App: React.FC = () => {
     )
       return;
 
+    let lastSection = 'LINHA MECÂNICA';
+    for (let i = srv.logs.length - 1; i >= 0; i--) {
+      const dest = srv.logs[i].destination;
+      if (dest && dest !== 'LIBERADO' && dest !== 'DESCONHECIDO') {
+        lastSection = dest;
+        break;
+      }
+    }
+
+    const exitTimestamp = Date.now();
+    const updatedLogs = [
+      ...srv.logs,
+      {
+        mechanicName: currentMechanic?.name || 'RECEPÇÃO',
+        description: 'SERVIÇO REABERTO',
+        remainingTasks: '',
+        timestamp: exitTimestamp,
+        durationInSession: 0,
+        destination: lastSection,
+      }
+    ];
+
+    const destHistoryText = getDestinationHistoryText(updatedLogs);
+
     const updated: ServiceRecord = {
       ...srv,
       status: ServiceStatus.IN_PROGRESS,
-      endTime: 0,
+      assignedSection: lastSection,
+      endTime: null as any,
       exitDate: '',
       readyForClient: false,
+      releaseToken: null as any,
+      logs: updatedLogs,
     };
 
     await persistService(updated);
+
+    sendToGoogleSheets({
+      os: srv.os || '',
+      plate: srv.plate,
+      prefix: srv.prefix,
+      year: srv.year,
+      brand: srv.brand,
+      model: srv.model,
+      opm: srv.opm,
+      entryDate: new Date(srv.globalStartTime).toLocaleDateString('pt-BR'),
+      exitDate: '',
+      destination: destHistoryText,
+      km: srv.km,
+      problem: srv.finalDiagnosis || srv.draftDiagnosis || '',
+    }).catch((err) => console.error('Erro Planilha Reabertura:', err));
+
     alert(`✅ Serviço ${srv.plate} reaberto com sucesso!`);
     setView('DASHBOARD');
   };
 
-  const handleReleaseVehicle = async (token: string) => {
+  // LIBERAÇÃO DIRETA DA VIATURA (Sem exigir token de 6 dígitos)
+  const handleReleaseVehicleDirect = async () => {
     if (!selectedServiceId || !currentMechanic) return;
-    const { data: tokenData, error: tokenError } = await supabase
-      .from('satisfaction_tokens')
-      .select('*')
-      .eq('token', token)
-      .eq('used', false)
-      .single();
-    if (tokenError || !tokenData) {
-      alert('❌ Token inválido ou já utilizado!');
-      return;
-    }
-    const servicePlate = services.find(
-      (s) => s.id === selectedServiceId
-    )?.plate;
-    await supabase
-      .from('satisfaction_tokens')
-      .update({
-        used: true,
-        used_by: currentMechanic.name,
-        service_id: servicePlate,
-        used_at: Date.now(),
-      })
-      .eq('id', tokenData.id);
-    const updatedService = services.find((s) => s.id === selectedServiceId);
-    if (updatedService) {
-      const newRecord = { ...updatedService, releaseToken: token };
-      await persistService(newRecord);
-      alert('✅ SAÍDA LIBERADA COM SUCESSO!');
-      setShowReleaseModal(false);
-    }
+    
+    const targetService = services.find((s) => s.id === selectedServiceId);
+    if (!targetService) return;
+
+    if (!confirm(`Deseja realmente liberar a saída da viatura ${targetService.plate}?`)) return;
+
+    const exitTimestamp = Date.now();
+    const exitDateFormatted = new Date(exitTimestamp).toLocaleString(
+      'pt-BR',
+      {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+      }
+    );
+
+    const updatedLogs = [
+      ...targetService.logs,
+      {
+        mechanicName: currentMechanic.name,
+        description: 'SAÍDA AUTORIZADA / LIBERADO',
+        remainingTasks: '',
+        timestamp: exitTimestamp,
+        durationInSession: 0,
+        destination: 'LIBERADO',
+      }
+    ];
+
+    const destHistoryText = getDestinationHistoryText(updatedLogs);
+
+    const updated: ServiceRecord = {
+      ...targetService,
+      status: ServiceStatus.RESOLVED,
+      endTime: exitTimestamp,
+      exitDate: exitDateFormatted,
+      releaseToken: 'LIBERADO_DIRETO',
+      logs: updatedLogs,
+    };
+
+    await persistService(updated);
+
+    sendToGoogleSheets({
+      os: targetService.os || '',
+      plate: targetService.plate,
+      prefix: targetService.prefix,
+      year: targetService.year,
+      brand: targetService.brand,
+      model: targetService.model,
+      opm: targetService.opm,
+      entryDate: new Date(targetService.globalStartTime).toLocaleDateString('pt-BR'),
+      exitDate: new Date().toLocaleDateString('pt-BR'),
+      destination: destHistoryText,
+      km: targetService.km,
+      problem: targetService.finalDiagnosis || targetService.draftDiagnosis || '',
+    }).catch((err) => console.error('Erro Planilha Saída Direta:', err));
+
+    alert('✅ SAÍDA LIBERADA COM SUCESSO!');
+    setSelectedServiceId(null);
+    setView('DASHBOARD');
   };
 
   const handleImportVehicles = async (newVehicles: Vehicle[]) => {
@@ -3836,7 +979,6 @@ const App: React.FC = () => {
       (s) => s.status !== ServiceStatus.IN_PROGRESS
     );
 
-    // Filtramos apenas as viaturas que realmente têm data de saída válida para não quebrar a conta
     const validResolved = resolved.filter(
       (s) => s.endTime && s.globalStartTime && s.endTime > s.globalStartTime
     );
@@ -3994,7 +1136,7 @@ const App: React.FC = () => {
           acc +
           ((s.individualTimes || {})[m.id] || 0) +
           (s.activeWorkSessions?.[m.id]
-            ? Date.now() - s.activeWorkSessions[m.id]
+            ? Date.now() - (s.activeWorkSessions[m.id] as number)
             : 0),
         0
       );
@@ -4025,7 +1167,7 @@ const App: React.FC = () => {
           individualTime:
             ((s.individualTimes || {})[m.id] || 0) +
             (s.activeWorkSessions?.[m.id]
-              ? Date.now() - s.activeWorkSessions[m.id]
+              ? Date.now() - (s.activeWorkSessions[m.id] as number)
               : 0),
         })),
       };
@@ -4041,6 +1183,11 @@ const App: React.FC = () => {
       totalWithSection,
     };
   }, [services, mechanics]);
+
+  const filteredActiveServices = useMemo(() => {
+    if (activeSectionFilter === 'TODOS') return activeServices;
+    return activeServices.filter((s) => s.assignedSection === activeSectionFilter);
+  }, [activeServices, activeSectionFilter]);
 
   const canEndShift =
     currentMechanic &&
@@ -4060,10 +1207,10 @@ const App: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-black text-white pb-12 font-sans">
-      <header className="bg-black border-b border-zinc-800 p-4 sticky top-0 z-50">
+      <header className="bg-zinc-950 border-b border-zinc-900 p-4 sticky top-0 z-50">
         <div className="max-w-5xl mx-auto flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className="bg-white p-2 rounded-sm">
+          <div className="flex items-center gap-3">
+            <div className="bg-white p-2 rounded-lg">
               <Wrench className="w-5 h-5 text-black" />
             </div>
             <h1 className="text-xl font-bold tracking-tighter uppercase">
@@ -4073,17 +1220,28 @@ const App: React.FC = () => {
               </span>
             </h1>
           </div>
-          {currentMechanic && (
-            <button
-              onClick={() => {
-                setCurrentMechanic(null);
-                setView('SELECT_MECHANIC');
-              }}
-              className="p-2 text-zinc-400 hover:text-white hover:bg-zinc-900 rounded-sm"
-            >
-              <LogOut className="w-5 h-5" />
-            </button>
-          )}
+          <div className="flex items-center gap-3">
+            <div className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[10px] font-black uppercase transition-all ${
+              isOnline 
+                ? 'bg-emerald-950/40 text-emerald-400 border border-emerald-800/30' 
+                : 'bg-rose-950/40 text-rose-400 border border-rose-800/30 animate-pulse'
+            }`}>
+              <span className={`w-1.5 h-1.5 rounded-full ${isOnline ? 'bg-emerald-400' : 'bg-rose-400'}`}></span>
+              {isOnline ? 'Online' : 'Offline'}
+            </div>
+            {currentMechanic && (
+              <button
+                onClick={() => {
+                  setCurrentMechanic(null);
+                  setView('SELECT_MECHANIC');
+                }}
+                className="p-2 text-zinc-400 hover:text-white hover:bg-zinc-900 rounded-lg h-9 w-9 flex items-center justify-center border border-zinc-800 hover:border-zinc-700"
+                title="Sair"
+              >
+                <LogOut className="w-4 h-4" />
+              </button>
+            )}
+          </div>
         </div>
       </header>
       <main className="max-w-5xl mx-auto p-4 sm:p-6">
@@ -4101,7 +1259,7 @@ const App: React.FC = () => {
             <div className="flex flex-col gap-6 w-full max-w-md">
               <button
                 onClick={() => setView('PRE_AUTH')}
-                className="w-full py-12 bg-transparent border-4 border-white hover:bg-white hover:text-black text-white font-black uppercase text-2xl tracking-widest rounded-sm shadow-2xl transition-all active:scale-95 flex flex-col items-center justify-center gap-2"
+                className="w-full py-12 bg-zinc-950 border-4 border-zinc-800 hover:border-white text-white font-black uppercase text-2xl tracking-widest rounded-2xl shadow-2xl transition-all active:scale-95 flex flex-col items-center justify-center gap-2"
               >
                 ACESSO CMM
                 <span className="text-xs font-bold opacity-60">
@@ -4112,7 +1270,7 @@ const App: React.FC = () => {
 
               <button
                 onClick={() => setView('CLIENT_CONSULT')}
-                className="w-full py-12 bg-transparent border-4 border-white hover:bg-white hover:text-black text-white font-black uppercase text-2xl tracking-widest rounded-sm shadow-2xl transition-all active:scale-95 flex flex-col items-center justify-center gap-2"
+                className="w-full py-12 bg-zinc-950 border-4 border-zinc-800 hover:border-white text-white font-black uppercase text-2xl tracking-widest rounded-2xl shadow-2xl transition-all active:scale-95 flex flex-col items-center justify-center gap-2"
               >
                 CONSULTAR VEÍCULO
                 <span className="text-xs font-bold opacity-60">(USUÁRIO)</span>
@@ -4155,7 +1313,7 @@ const App: React.FC = () => {
           <div className="flex flex-col items-center justify-center py-20 animate-in slide-in-from-right duration-500">
             <button
               onClick={() => setView('START_PAGE')}
-              className="mb-8 px-6 py-3 bg-zinc-800 text-white font-bold uppercase text-[9px] rounded-sm flex items-center gap-2"
+              className="mb-8 px-6 py-3 bg-zinc-800 text-white font-bold uppercase text-[9px] rounded-lg flex items-center gap-2"
             >
               <ArrowLeft className="w-4 h-4" /> Voltar ao Início
             </button>
@@ -4166,42 +1324,42 @@ const App: React.FC = () => {
               <div className="flex flex-col gap-4 w-full max-w-md">
                 <button
                   onClick={() => setSelectedDepartment('CHEFES')}
-                  className="w-full py-8 bg-zinc-700 text-white font-black uppercase text-xl rounded-sm flex items-center justify-center gap-4 active:scale-95 shadow-xl border-2 border-white/20 hover:bg-zinc-600 transition-all"
+                  className="w-full py-8 bg-zinc-700 text-white font-black uppercase text-xl rounded-xl flex items-center justify-center gap-4 active:scale-95 shadow-xl border-2 border-white/20 hover:bg-zinc-600 transition-all"
                 >
                   <UserCog className="w-8 h-8 text-amber-500" /> Chefes
                 </button>
 
                 <button
                   onClick={() => setSelectedDepartment('RECEPÇÃO')}
-                  className="w-full py-8 bg-amber-600 text-white font-black uppercase text-xl rounded-sm flex items-center justify-center gap-4 active:scale-95"
+                  className="w-full py-8 bg-amber-600 text-white font-black uppercase text-xl rounded-xl flex items-center justify-center gap-4 active:scale-95"
                 >
                   <ClipboardList className="w-8 h-8" /> Recepção
                 </button>
 
                 <button
                   onClick={() => setSelectedDepartment('LINHA MECÂNICA')}
-                  className="w-full py-8 bg-emerald-600 text-white font-black uppercase text-xl rounded-sm flex items-center justify-center gap-4 active:scale-95"
+                  className="w-full py-8 bg-emerald-600 text-white font-black uppercase text-xl rounded-xl flex items-center justify-center gap-4 active:scale-95"
                 >
                   <Wrench className="w-8 h-8" /> Linha Mecânica
                 </button>
 
                 <button
                   onClick={() => setSelectedDepartment('SINALIZADOR')}
-                  className="w-full py-8 bg-blue-600 text-white font-black uppercase text-xl rounded-sm flex items-center justify-center gap-4 active:scale-95"
+                  className="w-full py-8 bg-blue-600 text-white font-black uppercase text-xl rounded-xl flex items-center justify-center gap-4 active:scale-95"
                 >
                   <AlertTriangle className="w-8 h-8" /> SINALIZADOR
                 </button>
 
                 <button
                   onClick={() => setSelectedDepartment('GRAFISMO')}
-                  className="w-full py-8 bg-purple-600 text-white font-black uppercase text-xl rounded-sm flex items-center justify-center gap-4 active:scale-95"
+                  className="w-full py-8 bg-purple-600 text-white font-black uppercase text-xl rounded-xl flex items-center justify-center gap-4 active:scale-95"
                 >
                   <Brush className="w-8 h-8" /> GRAFISMO
                 </button>
 
                 <button
                   onClick={() => setSelectedDepartment('SETOR TÉCNICO')}
-                  className="w-full py-8 bg-red-600 text-white font-black uppercase text-xl rounded-sm flex items-center justify-center gap-4 active:scale-95"
+                  className="w-full py-8 bg-red-600 text-white font-black uppercase text-xl rounded-xl flex items-center justify-center gap-4 active:scale-95"
                 >
                   <Cpu className="w-8 h-8" /> Setor Técnico
                 </button>
@@ -4210,14 +1368,14 @@ const App: React.FC = () => {
                   onClick={() =>
                     setSelectedDepartment('LINHA MECÂNICA PESADOS')
                   }
-                  className="w-full py-8 bg-emerald-900 text-white font-black uppercase text-xl rounded-sm flex items-center justify-center gap-4 active:scale-95"
+                  className="w-full py-8 bg-emerald-900 text-white font-black uppercase text-xl rounded-xl flex items-center justify-center gap-4 active:scale-95"
                 >
                   <Truck className="w-8 h-8" /> L. Mecânica Pesados
                 </button>
 
                 <button
                   onClick={() => setSelectedDepartment('ALMOXARIFADO')}
-                  className="w-full py-8 bg-zinc-500 text-white font-black uppercase text-xl rounded-sm flex items-center justify-center gap-4 active:scale-95"
+                  className="w-full py-8 bg-zinc-500 text-white font-black uppercase text-xl rounded-xl flex items-center justify-center gap-4 active:scale-95"
                 >
                   <Package className="w-8 h-8" /> Almoxarifado
                 </button>
@@ -4226,7 +1384,7 @@ const App: React.FC = () => {
               <div className="w-full max-w-4xl">
                 <button
                   onClick={() => setSelectedDepartment(null)}
-                  className="mb-8 px-6 py-3 bg-zinc-800 hover:bg-zinc-700 text-white font-bold uppercase text-xs rounded-sm flex items-center gap-2"
+                  className="mb-8 px-6 py-3 bg-zinc-800 hover:bg-zinc-700 text-white font-bold uppercase text-xs rounded-lg flex items-center gap-2"
                 >
                   <ArrowLeft className="w-4 h-4" />
                   Voltar
@@ -4284,7 +1442,7 @@ const App: React.FC = () => {
                           setSelectedForAuth(m);
                           setView('AUTH');
                         }}
-                        className={`bg-zinc-900/40 border border-zinc-800 p-5 rounded-sm flex items-center justify-between group transition-all ${
+                        className={`bg-zinc-900/40 border border-zinc-800 p-5 rounded-xl flex items-center justify-between group transition-all ${
                           selectedDepartment === 'CHEFES'
                             ? 'hover:bg-zinc-800 hover:border-zinc-500'
                             : selectedDepartment === 'RECEPÇÃO'
@@ -4335,6 +1493,7 @@ const App: React.FC = () => {
             )}
           </div>
         )}
+        
         {view === 'AUTH' && selectedForAuth && (
           <AuthView
             mechanic={selectedForAuth}
@@ -4347,12 +1506,13 @@ const App: React.FC = () => {
             }}
           />
         )}
+        
         {view === 'DASHBOARD' && (
           <div className="space-y-6">
             {canEndShift && (
               <button
                 onClick={handleEndShift}
-                className="w-full py-6 bg-gradient-to-r from-rose-600 to-orange-600 text-white font-black uppercase text-sm tracking-widest flex items-center justify-center gap-3 rounded-sm shadow-2xl hover:from-rose-700 hover:to-orange-700"
+                className="w-full py-6 bg-gradient-to-r from-rose-600 to-orange-600 text-white font-black uppercase text-sm tracking-widest flex items-center justify-center gap-3 rounded-xl shadow-2xl hover:from-rose-700 hover:to-orange-700 transition-all"
               >
                 <Power className="w-6 h-6" /> ENCERRAR EXPEDIENTE
               </button>
@@ -4362,7 +1522,7 @@ const App: React.FC = () => {
               <button
                 onClick={() => setView('NEW_SERVICE')}
                 disabled={currentMechanic?.role === UserRole.CHIEF}
-                className="bg-white text-black p-10 rounded-sm flex flex-col items-center justify-center gap-4 active:scale-95 disabled:opacity-30 shadow-2xl"
+                className="bg-white text-black p-10 rounded-2xl flex flex-col items-center justify-center gap-4 active:scale-95 disabled:opacity-30 shadow-2xl transition-all"
               >
                 <Play className="w-12 h-12" />
                 <span className="text-xl font-black uppercase tracking-tighter">
@@ -4371,7 +1531,7 @@ const App: React.FC = () => {
               </button>
               <button
                 onClick={() => setView('CONSULT_SERVICE')}
-                className="bg-zinc-900 text-white p-10 rounded-sm border border-zinc-800 flex flex-col items-center justify-center gap-4 hover:bg-zinc-800 shadow-xl"
+                className="bg-zinc-900 text-white p-10 rounded-2xl border border-zinc-800 flex flex-col items-center justify-center gap-4 hover:bg-zinc-850 hover:border-zinc-700 shadow-xl transition-all"
               >
                 <Search className="w-12 h-12 text-zinc-500" />
                 <span className="text-xl font-black uppercase tracking-tighter text-white">
@@ -4384,7 +1544,7 @@ const App: React.FC = () => {
               currentMechanic?.role === UserRole.CHIEF) && (
               <button
                 onClick={() => setView('READY_VEHICLES')}
-                className="w-full bg-emerald-900/20 border border-emerald-500/50 p-6 rounded-sm flex items-center justify-center gap-4 hover:bg-emerald-900/40 transition-all shadow-xl"
+                className="w-full bg-emerald-950/20 border border-emerald-500/30 p-6 rounded-xl flex items-center justify-center gap-4 hover:bg-emerald-900/20 hover:border-emerald-500/50 transition-all shadow-xl"
               >
                 <CheckCircle2 className="w-8 h-8 text-emerald-500" />
                 <div className="text-left">
@@ -4408,66 +1568,10 @@ const App: React.FC = () => {
             )}
 
             {currentMechanic?.role === UserRole.CHIEF && (
-              <div className="col-span-full bg-zinc-950 border border-zinc-900 p-6 rounded-sm shadow-2xl mb-4">
-                <div className="flex items-center gap-2 mb-4">
-                  <div
-                    className={`w-2 h-2 rounded-full ${
-                      isAiThinking
-                        ? 'bg-amber-500 animate-ping'
-                        : 'bg-emerald-500'
-                    }`}
-                  ></div>
-                  <span className="text-[10px] font-black uppercase text-zinc-500">
-                    CMM ASSISTENTE IA
-                  </span>
-                </div>
-                <div className="flex gap-2">
-                  <div className="relative flex-1">
-                    <input
-                      type="text"
-                      placeholder="Fale com a frota..."
-                      className="w-full bg-zinc-900 border border-zinc-800 text-white pl-4 pr-12 py-4 text-xs font-mono outline-none focus:border-white uppercase"
-                      onKeyDown={(e) =>
-                        e.key === 'Enter' && handleAiAsk(e.currentTarget.value)
-                      }
-                    />
-                    <div className="absolute right-2 top-1/2 -translate-y-1/2">
-                      <VoiceInput onResult={(text) => handleAiAsk(text)} />
-                    </div>
-                  </div>
-                  <button
-                    onClick={() => {
-                      const input = document.querySelector(
-                        'input[placeholder="Fale com a frota..."]'
-                      ) as HTMLInputElement;
-                      handleAiAsk(input?.value);
-                    }}
-                    className="bg-white text-black px-6 font-black uppercase text-[10px] rounded-sm"
-                  >
-                    {isAiThinking ? '...' : 'Enviar'}
-                  </button>
-                </div>
-                {aiChat && (
-                  <div className="mt-4 p-4 bg-zinc-900 border-l-2 border-amber-500 animate-in fade-in duration-300">
-                    <p className="text-xs text-zinc-200 font-sans whitespace-pre-wrap">
-                      {aiChat.answer}
-                    </p>
-                    <button
-                      onClick={() => setAiChat(null)}
-                      className="mt-3 text-[8px] text-zinc-600 uppercase font-black"
-                    >
-                      Limpar
-                    </button>
-                  </div>
-                )}
-              </div>
-            )}
-
-            {currentMechanic?.role === UserRole.CHIEF && (
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <button
                   onClick={() => setView('CHIEF_STATS')}
-                  className="bg-zinc-950 border border-zinc-800 p-6 rounded-sm flex items-center justify-center gap-4 hover:border-white shadow-xl"
+                  className="bg-zinc-950 border border-zinc-800 p-6 rounded-xl flex items-center justify-center gap-4 hover:border-white shadow-xl transition-all"
                 >
                   <BarChart3 className="w-6 h-6 text-white" />
                   <span className="text-sm font-bold uppercase">
@@ -4476,7 +1580,7 @@ const App: React.FC = () => {
                 </button>
                 <button
                   onClick={exportToExcel}
-                  className="bg-zinc-950 border border-zinc-800 p-6 rounded-sm flex items-center justify-center gap-4 hover:border-white shadow-xl"
+                  className="bg-zinc-950 border border-zinc-800 p-6 rounded-xl flex items-center justify-center gap-4 hover:border-white shadow-xl transition-all"
                 >
                   <FileSpreadsheet className="w-6 h-6 text-emerald-500" />
                   <span className="text-sm font-bold uppercase">
@@ -4485,7 +1589,7 @@ const App: React.FC = () => {
                 </button>
                 <button
                   onClick={() => setView('IMPORT_VEHICLES')}
-                  className="bg-zinc-950 border border-zinc-800 p-6 rounded-sm flex items-center justify-center gap-4 hover:border-white shadow-xl"
+                  className="bg-zinc-950 border border-zinc-800 p-6 rounded-xl flex items-center justify-center gap-4 hover:border-white shadow-xl transition-all"
                 >
                   <Database className="w-6 h-6 text-amber-500" />
                   <span className="text-sm font-bold uppercase">
@@ -4496,18 +1600,29 @@ const App: React.FC = () => {
             )}
 
             <div className="space-y-6 pt-10 border-t border-zinc-900 mt-10">
-              <div className="flex flex-wrap items-center justify-between gap-4 mb-4">
+              <div className="flex flex-col gap-4 mb-6">
                 <div className="flex items-center gap-3">
                   <Car className="w-4 h-4 text-amber-500" />
                   <h4 className="text-[11px] font-black uppercase tracking-[0.3em] text-white">
                     Pátio Ativo
                   </h4>
-                  <span className="bg-amber-500 text-black px-2 py-0.5 rounded-sm font-black text-[11px]">
+                  <span className="bg-amber-500 text-black px-2 py-0.5 rounded-md font-black text-[11px]">
                     {activeServices.length}
                   </span>
                 </div>
 
-                <div className="flex flex-wrap items-center gap-2">
+                <div className="flex flex-wrap gap-2">
+                  <button
+                    onClick={() => setActiveSectionFilter('TODOS')}
+                    className={`px-3 py-2 border rounded-lg flex items-center gap-2 text-xs font-black uppercase tracking-tighter transition-all ${
+                      activeSectionFilter === 'TODOS'
+                        ? 'border-white text-black bg-white'
+                        : 'border-zinc-800 text-zinc-400 bg-zinc-950/40 hover:text-white hover:border-zinc-700'
+                    }`}
+                  >
+                    <span>Todos</span>
+                    <span className="text-[10px] font-mono opacity-80">{activeServices.length}</span>
+                  </button>
                   {[
                     'LINHA MECÂNICA',
                     'BORRACHARIA',
@@ -4520,47 +1635,62 @@ const App: React.FC = () => {
                     const count = activeServices.filter(
                       (s) => s.assignedSection === setor
                     ).length;
-                    if (count === 0) return null;
-                    const colors: Record<string, string> = {
-                      'LINHA MECÂNICA':
-                        'border-emerald-900 text-emerald-500 bg-emerald-950/20',
-                      BORRACHARIA:
-                        'border-orange-900 text-orange-500 bg-orange-950/20',
-                      SINALIZADOR:
-                        'border-blue-900 text-blue-500 bg-blue-950/20',
-                      GRAFISMO:
-                        'border-purple-900 text-purple-500 bg-purple-950/20',
-                      'SETOR TÉCNICO':
-                        'border-red-900 text-red-500 bg-red-950/20',
-                      'LINHA MECÂNICA PESADOS':
-                        'border-emerald-950 text-emerald-700 bg-emerald-950/40',
-                      ALMOXARIFADO:
-                        'border-zinc-700 text-zinc-400 bg-zinc-900/20',
+                    if (count === 0 && activeSectionFilter !== setor) return null;
+                    const colors: Record<string, { active: string, inactive: string }> = {
+                      'LINHA MECÂNICA': {
+                        active: 'border-emerald-500 text-black bg-emerald-500',
+                        inactive: 'border-emerald-950/30 text-emerald-500 bg-emerald-950/10 hover:border-emerald-800'
+                      },
+                      BORRACHARIA: {
+                        active: 'border-orange-500 text-black bg-orange-500',
+                        inactive: 'border-orange-950/30 text-orange-500 bg-orange-950/10 hover:border-orange-800'
+                      },
+                      SINALIZADOR: {
+                        active: 'border-blue-500 text-black bg-blue-500',
+                        inactive: 'border-blue-950/30 text-blue-500 bg-blue-950/10 hover:border-blue-800'
+                      },
+                      GRAFISMO: {
+                        active: 'border-purple-500 text-black bg-purple-500',
+                        inactive: 'border-purple-950/30 text-purple-500 bg-purple-950/10 hover:border-purple-800'
+                      },
+                      'SETOR TÉCNICO': {
+                        active: 'border-red-500 text-black bg-red-500',
+                        inactive: 'border-red-950/30 text-red-500 bg-red-950/10 hover:border-red-800'
+                      },
+                      'LINHA MECÂNICA PESADOS': {
+                        active: 'border-amber-500 text-black bg-amber-500',
+                        inactive: 'border-amber-950/30 text-amber-500 bg-amber-950/10 hover:border-amber-800'
+                      },
+                      ALMOXARIFADO: {
+                        active: 'border-zinc-400 text-black bg-zinc-400',
+                        inactive: 'border-zinc-800 text-zinc-400 bg-zinc-950/10 hover:border-zinc-700'
+                      },
+                    };
+                    const colorStyles = colors[setor] || {
+                      active: 'border-zinc-400 text-black bg-zinc-400',
+                      inactive: 'border-zinc-800 text-zinc-400 bg-zinc-950/10'
                     };
                     return (
-                      <div
+                      <button
                         key={setor}
-                        className={`px-3 py-1.5 border rounded-sm flex items-center gap-2 ${
-                          colors[setor] || 'border-zinc-800 text-zinc-400'
+                        onClick={() => setActiveSectionFilter(setor)}
+                        className={`px-3 py-2 border rounded-lg flex items-center gap-2 text-xs font-black uppercase tracking-tighter transition-all ${
+                          activeSectionFilter === setor ? colorStyles.active : colorStyles.inactive
                         }`}
                       >
-                        <span className="text-[8px] font-black uppercase tracking-tighter">
-                          {setor === 'SINALIZADOR' ? 'SINALIZADOR' : setor}
-                        </span>
-                        <span className="text-[10px] font-mono font-bold opacity-80">
-                          {count}
-                        </span>
-                      </div>
+                        <span>{setor === 'LINHA MECÂNICA PESADOS' ? 'PESADOS' : setor}</span>
+                        <span className="text-[10px] font-mono opacity-80">{count}</span>
+                      </button>
                     );
                   })}
                 </div>
               </div>
 
               <div className="grid gap-3">
-                {activeServices.map((service) => (
+                {filteredActiveServices.map((service) => (
                   <div
                     key={service.id}
-                    className="bg-zinc-900/40 border border-zinc-800 p-5 rounded-sm flex items-center justify-between gap-4 group hover:border-zinc-600 transition-all"
+                    className="bg-zinc-950 border border-zinc-900 p-5 rounded-xl flex items-center justify-between gap-4 group hover:border-zinc-700 transition-all shadow-lg"
                   >
                     <div className="flex items-center gap-5">
                       <div className="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></div>
@@ -4570,7 +1700,7 @@ const App: React.FC = () => {
                             {service.plate}
                           </span>
                           <span
-                            className={`text-[8px] font-black uppercase px-2 py-0.5 rounded-sm border ${
+                            className={`text-[8px] font-black uppercase px-2 py-0.5 rounded-md border ${
                               {
                                 'LINHA MECÂNICA':
                                   'border-emerald-900 text-emerald-500 bg-emerald-950/20',
@@ -4583,10 +1713,10 @@ const App: React.FC = () => {
                                 'SETOR TÉCNICO':
                                   'border-red-900 text-red-500 bg-red-950/20',
                                 'LINHA MECÂNICA PESADOS':
-                                  'border-emerald-950 text-emerald-700 bg-emerald-950/40',
+                                  'border-emerald-955 text-emerald-700 bg-emerald-955/40',
                                 ALMOXARIFADO:
                                   'border-zinc-700 text-zinc-400 bg-zinc-900/20',
-                              }[service.assignedSection] ||
+                              }[service.assignedSection || ''] ||
                               'bg-zinc-800 text-zinc-400 border-zinc-700'
                             }`}
                           >
@@ -4604,7 +1734,11 @@ const App: React.FC = () => {
                           Tempo Oficina
                         </span>
                         <span className="text-xs font-mono font-bold text-amber-500">
-                          {formatMS(Date.now() - service.globalStartTime)}
+                          {formatMS(
+                            ((service.status === ServiceStatus.RESOLVED || service.releaseToken)
+                              ? (service.endTime || service.logs[service.logs.length - 1]?.timestamp || Date.now())
+                              : Date.now()) - service.globalStartTime
+                          )}
                         </span>
                       </div>
                       <div className="flex gap-2">
@@ -4613,14 +1747,15 @@ const App: React.FC = () => {
                             setSelectedServiceId(service.id);
                             setView('VIEW_DETAILS');
                           }}
-                          className="p-2 border border-zinc-800 text-white hover:bg-zinc-800 rounded-sm shadow-lg"
+                          className="p-3 border border-zinc-800 hover:border-zinc-700 text-white hover:bg-zinc-900 rounded-lg shadow-lg transition-all"
+                          title="Visualizar Detalhes"
                         >
                           <Eye className="w-4 h-4" />
                         </button>
                         {currentMechanic?.role !== UserRole.CHIEF && (
                           <button
                             onClick={() => handleContinueService(service.id)}
-                            className="px-5 py-2 bg-white text-black text-[10px] font-black uppercase rounded-sm active:scale-95 shadow-lg"
+                            className="px-5 py-3 bg-white text-black text-[10px] font-black uppercase rounded-lg active:scale-95 shadow-lg hover:bg-zinc-205 transition-all"
                           >
                             Assumir
                           </button>
@@ -4630,14 +1765,20 @@ const App: React.FC = () => {
                   </div>
                 ))}
                 {activeServices.length === 0 && (
-                  <p className="text-center py-10 text-zinc-600 italic uppercase text-[10px] tracking-widest">
+                  <p className="text-center py-10 text-zinc-650 italic uppercase text-[10px] tracking-widest">
                     Pátio Vazio
+                  </p>
+                )}
+                {activeServices.length > 0 && filteredActiveServices.length === 0 && (
+                  <p className="text-center py-10 text-zinc-650 italic uppercase text-[10px] tracking-widest">
+                    Nenhuma viatura nesta seção
                   </p>
                 )}
               </div>
             </div>
           </div>
         )}
+
         {view === 'CHIEF_STATS' && (
           <ChiefStatsDashboard
             stats={stats}
@@ -4668,6 +1809,7 @@ const App: React.FC = () => {
             onBack={() => setView('CHIEF_STATS')}
           />
         )}
+
         {view === 'NEW_SERVICE' && (
           <NewServiceForm
             allServices={services}
@@ -4678,6 +1820,7 @@ const App: React.FC = () => {
             onStart={handleStartNewService}
           />
         )}
+
         {view === 'IMPORT_VEHICLES' && (
           <ImportVehiclesView
             onBack={() => setView('DASHBOARD')}
@@ -4685,13 +1828,13 @@ const App: React.FC = () => {
             currentVehicles={vehicles}
           />
         )}
+
         {view === 'CONSULT_SERVICE' && (
           <ConsultServiceView
             services={services}
-            searchPlate={searchPlate}
-            setSearchPlate={setSearchPlate}
             onBack={() => setView('DASHBOARD')}
             onContinue={handleContinueService}
+            onReopen={handleReopenService}
             onViewDetails={(id) => {
               setSelectedServiceId(id);
               setView('VIEW_DETAILS');
@@ -4699,6 +1842,7 @@ const App: React.FC = () => {
             currentMechanic={currentMechanic}
           />
         )}
+
         {view === 'ACTIVE_SERVICE' && activeServiceId && (
           <ActiveServiceTimer
             service={services.find((s) => s.id === activeServiceId)!}
@@ -4709,6 +1853,7 @@ const App: React.FC = () => {
             onBack={() => setView('DASHBOARD')}
           />
         )}
+
         {view === 'VIEW_DETAILS' && selectedServiceId && (
           <ServiceDetailsView
             service={services.find((s) => s.id === selectedServiceId)!}
@@ -4717,7 +1862,7 @@ const App: React.FC = () => {
             currentMechanic={currentMechanic!}
             onBack={() => setView('DASHBOARD')}
             onContinue={handleContinueService}
-            onRelease={() => setShowReleaseModal(true)}
+            onRelease={handleReleaseVehicleDirect}
           />
         )}
 
@@ -4809,7 +1954,7 @@ const App: React.FC = () => {
                                 );
                               } catch (err) {
                                 alert(
-                                  'PORTAL ATUALIZADO, MAS O ENVIO DO E-MAIL FALHOU.'
+                                  'PORTAL ATUALIZADO, BUT EMAIL SEND FAILED.'
                                 );
                               }
                             } else {
@@ -4867,7 +2012,20 @@ const App: React.FC = () => {
             onBack={() => setView('START_PAGE')}
           />
         )}
+
+        {view === ( 'SEARCH_RESULTS' as AppState ) && searchQuery && (
+          <SearchResultsView
+            query={searchQuery}
+            services={services}
+            onSelect={(id) => {
+              setSelectedServiceId(id);
+              setView('VIEW_DETAILS');
+            }}
+            onBack={() => setView('DASHBOARD')}
+          />
+        )}
       </main>
+
       {showActiveMechanicsModal && (
         <ActiveMechanicsModal
           service={services.find((s) => s.id === showActiveMechanicsModal)!}
@@ -4876,258 +2034,25 @@ const App: React.FC = () => {
           onPauseMechanic={handlePauseMechanicInService}
         />
       )}
-      {showReleaseModal && selectedServiceId && (
-        <ReleaseVehicleModal
-          onClose={() => setShowReleaseModal(false)}
-          onConfirm={handleReleaseVehicle}
-          plate={services.find((s) => s.id === selectedServiceId)?.plate || ''}
-        />
-      )}
     </div>
   );
 };
 
-// ========== CLIENT CONSULT VIEW ==========
-const ClientConsultView: React.FC<{
-  services: ServiceRecord[];
-  onBack: () => void;
-}> = ({ services, onBack }) => {
-  const [plate, setPlate] = useState('');
-  const [found, setFound] = useState<ServiceRecord | null>(null);
-
-  const handleSearch = () => {
-    const srv = services
-      .filter((s) => s.plate.toUpperCase() === plate.toUpperCase())
-      .sort((a, b) => b.globalStartTime - a.globalStartTime)[0];
-    setFound(srv || null);
-    if (!srv) alert('Viatura não encontrada ou sem registro ativo.');
-  };
-
-  const getStep = (s: ServiceRecord) => {
-    if (s.readyForClient) return 4;
-    const additionalStatuses = [
-      ServiceStatus.RESOLVED,
-      ServiceStatus.OUTSOURCED,
-      ServiceStatus.SIGNALING,
-      ServiceStatus.GRAPHICS,
-      ServiceStatus.UNLOADING,
-      ServiceStatus.TIRE_SHOP,
-      ServiceStatus.WARRANTY,
-      ServiceStatus.TECHNICAL,
-    ];
-    if (additionalStatuses.includes(s.status)) return 3;
-
-    if (
-      (s.activeWorkSessions && Object.keys(s.activeWorkSessions).length > 0) ||
-      s.logs.length > 1
-    )
-      return 2;
-    return 1;
-  };
-
-  const getCarProgress = (s: ServiceRecord) => {
-    const currentStep = getStep(s);
-    if (currentStep === 4) return 100;
-
-    const startTime = s.globalStartTime;
-    const hoursPassed = (Date.now() - startTime) / (1000 * 60 * 60);
-    const progressWithinPhase = Math.min((hoursPassed % 240) / 240, 0.85);
-    const basePositions = [0, 0, 33, 66, 100];
-    const currentBase = basePositions[currentStep];
-    const nextBase = basePositions[currentStep + 1] || 100;
-
-    return currentBase + (nextBase - currentBase) * progressWithinPhase;
-  };
-
-  const getStatusLabel = (s: ServiceRecord, step: number) => {
-    if (step === 2) return `Local: ${s.assignedSection || 'MECÂNICA'}`;
-    if (step === 3) {
-      const labels: Record<string, string> = {
-        [ServiceStatus.OUTSOURCED]: 'Contratação',
-        [ServiceStatus.SIGNALING]: 'SINALIZADOR',
-        [ServiceStatus.GRAPHICS]: 'Grafismo',
-        [ServiceStatus.TIRE_SHOP]: 'Borracharia',
-        [ServiceStatus.UNLOADING]: 'Descarga',
-        [ServiceStatus.WARRANTY]: 'Garantia',
-        [ServiceStatus.TECHNICAL]: 'Setor Técnico',
-      };
-      return `Encaminhado: ${labels[s.status] || s.status}`;
-    }
-    return '';
-  };
-
-  return (
-    <div className="max-w-3xl mx-auto py-10 px-4 space-y-12">
-      <div className="text-center space-y-4">
-        <div className="bg-white w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-6 shadow-2xl">
-          <Car className="text-black w-8 h-8" />
-        </div>
-        <h2 className="text-3xl font-black uppercase tracking-tighter">
-          Consultar Veículo
-        </h2>
-        <p className="text-zinc-500 text-xs uppercase tracking-widest italic">
-          Acompanhe o status da sua viatura em tempo real
-        </p>
-      </div>
-
-      <div className="flex gap-2">
-        <input
-          type="text"
-          placeholder="DIGITE A PLACA (EX: ABC1D23)"
-          value={plate}
-          onChange={(e) => setPlate(e.target.value.toUpperCase())}
-          className="flex-1 bg-zinc-900 border border-zinc-800 p-5 text-2xl font-mono text-center focus:border-emerald-500 outline-none rounded-sm"
-        />
-        <button
-          onClick={handleSearch}
-          className="bg-white text-black px-10 font-black uppercase text-xs rounded-sm hover:bg-zinc-200 transition-colors"
-        >
-          Buscar
-        </button>
-      </div>
-
-      {found && (
-        <div className="bg-zinc-950 border border-zinc-900 p-12 rounded-sm animate-in fade-in zoom-in duration-500 shadow-2xl relative overflow-hidden">
-          <div className="text-center mb-16">
-            {found.readyForClient && !found.releaseToken && (
-              <div className="mb-8 p-6 bg-emerald-600/20 border border-emerald-500 rounded-sm animate-bounce">
-                <span className="block text-emerald-500 font-black uppercase text-sm mb-1">
-                  ✨ Viatura Pronta para Retirada!
-                </span>
-                <p className="text-[10px] text-white uppercase font-bold leading-tight">
-                  A manutenção foi concluída. Dirija-se à recepção para validar
-                  o código de liberação e retirar o veículo.
-                </p>
-              </div>
-            )}
-            <span className="text-5xl font-mono font-bold text-white tracking-tighter">
-              {found.plate}
-            </span>
-            <p className="text-zinc-500 text-xs uppercase mt-3 tracking-[0.3em] font-bold">
-              {found.brand} {found.model}
-            </p>
-          </div>
-
-          <div className="relative h-24 flex items-center">
-            <div className="absolute top-1/2 left-0 w-full h-1 bg-zinc-900 -translate-y-1/2 z-0 rounded-full"></div>
-
-            <div
-              className="absolute top-1/2 -translate-y-[130%] transition-all duration-1000 ease-linear z-20 text-2xl"
-              style={{ left: `${getCarProgress(found)}%`, marginLeft: '-15px' }}
-            >
-              🚗
-            </div>
-
-            {[
-              { id: 1, label: 'Diagnóstico', color: 'bg-rose-600' },
-              { id: 2, label: 'Em Serviço', color: 'bg-amber-500' },
-              { id: 3, label: 'Serviço Adicional', color: 'bg-amber-500' },
-              { id: 4, label: 'Pronto', color: 'bg-emerald-500' },
-            ].map((step) => {
-              const currentStep = getStep(found);
-              const isActive = step.id === currentStep;
-              const isDone = step.id < currentStep;
-              return (
-                <div
-                  key={step.id}
-                  className="relative z-10 flex-1 flex flex-col items-center"
-                >
-                  <div
-                    className={`w-5 h-5 rounded-full border-4 transition-all duration-700 ${
-                      isActive
-                        ? `${step.color} border-zinc-800 animate-pulse scale-150`
-                        : isDone
-                        ? `${step.color} border-zinc-800`
-                        : 'bg-zinc-900 border-zinc-800'
-                    }`}
-                  ></div>
-
-                  <div className="absolute -bottom-8 flex flex-col items-center w-32 text-center">
-                    <span
-                      className={`text-[9px] font-black uppercase tracking-tighter ${
-                        isActive ? 'text-white' : 'text-zinc-600'
-                      }`}
-                    >
-                      {step.label}
-                    </span>
-
-                    {isActive && (
-                      <span className="text-[7px] text-zinc-400 uppercase font-bold mt-1 leading-tight">
-                        {getStatusLabel(found, step.id)}
-                      </span>
-                    )}
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      )}
-
-      <button
-        onClick={onBack}
-        className="w-full py-4 text-zinc-600 uppercase font-black text-[9px] hover:text-white transition-colors tracking-widest border-t border-zinc-900 mt-10"
-      >
-        Voltar para Acesso Restrito
-      </button>
-    </div>
-  );
-};
-
-const SearchResultsView: React.FC<{
-  query: string;
-  services: ServiceRecord[];
-  onSelect: (id: string) => void;
-  onBack: () => void;
-}> = ({ query, services, onSelect, onBack }) => {
-  const results = services.filter((s) =>
-    Object.values(s).some((val) => String(val).toUpperCase().includes(query))
-  );
-  return (
-    <div className="p-6 bg-black min-h-screen text-white animate-in fade-in duration-500">
-      <div className="flex justify-between items-center mb-8 border-b border-zinc-900 pb-4">
-        <div>
-          <h2 className="text-xl font-black uppercase italic tracking-tighter">
-            Resultados da Busca
-          </h2>
-          <p className="text-[9px] text-zinc-500 font-mono">
-            TERMO: "{query}" • {results.length} ENCONTRADOS
-          </p>
-        </div>
-        <button
-          onClick={onBack}
-          className="text-[9px] font-black uppercase bg-zinc-900 px-4 py-2 border border-zinc-800 rounded-sm"
-        >
-          Voltar
-        </button>
-      </div>
-
-      <div className="space-y-3">
-        {results.map((s) => (
-          <div
-            key={s.id}
-            onClick={() => onSelect(s.id)}
-            className="bg-zinc-900/40 p-4 border-l-2 border-white hover:bg-zinc-800 cursor-pointer transition-all"
-          >
-            <div className="flex justify-between items-center">
-              <span className="text-lg font-black font-mono">{s.plate}</span>
-              <span className="text-[8px] px-2 py-1 bg-white text-black font-black uppercase">
-                {s.status}
-              </span>
-            </div>
-            <p className="text-[10px] font-bold text-zinc-400 mt-1 uppercase">
-              {s.model} — {s.opm}
-            </p>
-          </div>
-        ))}
-        {results.length === 0 && (
-          <p className="text-center text-zinc-700 py-10 font-black uppercase text-xs">
-            Nada encontrado.
-          </p>
-        )}
-      </div>
-    </div>
-  );
-};
+// SVG Lock Icon (for matching original custom Lock Component)
+const Lock: React.FC<{ className?: string }> = ({ className }) => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    className={className}
+  >
+    <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+    <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+  </svg>
+);
 
 export default App;

@@ -41,6 +41,7 @@ export interface WorkLog {
   remainingTasks: string;
   timestamp: number;
   durationInSession: number;
+  destination?: string; // NOVO: Guarda a seção/destino dessa etapa do histórico
 }
 
 export interface UsedPart {
