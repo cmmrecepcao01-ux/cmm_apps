@@ -1,0 +1,47 @@
+================================================================================
+INSTRUÇÕES DE CONFIGURAÇÃO E INTEGRAÇÃO DO GOOGLE SHEETS
+================================================================================
+
+Este aplicativo (Painel do Dispositivo Motorizado 9 de Julho) pode rodar de forma
+100% offline (com dados simulados/mock) ou conectado diretamente à sua planilha
+do Google Sheets, permitindo carregar, salvar e editar em tempo real.
+
+Para conectar o Dashboard à sua Planilha Google:
+
+PASSO 1: CONFIGURAR O GOOGLE APPS SCRIPT
+--------------------------------------------------------------------------------
+1. Abra a sua planilha do Google Sheets no navegador.
+2. No menu superior, clique em "Extensões" (Extensions) > "Apps Script".
+3. Apague qualquer código que estiver lá e cole todo o conteúdo do arquivo
+   "server_script.gs" (que está nesta mesma pasta).
+4. Clique no ícone de disquete no topo do editor para salvar o projeto.
+
+PASSO 2: IMPLANTAR COMO APP DA WEB
+--------------------------------------------------------------------------------
+1. No canto superior direito da tela do Apps Script, clique em "Implantar" 
+   (Deploy) e escolha "Nova implantação" (New deployment).
+2. Clique no ícone de engrenagem ao lado de "Selecione o tipo" e escolha 
+   "App da web" (Web App).
+3. Preencha os campos exatamente assim:
+   - Descrição: Conexão Painel CMM
+   - Executar como: "Eu (seu-email@gmail.com)"
+   - Quem tem acesso: "Qualquer pessoa" (Anyone) <-- IMPORTANTE! Se deixar
+     "Apenas eu", o HTML não conseguirá carregar os dados.
+4. Clique em "Implantar".
+5. O Google solicitará permissões de acesso aos dados da planilha. Conceda as
+   permissões clicando em "Autorizar acesso", escolhendo sua conta e depois
+   em "Avançado" > "Ir para Projeto sem nome (não seguro)" e clique em "Permitir".
+6. Após a implantação concluir, o Google gerará um link chamado "URL do app da web".
+   Copie este link (ele termina com "/exec").
+
+PASSO 3: CONFIGURAR NO DASHBOARD HTML
+--------------------------------------------------------------------------------
+1. Abra o arquivo "index.html" no seu navegador.
+2. Clique no ícone de engrenagem no cabeçalho superior direito do Dashboard.
+3. Cole a URL copiada no campo "URL do Google Apps Script (Web App)".
+4. Clique em "Conectar Planilha".
+5. O painel carregará as respostas das viaturas reais em tempo real e habilitará
+   o salvamento persistente do layout e das vistorias!
+
+
+LINK DO APPSCRIPT: https://script.google.com/macros/s/AKfycbzP4mc3HboTDIqpompfN0MrH8csn7HyCWEywdx6IbnQKfiqH7Jzrn-8LklxPzqNiI_8BA/exec

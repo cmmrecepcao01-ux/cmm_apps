@@ -1,0 +1,2028 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CMM - Painel do Dispositivo Motorizado (9 de Julho)</title>
+  
+  <!-- Fontes Premium do Google -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;600;800&display=swap" rel="stylesheet">
+  
+  <style>
+    :root {
+      --bg-main: #0b0f19;
+      --bg-panel: #111827;
+      --bg-card: #1f2937;
+      --bg-road: #1e293b;
+      --border-color: #374151;
+      
+      --text-main: #f3f4f6;
+      --text-muted: #9ca3af;
+      
+      --color-primary: #3b82f6;
+      --color-primary-glow: rgba(59, 130, 246, 0.4);
+      --color-success: #10b981;
+      --color-success-glow: rgba(16, 185, 129, 0.35);
+      --color-warning: #f59e0b;
+      --color-error: #ef4444;
+      --color-error-glow: rgba(239, 68, 68, 0.35);
+      
+      --font-main: 'Inter', sans-serif;
+      --font-display: 'Outfit', sans-serif;
+      
+      /* Tamanho dos ícones aumentado para legibilidade */
+      --card-moto-w: 85px;
+      --card-moto-h: 90px;
+      --card-carro-w: 145px;
+      --card-carro-h: 105px;
+    }
+    
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+    }
+    
+    body {
+      background-color: var(--bg-main);
+      color: var(--text-main);
+      font-family: var(--font-main);
+      height: 100vh;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+    
+    /* Cabeçalho */
+    header {
+      background-color: var(--bg-panel);
+      border-bottom: 1px solid var(--border-color);
+      padding: 12px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      height: 70px;
+      z-index: 10;
+    }
+    
+    .logo-container {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    
+    .logo-badge {
+      background: linear-gradient(135deg, #1d4ed8, #3b82f6);
+      color: #fff;
+      font-family: var(--font-display);
+      font-weight: 800;
+      font-size: 18px;
+      padding: 6px 12px;
+      border-radius: 8px;
+      letter-spacing: 1px;
+      box-shadow: 0 0 15px var(--color-primary-glow);
+    }
+    
+    .title-container h1 {
+      font-family: var(--font-display);
+      font-size: 18px;
+      font-weight: 600;
+      letter-spacing: -0.5px;
+    }
+    
+    .title-container p {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+    
+    /* Alternador de Modo de Exibição (Tabs) */
+    .mode-selector {
+      display: flex;
+      background-color: var(--bg-main);
+      padding: 4px;
+      border-radius: 8px;
+      border: 1px solid var(--border-color);
+      gap: 4px;
+    }
+    
+    .mode-tab {
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      font-family: var(--font-display);
+      font-weight: 600;
+      font-size: 13px;
+      padding: 8px 16px;
+      border-radius: 6px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s;
+    }
+    
+    .mode-tab.active {
+      background-color: var(--bg-card);
+      color: var(--text-main);
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    }
+    
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    
+    .btn {
+      background-color: var(--bg-card);
+      border: 1px solid var(--border-color);
+      color: var(--text-main);
+      font-weight: 600;
+      font-size: 13px;
+      padding: 8px 14px;
+      border-radius: 6px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s ease;
+    }
+    
+    .btn:hover {
+      background-color: var(--border-color);
+      border-color: #4b5563;
+    }
+    
+    .btn-primary {
+      background-color: var(--color-primary);
+      border-color: var(--color-primary);
+    }
+    
+    .btn-primary:hover {
+      background-color: #2563eb;
+      border-color: #2563eb;
+      box-shadow: 0 0 10px rgba(59, 130, 246, 0.3);
+    }
+    
+    .btn-success {
+      background-color: var(--color-success);
+      border-color: var(--color-success);
+    }
+    
+    .btn-success:hover {
+      background-color: #059669;
+      border-color: #059669;
+      box-shadow: 0 0 10px rgba(16, 185, 129, 0.3);
+    }
+    
+    .status-indicator {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background-color: rgba(31, 41, 55, 0.6);
+      padding: 6px 12px;
+      border-radius: 20px;
+      border: 1px solid var(--border-color);
+      font-size: 11px;
+      font-weight: 500;
+    }
+    
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background-color: var(--color-warning);
+      box-shadow: 0 0 8px var(--color-warning);
+    }
+    
+    .status-dot.connected {
+      background-color: var(--color-success);
+      box-shadow: 0 0 8px var(--color-success);
+    }
+    
+    .status-dot.offline {
+      background-color: var(--color-error);
+      box-shadow: 0 0 8px var(--color-error);
+    }
+    
+    /* Layout Geral */
+    .app-workspace {
+      display: flex;
+      flex: 1;
+      height: calc(100vh - 70px);
+      overflow: hidden;
+      position: relative;
+    }
+    
+    .view-pane {
+      display: none;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+    }
+    
+    .view-pane.active {
+      display: flex;
+    }
+    
+    /* ----------------------------------------------------
+       ABA 1: LAYOUT DO DESFILE 
+       ---------------------------------------------------- */
+    .layout-view-sidebar {
+      width: 290px;
+      background-color: var(--bg-panel);
+      border-right: 1px solid var(--border-color);
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      z-index: 5;
+    }
+    
+    .layout-view-sidebar.collapsed {
+      margin-left: -290px;
+    }
+    
+    .sidebar-header {
+      padding: 14px;
+      border-bottom: 1px solid var(--border-color);
+    }
+    
+    .sidebar-toggle-btn {
+      position: absolute;
+      left: 290px;
+      top: 50%;
+      transform: translateY(-50%);
+      background-color: var(--bg-panel);
+      border: 1px solid var(--border-color);
+      border-left: none;
+      color: var(--text-main);
+      width: 24px;
+      height: 60px;
+      border-radius: 0 8px 8px 0;
+      cursor: pointer;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 12px;
+      z-index: 10;
+      transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 4px 0 10px rgba(0,0,0,0.2);
+    }
+    
+    .layout-view-sidebar.collapsed + .sidebar-toggle-btn {
+      left: 0;
+    }
+    
+    .search-box {
+      width: 100%;
+      background-color: var(--bg-main);
+      border: 1px solid var(--border-color);
+      color: var(--text-main);
+      padding: 8px 12px;
+      border-radius: 6px;
+      font-size: 13px;
+      outline: none;
+    }
+    
+    .vtr-list-container {
+      flex: 1;
+      overflow-y: auto;
+      padding: 10px;
+    }
+    
+    .opm-group {
+      margin-bottom: 14px;
+    }
+    
+    .opm-group-title {
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 4px;
+      display: flex;
+      justify-content: space-between;
+    }
+    
+    .vtr-list-item {
+      background-color: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      padding: 8px 10px;
+      margin-bottom: 6px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    
+    .vtr-list-item:hover {
+      border-color: #4b5563;
+      background-color: #262f3f;
+    }
+    
+    .vtr-list-item.placed {
+      opacity: 0.35;
+      cursor: not-allowed;
+      border-style: dashed;
+    }
+    
+    .vtr-prefix {
+      font-weight: 700;
+      font-size: 13px;
+    }
+    
+    .vtr-badge-small {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+    }
+    
+    /* Canvas Layout */
+    .canvas-container {
+      flex: 1;
+      overflow: auto;
+      background-color: #0a0d14;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 30px;
+      position: relative;
+    }
+    
+    .canvas-toolbar {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 15px;
+      background-color: var(--bg-panel);
+      border: 1px solid var(--border-color);
+      padding: 8px 16px;
+      border-radius: 8px;
+      z-index: 10;
+      flex-shrink: 0;
+    }
+    
+    .toolbar-btn {
+      background-color: var(--bg-card);
+      border: 1px solid var(--border-color);
+      color: var(--text-main);
+      font-weight: 600;
+      font-size: 12px;
+      padding: 6px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s ease;
+    }
+    
+    .toolbar-btn:hover {
+      background-color: var(--border-color);
+      border-color: #4b5563;
+    }
+    
+    .canvas {
+      width: 1000px;
+      height: 3100px;
+      background-color: #0f172a;
+      background-image: radial-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+      background-size: 20px 20px;
+      border: 2px solid var(--border-color);
+      border-radius: 12px;
+      position: relative;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
+    }
+    
+    /* Estrada mais larga (560px de largura, centralizada) */
+    .canvas::before {
+      content: '';
+      position: absolute;
+      left: 220px;
+      top: 0;
+      width: 560px;
+      height: 100%;
+      background-color: #1e293b;
+      border-left: 3px dashed #475569;
+      border-right: 3px dashed #475569;
+      z-index: 1;
+    }
+    
+    .road-stripes {
+      position: absolute;
+      left: 498px;
+      top: 0;
+      width: 4px;
+      height: 100%;
+      border-left: 2px dashed #eab308;
+      z-index: 2;
+      opacity: 0.45;
+    }
+    
+    /* Palanque com tamanho reduzido */
+    .palanque-element {
+      position: absolute;
+      left: 790px;
+      top: 320px;
+      width: 190px;
+      height: 100px;
+      background: linear-gradient(135deg, #1e293b, #0f172a);
+      border: 2px solid #3b82f6;
+      border-radius: 8px;
+      z-index: 5;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      box-shadow: 0 4px 20px rgba(59, 130, 246, 0.35);
+    }
+    
+    .palanque-element h3 {
+      font-family: var(--font-display);
+      font-weight: 800;
+      font-size: 14px;
+      letter-spacing: 1px;
+      color: #3b82f6;
+    }
+    
+    /* Cards de VTR no Canvas */
+    .vtr-card {
+      position: absolute;
+      background-color: var(--bg-card);
+      border: 2px solid #4b5563;
+      border-radius: 8px;
+      z-index: 3;
+      cursor: move;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      transform-origin: center center;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+      padding: 4px;
+      overflow: hidden;
+    }
+    
+    .vtr-card.moto {
+      width: var(--card-moto-w);
+      height: var(--card-moto-h);
+    }
+    
+    .vtr-card.carro {
+      width: var(--card-carro-w);
+      height: var(--card-carro-h);
+    }
+    
+    .vtr-card.selected {
+      border-color: #f59e0b !important;
+      box-shadow: 0 0 15px rgba(245, 158, 11, 0.9) !important;
+      z-index: 100 !important;
+    }
+    
+    .vtr-card.approved {
+      border-color: var(--color-success);
+      box-shadow: 0 0 10px var(--color-success-glow);
+    }
+    
+    .vtr-card.fail {
+      border-color: var(--color-error);
+      box-shadow: 0 0 10px var(--color-error-glow);
+      animation: pulse-red-border 2s infinite;
+    }
+    
+    .vtr-card-prefix {
+      font-size: 14px;
+      font-weight: 800;
+      color: var(--text-main);
+    }
+    
+    .vtr-card-opm {
+      font-size: 10px;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      margin-bottom: 2px;
+    }
+    
+    .vtr-card-icon {
+      font-size: 16px;
+      margin-bottom: 2px;
+    }
+    
+    /* Textos de tripulantes sem quebra de linha */
+    .vtr-card-crew {
+      font-size: 10.5px;
+      font-weight: 600;
+      color: #cbd5e1;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      width: 100%;
+      text-align: center;
+      line-height: 1.25;
+    }
+    
+    /* Painel de Controle de VTR Flutuante */
+    .floating-vtr-control {
+      position: fixed;
+      right: 30px;
+      bottom: 30px;
+      width: 320px;
+      background-color: var(--bg-panel);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 16px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+      z-index: 100;
+      display: none;
+      backdrop-filter: blur(10px);
+    }
+    
+    .floating-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 8px;
+    }
+    
+    .floating-title {
+      font-family: var(--font-display);
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--color-primary);
+    }
+    
+    /* ----------------------------------------------------
+       ABA 2: VISTORIAS (LAYOUT EM SPLIT) 
+       ---------------------------------------------------- */
+    .vistoria-view {
+      flex: 1;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      padding: 20px;
+      overflow: hidden;
+    }
+    
+    .stats-bar {
+      display: flex;
+      gap: 16px;
+      margin-bottom: 15px;
+      flex-shrink: 0;
+    }
+    
+    .stat-card {
+      flex: 1;
+      background-color: var(--bg-panel);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 12px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    
+    .stat-val {
+      font-family: var(--font-display);
+      font-size: 22px;
+      font-weight: 800;
+    }
+    
+    .stat-label {
+      font-size: 11px;
+      color: var(--text-muted);
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+    
+    /* Layout Split-Screen para Vistorias */
+    .vistoria-split-container {
+      display: flex;
+      flex: 1;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      background-color: var(--bg-panel);
+      overflow: hidden;
+    }
+    
+    /* Índice de OPMs à Esquerda */
+    .opm-index-sidebar {
+      width: 220px;
+      border-right: 1px solid var(--border-color);
+      background-color: rgba(17, 24, 39, 0.6);
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
+    }
+    
+    .opm-index-btn {
+      width: 100%;
+      background: none;
+      border: none;
+      border-left: 3px solid transparent;
+      color: var(--text-muted);
+      padding: 12px 16px;
+      text-align: left;
+      font-weight: 600;
+      font-size: 12px;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .opm-index-btn:hover {
+      background-color: rgba(31, 41, 55, 0.4);
+      color: var(--text-main);
+    }
+    
+    .opm-index-btn.active {
+      background-color: var(--bg-card);
+      color: var(--color-primary);
+      border-left-color: var(--color-primary);
+    }
+    
+    /* Tabelas e Conteúdo de VTR à Direita (Com Scroll Independente) */
+    .opm-vtrs-details {
+      flex: 1;
+      padding: 20px;
+      overflow-y: auto;
+      height: 100%;
+    }
+    
+    .vistoria-table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      font-size: 12.5px;
+    }
+    
+    .vistoria-table th {
+      background-color: rgba(31, 41, 55, 0.6);
+      padding: 12px;
+      font-weight: 600;
+      border-bottom: 1px solid var(--border-color);
+      color: var(--text-muted);
+    }
+    
+    .vistoria-table td {
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--border-color);
+    }
+    
+    .vistoria-table tr:hover {
+      background-color: rgba(31, 41, 55, 0.25);
+    }
+    
+    /* Badges de Checklist */
+    .checklist-badge {
+      display: inline-block;
+      padding: 4px 8px;
+      border-radius: 20px;
+      font-weight: 600;
+      font-size: 10.5px;
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.15s;
+      min-width: 48px;
+    }
+    
+    .checklist-badge.yes {
+      background-color: rgba(16, 185, 129, 0.15);
+      color: var(--color-success);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+    }
+    
+    .checklist-badge.yes:hover {
+      background-color: rgba(16, 185, 129, 0.35);
+    }
+    
+    .checklist-badge.no {
+      background-color: rgba(239, 68, 68, 0.15);
+      color: var(--color-error);
+      border: 1px solid rgba(239, 68, 68, 0.3);
+    }
+    
+    .checklist-badge.no:hover {
+      background-color: rgba(239, 68, 68, 0.35);
+    }
+    
+    /* Modal Styles */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background-color: rgba(0, 0, 0, 0.75);
+      backdrop-filter: blur(5px);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+    
+    .modal {
+      background-color: var(--bg-panel);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      width: 450px;
+      max-width: 90%;
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5), 0 10px 10px -5px rgba(0, 0, 0, 0.5);
+      overflow: hidden;
+      animation: modal-fade-in 0.3s ease-out;
+    }
+    
+    @keyframes modal-fade-in {
+      from { transform: scale(0.95); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+    
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border-color);
+    }
+    
+    .modal-title {
+      font-family: var(--font-display);
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--color-primary);
+    }
+    
+    .modal-close {
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      font-size: 24px;
+      cursor: pointer;
+      line-height: 1;
+      transition: color 0.15s;
+    }
+    
+    .modal-close:hover {
+      color: var(--text-main);
+    }
+    
+    .modal-body {
+      padding: 20px;
+    }
+    
+    .form-group {
+      margin-bottom: 16px;
+    }
+    
+    .form-label {
+      display: block;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    
+    .form-input {
+      width: 100%;
+      background-color: var(--bg-main);
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      color: var(--text-main);
+      padding: 10px 12px;
+      font-size: 13px;
+      outline: none;
+      transition: border-color 0.15s;
+    }
+    
+    .form-input:focus {
+      border-color: var(--color-primary);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- CABEÇALHO -->
+  <header>
+    <div class="logo-container">
+      <div class="logo-badge">CMM</div>
+      <div class="title-container">
+        <h1>Painel do Dispositivo Motorizado</h1>
+        <p>Desfile Comemorativo de 9 de Julho de 2026</p>
+      </div>
+    </div>
+    
+    <!-- ALTERNADOR DE MODO (TABS) -->
+    <div class="mode-selector">
+      <button class="mode-tab active" id="tab-layout-view">🗺️ Layout do Desfile</button>
+      <button class="mode-tab" id="tab-vistoria-view">📋 Vistorias</button>
+    </div>
+    
+    <div class="header-actions">
+      <div class="status-indicator">
+        <div class="status-dot" id="status-dot"></div>
+        <span id="status-text">Carregando...</span>
+      </div>
+      <button class="btn btn-success" id="btn-save-layout" title="Salvar layout e tripulações no Google Sheets">
+        💾 Salvar Layout
+      </button>
+      <button class="btn" id="btn-sync" title="Forçar recarga de dados do Sheets">
+        🔄 Sincronizar
+      </button>
+      <button class="btn" id="btn-settings" title="Configurar link da planilha">
+        ⚙️ Configurações
+      </button>
+    </div>
+  </header>
+
+  <!-- ÁREA DE TRABALHO -->
+  <div class="app-workspace">
+    
+    <!-- ====================================================
+         ABA 1: VISUALIZAÇÃO DO LAYOUT 
+         ==================================================== -->
+    <div class="view-pane active" id="pane-layout">
+      
+      <!-- Lista Lateral Esquerda -->
+      <div class="layout-view-sidebar" id="vtr-sidebar">
+        <div class="sidebar-header">
+          <input type="text" class="search-box" id="vtr-search" placeholder="Buscar VTR ou OPM...">
+        </div>
+        <div class="vtr-list-container" id="vtr-list">
+          <!-- Injetado dinamicamente -->
+        </div>
+      </div>
+      
+      <button class="sidebar-toggle-btn" id="btn-toggle-sidebar" title="Recolher/Expandir Lista VTRs">&lt;</button>
+      
+      <!-- Canvas de Arraste -->
+      <div class="canvas-container">
+        <div class="canvas-toolbar">
+          <button class="toolbar-btn" id="tool-align-wedge">📐 Alinhar em Cunha</button>
+          <button class="toolbar-btn" id="tool-align-column">↕️ Fila Única</button>
+          <button class="toolbar-btn" id="tool-align-double">↔️ Duas Colunas</button>
+          <button class="toolbar-btn" id="tool-clear-canvas" style="color: var(--color-error);">🗑️ Limpar Layout</button>
+        </div>
+
+        <div class="canvas" id="parade-canvas">
+          <div class="road-stripes"></div>
+          
+          <!-- Palanque menor -->
+          <div class="palanque-element">
+            <h3>PALANQUE</h3>
+            <p>Tribuna das Autoridades</p>
+          </div>
+          
+          <!-- Legenda Visual Rápida -->
+          <div style="position: absolute; left: 790px; top: 120px; width: 190px; background-color: rgba(17, 24, 39, 0.85); border: 1px solid var(--border-color); border-radius: 8px; padding: 10px; z-index: 5; font-size: 10px;">
+            <div style="display:flex; align-items:center; gap:6px; margin-bottom:4px;">
+              <div style="width:8px; height:8px; border-radius:50%; background-color: var(--color-success);"></div>
+              <span>VTR Aprovada</span>
+            </div>
+            <div style="display:flex; align-items:center; gap:6px;">
+              <div style="width:8px; height:8px; border-radius:50%; background-color: var(--color-error); animation: pulse-red-border 2s infinite;"></div>
+              <span>VTR c/ Pendência</span>
+            </div>
+          </div>
+
+          <!-- Cards de viaturas serão colocados aqui dinamicamente -->
+        </div>
+      </div>
+      
+      <!-- Painel de Controle Flutuante -->
+      <div class="floating-vtr-control" id="floating-card-control">
+        <div class="floating-header">
+          <span class="floating-title" id="float-vtr-title">Viatura</span>
+          <button style="background:none; border:none; color:var(--text-muted); cursor:pointer; font-size:16px;" id="float-vtr-close">&times;</button>
+        </div>
+        <div style="display:flex; flex-direction:column; gap:10px; font-size:12px;">
+          <div style="display:flex; justify-content:space-between;">
+            <span style="color:var(--text-muted)">OPM:</span>
+            <span id="float-vtr-opm" style="font-weight:600;">-</span>
+          </div>
+          
+          <!-- Inputs de tripulação manual -->
+          <div style="display:flex; flex-direction:column; gap:4px;">
+            <label style="font-size:10px; font-weight:600; color:var(--text-muted);">INTEGRANTE 1 (MOTORISTA)</label>
+            <input type="text" id="float-vtr-driver-input" class="form-input" style="padding:6px; font-size:11px;" placeholder="Ex: SD PM Gielison">
+          </div>
+          <div style="display:flex; flex-direction:column; gap:4px;">
+            <label style="font-size:10px; font-weight:600; color:var(--text-muted);">INTEGRANTE 2 (ENCARREGADO)</label>
+            <input type="text" id="float-vtr-encarregado-input" class="form-input" style="padding:6px; font-size:11px;" placeholder="Ex: SGT PM Eliezer">
+          </div>
+          
+          <!-- Rotação slider -->
+          <div style="display:flex; flex-direction:column; gap:4px;">
+            <label style="font-size:10px; font-weight:600; color:var(--text-muted);">ROTAÇÃO</label>
+            <div style="display:flex; align-items:center; gap:8px;">
+              <input type="range" id="float-vtr-rotation" min="0" max="360" step="15" value="0" style="flex:1; accent-color:var(--color-primary);">
+              <span id="float-vtr-rot-val">0°</span>
+            </div>
+          </div>
+          
+          <!-- Movimentação por barras de rolagem (sliders) X e Y para posições específicas -->
+          <div style="display:flex; flex-direction:column; gap:4px;">
+            <label style="font-size:10px; font-weight:600; color:var(--text-muted);">COORDENADA X (LATERAIS)</label>
+            <input type="range" id="float-vtr-x-slider" min="50" max="880" step="10" style="width:100%; accent-color:var(--color-primary);">
+          </div>
+          <div style="display:flex; flex-direction:column; gap:4px;">
+            <label style="font-size:10px; font-weight:600; color:var(--text-muted);">COORDENADA Y (FRENTE/TRÁS)</label>
+            <input type="range" id="float-vtr-y-slider" min="50" max="3020" step="10" style="width:100%; accent-color:var(--color-primary);">
+          </div>
+          
+          <!-- Ajuste fino com botões direcionais de grid (pontos fixos) -->
+          <div style="display:flex; flex-direction:column; gap:4px;">
+            <label style="font-size:9px; font-weight:600; color:var(--text-muted); text-align:center;">PONTOS FIXOS (AJUSTE FINO)</label>
+            <div style="display:flex; flex-direction:column; gap:6px;">
+              <div style="display:flex; justify-content:center; gap:6px;">
+                <button class="btn" id="float-align-left" style="padding:4px 8px; font-size:10px;" title="Mover para pista esquerda">◀ Esq</button>
+                <button class="btn" id="float-align-center" style="padding:4px 8px; font-size:10px;" title="Mover para pista central">● Centro</button>
+                <button class="btn" id="float-align-right" style="padding:4px 8px; font-size:10px;" title="Mover para pista direita">Dir ▶</button>
+              </div>
+              <div style="display:flex; justify-content:center; gap:6px;">
+                <button class="btn" id="float-align-up" style="padding:4px 8px; font-size:10px;" title="Mover para frente">▲ Frente</button>
+                <button class="btn" id="float-align-down" style="padding:4px 8px; font-size:10px;" title="Mover para trás">▼ Trás</button>
+              </div>
+            </div>
+          </div>
+          
+          <button class="btn btn-primary" id="float-btn-apply" style="justify-content:center; padding:6px; font-size:11px; margin-top:5px;">
+            💾 Aplicar Alterações
+          </button>
+          <button class="btn" id="float-btn-remove" style="justify-content:center; padding:6px; font-size:11px; color:var(--color-error); border-color:rgba(239,68,68,0.2);">
+            🗑️ Remover do Layout
+          </button>
+        </div>
+      </div>
+
+    </div>
+    
+    <!-- ====================================================
+         ABA 2: VISTORIAS (LAYOUT EM SPLIT-SCREEN)
+         ==================================================== -->
+    <div class="view-pane" id="pane-vistoria">
+      <div class="vistoria-view">
+        
+        <!-- Cartões de Estatísticas -->
+        <div class="stats-bar">
+          <div class="stat-card" style="border-left: 4px solid var(--color-primary);">
+            <span class="stat-val" id="stat-total">0</span>
+            <span class="stat-label">Total Escalado</span>
+          </div>
+          <div class="stat-card" style="border-left: 4px solid var(--color-success);">
+            <span class="stat-val" id="stat-ok" style="color:var(--color-success)">0</span>
+            <span class="stat-label">Aprovadas (OK)</span>
+          </div>
+          <div class="stat-card" style="border-left: 4px solid var(--color-error);">
+            <span class="stat-val" id="stat-pending" style="color:var(--color-error)">0</span>
+            <span class="stat-label">Pendentes (Erros)</span>
+          </div>
+        </div>
+        
+        <!-- Split-Screen da Vistoria -->
+        <div class="vistoria-split-container">
+          <!-- OPM Índice à Esquerda -->
+          <div class="opm-index-sidebar" id="opm-index-list">
+            <!-- Botões das OPMs injetados dinamicamente -->
+          </div>
+          
+          <!-- Tabelas e Checklist à Direita com Scroll Independente -->
+          <div class="opm-vtrs-details" id="opm-vtrs-table-container">
+            <div id="opm-selected-title" style="font-family:var(--font-display); font-size:16px; font-weight:600; color:var(--color-primary); margin-bottom:12px;">
+              Selecione uma OPM no índice à esquerda
+            </div>
+            <table class="vistoria-table" id="selected-opm-table" style="display:none;">
+              <thead>
+                <tr>
+                  <th>Prefixo</th>
+                  <th>Motorista</th>
+                  <th>Encarregado</th>
+                  <th style="text-align:center;">Pintura/Funilaria</th>
+                  <th style="text-align:center;">Novo Grafismo</th>
+                  <th style="text-align:center;">Grafismo Geral</th>
+                  <th style="text-align:center;">Giroflex/Sirene</th>
+                  <th style="text-align:center;">Calotas</th>
+                  <th style="text-align:center;">Luzes/Freios</th>
+                  <th style="text-align:center;">Mecânica</th>
+                  <th style="text-align:center;">Status</th>
+                </tr>
+              </thead>
+              <tbody id="selected-opm-table-body">
+                <!-- Injetado dinamicamente -->
+              </tbody>
+            </table>
+            <div id="no-opm-selected" style="text-align:center; padding:40px; color:var(--text-muted);">
+              Nenhuma OPM selecionada para vistoria no momento.
+            </div>
+          </div>
+        </div>
+        
+      </div>
+    </div>
+
+  </div>
+
+  <!-- MODAL DE CONFIGURAÇÃO (GOOGLE SHEETS) -->
+  <div class="modal-overlay" id="settings-modal">
+    <div class="modal">
+      <div class="modal-header">
+        <h2 class="modal-title">Configurações</h2>
+        <button class="modal-close" id="modal-close">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label class="form-label">Link de Implantação do Web App (Google Sheets)</label>
+          <input type="text" class="form-input" id="sheets-url-input">
+        </div>
+        <button class="btn btn-primary" id="btn-save-settings" style="width: 100%; justify-content: center; margin-top: 10px;">
+          Conectar Planilha
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- LÓGICA DO DASHBOARD JAVASCRIPT -->
+  <script>
+    // 1. LINK DE IMPLANTAÇÃO PADRÃO DIRETAMENTE NO CÓDIGO
+    const HARDCODED_WEBAPP_URL = "https://script.google.com/macros/s/AKfycbzP4mc3HboTDIqpompfN0MrH8csn7HyCWEywdx6IbnQKfiqH7Jzrn-8LklxPzqNiI_8BA/exec";
+    
+    // Helper para checklist inicial perfeito
+    function createPerfectChecklist() {
+      return {
+        pintura: "Sim",
+        novo_grafismo: "Sim",
+        grafismo_geral: "Sim",
+        sinais_sonoros: "Sim",
+        calota_padrao: "Sim",
+        luzes_farois: "Sim",
+        mecanica_geral: "Sim"
+      };
+    }
+    
+    // ----------------------------------------------------
+    // DADOS MOCK (Alinhados com o desenho original e rotação inicial 0)
+    // ----------------------------------------------------
+    const DEFAULT_VECTORS = [
+      { id: "cmm_j1", opm: "CMM", prefix: "JEEP Cmt", type: "carro", driver: "2º Sgt PM Murilo", encarregado: "", checklist: createPerfectChecklist() },
+      { id: "chq_m1", opm: "2º BPChoq", prefix: "14-51", type: "moto", driver: "Sgt Eliezer", encarregado: "", checklist: createPerfectChecklist() },
+      { id: "chq_m2", opm: "2º BPChoq", prefix: "14-53", type: "moto", driver: "Cb Josino", encarregado: "", checklist: createPerfectChecklist() },
+      { id: "chq_m3", opm: "2º BPChoq", prefix: "14-57", type: "moto", driver: "Cb Guilly", encarregado: "", checklist: createPerfectChecklist() },
+      { id: "cmm_j2", opm: "CMM", prefix: "3-1000", type: "carro", driver: "Ten Cel Demetrius", encarregado: "Cb Escames", checklist: createPerfectChecklist() },
+      
+      // Históricas
+      { id: "hist_1", opm: "CMM", prefix: "VERANEIO", type: "carro", driver: "Sd Willian", encarregado: "Veteranos ROTA", checklist: createPerfectChecklist() },
+      { id: "hist_2", opm: "CMM", prefix: "FUSCA", type: "carro", driver: "Sd Tibúrcio", encarregado: "", checklist: createPerfectChecklist() },
+      { id: "hist_3", opm: "CMM", prefix: "KOMBI", type: "carro", driver: "Cb Emílio", encarregado: "", checklist: createPerfectChecklist() },
+      { id: "hist_4", opm: "CMM", prefix: "UNO", type: "carro", driver: "Cb Davi", encarregado: "", checklist: createPerfectChecklist() },
+      { id: "hist_5", opm: "CMM", prefix: "IPANEMA", type: "carro", driver: "Sd Arnaldo", encarregado: "", checklist: createPerfectChecklist() },
+      { id: "hist_6", opm: "CMM", prefix: "OPALA", type: "carro", driver: "Cb Weslley", encarregado: "", checklist: createPerfectChecklist() },
+      
+      // ROCAM 2º BPChq
+      { id: "rocam_1", opm: "2º BPChoq", prefix: "92404", type: "moto", driver: "Cap PM Bazela", encarregado: "", checklist: createPerfectChecklist() },
+      { id: "rocam_2", opm: "2º BPChoq", prefix: "92422", type: "moto", driver: "Sgt Gilberto", encarregado: "", checklist: createPerfectChecklist() },
+      { id: "rocam_3", opm: "2º BPChoq", prefix: "92045", type: "moto", driver: "Sd Pansonato", encarregado: "", checklist: createPerfectChecklist() },
+      { id: "rocam_4", opm: "2º BPChoq", prefix: "92407", type: "moto", driver: "Cb PM Santiago", encarregado: "", checklist: createPerfectChecklist() },
+      { id: "rocam_5", opm: "2º BPChoq", prefix: "92428", type: "moto", driver: "Sd Leandro", encarregado: "", checklist: createPerfectChecklist() },
+      { id: "rocam_6", opm: "2º BPChoq", prefix: "92427", type: "moto", driver: "Sd Damin", encarregado: "", checklist: createPerfectChecklist() },
+      
+      // 1º BPChoq (ROTA)
+      { id: "rota_1", opm: "1º BPChoq", prefix: "91225", type: "carro", driver: "CB Rodrigues", encarregado: "", checklist: createPerfectChecklist() },
+      { id: "rota_2", opm: "1º BPChoq", prefix: "91239", type: "carro", driver: "CB Perini", encarregado: "", checklist: createPerfectChecklist() },
+      { id: "rota_3", opm: "1º BPChoq", prefix: "91227", type: "carro", driver: "SD Cássio", encarregado: "", checklist: createPerfectChecklist() },
+      { id: "rota_4", opm: "1º BPChoq", prefix: "91229", type: "carro", driver: "CB GIOVANI", encarregado: "", checklist: createPerfectChecklist() },
+      
+      // CPC Motos
+      { id: "cpc_m1", opm: "CPC", prefix: "E-07314", type: "moto", driver: "Sd Jesus", encarregado: "", checklist: createPerfectChecklist() },
+      { id: "cpc_m2", opm: "CPC", prefix: "E-07334", type: "moto", driver: "Sd David", encarregado: "", checklist: createPerfectChecklist() },
+      { id: "cpc_m3", opm: "CPC", prefix: "E-07326", type: "moto", driver: "Sd Emanuel", encarregado: "", checklist: createPerfectChecklist() },
+      { id: "cpc_m4", opm: "CPC", prefix: "E-07374", type: "moto", driver: "Sd Yamane", encarregado: "", checklist: createPerfectChecklist() },
+      { id: "cpc_m5", opm: "CPC", prefix: "E-07340", type: "moto", driver: "Sd Souza", encarregado: "", checklist: createPerfectChecklist() },
+      { id: "cpc_m6", opm: "CPC", prefix: "E-07352", type: "moto", driver: "Sd Lemos", encarregado: "", checklist: createPerfectChecklist() },
+      
+      // CPTran Motos
+      { id: "cpt_m1", opm: "CPTRAN", prefix: "T-00087-11", type: "moto", driver: "Cb Nascimento", encarregado: "", checklist: createPerfectChecklist() },
+      { id: "cpt_m2", opm: "CPTRAN", prefix: "T-00072-11", type: "moto", driver: "Cb Alisson", encarregado: "", checklist: createPerfectChecklist() },
+      { id: "cpt_m3", opm: "CPTRAN", prefix: "T-02010-11", type: "moto", driver: "Sd Neto", encarregado: "", checklist: createPerfectChecklist() },
+      { id: "cpt_m4", opm: "CPTRAN", prefix: "T-02003-11", type: "moto", driver: "Sd Beatriz", encarregado: "", checklist: createPerfectChecklist() },
+      { id: "cpt_m5", opm: "CPTRAN", prefix: "T-01073-11", type: "moto", driver: "Sd João Pereira", encarregado: "", checklist: createPerfectChecklist() },
+      { id: "cpt_m6", opm: "CPTRAN", prefix: "T-01056-11", type: "moto", driver: "Sd Igo", encarregado: "", checklist: createPerfectChecklist() },
+      
+      // CPRv Motos
+      { id: "cpr_m1", opm: "CPRV", prefix: "R-04161-11", type: "moto", driver: "Sd Davi", encarregado: "", checklist: createPerfectChecklist() },
+      { id: "cpr_m2", opm: "CPRV", prefix: "R-04160-11", type: "moto", driver: "Sd Fernando", encarregado: "", checklist: createPerfectChecklist() },
+      { id: "cpr_m3", opm: "CPRV", prefix: "R-06263-11", type: "moto", driver: "Sd Wesllen", encarregado: "", checklist: createPerfectChecklist() },
+      { id: "cpr_m4", opm: "CPRV", prefix: "R-06262-11", type: "moto", driver: "Cb Júlio", encarregado: "", checklist: createPerfectChecklist() },
+      { id: "cpr_m5", opm: "CPRV", prefix: "R-01381-11", type: "moto", driver: "Cb Saraiva", encarregado: "", checklist: createPerfectChecklist() },
+      { id: "cpr_m6", opm: "CPRV", prefix: "R-01380-11", type: "moto", driver: "Sd Castanha", encarregado: "", checklist: createPerfectChecklist() },
+      
+      // Radiopatrulha CPC Cars
+      { id: "cpc_c1", opm: "CPC", prefix: "M-18141", type: "carro", driver: "Sd 2ª Cl Filho", encarregado: "", checklist: createPerfectChecklist() },
+      { id: "cpc_c2", opm: "CPC", prefix: "M-43200", type: "carro", driver: "Sd 2ª Cl Perenha", encarregado: "", checklist: createPerfectChecklist() },
+      { id: "cpc_c3", opm: "CPC", prefix: "M-04111", type: "carro", driver: "Sd R Fernandes", encarregado: "", checklist: createPerfectChecklist() },
+      { id: "cpc_c4", opm: "CPC", prefix: "M-04312", type: "carro", driver: "Sd Pereira", encarregado: "", checklist: createPerfectChecklist() },
+      
+      // CPTran Cars
+      { id: "cpt_c1", opm: "CPTRAN", prefix: "T-00084", type: "carro", driver: "Sd Madruga", encarregado: "", checklist: createPerfectChecklist() },
+      { id: "cpt_c2", opm: "CPTRAN", prefix: "T-00090", type: "carro", driver: "Sd Jhonny", encarregado: "", checklist: createPerfectChecklist() },
+      { id: "cpt_c3", opm: "CPTRAN", prefix: "R-06287", type: "carro", driver: "Sd Igor", encarregado: "", checklist: createPerfectChecklist() },
+      { id: "cpt_c4", opm: "CPTRAN", prefix: "R-01008", type: "carro", driver: "Sd Oliveira", encarregado: "", checklist: createPerfectChecklist() },
+      
+      // CPRv Cars
+      { id: "cpr_c1", opm: "CPRV", prefix: "R-05490", type: "carro", driver: "Cb De Melo", encarregado: "", checklist: createPerfectChecklist() },
+      { id: "cpr_c2", opm: "CPRV", prefix: "R-05491", type: "carro", driver: "Cb Luiz Eduardo", encarregado: "", checklist: createPerfectChecklist() },
+      { id: "cpr_c3", opm: "CPRV", prefix: "T-01020", type: "carro", driver: "Sd Alcantara", encarregado: "", checklist: createPerfectChecklist() },
+      { id: "cpr_c4", opm: "CPRV", prefix: "T-02139", type: "carro", driver: "Sd Perez", encarregado: "", checklist: createPerfectChecklist() },
+      
+      // CPAmb Cars
+      { id: "cpamb_c1", opm: "CPAmb", prefix: "A-05001", type: "carro", driver: "Sd Henrique", encarregado: "", checklist: createPerfectChecklist() },
+      { id: "cpamb_c2", opm: "CPAmb", prefix: "A-01101", type: "carro", driver: "Sd Jonatan", encarregado: "", checklist: createPerfectChecklist() },
+      { id: "cpamb_c3", opm: "CPAmb", prefix: "A-05002", type: "carro", driver: "Cb Silva", encarregado: "", checklist: createPerfectChecklist() },
+      { id: "cpamb_c4", opm: "CPAmb", prefix: "A-01203", type: "carro", driver: "Cb De Oliveira", encarregado: "", checklist: createPerfectChecklist() },
+      
+      // Corregedoria PDO
+      { id: "corr_1", opm: "Corregedoria", prefix: "60011", type: "carro", driver: "Sd Fagundes", encarregado: "", checklist: createPerfectChecklist() },
+      { id: "corr_2", opm: "Corregedoria", prefix: "60002", type: "carro", driver: "Sd Cristovão", encarregado: "", checklist: createPerfectChecklist() },
+      { id: "corr_3", opm: "Corregedoria", prefix: "60010", type: "carro", driver: "Sd Ventura", encarregado: "", checklist: createPerfectChecklist() },
+      { id: "corr_4", opm: "Corregedoria", prefix: "60006", type: "carro", driver: "Sd Luan", encarregado: "", checklist: createPerfectChecklist() },
+      
+      // 3º BPChq
+      { id: "chq3_1", opm: "3º BPChoq", prefix: "93131", type: "carro", driver: "Cb Isac", encarregado: "", checklist: createPerfectChecklist() },
+      { id: "chq3_2", opm: "3º BPChoq", prefix: "93128", type: "carro", driver: "Cb Carnevale", encarregado: "", checklist: createPerfectChecklist() },
+      { id: "chq3_3", opm: "3º BPChoq", prefix: "93116", type: "carro", driver: "Cb Pergentino", encarregado: "", checklist: createPerfectChecklist() },
+      { id: "chq3_4", opm: "3º BPChoq", prefix: "VLA", type: "carro", driver: "Motorista VLA", encarregado: "", checklist: createPerfectChecklist() },
+      
+      // 4º BPChq (GATE/COE)
+      { id: "chq4_1", opm: "4º BPChoq", prefix: "94001", type: "carro", driver: "Cb Castro", encarregado: "", checklist: createPerfectChecklist() },
+      { id: "chq4_2", opm: "4º BPChoq", prefix: "94503", type: "carro", driver: "Sd Nascimento", encarregado: "", checklist: createPerfectChecklist() },
+      { id: "chq4_3", opm: "4º BPChoq", prefix: "94100", type: "carro", driver: "Cb Erick", encarregado: "", checklist: createPerfectChecklist() },
+      { id: "chq4_4", opm: "4º BPChoq", prefix: "94003", type: "carro", driver: "Sd Arthur", encarregado: "", checklist: createPerfectChecklist() },
+      
+      // 5º BPChq (Canil)
+      { id: "chq5_1", opm: "5º BPChoq", prefix: "95100", type: "carro", driver: "Cb Ebúrnio", encarregado: "", checklist: createPerfectChecklist() },
+      { id: "chq5_2", opm: "5º BPChoq", prefix: "95252", type: "carro", driver: "Cb Demetrius", encarregado: "", checklist: createPerfectChecklist() },
+      
+      // RPMon
+      { id: "rpmon_1", opm: "RPMon", prefix: "Biga", type: "carro", driver: "Cb Sivelli", encarregado: "", checklist: createPerfectChecklist() }
+    ];
+    
+    // Coordenadas padrão de layout default (Rotação = 0 para visualização direita)
+    const DEFAULT_LAYOUT = {
+      // 2º BPChq Escolta (Cunha)
+      "CMM_JEEP Cmt": { x: 440, y: 120, rotation: 0 },
+      "2º BPChoq_14-51": { x: 448, y: 220, rotation: 0 },
+      "2º BPChoq_14-53": { x: 360, y: 280, rotation: 0 },
+      "2º BPChoq_14-57": { x: 536, y: 280, rotation: 0 },
+      
+      // Jeep Cmt
+      "CMM_3-1000": { x: 440, y: 390, rotation: 0 },
+      
+      // Históricas (Duas colunas)
+      "CMM_VERANEIO": { x: 320, y: 500, rotation: 0 },
+      "CMM_FUSCA": { x: 560, y: 500, rotation: 0 },
+      "CMM_KOMBI": { x: 320, y: 600, rotation: 0 },
+      "CMM_UNO": { x: 560, y: 600, rotation: 0 },
+      "CMM_IPANEMA": { x: 320, y: 700, rotation: 0 },
+      "CMM_OPALA": { x: 560, y: 700, rotation: 0 },
+      
+      // ROCAM 2º BPChq (Motos)
+      "2º BPChoq_92404": { x: 448, y: 810, rotation: 0 },
+      "2º BPChoq_92422": { x: 360, y: 810, rotation: 0 },
+      "2º BPChoq_92045": { x: 536, y: 810, rotation: 0 },
+      "2º BPChoq_92407": { x: 448, y: 890, rotation: 0 },
+      "2º BPChoq_92428": { x: 360, y: 890, rotation: 0 },
+      "2º BPChoq_92427": { x: 536, y: 890, rotation: 0 },
+    };
+    
+    // Lista ordenada de OPMs para o Índice de Vistorias
+    const OPM_INDEX_LIST = [
+      "1º BPChoq", "2º BPChoq", "3º BPChoq", "4º BPChoq", "5º BPChoq", 
+      "CPC", "CPTRAN", "CPRV", "CPAmb", "Corregedoria", "RPMon", "CMM"
+    ];
+    
+    // ----------------------------------------------------
+    // ESTADO GLOBAL DO APLICATIVO
+    // ----------------------------------------------------
+    let viaturas = [...DEFAULT_VECTORS];
+    let layouts = {...DEFAULT_LAYOUT};
+    let activeWebAppUrl = localStorage.getItem("cmm_sheets_url") || HARDCODED_WEBAPP_URL; // Usando URL fixa por padrão
+    let selectedVtrCard = null;
+    let isConnected = false;
+    let isSidebarCollapsed = false;
+    let selectedOpmForVistoria = OPM_INDEX_LIST[0]; // Primeira OPM por padrão
+    
+    // Elementos DOM
+    const statusDot = document.getElementById("status-dot");
+    const statusText = document.getElementById("status-text");
+    const vtrList = document.getElementById("vtr-list");
+    const paradeCanvas = document.getElementById("parade-canvas");
+    const vtrSearch = document.getElementById("vtr-search");
+    const btnSaveLayout = document.getElementById("btn-save-layout");
+    const btnSync = document.getElementById("btn-sync");
+    const btnSettings = document.getElementById("btn-settings");
+    const settingsModal = document.getElementById("settings-modal");
+    const modalClose = document.getElementById("modal-close");
+    const btnSaveSettings = document.getElementById("btn-save-settings");
+    const sheetsUrlInput = document.getElementById("sheets-url-input");
+    
+    // Elementos do Painel Flutuante (Floating)
+    const floatControl = document.getElementById("floating-card-control");
+    const floatVtrTitle = document.getElementById("float-vtr-title");
+    const floatVtrOpm = document.getElementById("float-vtr-opm");
+    const floatVtrDriverInput = document.getElementById("float-vtr-driver-input");
+    const floatVtrEncarregadoInput = document.getElementById("float-vtr-encarregado-input");
+    const floatVtrRotation = document.getElementById("float-vtr-rotation");
+    const floatVtrRotVal = document.getElementById("float-vtr-rot-val");
+    const floatVtrXSlider = document.getElementById("float-vtr-x-slider");
+    const floatVtrYSlider = document.getElementById("float-vtr-y-slider");
+    
+    // Alternadores de Modo
+    const tabLayoutView = document.getElementById("tab-layout-view");
+    const tabVistoriaView = document.getElementById("tab-vistoria-view");
+    const paneLayout = document.getElementById("pane-layout");
+    const paneVistoria = document.getElementById("pane-vistoria");
+    const sidebar = document.getElementById("vtr-sidebar");
+    const btnToggleSidebar = document.getElementById("btn-toggle-sidebar");
+    
+    // Índice de Vistorias
+    const opmIndexList = document.getElementById("opm-index-list");
+    const opmSelectedTitle = document.getElementById("opm-selected-title");
+    const selectedOpmTable = document.getElementById("selected-opm-table");
+    const selectedOpmTableBody = document.getElementById("selected-opm-table-body");
+    const noOpmSelected = document.getElementById("no-opm-selected");
+    
+    // ----------------------------------------------------
+    // INICIALIZAÇÃO
+    // ----------------------------------------------------
+    window.addEventListener("DOMContentLoaded", () => {
+      sheetsUrlInput.value = activeWebAppUrl;
+      updateStatusDisplay();
+      syncWithGoogleSheets();
+      
+      // Tabs
+      tabLayoutView.addEventListener("click", () => switchView("layout"));
+      tabVistoriaView.addEventListener("click", () => switchView("vistoria"));
+      
+      // Sidebar Toggle
+      btnToggleSidebar.addEventListener("click", toggleSidebar);
+      
+      // Configurações
+      btnSettings.addEventListener("click", () => settingsModal.style.display = "flex");
+      modalClose.addEventListener("click", () => settingsModal.style.display = "none");
+      window.addEventListener("click", (e) => { if (e.target === settingsModal) settingsModal.style.display = "none"; });
+      
+      btnSaveSettings.addEventListener("click", () => {
+        activeWebAppUrl = sheetsUrlInput.value.trim();
+        localStorage.setItem("cmm_sheets_url", activeWebAppUrl);
+        settingsModal.style.display = "none";
+        updateStatusDisplay();
+        syncWithGoogleSheets();
+      });
+      
+      btnSync.addEventListener("click", syncWithGoogleSheets);
+      btnSaveLayout.addEventListener("click", saveLayoutToGoogleSheets);
+      vtrSearch.addEventListener("input", renderVtrList);
+      
+      // Alinhamentos automáticos
+      document.getElementById("tool-align-wedge").addEventListener("click", () => alignSelection("wedge"));
+      document.getElementById("tool-align-column").addEventListener("click", () => alignSelection("column"));
+      document.getElementById("tool-align-double").addEventListener("click", () => alignSelection("double"));
+      document.getElementById("tool-clear-canvas").addEventListener("click", clearAllLayout);
+      
+      // Floating Card Controls
+      document.getElementById("float-vtr-close").addEventListener("click", deselectAll);
+      document.getElementById("float-btn-apply").addEventListener("click", applyFloatingAjustes);
+      document.getElementById("float-btn-remove").addEventListener("click", removeSelectedVtr);
+      
+      // Sliders X e Y na barra flutuante
+      floatVtrXSlider.addEventListener("input", (e) => {
+        if (selectedVtrCard) {
+          const val = e.target.value;
+          selectedVtrCard.style.left = val + "px";
+        }
+      });
+      floatVtrYSlider.addEventListener("input", (e) => {
+        if (selectedVtrCard) {
+          const val = e.target.value;
+          selectedVtrCard.style.top = val + "px";
+        }
+      });
+      
+      // Botões direcionais de grid (Mover a pontos fixos)
+      document.getElementById("float-align-left").addEventListener("click", () => moveCardFixed("left"));
+      document.getElementById("float-align-center").addEventListener("click", () => moveCardFixed("center"));
+      document.getElementById("float-align-right").addEventListener("click", () => moveCardFixed("right"));
+      document.getElementById("float-align-up").addEventListener("click", () => moveCardFixed("up"));
+      document.getElementById("float-align-down").addEventListener("click", () => moveCardFixed("down"));
+      
+      setupCanvasDragAndDrop();
+    });
+    
+    // Alternar entre abas
+    function switchView(mode) {
+      if (mode === "layout") {
+        tabLayoutView.classList.add("active");
+        tabVistoriaView.classList.remove("active");
+        paneLayout.classList.add("active");
+        paneVistoria.classList.remove("active");
+        btnSaveLayout.style.display = "flex";
+      } else {
+        tabLayoutView.classList.remove("active");
+        tabVistoriaView.classList.add("active");
+        paneLayout.classList.remove("active");
+        paneVistoria.classList.add("active");
+        btnSaveLayout.style.display = "none";
+        renderOpmIndexList();
+        renderOpmVistoriaTable();
+      }
+      deselectAll();
+    }
+    
+    function toggleSidebar() {
+      isSidebarCollapsed = !isSidebarCollapsed;
+      if (isSidebarCollapsed) {
+        sidebar.classList.add("collapsed");
+        btnToggleSidebar.innerText = ">";
+        btnToggleSidebar.style.left = "0px";
+      } else {
+        sidebar.classList.remove("collapsed");
+        btnToggleSidebar.innerText = "<";
+        btnToggleSidebar.style.left = "290px";
+      }
+    }
+    
+    // ----------------------------------------------------
+    // SYNC & FETCH GOOGLE SHEETS
+    // ----------------------------------------------------
+    function updateStatusDisplay() {
+      if (!activeWebAppUrl) {
+        statusDot.className = "status-dot offline";
+        statusText.innerText = "Modo Offline";
+        statusText.style.color = "var(--color-error)";
+        isConnected = false;
+        return;
+      }
+      statusDot.className = "status-dot";
+      statusText.innerText = "Conectando...";
+      statusText.style.color = "var(--color-warning)";
+    }
+    
+    function syncWithGoogleSheets() {
+      if (!activeWebAppUrl) {
+        processLoadedData(null);
+        return;
+      }
+      
+      const fetchUrl = activeWebAppUrl + "?action=get_data";
+      
+      fetch(fetchUrl)
+        .then(response => response.json())
+        .then(res => {
+          if (res.status === "success") {
+            statusDot.className = "status-dot connected";
+            statusText.innerText = "Sheets Conectado";
+            statusText.style.color = "var(--color-success)";
+            isConnected = true;
+            processLoadedData(res);
+          } else {
+            statusDot.className = "status-dot offline";
+            statusText.innerText = "Erro na Planilha";
+            statusText.style.color = "var(--color-error)";
+          }
+        })
+        .catch(err => {
+          console.error("Erro na carga do Sheets", err);
+          statusDot.className = "status-dot offline";
+          statusText.innerText = "Sem Conexão";
+          statusText.style.color = "var(--color-error)";
+          processLoadedData(null); // fallback local
+        });
+    }
+    
+    function processLoadedData(res) {
+      if (!res) {
+        viaturas = [...DEFAULT_VECTORS];
+        layouts = {...DEFAULT_LAYOUT};
+        renderAll();
+        return;
+      }
+      
+      const sheetResponses = res.checklist || [];
+      const loadedLayout = res.layout || {};
+      const updatedViaturas = [];
+      const responseMap = {};
+      
+      sheetResponses.forEach(row => {
+        const opm = row["OPM (Batalhão / Unidade / Comando)"];
+        const prefix = row["VTR (Prefixo)"];
+        if (opm && prefix) {
+          responseMap[opm.trim() + "_" + prefix.trim()] = row;
+        }
+      });
+      
+      DEFAULT_VECTORS.forEach(vtr => {
+        const key = vtr.opm + "_" + vtr.prefix;
+        const sheetRow = responseMap[key];
+        const layoutRow = loadedLayout[key];
+        
+        let checklist = {...vtr.checklist};
+        let status = "Aprovado";
+        let motorista = vtr.driver;
+        let encarregado = vtr.encarregado;
+        
+        // Sobrescreve tripulação se houver no dashboard
+        if (layoutRow) {
+          if (layoutRow.motorista) motorista = layoutRow.motorista;
+          if (layoutRow.encarregado) encarregado = layoutRow.encarregado;
+        }
+        
+        if (sheetRow) {
+          checklist = {
+            pintura: sheetRow["Pintura, lataria (funilaria) em perfeito estado?"] || "Sim",
+            novo_grafismo: sheetRow["Novo grafismo (gestão de governo atual)?"] || "Sim",
+            grafismo_geral: sheetRow["Grafismo (geral) em perfeito estado?"] || "Sim",
+            sinais_sonoros: sheetRow["Sinais sonoros e luminosos em perfeito funcionamento?"] || "Sim",
+            calota_padrao: sheetRow["Calota padrão (padrão de fábrica obrigatório)?"] || "Sim",
+            luzes_farois: sheetRow["Luzes/lanternas/faróis/freios em perfeito funcionamento?"] || "Sim",
+            mecanica_geral: sheetRow["Mecânica geral em perfeito funcionamento?"] || "Sim"
+          };
+          
+          if (Object.values(checklist).includes("Não")) {
+            status = "Pendente";
+          }
+        }
+        
+        updatedViaturas.push({
+          ...vtr,
+          driver: motorista,
+          encarregado: encarregado,
+          checklist: checklist,
+          status: status
+        });
+      });
+      
+      viaturas = updatedViaturas;
+      
+      if (Object.keys(loadedLayout).length > 0) {
+        layouts = loadedLayout;
+      } else {
+        layouts = {...DEFAULT_LAYOUT};
+      }
+      
+      renderAll();
+    }
+    
+    function saveLayoutToGoogleSheets() {
+      if (!activeWebAppUrl) {
+        alert("Modo offline. Posições salvas apenas no navegador.");
+        return;
+      }
+      
+      const positions = [];
+      const cards = paradeCanvas.querySelectorAll(".vtr-card");
+      cards.forEach(card => {
+        const id = card.dataset.id;
+        const vtr = viaturas.find(v => v.id === id);
+        if (vtr) {
+          positions.push({
+            opm: vtr.opm,
+            vtr: vtr.prefix,
+            x: Math.round(parseFloat(card.style.left)),
+            y: Math.round(parseFloat(card.style.top)),
+            rotation: card.dataset.rotation || 0,
+            motorista: vtr.driver || "",
+            encarregado: vtr.encarregado || ""
+          });
+        }
+      });
+      
+      const payload = {
+        action: "save_layout",
+        positions: positions
+      };
+      
+      btnSaveLayout.innerText = "⏳ Salvando...";
+      btnSaveLayout.disabled = true;
+      
+      fetch(activeWebAppUrl, {
+        method: "POST",
+        mode: "cors",
+        body: JSON.stringify(payload)
+      })
+      .then(res => res.json())
+      .then(res => {
+        if (res.status === "success") {
+          alert("Posições e tripulação salvas na aba 'dashboard'!");
+        } else {
+          alert("Erro: " + res.message);
+        }
+      })
+      .catch(err => {
+        console.error("Erro de POST", err);
+        alert("Erro de rede ao salvar layout.");
+      })
+      .finally(() => {
+        btnSaveLayout.innerText = "💾 Salvar Layout";
+        btnSaveLayout.disabled = false;
+      });
+    }
+    
+    function updateVtrChecklistInGoogleSheets(vtr) {
+      if (!activeWebAppUrl) return;
+      
+      const payload = {
+        action: "update_checklist",
+        opm: vtr.opm,
+        vtr: vtr.prefix,
+        pintura: vtr.checklist.pintura,
+        novo_grafismo: vtr.checklist.novo_grafismo,
+        grafismo_geral: vtr.checklist.grafismo_geral,
+        sinais_sonoros: vtr.checklist.sinais_sonoros,
+        calota_padrao: vtr.checklist.calota_padrao,
+        luzes_farois: vtr.checklist.luzes_farois,
+        mecanica_geral: vtr.checklist.mecanica_geral
+      };
+      
+      fetch(activeWebAppUrl, {
+        method: "POST",
+        mode: "cors",
+        body: JSON.stringify(payload)
+      })
+      .catch(err => console.error("Erro na sincronização do checklist:", err));
+    }
+    
+    // ----------------------------------------------------
+    // RENDERIZAÇÃO
+    // ----------------------------------------------------
+    function renderAll() {
+      renderVtrList();
+      renderCanvasCards();
+      renderOpmIndexList();
+      renderOpmVistoriaTable();
+    }
+    
+    function renderVtrList() {
+      const searchTerm = vtrSearch.value.toLowerCase();
+      vtrList.innerHTML = "";
+      
+      const grouped = {};
+      viaturas.forEach(vtr => {
+        const matchSearch = vtr.opm.toLowerCase().includes(searchTerm) || vtr.prefix.toLowerCase().includes(searchTerm);
+        if (!matchSearch) return;
+        
+        if (!grouped[vtr.opm]) grouped[vtr.opm] = [];
+        grouped[vtr.opm].push(vtr);
+      });
+      
+      Object.keys(grouped).forEach(opmName => {
+        const vtrs = grouped[opmName];
+        const groupEl = document.createElement("div");
+        groupEl.className = "opm-group";
+        
+        groupEl.innerHTML = `<div class="opm-group-title"><span>${opmName}</span><span class="opm-badge">${vtrs.length}</span></div>`;
+        
+        vtrs.forEach(vtr => {
+          const isPlaced = isVtrPlaced(vtr);
+          const itemEl = document.createElement("div");
+          itemEl.className = `vtr-list-item ${isPlaced ? 'placed' : ''}`;
+          
+          const badgeColor = vtr.status === "Aprovado" ? "var(--color-success)" : "var(--color-error)";
+          const icon = vtr.type === "moto" ? "🏍️" : "🚔";
+          
+          itemEl.innerHTML = `
+            <div class="vtr-info">
+              <span>${icon}</span>
+              <span class="vtr-prefix">${vtr.prefix}</span>
+            </div>
+            <div class="vtr-badge-small" style="background-color: ${badgeColor};"></div>
+          `;
+          
+          if (!isPlaced) {
+            itemEl.addEventListener("click", () => placeVtrOnCanvas(vtr));
+          }
+          groupEl.appendChild(itemEl);
+        });
+        vtrList.appendChild(groupEl);
+      });
+    }
+    
+    function isVtrPlaced(vtr) {
+      return layouts[vtr.opm + "_" + vtr.prefix] !== undefined;
+    }
+    
+    function renderCanvasCards() {
+      const existingCards = paradeCanvas.querySelectorAll(".vtr-card");
+      existingCards.forEach(c => c.remove());
+      
+      viaturas.forEach(vtr => {
+        const key = vtr.opm + "_" + vtr.prefix;
+        const coords = layouts[key];
+        
+        if (coords) {
+          const card = document.createElement("div");
+          card.className = `vtr-card ${vtr.type} ${vtr.status === 'Aprovado' ? 'approved' : 'fail'}`;
+          card.style.left = coords.x + "px";
+          card.style.top = coords.y + "px";
+          card.style.transform = `rotate(${coords.rotation || 0}deg)`;
+          card.dataset.id = vtr.id;
+          card.dataset.rotation = coords.rotation || 0;
+          
+          const icon = vtr.type === "moto" ? "🏍️" : "🚔";
+          
+          // Formata tripulação para exibição limpa sem quebra de palavra
+          const dText = vtr.driver ? `M: ${vtr.driver}` : "M: -";
+          const eText = vtr.encarregado ? `E: ${vtr.encarregado}` : "E: -";
+          
+          card.innerHTML = `
+            <span class="vtr-card-icon">${icon}</span>
+            <span class="vtr-card-prefix">${vtr.prefix}</span>
+            <span class="vtr-card-opm">${vtr.opm.substring(0, 10)}</span>
+            <div class="vtr-card-crew" title="${dText}">${dText}</div>
+            <div class="vtr-card-crew" title="${eText}">${eText}</div>
+          `;
+          
+          card.addEventListener("pointerdown", (e) => {
+            e.stopPropagation();
+            selectVtrCard(card, vtr);
+          });
+          
+          paradeCanvas.appendChild(card);
+        }
+      });
+    }
+    
+    // ----------------------------------------------------
+    // ABA 2: VISTORIAS COM ÍNDICE LATERAL (SPLIT)
+    // ----------------------------------------------------
+    function renderOpmIndexList() {
+      opmIndexList.innerHTML = "";
+      
+      OPM_INDEX_LIST.forEach(opm => {
+        const count = viaturas.filter(v => v.opm === opm).length;
+        const activeClass = selectedOpmForVistoria === opm ? "active" : "";
+        
+        const btn = document.createElement("button");
+        btn.className = `opm-index-btn ${activeClass}`;
+        btn.innerHTML = `<span>${opm}</span> <span class="opm-badge">${count}</span>`;
+        
+        btn.addEventListener("click", () => {
+          selectedOpmForVistoria = opm;
+          renderOpmIndexList();
+          renderOpmVistoriaTable();
+        });
+        
+        opmIndexList.appendChild(btn);
+      });
+      
+      // Atualiza estatísticas globais
+      let okCount = viaturas.filter(v => v.status === "Aprovado").length;
+      document.getElementById("stat-total").innerText = viaturas.length;
+      document.getElementById("stat-ok").innerText = okCount;
+      document.getElementById("stat-pending").innerText = viaturas.length - okCount;
+    }
+    
+    function renderOpmVistoriaTable() {
+      selectedOpmTableBody.innerHTML = "";
+      
+      if (!selectedOpmForVistoria) {
+        opmSelectedTitle.innerText = "Selecione uma OPM no índice";
+        selectedOpmTable.style.display = "none";
+        noOpmSelected.style.display = "block";
+        return;
+      }
+      
+      opmSelectedTitle.innerText = `Vistorias do ${selectedOpmForVistoria}`;
+      selectedOpmTable.style.display = "table";
+      noOpmSelected.style.display = "none";
+      
+      const vtrsOfOpm = viaturas.filter(v => v.opm === selectedOpmForVistoria);
+      
+      vtrsOfOpm.forEach(vtr => {
+        const tr = document.createElement("tr");
+        
+        const tdPref = `<td><span style="font-size:14px; font-weight:700; color:var(--color-primary);">${vtr.prefix}</span></td>`;
+        const tdDriver = `<td>${vtr.driver || "-"}</td>`;
+        const tdEnc = `<td>${vtr.encarregado || "-"}</td>`;
+        
+        const tdPintura = renderTableBadge(vtr, "pintura");
+        const tdGrafGov = renderTableBadge(vtr, "novo_grafismo");
+        const tdGrafGeral = renderTableBadge(vtr, "grafismo_geral");
+        const tdSinais = renderTableBadge(vtr, "sinais_sonoros");
+        const tdCalota = renderTableBadge(vtr, "calota_padrao");
+        const tdLuzes = renderTableBadge(vtr, "luzes_farois");
+        const tdMecanica = renderTableBadge(vtr, "mecanica_geral");
+        
+        const statusClass = vtr.status === "Aprovado" ? "ok" : "fail";
+        const statusText = vtr.status === "Aprovado" ? "APROVADO" : "PENDENTE";
+        const tdStatus = `<td><span class="vtr-status-tag ${statusClass}">${statusText}</span></td>`;
+        
+        tr.innerHTML = tdPref + tdDriver + tdEnc + tdPintura + tdGrafGov + tdGrafGeral + tdSinais + tdCalota + tdLuzes + tdMecanica + tdStatus;
+        selectedOpmTableBody.appendChild(tr);
+      });
+    }
+    
+    function renderTableBadge(vtr, field) {
+      const val = vtr.checklist[field];
+      const cssClass = val === "Sim" ? "yes" : "no";
+      const label = val === "Sim" ? "OK" : "FALHA";
+      const cellId = `cell_${vtr.id}_${field}`;
+      
+      setTimeout(() => {
+        const badge = document.getElementById(cellId);
+        if (badge) {
+          badge.addEventListener("click", () => {
+            vtr.checklist[field] = vtr.checklist[field] === "Sim" ? "Não" : "Sim";
+            const hasFail = Object.values(vtr.checklist).includes("Não");
+            vtr.status = hasFail ? "Pendente" : "Aprovado";
+            
+            updateVtrChecklistInGoogleSheets(vtr);
+            renderOpmVistoriaTable();
+            renderCanvasCards();
+            renderVtrList();
+          });
+        }
+      }, 0);
+      
+      return `<td style="text-align:center;"><span class="checklist-badge ${cssClass}" id="${cellId}">${label}</span></td>`;
+    }
+    
+    // ----------------------------------------------------
+    // DRAG & CONTROLES DE MOVIMENTAÇÃO
+    // ----------------------------------------------------
+    function placeVtrOnCanvas(vtr) {
+      const key = vtr.opm + "_" + vtr.prefix;
+      layouts[key] = { x: 440, y: 150, rotation: 0 };
+      
+      renderAll();
+      
+      setTimeout(() => {
+        const card = paradeCanvas.querySelector(`.vtr-card[data-id="${vtr.id}"]`);
+        if (card) selectVtrCard(card, vtr);
+      }, 50);
+    }
+    
+    function selectVtrCard(card, vtr) {
+      const previous = paradeCanvas.querySelector(".vtr-card.selected");
+      if (previous) previous.classList.remove("selected");
+      
+      selectedVtrCard = card;
+      card.classList.add("selected");
+      
+      floatControl.style.display = "block";
+      floatVtrTitle.innerText = `Prefixo: ${vtr.prefix}`;
+      floatVtrOpm.innerText = vtr.opm;
+      floatVtrDriverInput.value = vtr.driver || "";
+      floatVtrEncarregadoInput.value = vtr.encarregado || "";
+      
+      const key = vtr.opm + "_" + vtr.prefix;
+      const coords = layouts[key] || { x: 0, y: 0, rotation: 0 };
+      
+      floatVtrRotation.value = coords.rotation || 0;
+      floatVtrRotVal.innerText = (coords.rotation || 0) + "°";
+      
+      // Define limites dos sliders conforme tamanho do card
+      floatVtrXSlider.value = coords.x;
+      floatVtrYSlider.value = coords.y;
+    }
+    
+    function deselectAll() {
+      if (selectedVtrCard) selectedVtrCard.classList.remove("selected");
+      selectedVtrCard = null;
+      floatControl.style.display = "none";
+    }
+    
+    // Botões direcionais de grid (pontos fixos)
+    function moveCardFixed(dir) {
+      if (!selectedVtrCard) return;
+      const id = selectedVtrCard.dataset.id;
+      const vtr = viaturas.find(v => v.id === id);
+      const key = vtr.opm + "_" + vtr.prefix;
+      
+      let x = parseFloat(selectedVtrCard.style.left);
+      let y = parseFloat(selectedVtrCard.style.top);
+      
+      if (dir === "left") {
+        x = 320; // Ponto fixo: pista esquerda
+      } else if (dir === "right") {
+        x = 560; // Ponto fixo: pista direita
+      } else if (dir === "center") {
+        x = 440; // Ponto fixo: pista central
+      } else if (dir === "up") {
+        y = Math.max(50, y - 50); // Mover frente
+      } else if (dir === "down") {
+        y = Math.min(3020, y + 50); // Mover trás
+      }
+      
+      selectedVtrCard.style.left = x + "px";
+      selectedVtrCard.style.top = y + "px";
+      layouts[key].x = x;
+      layouts[key].y = y;
+      
+      floatVtrXSlider.value = x;
+      floatVtrYSlider.value = y;
+    }
+    
+    function applyFloatingAjustes() {
+      if (!selectedVtrCard) return;
+      
+      const id = selectedVtrCard.dataset.id;
+      const vtr = viaturas.find(v => v.id === id);
+      if (vtr) {
+        const key = vtr.opm + "_" + vtr.prefix;
+        
+        // Atualiza tripulação manualmente no objeto
+        vtr.driver = floatVtrDriverInput.value.trim();
+        vtr.encarregado = floatVtrEncarregadoInput.value.trim();
+        
+        const x = parseInt(floatVtrXSlider.value) || 0;
+        const y = parseInt(floatVtrYSlider.value) || 0;
+        const r = parseInt(floatVtrRotation.value) || 0;
+        
+        layouts[key] = { x: x, y: y, rotation: r };
+        
+        // Força renderização para reescrever tripulantes
+        renderCanvasCards();
+        renderVtrList();
+        
+        // Seleciona de novo
+        const newCard = paradeCanvas.querySelector(`.vtr-card[data-id="${vtr.id}"]`);
+        if (newCard) selectVtrCard(newCard, vtr);
+      }
+    }
+    
+    function removeSelectedVtr() {
+      if (!selectedVtrCard) return;
+      const id = selectedVtrCard.dataset.id;
+      const vtr = viaturas.find(v => v.id === id);
+      if (vtr) {
+        delete layouts[vtr.opm + "_" + vtr.prefix];
+        deselectAll();
+        renderAll();
+      }
+    }
+    
+    function setupCanvasDragAndDrop() {
+      let activeCard = null;
+      let startX = 0, startY = 0;
+      let initialX = 0, initialY = 0;
+      
+      paradeCanvas.addEventListener("pointerdown", (e) => {
+        if (e.target === paradeCanvas || e.target.className === "road-stripes") {
+          deselectAll();
+          return;
+        }
+        
+        const card = e.target.closest(".vtr-card");
+        if (!card) return;
+        
+        activeCard = card;
+        initialX = parseFloat(card.style.left) || 0;
+        initialY = parseFloat(card.style.top) || 0;
+        startX = e.clientX;
+        startY = e.clientY;
+        
+        card.setPointerCapture(e.pointerId);
+        card.classList.add("dragging");
+      });
+      
+      paradeCanvas.addEventListener("pointermove", (e) => {
+        if (!activeCard) return;
+        
+        const dx = e.clientX - startX;
+        const dy = e.clientY - startY;
+        
+        let newX = initialX + dx;
+        let newY = initialY + dy;
+        
+        // Snapping inteligente (pontos fixos):
+        // X snap nas pistas esquerda (320px), centro (440px) ou direita (560px)
+        if (Math.abs(newX - 320) < 50) newX = 320;
+        else if (Math.abs(newX - 440) < 50) newX = 440;
+        else if (Math.abs(newX - 560) < 50) newX = 560;
+        else newX = Math.round(newX / 10) * 10; // Caso contrário snap de 10px
+        
+        // Y snap em intervalos de 40px para frente/trás alinhado
+        newY = Math.round(newY / 40) * 40;
+        
+        newX = Math.max(0, Math.min(1000 - activeCard.offsetWidth, newX));
+        newY = Math.max(0, Math.min(3100 - activeCard.offsetHeight, newY));
+        
+        activeCard.style.left = newX + "px";
+        activeCard.style.top = newY + "px";
+        
+        if (selectedVtrCard && selectedVtrCard === activeCard) {
+          floatVtrXSlider.value = newX;
+          floatVtrYSlider.value = newY;
+        }
+      });
+      
+      paradeCanvas.addEventListener("pointerup", (e) => {
+        if (!activeCard) return;
+        
+        activeCard.releasePointerCapture(e.pointerId);
+        activeCard.classList.remove("dragging");
+        
+        const id = activeCard.dataset.id;
+        const vtr = viaturas.find(v => v.id === id);
+        if (vtr) {
+          const key = vtr.opm + "_" + vtr.prefix;
+          layouts[key] = {
+            x: parseInt(activeCard.style.left),
+            y: parseInt(activeCard.style.top),
+            rotation: parseInt(activeCard.dataset.rotation || 0)
+          };
+        }
+        activeCard = null;
+      });
+    }
+    
+    // ----------------------------------------------------
+    // ALINHAMENTOS AUTOMÁTICOS
+    // ----------------------------------------------------
+    function getPlacedCards() {
+      return Array.from(paradeCanvas.querySelectorAll(".vtr-card"));
+    }
+
+    function alignSelection(mode) {
+      const cards = getPlacedCards();
+      if (cards.length === 0) return;
+      
+      cards.sort((a, b) => parseFloat(a.style.top) - parseFloat(b.style.top));
+      
+      if (mode === "column") {
+        let currentY = 160;
+        cards.forEach(card => {
+          const vtr = viaturas.find(v => v.id === card.dataset.id);
+          layouts[vtr.opm + "_" + vtr.prefix] = {
+            x: vtr.type === "moto" ? 465 : 440,
+            y: currentY,
+            rotation: 0
+          };
+          currentY += vtr.type === "moto" ? 110 : 125;
+        });
+      }
+      
+      else if (mode === "double") {
+        let currentY = 160;
+        for (let i = 0; i < cards.length; i += 2) {
+          const v1 = viaturas.find(v => v.id === cards[i].dataset.id);
+          layouts[v1.opm + "_" + v1.prefix] = { x: 320, y: currentY, rotation: 0 };
+          
+          if (i + 1 < cards.length) {
+            const v2 = viaturas.find(v => v.id === cards[i+1].dataset.id);
+            layouts[v2.opm + "_" + v2.prefix] = { x: 560, y: currentY, rotation: 0 };
+          }
+          currentY += 125;
+        }
+      }
+      
+      else if (mode === "wedge") {
+        if (cards.length < 3) return;
+        let startY = 160;
+        
+        const v1 = viaturas.find(v => v.id === cards[0].dataset.id);
+        layouts[v1.opm + "_" + v1.prefix] = { x: 440, y: startY, rotation: 0 };
+        
+        const v2 = viaturas.find(v => v.id === cards[1].dataset.id);
+        layouts[v2.opm + "_" + v2.prefix] = { x: 320, y: startY + 110, rotation: 0 };
+        
+        const v3 = viaturas.find(v => v.id === cards[2].dataset.id);
+        layouts[v3.opm + "_" + v3.prefix] = { x: 560, y: startY + 110, rotation: 0 };
+        
+        let currentY = startY + 235;
+        for (let i = 3; i < cards.length; i += 2) {
+          const vL = viaturas.find(v => v.id === cards[i].dataset.id);
+          layouts[vL.opm + "_" + vL.prefix] = { x: 320, y: currentY, rotation: 0 };
+          
+          if (i + 1 < cards.length) {
+            const vR = viaturas.find(v => v.id === cards[i+1].dataset.id);
+            layouts[vR.opm + "_" + vR.prefix] = { x: 560, y: currentY, rotation: 0 };
+          }
+          currentY += 125;
+        }
+      }
+      
+      renderAll();
+      deselectAll();
+    }
+    
+    function clearAllLayout() {
+      if (confirm("Reiniciar o layout?")) {
+        layouts = {};
+        deselectAll();
+        renderAll();
+      }
+    }
+  </script>
+</body>
+</html>
