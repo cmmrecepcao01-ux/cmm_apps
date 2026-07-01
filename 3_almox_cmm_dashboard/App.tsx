@@ -10,6 +10,7 @@ import { LowStockAlerts } from './components/LowStockAlerts';
 import { StockManager, ManualTransaction } from './components/StockManager';
 import { EssentialAlertModal } from './components/EssentialAlertModal';
 import { ErrorBoundary } from './components/ErrorBoundary';
+import { ReportsView } from './components/ReportsView';
 import { Clock, RefreshCw, AlertTriangle, FileSpreadsheet } from 'lucide-react';
 
 interface FleetcomItem {
@@ -444,19 +445,21 @@ const App: React.FC = () => {
           <div className="max-w-7xl mx-auto space-y-6">
             
             {/* Header da Aba Corrente */}
-            <div className="flex items-center justify-between border-b border-zinc-900 pb-5">
+            <div className="flex items-center justify-between border-b border-zinc-900 pb-5 no-print">
               <div>
                 <h1 className="text-3xl font-black uppercase tracking-tighter text-white">
                   {activeTab === 'DASHBOARD' && 'Painel Geral de Controle'}
                   {activeTab === 'CATALOG' && 'Catálogo de Peças'}
                   {activeTab === 'ALERTS' && 'Alertas e Estoque Mínimo'}
                   {activeTab === 'STOCK_MANAGER' && 'Controle de Movimentação'}
+                  {activeTab === 'REPORTS' && 'Relatórios e Exportações Oficiais'}
                 </h1>
                 <p className="text-zinc-500 text-xs font-bold uppercase tracking-wider mt-1">
                   {activeTab === 'DASHBOARD' && 'Dados consolidados da frota e estoque físico'}
                   {activeTab === 'CATALOG' && 'Pesquise e consulte a quantidade de peças'}
                   {activeTab === 'ALERTS' && 'Itens com estoque zerado ou abaixo dos limites operacionais'}
                   {activeTab === 'STOCK_MANAGER' && 'Lançamento manual de entradas e saídas físicas'}
+                  {activeTab === 'REPORTS' && 'Geração de relatórios analíticos, exportação em Excel e impressão de PDFs comprobatórios'}
                 </p>
               </div>
 
@@ -524,6 +527,15 @@ const App: React.FC = () => {
                   onDeleteTransaction={handleDeleteTransaction}
                   selectedPartForQuickAction={quickActionPart}
                   clearQuickActionPart={() => setQuickActionPart(null)}
+                />
+              )}
+
+              {activeTab === 'REPORTS' && (
+                <ReportsView 
+                  inventory={inventory}
+                  supabaseServices={supabaseServices}
+                  manualTransactions={manualTransactions}
+                  monthlyStats={monthlyStats}
                 />
               )}
             </ErrorBoundary>

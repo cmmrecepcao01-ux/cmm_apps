@@ -7,10 +7,11 @@ import {
   Settings, 
   Menu,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  FileText
 } from 'lucide-react';
 
-export type ActiveTab = 'DASHBOARD' | 'CATALOG' | 'ALERTS' | 'STOCK_MANAGER';
+export type ActiveTab = 'DASHBOARD' | 'CATALOG' | 'ALERTS' | 'STOCK_MANAGER' | 'REPORTS';
 
 interface SidebarProps {
   activeTab: ActiveTab;
@@ -49,6 +50,11 @@ export const Sidebar: React.FC<SidebarProps> = ({
       id: 'STOCK_MANAGER' as ActiveTab,
       label: 'Lançar Entr. / Saída',
       icon: <ArrowUpDown className="w-5 h-5" />,
+    },
+    {
+      id: 'REPORTS' as ActiveTab,
+      label: 'Relatórios & Export',
+      icon: <FileText className="w-5 h-5" />,
     },
   ];
 
