@@ -1,0 +1,253 @@
+X:    1273451 | Y:    -494913 | SUBGRUPAMENTO 4º BPChq
+X:     891788 | Y:    -486962 | SUBGRUPAMENTO MOTOCICLETA
+X:    3510915 | Y:    -455295 | Jeep com a placa 2º Sgt PM Murilo
+X:    1080024 | Y:    -333900 | SUBGRUPAMENTO RADIOPATRULHAMENTO
+X:    4890770 | Y:    -253365 | PALANQUE
+X:    1331099 | Y:    -154305 | SUBGRUPAMENTO 3º BPChq
+X:    4382411 | Y:        138 | UNO Cb Davi e Cb PM xxxxx
+X:    1765935 | Y:      13970 | 2º BPChq
+X:    4358557 | Y:      19878 | FUSCA Sd Tibúrcio
+X:    3364230 | Y:      22860 | CPC
+X:    1694870 | Y:      23411 | CPC
+X:    -277495 | Y:      35560 | M-04312 – Sd Pereira
+X:    4461510 | Y:      35560 | M-04111 – Sd R Fernandes
+X:    1305256 | Y:      44892 | Trail Blazer camuflada
+X:    2776249 | Y:      44892 | Hilux camuflada
+X:    2924810 | Y:      81280 | 2º BPChq
+X:    1473835 | Y:      85090 | COE
+X:    2945130 | Y:      85090 | COE
+X:    -372745 | Y:     102870 | 91229 – CB GIOVANI
+X:    4373880 | Y:     102870 | 91227 – SD Cássio
+X:    4056408 | Y:     133240 | 92404 Cap PM Bazela
+X:    3627037 | Y:     134398 | 3-1000 TEN CEL Demetrius , Cb Escames e Cb PM xxxxx - ESSd
+X:    2834005 | Y:     135890 | CANIL
+X:    2926715 | Y:     135890 | CPC
+X:    1362765 | Y:     136138 | CANIL
+X:    2926080 | Y:     136525 | 2º BPChq
+X:    2926080 | Y:     136525 | CPTran q
+X:    2926080 | Y:     136525 | CPRv
+X:    1774825 | Y:     140335 | 2º BPChq
+X:    1774825 | Y:     140335 | CPTran q
+X:    1774825 | Y:     140335 | CPRv
+X:    1774383 | Y:     144145 | CPC
+X:    2926715 | Y:     148590 | CPC
+X:    -277495 | Y:     149860 | M-43200 – Sd 2ª Cl Perenha
+X:    2927350 | Y:     150053 | 2º BPChq
+X:    2927350 | Y:     150053 | CPTran q
+X:    2927350 | Y:     150053 | CPRv
+X:    4461924 | Y:     150302 | M-18141 – Sd 2ª Cl Filho
+X:    1771650 | Y:     154305 | 2º BPChq
+X:    1771650 | Y:     154305 | CPTran q
+X:    1771650 | Y:     154305 | CPRv
+X:    -213995 | Y:     156845 | 92422 – Sgt Gilberto
+X:    1774190 | Y:     156845 | CPC
+X:    -666750 | Y:     173990 | 93128 – Cb Carnevale
+X:    4072255 | Y:     173990 | 93131 – Cb Isac
+X:    2044700 | Y:     174625 | GUARDIER
+X:    1608676 | Y:     180975 | PDO
+X:    3277870 | Y:     180975 | PDO
+X:    1361440 | Y:     181610 | GATE
+X:    2832735 | Y:     181610 | GATE
+X:    4056408 | Y:     184813 | T-02010-11 – Sd Neto
+X:    2926715 | Y:     186690 | CPC
+X:    3984846 | Y:     186856 | E-07340 – Sd Souza
+X:    4056408 | Y:     186856 | 92428 – Sd Leandro
+X:    2925445 | Y:     188595 | CPTran q
+X:    2925445 | Y:     188595 | CPRv
+X:    4056380 | Y:     191135 | R-06263-11 – Sd Wesllen
+X:    4056380 | Y:     191770 | E-07326 – Sd Emanuel
+X:    -365125 | Y:     193675 | 91239 – CB Perini
+X:    4382411 | Y:     193923 | 91225 – CB Rodrigues
+X:    3984846 | Y:     194089 | R-01381-11 – Cb Saraiva
+X:    1774190 | Y:     194310 | CPC
+X:    4056380 | Y:     197485 | T-00087-11 – Cb Nascimento
+X:    4056408 | Y:     199804 | 92407 Cb PM Santiago
+X:    4058285 | Y:     201295 | R-04161-11 – Sd Davi
+X:    4056408 | Y:     204801 | E-07314 – Sd Jesus
+X:    1947048 | Y:     211151 | JEEP
+X:    -499110 | Y:     211455 | 94100 – CB Erick
+X:    4239895 | Y:     211455 | 94003 – Sd Arthur
+X:    2044700 | Y:     225425 | VLA
+X:    -507641 | Y:     249583 | OPALA Cb Weslley e Sd PM xxxxx
+X:    -579203 | Y:     264574 | VERANEIO Sd Willian ( 1º BPChoq ) e veteranos
+X:    4120018 | Y:     266617 | 14-57 – Cb Guilly
+X:    4135755 | Y:     269240 | 95100 – Cb Ebúrnio
+X:    -611008 | Y:     269323 | 95252 – Cb Demetrius
+X:    -260985 | Y:     269875 | 14-53 – Cb Josino
+X:    3221521 | Y:     275231 | JEEP COM A BIGA RPmon - Cb Sivelli
+X:    -205740 | Y:     278765 | E-07374 – Sd Yamane
+X:    -205740 | Y:     280035 | T-02003-11 – Sd Beatriz
+X:    -205105 | Y:     283210 | 92427 – Sd Damin
+X:    1680210 | Y:     285750 | CPTran
+X:    3349625 | Y:     285750 | CPTran
+X:    -205740 | Y:     286385 | R-06262-11 – Cb Júlio
+X:    -205740 | Y:     294640 | 92045 – Sd Pansonato
+X:    -207756 | Y:     297180 | R-04160-11 – Sd Fernando
+X:    -205740 | Y:     299720 | E-07334 – Sd David
+X:    -205740 | Y:     300990 | T-00072-11 – Cb Alisson
+X:      72804 | Y:     304082 | 93116 – Cb Pergentino
+X:    -611505 | Y:     307975 | 94503 – Sd Nascimento
+X:    4127969 | Y:     308168 | 94001 – Cb Castro
+X:    -365125 | Y:     308610 | 60006 – Sd Luan
+X:    4373880 | Y:     308610 | 60010 – Sd Ventura
+X:    -213995 | Y:     313055 | R-01380-11 – Sd Castanha
+X:    -213995 | Y:     313690 | E-07352 – Sd Lemos
+X:    1599565 | Y:     314960 | CPAmb
+X:    3268980 | Y:     314960 | CPAmb
+X:    -213443 | Y:     314988 | T-01056-11 – Sd Igo
+X:    3984846 | Y:     314988 | T-01073-11 – Sd João Pereira
+X:    2415540 | Y:     315595 | 2º BPChq
+X:    3501390 | Y:     341630 | 14-51 – Sgt Eliezer
+X:    4406265 | Y:     352951 | IPANEMA Sd Arnaldo e Cb PM xxxxx
+X:      72804 | Y:     354992 | BAIXADO
+X:      74295 | Y:     355600 | BAASAIXADO
+X:    1696085 | Y:     392430 | CPC
+X:    3365500 | Y:     392430 | CPC
+X:    1388745 | Y:     396240 | SUBGRUPAMENTO 5º BPChq
+X:    -507641 | Y:     396544 | KOMBI Cb Emílio e Cb PM xxxxx
+X:    -356870 | Y:     407670 | 60002 – Sd Cristovão
+X:    4382135 | Y:     407670 | 60011 – Sd Fagundes
+X:    -293370 | Y:     412115 | T-00090 – Sd Jhonny
+X:    4446022 | Y:     412447 | T-00084 – Sd Madruga
+X:    1472235 | Y:     440165 | SUBGRUPAMENTO CCB
+X:    -372745 | Y:     443230 | Viatura A-05001 – Sd Henrique
+X:    4366895 | Y:     443230 | A-01101 – Sd Jonatan
+X:    1603375 | Y:     461010 | ROTA
+X:    3272790 | Y:     461010 | ROTA
+X:    -293370 | Y:     781050 | T-02139 – Sd Perez
+X:    4453973 | Y:     781160 | T-01020 – Sd Alcantara
+X:    1682115 | Y:    1201420 | 2º BPChq
+X:    3034665 | Y:    1201420 | 2º BPChq
+X:    1609725 | Y:    1517650 | ROTA
+X:    3279140 | Y:    1517650 | ROTA
+X:    1681480 | Y:    1622425 | CPTran
+X:    3350895 | Y:    1622425 | CPTran
+X:    1600835 | Y:    1651635 | CPAmb
+X:    3270250 | Y:    1651635 | CPAmb
+X:    1617345 | Y:    1731010 | PDO
+X:    3286760 | Y:    1731010 | PDO
+X:    -371475 | Y:    1779270 | A-01203 – Cb De Oliveira
+X:    4366895 | Y:    1779270 | A-05002 – Cb Silva
+X:    1654810 | Y:    2186940 | CPRv
+X:    3324225 | Y:    2186940 | CPRv
+X:    -316865 | Y:    2315210 | R-05491 – Cb Luiz Eduardo
+X:    4422140 | Y:    2315210 | R-05490 – Cb De Melo
+X:    2357120 | Y:    2439670 | JEEP A
+X:    1656080 | Y:    3523615 | CPRv
+X:    3325495 | Y:    3523615 | CPRv
+X:    4422140 | Y:    3651250 | R-06287 – Sd Igor
+X:    -316810 | Y:    3651581 | R-01008 – Sd Oliveira
+X:    1528445 | Y:    3773170 | HISTÓRICA
+X:    3147695 | Y:    3773170 | HISTÓRICA
+X:    1703705 | Y:    4439920 | PDO
+X:    3200400 | Y:    4441825 | PDO
+X:    1518920 | Y:    5049520 | HISTÓRICA
+X:    3147695 | Y:    5116195 | HISTÓRICA
+X:    1656080 | Y:    5751830 | PDO
+X:    3248025 | Y:    5757545 | PDO
+X:    1509395 | Y:    6506845 | HISTÓRICA
+X:    3128645 | Y:    6516370 | HISTÓRICA
+X:    1795145 | Y:    6823075 | z
+X:    1747520 | Y:    7731760 | CPTran
+X:    3257550 | Y:    7745095 | CPTran VIL
+X:    1739900 | Y:    9030335 | CPTran
+X:    3257076 | Y:    9032610 | CPTran
+X:   99999999 | Y:   99999999 | Jeep com a placa 2º Sgt PM Murilo
+X:   99999999 | Y:   99999999 | PALANQUE
+X:   99999999 | Y:   99999999 | 14-51 – Sgt Eliezer
+X:   99999999 | Y:   99999999 | HISTÓRICA
+X:   99999999 | Y:   99999999 | JEEP A
+X:   99999999 | Y:   99999999 | 2º BPChq
+X:   99999999 | Y:   99999999 | 14-57 – Cb Guilly
+X:   99999999 | Y:   99999999 | 14-53 – Cb Josino
+X:   99999999 | Y:   99999999 | 3-1000 TEN CEL Demetrius , Cb Escames e Cb PM xxxxx - ESSd
+X:   99999999 | Y:   99999999 | VERANEIO Sd Willian ( 1º BPChoq ) e veteranos
+X:   99999999 | Y:   99999999 | FUSCA Sd Tibúrcio
+X:   99999999 | Y:   99999999 | KOMBI Cb Emílio e Cb PM xxxxx
+X:   99999999 | Y:   99999999 | UNO Cb Davi e Cb PM xxxxx
+X:   99999999 | Y:   99999999 | IPANEMA Sd Arnaldo e Cb PM xxxxx
+X:   99999999 | Y:   99999999 | OPALA Cb Weslley e Sd PM xxxxx
+X:   99999999 | Y:   99999999 | 92404 Cap PM Bazela
+X:   99999999 | Y:   99999999 | 92422 – Sgt Gilberto
+X:   99999999 | Y:   99999999 | SUBGRUPAMENTO MOTOCICLETA
+X:   99999999 | Y:   99999999 | 92045 – Sd Pansonato
+X:   99999999 | Y:   99999999 | 92407 Cb PM Santiago
+X:   99999999 | Y:   99999999 | 92428 – Sd Leandro
+X:   99999999 | Y:   99999999 | 92427 – Sd Damin
+X:   99999999 | Y:   99999999 | T-00087-11 – Cb Nascimento
+X:   99999999 | Y:   99999999 | T-00072-11 – Cb Alisson
+X:   99999999 | Y:   99999999 | CPTran q
+X:   99999999 | Y:   99999999 | T-02010-11 – Sd Neto
+X:   99999999 | Y:   99999999 | T-02003-11 – Sd Beatriz
+X:   99999999 | Y:   99999999 | T-01073-11 – Sd João Pereira
+X:   99999999 | Y:   99999999 | T-01056-11 – Sd Igo
+X:   99999999 | Y:   99999999 | R-04161-11 – Sd Davi
+X:   99999999 | Y:   99999999 | CPRv
+X:   99999999 | Y:   99999999 | R-04160-11 – Sd Fernando
+X:   99999999 | Y:   99999999 | R-06263-11 – Sd Wesllen
+X:   99999999 | Y:   99999999 | R-06262-11 – Cb Júlio
+X:   99999999 | Y:   99999999 | R-01381-11 – Cb Saraiva
+X:   99999999 | Y:   99999999 | R-01380-11 – Sd Castanha
+X:   99999999 | Y:   99999999 | E-07314 – Sd Jesus
+X:   99999999 | Y:   99999999 | E-07334 – Sd David
+X:   99999999 | Y:   99999999 | CPC
+X:   99999999 | Y:   99999999 | E-07326 – Sd Emanuel
+X:   99999999 | Y:   99999999 | E-07374 – Sd Yamane
+X:   99999999 | Y:   99999999 | E-07340 – Sd Souza
+X:   99999999 | Y:   99999999 | E-07352 – Sd Lemos
+X:   99999999 | Y:   99999999 | M-18141 – Sd 2ª Cl Filho
+X:   99999999 | Y:   99999999 | M-43200 – Sd 2ª Cl Perenha
+X:   99999999 | Y:   99999999 | SUBGRUPAMENTO RADIOPATRULHAMENTO
+X:   99999999 | Y:   99999999 | M-04111 – Sd R Fernandes
+X:   99999999 | Y:   99999999 | M-04312 – Sd Pereira
+X:   99999999 | Y:   99999999 | T-00084 – Sd Madruga
+X:   99999999 | Y:   99999999 | T-00090 – Sd Jhonny
+X:   99999999 | Y:   99999999 | CPTran
+X:   99999999 | Y:   99999999 | R-06287 – Sd Igor
+X:   99999999 | Y:   99999999 | R-01008 – Sd Oliveira
+X:   99999999 | Y:   99999999 | R-05490 – Cb De Melo
+X:   99999999 | Y:   99999999 | R-05491 – Cb Luiz Eduardo
+X:   99999999 | Y:   99999999 | T-01020 – Sd Alcantara
+X:   99999999 | Y:   99999999 | T-02139 – Sd Perez
+X:   99999999 | Y:   99999999 | Viatura A-05001 – Sd Henrique
+X:   99999999 | Y:   99999999 | CPAmb
+X:   99999999 | Y:   99999999 | A-01101 – Sd Jonatan
+X:   99999999 | Y:   99999999 | A-05002 – Cb Silva
+X:   99999999 | Y:   99999999 | A-01203 – Cb De Oliveira
+X:   99999999 | Y:   99999999 | PDO
+X:   99999999 | Y:   99999999 | 60011 – Sd Fagundes
+X:   99999999 | Y:   99999999 | 60002 – Sd Cristovão
+X:   99999999 | Y:   99999999 | 60010 – Sd Ventura
+X:   99999999 | Y:   99999999 | 60006 – Sd Luan
+X:   99999999 | Y:   99999999 | ROTA
+X:   99999999 | Y:   99999999 | 91225 – CB Rodrigues
+X:   99999999 | Y:   99999999 | 91239 – CB Perini
+X:   99999999 | Y:   99999999 | 91227 – SD Cássio
+X:   99999999 | Y:   99999999 | 91229 – CB GIOVANI
+X:   99999999 | Y:   99999999 | SUBGRUPAMENTO 3º BPChq
+X:   99999999 | Y:   99999999 | 93131 – Cb Isac
+X:   99999999 | Y:   99999999 | 93128 – Cb Carnevale
+X:   99999999 | Y:   99999999 | Hilux camuflada
+X:   99999999 | Y:   99999999 | Trail Blazer camuflada
+X:   99999999 | Y:   99999999 | BAIXADO
+X:   99999999 | Y:   99999999 | VLA
+X:   99999999 | Y:   99999999 | BAASAIXADO
+X:   99999999 | Y:   99999999 | 93116 – Cb Pergentino
+X:   99999999 | Y:   99999999 | GUARDIER
+X:   99999999 | Y:   99999999 | CPTran VIL
+X:   99999999 | Y:   99999999 | z
+X:   99999999 | Y:   99999999 | 94001 – Cb Castro
+X:   99999999 | Y:   99999999 | 94503 – Sd Nascimento
+X:   99999999 | Y:   99999999 | SUBGRUPAMENTO 4º BPChq
+X:   99999999 | Y:   99999999 | GATE
+X:   99999999 | Y:   99999999 | 94100 – CB Erick
+X:   99999999 | Y:   99999999 | 94003 – Sd Arthur
+X:   99999999 | Y:   99999999 | COE
+X:   99999999 | Y:   99999999 | SUBGRUPAMENTO 5º BPChq
+X:   99999999 | Y:   99999999 | SUBGRU PAMENTO 5º BPChq
+X:   99999999 | Y:   99999999 | 95100 – Cb Ebúrnio
+X:   99999999 | Y:   99999999 | 95252 – Cb Demetrius
+X:   99999999 | Y:   99999999 | CANIL
+X:   99999999 | Y:   99999999 | JEEP
+X:   99999999 | Y:   99999999 | JEEP COM A BIGA RPmon - Cb Sivelli
+X:   99999999 | Y:   99999999 | SUBGRUPAMENTO CCB
