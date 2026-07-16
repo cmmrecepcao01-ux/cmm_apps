@@ -198,6 +198,38 @@
             box-shadow: 0 2px 5px rgba(0,0,0,0.3);
         }
 
+        .btn-govbr {
+            display: inline-flex;
+            align-items: center;
+            transition: all 0.2s ease-in-out;
+        }
+        .btn-govbr:hover {
+            transform: translateY(-2px);
+        }
+        .btn-govbr img {
+            height: 42px;
+            width: auto;
+            border-radius: 8px;
+            display: block;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+        }
+
+        .btn-compras {
+            display: inline-flex;
+            align-items: center;
+            transition: all 0.2s ease-in-out;
+        }
+        .btn-compras:hover {
+            transform: translateY(-2px);
+        }
+        .btn-compras img {
+            height: 42px;
+            width: auto;
+            border-radius: 8px;
+            display: block;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+        }
+
         .header-titles h2 { color: #64748b; font-size: 13px; font-weight: 500; letter-spacing: 1px; margin-top: 4px; }
 
         .header-right { display: flex; align-items: center; gap: 15px; }
@@ -1632,6 +1664,12 @@
                             <a href="https://minhaarea.sp.gov.br/plataformasp" target="_blank" class="btn-sei">
                                 <img src="seibutton.png" alt="SEI">
                             </a>
+                            <a href="https://www.gov.br/governodigital/pt-br/identidade/assinatura-eletronica" target="_blank" class="btn-govbr">
+                                <img src="govbrbutton.png" alt="Gov.br">
+                            </a>
+                            <a href="https://www.comprasnet.gov.br/seguro/loginPortalUASG.asp" target="_blank" class="btn-compras">
+                                <img src="comprasogvbutton.png" alt="Compras">
+                            </a>
                         </div>
                     </h1>
                     <h2>CENTRO DE MOTOMECANIZAÇÃO</h2>
@@ -1644,16 +1682,6 @@
                     <div class="info">
                         <strong id="current-date">CARREGANDO...</strong>
                         <span id="current-day-time"></span>
-                    </div>
-                </div>
-                <div class="header-widget" id="userWidget" style="position: relative; cursor: pointer;">
-                    <i class="fa-solid fa-user"></i>
-                    <div class="info">
-                        <strong>USUÁRIO</strong>
-                        <span>ADM CMM <i class="fa-solid fa-caret-down" style="font-size: 10px; color: #64748b; margin-left: 5px;"></i></span>
-                    </div>
-                    <div class="user-widget-menu" id="userWidgetMenu">
-                        <button id="btnAuthLogout"><i class="fa-solid fa-right-from-bracket"></i> Sair</button>
                     </div>
                 </div>
                 
@@ -1677,14 +1705,14 @@
                         <div class="panel-header"><i class="fa-solid fa-wrench"></i> SEÇÃO DE MANUTENÇÃO DE FROTA</div>
                         <div class="panel-body">
                             <div class="btn-grid">
-                                <a href="../9_secao_manutencao/index.html" class="btn-item"><i class="fa-solid fa-motorcycle"></i> LINHA 2 RODAS</a>
-                                <a href="../9_secao_manutencao/index.html" class="btn-item"><i class="fa-solid fa-car"></i> LINHA 4 RODAS</a>
-                                <a href="../9_secao_manutencao/index.html" class="btn-item"><i class="fa-solid fa-truck"></i> LINHA PESADOS</a>
-                                <a href="../9_secao_manutencao/index.html" class="btn-item"><i class="fa-solid fa-traffic-light"></i> SINALIZADORES</a>
-                                <a href="../9_secao_manutencao/index.html" class="btn-item"><i class="fa-solid fa-pen-ruler"></i> GRAFISMO</a>
-                                <a href="../9_secao_manutencao/index.html" class="btn-item"><i class="fa-solid fa-gears"></i> TÉCNICA</a>
-                                <a href="../9_secao_manutencao/index.html" class="btn-item"><i class="fa-solid fa-life-ring"></i> BORRACHARIA</a>
-                                <a href="https://cmmlinhamecanicaapp.netlify.app/" target="_blank" class="btn-item"><i class="fa-solid fa-boxes-stacked"></i> ALMOXARIFADO</a>
+                                <a href="#" onclick="window.open('https://cmmpaineldebordo.netlify.app/8_produtividade_manfrota/', '_blank'); window.open('https://docs.google.com/spreadsheets/d/1Ga5eQ_AhuOUkgTut2pfkzaZf_6cRcHHXg2ylLUvVQEs/edit?usp=sharing', '_blank'); return false;" class="btn-item"><i class="fa-solid fa-motorcycle"></i> LINHA 2 RODAS</a>
+                                <a href="#" onclick="window.open('https://cmmpaineldebordo.netlify.app/8_produtividade_manfrota/', '_blank'); window.open('https://docs.google.com/spreadsheets/d/1Ga5eQ_AhuOUkgTut2pfkzaZf_6cRcHHXg2ylLUvVQEs/edit?usp=sharing', '_blank'); return false;" class="btn-item"><i class="fa-solid fa-car"></i> LINHA 4 RODAS</a>
+                                <a href="#" onclick="window.open('https://cmmpaineldebordo.netlify.app/8_produtividade_manfrota/', '_blank'); window.open('https://docs.google.com/spreadsheets/d/1Ga5eQ_AhuOUkgTut2pfkzaZf_6cRcHHXg2ylLUvVQEs/edit?usp=sharing', '_blank'); return false;" class="btn-item"><i class="fa-solid fa-truck"></i> LINHA PESADOS</a>
+                                <a href="#" onclick="window.open('https://cmmpaineldebordo.netlify.app/8_produtividade_manfrota/', '_blank'); window.open('https://docs.google.com/spreadsheets/d/1Ga5eQ_AhuOUkgTut2pfkzaZf_6cRcHHXg2ylLUvVQEs/edit?usp=sharing', '_blank'); return false;" class="btn-item"><i class="fa-solid fa-traffic-light"></i> SINALIZADORES</a>
+                                <a href="#" onclick="window.open('https://cmmpaineldebordo.netlify.app/8_produtividade_manfrota/', '_blank'); window.open('https://docs.google.com/spreadsheets/d/1Ga5eQ_AhuOUkgTut2pfkzaZf_6cRcHHXg2ylLUvVQEs/edit?usp=sharing', '_blank'); return false;" class="btn-item"><i class="fa-solid fa-pen-ruler"></i> GRAFISMO</a>
+                                <a href="#" onclick="window.open('https://cmmpaineldebordo.netlify.app/8_produtividade_manfrota/', '_blank'); window.open('https://docs.google.com/spreadsheets/d/1Ga5eQ_AhuOUkgTut2pfkzaZf_6cRcHHXg2ylLUvVQEs/edit?usp=sharing', '_blank'); return false;" class="btn-item"><i class="fa-solid fa-gears"></i> TÉCNICA</a>
+                                <a href="#" onclick="window.open('https://cmmpaineldebordo.netlify.app/8_produtividade_manfrota/', '_blank'); window.open('https://docs.google.com/spreadsheets/d/1Ga5eQ_AhuOUkgTut2pfkzaZf_6cRcHHXg2ylLUvVQEs/edit?usp=sharing', '_blank'); return false;" class="btn-item"><i class="fa-solid fa-life-ring"></i> BORRACHARIA</a>
+                                <a href="https://cmmpaineldebordo.netlify.app/3_almox_cmm_dashboard/dist/" target="_blank" class="btn-item"><i class="fa-solid fa-boxes-stacked"></i> ALMOXARIFADO</a>
                                 <a href="https://cmmpaineldebordo.netlify.app/4_garantias_cmm_dashboard/" target="_blank" class="btn-item"><i class="fa-solid fa-shield-halved"></i> GARANTIA</a>
                                 <a href="https://cmmpaineldebordo.netlify.app/8_produtividade_manfrota/" target="_blank" class="btn-item"><i class="fa-solid fa-chart-line"></i> PRODUTIVIDADE</a>
                             </div>
@@ -1692,9 +1720,9 @@
                             <div class="sub-title-bar"><i class="fa-regular fa-calendar-check"></i> PEDIDOS DE AGENDAMENTO</div>
 
                             <div class="btn-grid-3">
-                                <a href="../9_secao_manutencao/index.html" class="btn-item" style="justify-content: center;"><i class="fa-solid fa-pen-nib"></i> GRAFISMO</a>
-                                <a href="../9_secao_manutencao/index.html" class="btn-item" style="justify-content: center;"><i class="fa-solid fa-lightbulb"></i> SINALIZADOR</a>
-                                <a href="../9_secao_manutencao/index.html" class="btn-item" style="justify-content: center;"><i class="fa-solid fa-circle-notch"></i> BORRACHARIA</a>
+                                <a href="#" onclick="window.open('https://cmmpaineldebordo.netlify.app/8_produtividade_manfrota/', '_blank'); window.open('https://docs.google.com/spreadsheets/d/1Ga5eQ_AhuOUkgTut2pfkzaZf_6cRcHHXg2ylLUvVQEs/edit?usp=sharing', '_blank'); return false;" class="btn-item" style="justify-content: center;"><i class="fa-solid fa-pen-nib"></i> GRAFISMO</a>
+                                <a href="#" onclick="window.open('https://cmmpaineldebordo.netlify.app/8_produtividade_manfrota/', '_blank'); window.open('https://docs.google.com/spreadsheets/d/1Ga5eQ_AhuOUkgTut2pfkzaZf_6cRcHHXg2ylLUvVQEs/edit?usp=sharing', '_blank'); return false;" class="btn-item" style="justify-content: center;"><i class="fa-solid fa-lightbulb"></i> SINALIZADOR</a>
+                                <a href="#" onclick="window.open('https://cmmpaineldebordo.netlify.app/8_produtividade_manfrota/', '_blank'); window.open('https://docs.google.com/spreadsheets/d/1Ga5eQ_AhuOUkgTut2pfkzaZf_6cRcHHXg2ylLUvVQEs/edit?usp=sharing', '_blank'); return false;" class="btn-item" style="justify-content: center;"><i class="fa-solid fa-circle-notch"></i> BORRACHARIA</a>
                             </div>
                         </div>
                     </div>
@@ -1705,19 +1733,19 @@
                             <div class="panel-header"><i class="fa-solid fa-file-signature"></i> SEÇÃO DE EXECUÇÃO CONTRATUAL</div>
                             <div class="panel-body">
                                 <div class="list-group">
-                                    <a href="../10_secao_contratos/index.html" class="list-item blue-icon">
+                                    <a href="#" onclick="window.open('https://cmmpaineldebordo.netlify.app/10_secao_contratos/', '_blank'); window.open('https://docs.google.com/spreadsheets/d/1ws6_IffVkDIK1N1KbuMQoNzjl0bYDL3AqHyd1z_ZW5g/edit?usp=sharing', '_blank'); return false;" class="list-item blue-icon">
                                         <div class="left"><i class="fa-regular fa-file"></i> GERAL</div>
                                         <div class="right"><i class="fa-solid fa-chevron-right"></i></div>
                                     </a>
-                                    <a href="../10_secao_contratos/index.html" class="list-item blue-icon">
+                                    <a href="#" onclick="window.open('https://cmmpaineldebordo.netlify.app/10_secao_contratos/', '_blank'); window.open('https://docs.google.com/spreadsheets/d/1ws6_IffVkDIK1N1KbuMQoNzjl0bYDL3AqHyd1z_ZW5g/edit?usp=sharing', '_blank'); return false;" class="list-item blue-icon">
                                         <div class="left">
                                             <i class="fa-solid fa-file-contract"></i> 
                                             <div>ARP DE MANUTENÇÃO<span class="sub">2025-2026</span></div>
                                         </div>
                                         <div class="right"><i class="fa-solid fa-chevron-right"></i></div>
                                     </a>
-                                    <a href="../10_secao_contratos/index.html" class="list-item blue-icon">
-                                        <div class="left"><i class="fa-solid fa-list-check"></i> CONTRATOS DE AQUISIÇÃO DE FROTA</div>
+                                    <a href="#" onclick="window.open('https://cmmpaineldebordo.netlify.app/10_secao_contratos/', '_blank'); window.open('https://docs.google.com/spreadsheets/d/1ws6_IffVkDIK1N1KbuMQoNzjl0bYDL3AqHyd1z_ZW5g/edit?usp=sharing', '_blank'); return false;" class="list-item blue-icon">
+                                        <div class="left"><i class="fa-solid fa-truck-ramp-box"></i> CONTRATOS DE AQUISIÇÃO DE FROTA</div>
                                         <div class="right"><i class="fa-solid fa-chevron-right"></i></div>
                                     </a>
                                 </div>
@@ -1728,11 +1756,11 @@
                             <div class="panel-header"><i class="fa-solid fa-truck-moving"></i> SEÇÃO DE APOIO E TRANSPORTE</div>
                             <div class="panel-body">
                                 <div class="list-group">
-                                    <a href="../11_secao_transporte/index.html" class="list-item blue-icon">
+                                    <a href="#" onclick="window.open('https://satsystem-526637683536.us-east1.run.app/', '_blank'); window.open('https://satsystem-526637683536.us-east1.run.app/dashboard-frota-SAT', '_blank'); window.open('https://docs.google.com/spreadsheets/d/1dD0mgd0T3_QASjWhnDqmy84KQ17NLghydFbwq9rPQ0I/edit?usp=sharing', '_blank'); window.open('https://docs.google.com/spreadsheets/d/1qfHFs3_1FxvGlEQyYTkSTmnfZyqGTpjF/edit?usp=sharing&ouid=112363702066529997763&rtpof=true&sd=true', '_blank'); return false;" class="list-item blue-icon">
                                         <div class="left"><i class="fa-solid fa-map-location-dot"></i> MAPA DA SAT</div>
                                         <div class="right"><i class="fa-solid fa-chevron-right"></i></div>
                                     </a>
-                                    <a href="../11_secao_transporte/index.html" class="list-item blue-icon">
+                                    <a href="#" onclick="window.open('https://satsystem-526637683536.us-east1.run.app/', '_blank'); window.open('https://satsystem-526637683536.us-east1.run.app/dashboard-frota-SAT', '_blank'); window.open('https://docs.google.com/spreadsheets/d/1dD0mgd0T3_QASjWhnDqmy84KQ17NLghydFbwq9rPQ0I/edit?usp=sharing', '_blank'); window.open('https://docs.google.com/spreadsheets/d/1qfHFs3_1FxvGlEQyYTkSTmnfZyqGTpjF/edit?usp=sharing&ouid=112363702066529997763&rtpof=true&sd=true', '_blank'); return false;" class="list-item blue-icon">
                                         <div class="left">
                                             <i class="fa-solid fa-id-card"></i> 
                                             <div>MUDANÇA DE CATEGORIA<span class="sub">CLASSE C e D</span></div>
@@ -1766,15 +1794,15 @@
                         <div class="panel-header"><i class="fa-solid fa-coins"></i> SEÇÃO DE FINANÇAS</div>
                         <div class="panel-body">
                             <div class="list-group">
-                                <a href="../13_secao_financas/index.html" class="list-item green-icon">
+                                <a href="#" onclick="window.open('https://cmmpaineldebordo.netlify.app/13_secao_financas/', '_blank'); window.open('https://docs.google.com/spreadsheets/d/1JiKW5rjCPir2Qa0fj36pU0SFw0IFNPF_qArTuVA5joo/edit?usp=sharing', '_blank'); window.open('https://docs.google.com/spreadsheets/d/1y5wWSUauJzoQTj-FQfcTjmd0SdREpS85lVKhmHR5-Go/edit?usp=drivesdk', '_blank'); return false;" class="list-item green-icon">
                                     <div class="left"><i class="fa-solid fa-file-invoice-dollar"></i> ADIANTAMENTOS</div>
                                     <div class="right"><i class="fa-solid fa-chevron-right"></i></div>
                                 </a>
-                                <a href="../13_secao_financas/index.html" class="list-item green-icon">
+                                <a href="#" onclick="window.open('https://cmmpaineldebordo.netlify.app/13_secao_financas/', '_blank'); window.open('https://docs.google.com/spreadsheets/d/1JiKW5rjCPir2Qa0fj36pU0SFw0IFNPF_qArTuVA5joo/edit?usp=sharing', '_blank'); window.open('https://docs.google.com/spreadsheets/d/1y5wWSUauJzoQTj-FQfcTjmd0SdREpS85lVKhmHR5-Go/edit?usp=drivesdk', '_blank'); return false;" class="list-item green-icon">
                                     <div class="left"><i class="fa-solid fa-handshake"></i> CONTRATAÇÕES</div>
                                     <div class="right"><i class="fa-solid fa-chevron-right"></i></div>
                                 </a>
-                                <a href="../13_secao_financas/index.html" class="list-item green-icon">
+                                <a href="#" onclick="window.open('https://cmmpaineldebordo.netlify.app/13_secao_financas/', '_blank'); window.open('https://docs.google.com/spreadsheets/d/1JiKW5rjCPir2Qa0fj36pU0SFw0IFNPF_qArTuVA5joo/edit?usp=sharing', '_blank'); window.open('https://docs.google.com/spreadsheets/d/1y5wWSUauJzoQTj-FQfcTjmd0SdREpS85lVKhmHR5-Go/edit?usp=drivesdk', '_blank'); return false;" class="list-item green-icon">
                                     <div class="left"><i class="fa-solid fa-laptop-file"></i> PCA-E</div>
                                     <div class="right"><i class="fa-solid fa-chevron-right"></i></div>
                                 </a>
@@ -1955,6 +1983,19 @@
                 </button>
             </div>
             
+            <!-- Três Botões Auxiliares (SEI, GOV.BR, Compras) -->
+            <div style="display: flex; gap: 15px; width: 100%; max-width: 420px; justify-content: center; align-items: center; margin-bottom: 10px;">
+                <a href="https://minhaarea.sp.gov.br/plataformasp" target="_blank" style="flex: 1; height: 50px; display: flex; align-items: center; justify-content: center; border-radius: 6px; overflow: hidden; box-shadow: 0 3px 6px rgba(0,0,0,0.3); transition: transform 0.1s ease, box-shadow 0.1s ease;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 5px 10px rgba(0,0,0,0.4)';" onmouseout="this.style.transform='none'; this.style.boxShadow='0 3px 6px rgba(0,0,0,0.3)';" onmousedown="this.style.transform='translateY(1px)'; this.style.boxShadow='0 1px 3px rgba(0,0,0,0.3)';">
+                    <img src="seibutton.png" alt="SEI" style="width: 100%; height: 100%; object-fit: fill; display: block;">
+                </a>
+                <a href="https://www.gov.br/governodigital/pt-br/identidade/assinatura-eletronica" target="_blank" style="flex: 1; height: 50px; display: flex; align-items: center; justify-content: center; border-radius: 6px; overflow: hidden; box-shadow: 0 3px 6px rgba(0,0,0,0.3); transition: transform 0.1s ease, box-shadow 0.1s ease;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 5px 10px rgba(0,0,0,0.4)';" onmouseout="this.style.transform='none'; this.style.boxShadow='0 3px 6px rgba(0,0,0,0.3)';" onmousedown="this.style.transform='translateY(1px)'; this.style.boxShadow='0 1px 3px rgba(0,0,0,0.3)';">
+                    <img src="govbrbutton.png" alt="Gov.br" style="width: 100%; height: 100%; object-fit: fill; display: block;">
+                </a>
+                <a href="https://www.comprasnet.gov.br/seguro/loginPortalUASG.asp" target="_blank" style="flex: 1; height: 50px; display: flex; align-items: center; justify-content: center; border-radius: 6px; overflow: hidden; box-shadow: 0 3px 6px rgba(0,0,0,0.3); transition: transform 0.1s ease, box-shadow 0.1s ease;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 5px 10px rgba(0,0,0,0.4)';" onmouseout="this.style.transform='none'; this.style.boxShadow='0 3px 6px rgba(0,0,0,0.3)';" onmousedown="this.style.transform='translateY(1px)'; this.style.boxShadow='0 1px 3px rgba(0,0,0,0.3)';">
+                    <img src="comprasogvbutton.png" alt="Compras" style="width: 100%; height: 100%; object-fit: fill; display: block;">
+                </a>
+            </div>
+            
             <!-- Barra de Pesquisa por Palavra-Chave -->
             <div class="sistema-search-box">
                 <i class="fa-solid fa-magnifying-glass search-icon"></i>
@@ -2115,14 +2156,6 @@
                 <div class="todos-links-category">
                     <h3 class="category-title"><i class="fa-solid fa-screwdriver-wrench"></i> Manutenção e Transporte</h3>
                     <div class="links-list">
-                        <a href="https://cmmpaineldebordo.netlify.app/" target="_blank" class="link-card">
-                            <div class="link-info">
-                                <span class="link-name">Página Inicial do Domínio</span>
-                                <span class="link-desc">Página de entrada principal do webapp</span>
-                                <span class="link-path">https://cmmpaineldebordo.netlify.app/</span>
-                            </div>
-                            <i class="fa-solid fa-chevron-right"></i>
-                        </a>
                         <a href="https://cmmpaineldebordo.netlify.app/1_painel_bordo_cmm/" target="_blank" class="link-card">
                             <div class="link-info">
                                 <span class="link-name">Painel de Bordo CMM (Principal)</span>
@@ -2131,27 +2164,27 @@
                             </div>
                             <i class="fa-solid fa-chevron-right"></i>
                         </a>
-                        <a href="https://cmmpaineldebordo.netlify.app/9_secao_manutencao/" target="_blank" class="link-card">
+                        <a href="#" onclick="window.open('https://cmmpaineldebordo.netlify.app/8_produtividade_manfrota/', '_blank'); window.open('https://docs.google.com/spreadsheets/d/1Ga5eQ_AhuOUkgTut2pfkzaZf_6cRcHHXg2ylLUvVQEs/edit?usp=sharing', '_blank'); return false;" class="link-card">
                             <div class="link-info">
                                 <span class="link-name">Seção de Manutenção</span>
                                 <span class="link-desc">Controle de Linha 2 Rodas, 4 Rodas, Pesados, etc.</span>
-                                <span class="link-path">9_secao_manutencao/</span>
+                                <span class="link-path">Produtividade & Planilha de Manutenção</span>
                             </div>
                             <i class="fa-solid fa-chevron-right"></i>
                         </a>
-                        <a href="https://cmmpaineldebordo.netlify.app/10_secao_contratos/" target="_blank" class="link-card">
+                        <a href="#" onclick="window.open('https://cmmpaineldebordo.netlify.app/10_secao_contratos/', '_blank'); window.open('https://docs.google.com/spreadsheets/d/1ws6_IffVkDIK1N1KbuMQoNzjl0bYDL3AqHyd1z_ZW5g/edit?usp=sharing', '_blank'); return false;" class="link-card">
                             <div class="link-info">
                                 <span class="link-name">Seção de Execução Contratual</span>
                                 <span class="link-desc">Controle Geral, ARP Manutenção, Aquisição Frota</span>
-                                <span class="link-path">10_secao_contratos/</span>
+                                <span class="link-path">Sistema & Planilha de Contratos</span>
                             </div>
                             <i class="fa-solid fa-chevron-right"></i>
                         </a>
-                        <a href="https://cmmpaineldebordo.netlify.app/11_secao_transporte/" target="_blank" class="link-card">
+                        <a href="#" onclick="window.open('https://satsystem-526637683536.us-east1.run.app/', '_blank'); window.open('https://satsystem-526637683536.us-east1.run.app/dashboard-frota-SAT', '_blank'); window.open('https://docs.google.com/spreadsheets/d/1dD0mgd0T3_QASjWhnDqmy84KQ17NLghydFbwq9rPQ0I/edit?usp=sharing', '_blank'); window.open('https://docs.google.com/spreadsheets/d/1qfHFs3_1FxvGlEQyYTkSTmnfZyqGTpjF/edit?usp=sharing&ouid=112363702066529997763&rtpof=true&sd=true', '_blank'); return false;" class="link-card">
                             <div class="link-info">
                                 <span class="link-name">Seção de Apoio e Transporte</span>
                                 <span class="link-desc">Mapa da SAT e Mudança de Categoria C/D</span>
-                                <span class="link-path">11_secao_transporte/</span>
+                                <span class="link-path">Sistemas & Planilhas de Apoio</span>
                             </div>
                             <i class="fa-solid fa-chevron-right"></i>
                         </a>
@@ -2170,11 +2203,11 @@
                             </div>
                             <i class="fa-solid fa-chevron-right"></i>
                         </a>
-                        <a href="https://cmmpaineldebordo.netlify.app/13_secao_financas/" target="_blank" class="link-card">
+                        <a href="#" onclick="window.open('https://cmmpaineldebordo.netlify.app/13_secao_financas/', '_blank'); window.open('https://docs.google.com/spreadsheets/d/1JiKW5rjCPir2Qa0fj36pU0SFw0IFNPF_qArTuVA5joo/edit?usp=sharing', '_blank'); window.open('https://docs.google.com/spreadsheets/d/1y5wWSUauJzoQTj-FQfcTjmd0SdREpS85lVKhmHR5-Go/edit?usp=drivesdk', '_blank'); return false;" class="link-card">
                             <div class="link-info">
                                 <span class="link-name">Seção de Finanças (UGE)</span>
                                 <span class="link-desc">Adiantamentos, Contratações e PCA-E</span>
-                                <span class="link-path">13_secao_financas/</span>
+                                <span class="link-path">Sistema & Planilhas de Finanças</span>
                             </div>
                             <i class="fa-solid fa-chevron-right"></i>
                         </a>
@@ -2240,19 +2273,19 @@
                 <div class="todos-links-category">
                     <h3 class="category-title"><i class="fa-solid fa-chart-line"></i> Apps e Dashboards Auxiliares</h3>
                     <div class="links-list">
-                        <a href="https://cmmlinhamecanicaapp.netlify.app/" target="_blank" class="link-card special-green">
+                        <a href="https://cmmpaineldebordo.netlify.app/2_linhamec_cmm_app/dist/" target="_blank" class="link-card special-green">
                             <div class="link-info">
                                 <span class="link-name">Linha Mecânica App (Atendimento)</span>
                                 <span class="link-desc">Sistema de atendimento mecânico (Netlify)</span>
-                                <span class="link-path">https://cmmlinhamecanicaapp.netlify.app</span>
+                                <span class="link-path">2_linhamec_cmm_app/dist/</span>
                             </div>
                             <i class="fa-solid fa-up-right-from-square"></i>
                         </a>
-                        <a href="https://cmmalmox.netlify.app/" target="_blank" class="link-card special-green">
+                        <a href="https://cmmpaineldebordo.netlify.app/3_almox_cmm_dashboard/dist/" target="_blank" class="link-card special-green">
                             <div class="link-info">
                                 <span class="link-name">Almoxarifado Dashboard</span>
                                 <span class="link-desc">Painel de gerenciamento do Almoxarifado</span>
-                                <span class="link-path">https://cmmalmox.netlify.app</span>
+                                <span class="link-path">3_almox_cmm_dashboard/dist/</span>
                             </div>
                             <i class="fa-solid fa-up-right-from-square"></i>
                         </a>
@@ -2337,22 +2370,39 @@
             }
         });
 
-        // Ouvir cliques nos botões do modal para fechar e rolar suavemente até a seção
+        // Ouvir cliques nos botões do modal para abrir links correspondentes ou rolar até a seção
         const botoesRapidos = document.querySelectorAll('.btn-rapido[data-section]');
         botoesRapidos.forEach(btn => {
             btn.addEventListener('click', function() {
                 const sectionId = this.getAttribute('data-section');
                 painelRapido.classList.remove('active');
+                resetSistemaSearch();
                 
-                const targetSec = document.getElementById(sectionId);
-                if (targetSec) {
-                    targetSec.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                    // Adiciona um destaque visual temporário na seção selecionada
-                    targetSec.style.transition = 'outline 0.3s ease';
-                    targetSec.style.outline = '3px solid var(--color-green)';
-                    setTimeout(() => {
-                        targetSec.style.outline = 'none';
-                    }, 2000);
+                if (sectionId === 'secao-manutencao') {
+                    window.open('https://cmmpaineldebordo.netlify.app/8_produtividade_manfrota/', '_blank');
+                    window.open('https://docs.google.com/spreadsheets/d/1Ga5eQ_AhuOUkgTut2pfkzaZf_6cRcHHXg2ylLUvVQEs/edit?usp=sharing', '_blank');
+                } else if (sectionId === 'secao-contratos') {
+                    window.open('https://cmmpaineldebordo.netlify.app/10_secao_contratos/', '_blank');
+                    window.open('https://docs.google.com/spreadsheets/d/1ws6_IffVkDIK1N1KbuMQoNzjl0bYDL3AqHyd1z_ZW5g/edit?usp=sharing', '_blank');
+                } else if (sectionId === 'secao-sat') {
+                    window.open('https://satsystem-526637683536.us-east1.run.app/', '_blank');
+                    window.open('https://satsystem-526637683536.us-east1.run.app/dashboard-frota-SAT', '_blank');
+                    window.open('https://docs.google.com/spreadsheets/d/1dD0mgd0T3_QASjWhnDqmy84KQ17NLghydFbwq9rPQ0I/edit?usp=sharing', '_blank');
+                    window.open('https://docs.google.com/spreadsheets/d/1qfHFs3_1FxvGlEQyYTkSTmnfZyqGTpjF/edit?usp=sharing&ouid=112363702066529997763&rtpof=true&sd=true', '_blank');
+                } else if (sectionId === 'secao-uge') {
+                    window.open('https://cmmpaineldebordo.netlify.app/13_secao_financas/', '_blank');
+                    window.open('https://docs.google.com/spreadsheets/d/1JiKW5rjCPir2Qa0fj36pU0SFw0IFNPF_qArTuVA5joo/edit?usp=sharing', '_blank');
+                    window.open('https://docs.google.com/spreadsheets/d/1y5wWSUauJzoQTj-FQfcTjmd0SdREpS85lVKhmHR5-Go/edit?usp=drivesdk', '_blank');
+                } else {
+                    const targetSec = document.getElementById(sectionId);
+                    if (targetSec) {
+                        targetSec.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        targetSec.style.transition = 'outline 0.3s ease';
+                        targetSec.style.outline = '3px solid var(--color-green)';
+                        setTimeout(() => {
+                            targetSec.style.outline = 'none';
+                        }, 2000);
+                    }
                 }
             });
         });
@@ -2418,12 +2468,6 @@
         // Dados de busca para todas as seções e dashboards do webapp CMM
         const SISTEMA_LINKS = [
             {
-                title: "Página Inicial do Domínio",
-                url: "https://cmmpaineldebordo.netlify.app/",
-                desc: "Página de entrada principal do webapp",
-                keywords: ["inicio", "início", "entrada", "home", "principal", "raiz", "painel", "portal"]
-            },
-            {
                 title: "Painel de Bordo CMM (Principal)",
                 url: "https://cmmpaineldebordo.netlify.app/1_painel_bordo_cmm/",
                 desc: "Painel de gerenciamento de bordo CMM com resumo de frota e indicadores",
@@ -2431,20 +2475,23 @@
             },
             {
                 title: "Seção de Manutenção",
-                url: "https://cmmpaineldebordo.netlify.app/9_secao_manutencao/",
-                desc: "Controle de Linha 2 Rodas, 4 Rodas, Pesados, Sinalizadores, Grafismo, Técnica e Borracharia",
+                url: "https://cmmpaineldebordo.netlify.app/8_produtividade_manfrota/",
+                onclick: "window.open('https://cmmpaineldebordo.netlify.app/8_produtividade_manfrota/', '_blank'); window.open('https://docs.google.com/spreadsheets/d/1Ga5eQ_AhuOUkgTut2pfkzaZf_6cRcHHXg2ylLUvVQEs/edit?usp=sharing', '_blank')",
+                desc: "Controle de Linha 2 Rodas, 4 Rodas, Pesados, Sinalizadores, Grafismo, Técnica e Borracharia (Produtividade & Planilha)",
                 keywords: ["manutenção", "manutencao", "conserto", "oficina", "motos", "viaturas", "pesados", "sinalizadores", "grafismo", "técnica", "tecnica", "borracharia", "borracha", "pneu", "reparo"]
             },
             {
                 title: "Seção de Execução Contratual",
                 url: "https://cmmpaineldebordo.netlify.app/10_secao_contratos/",
-                desc: "Controle Geral de Contratos, ARP de Manutenção 2025-2026, Contratos de Aquisição de Frota",
+                onclick: "window.open('https://cmmpaineldebordo.netlify.app/10_secao_contratos/', '_blank'); window.open('https://docs.google.com/spreadsheets/d/1ws6_IffVkDIK1N1KbuMQoNzjl0bYDL3AqHyd1z_ZW5g/edit?usp=sharing', '_blank')",
+                desc: "Controle Geral de Contratos, ARP de Manutenção 2025-2026, Contratos de Aquisição de Frota (Sistema & Planilha)",
                 keywords: ["contrato", "contratos", "arp", "licitação", "licitacao", "aquisição", "aquisicao", "compra", "execução", "execucao", "jurídico", "firmado"]
             },
             {
                 title: "Seção de Apoio e Transporte",
-                url: "https://cmmpaineldebordo.netlify.app/11_secao_transporte/",
-                desc: "Mapa da SAT, Mudança de Categoria Classe C e D, Apoio e Logística de Viagens",
+                url: "https://satsystem-526637683536.us-east1.run.app/",
+                onclick: "window.open('https://satsystem-526637683536.us-east1.run.app/', '_blank'); window.open('https://satsystem-526637683536.us-east1.run.app/dashboard-frota-SAT', '_blank'); window.open('https://docs.google.com/spreadsheets/d/1dD0mgd0T3_QASjWhnDqmy84KQ17NLghydFbwq9rPQ0I/edit?usp=sharing', '_blank'); window.open('https://docs.google.com/spreadsheets/d/1qfHFs3_1FxvGlEQyYTkSTmnfZyqGTpjF/edit?usp=sharing&ouid=112363702066529997763&rtpof=true&sd=true', '_blank')",
+                desc: "Mapa da SAT, Mudança de Categoria Classe C e D, Apoio e Logística de Viagens (Sistemas & Planilhas)",
                 keywords: ["sat", "transporte", "apoio", "logística", "logistica", "mapa", "categoria", "habilitação", "habilitacao", "motorista", "viagem", "classe c", "classe d"]
             },
             {
@@ -2456,7 +2503,8 @@
             {
                 title: "Seção de Finanças (UGE)",
                 url: "https://cmmpaineldebordo.netlify.app/13_secao_financas/",
-                desc: "Adiantamentos, Contratações da Divisão de Finanças e PCA-E",
+                onclick: "window.open('https://cmmpaineldebordo.netlify.app/13_secao_financas/', '_blank'); window.open('https://docs.google.com/spreadsheets/d/1JiKW5rjCPir2Qa0fj36pU0SFw0IFNPF_qArTuVA5joo/edit?usp=sharing', '_blank'); window.open('https://docs.google.com/spreadsheets/d/1y5wWSUauJzoQTj-FQfcTjmd0SdREpS85lVKhmHR5-Go/edit?usp=drivesdk', '_blank')",
+                desc: "Adiantamentos, Contratações da Divisão de Finanças e PCA-E (Sistema & Planilhas)",
                 keywords: ["finanças", "financas", "uge", "dinheiro", "verba", "adiantamento", "adiantamentos", "contratação", "contratacoes", "pca-e", "orçamento", "orcamento", "custo", "pagamento"]
             },
             {
@@ -2497,14 +2545,14 @@
             },
             {
                 title: "Linha Mecânica App (Atendimento)",
-                url: "https://cmmlinhamecanicaapp.netlify.app/",
+                url: "https://cmmpaineldebordo.netlify.app/2_linhamec_cmm_app/dist/",
                 desc: "Sistema de atendimento e ordem de serviço (OS) da Linha Mecânica",
                 keywords: ["linha mecânica", "linha mecanica", "atendimento", "os", "ordem de serviço", "ordem de servico", "mecânico", "mecanico", "conserto", "oficina", "peças", "pecas"],
                 isSpecial: true
             },
             {
                 title: "Almoxarifado Dashboard",
-                url: "https://cmmalmox.netlify.app/",
+                url: "https://cmmpaineldebordo.netlify.app/3_almox_cmm_dashboard/dist/",
                 desc: "Painel de gerenciamento de estoque e materiais do Almoxarifado CMM",
                 keywords: ["almoxarifado", "almox", "estoque", "peças", "pecas", "entrada", "saída", "saida", "inventário", "inventario", "material"],
                 isSpecial: true
@@ -2622,12 +2670,19 @@
                     const cardClass = item.isSpecial ? 'search-result-item special-green' : 'search-result-item';
                     const iconClass = item.isSpecial ? 'fa-solid fa-up-right-from-square' : 'fa-solid fa-chevron-right';
                     
+                    let clickHandler = `href="${item.url}" target="_blank"`;
+                    let pathText = item.url;
+                    if (item.onclick) {
+                        clickHandler = `href="#" onclick="${item.onclick}; return false;"`;
+                        pathText = "Links Múltiplos";
+                    }
+                    
                     const itemHtml = `
-                        <a href="${item.url}" target="_blank" class="${cardClass}">
+                        <a ${clickHandler} class="${cardClass}">
                             <div class="link-info">
                                 <span class="link-name">${item.title}</span>
                                 <span class="link-desc">${item.desc}</span>
-                                <span class="link-path">${item.url}</span>
+                                <span class="link-path">${pathText}</span>
                             </div>
                             <i class="${iconClass} chevron"></i>
                         </a>
