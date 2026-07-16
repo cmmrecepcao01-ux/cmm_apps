@@ -1,0 +1,3517 @@
+[
+  {
+    "id": "sheet_2__BPChoq_MOTO_ESCOLTA_1",
+    "opm": "2º BPChoq",
+    "prefix": "MOTO ESCOLTA 1",
+    "type": "moto",
+    "driver": "",
+    "encarregado": "",
+    "checklist": {
+      "pintura": "Sim",
+      "novo_grafismo": "Sim",
+      "grafismo_geral": "Sim",
+      "sinais_sonoros": "Sim",
+      "calota_padrao": "Sim",
+      "luzes_farois": "Sim",
+      "mecanica_geral": "Sim"
+    },
+    "status": "Aprovado",
+    "hasResponse": false
+  },
+  {
+    "id": "sheet_2__BPChoq_MOTO_ESCOLTA_2",
+    "opm": "2º BPChoq",
+    "prefix": "MOTO ESCOLTA 2",
+    "type": "moto",
+    "driver": "",
+    "encarregado": "",
+    "checklist": {
+      "pintura": "Sim",
+      "novo_grafismo": "Sim",
+      "grafismo_geral": "Sim",
+      "sinais_sonoros": "Sim",
+      "calota_padrao": "Sim",
+      "luzes_farois": "Sim",
+      "mecanica_geral": "Sim"
+    },
+    "status": "Aprovado",
+    "hasResponse": false
+  },
+  {
+    "id": "sheet_2__BPChoq_MOTO_ESCOLTA_3",
+    "opm": "2º BPChoq",
+    "prefix": "MOTO ESCOLTA 3",
+    "type": "moto",
+    "driver": "",
+    "encarregado": "",
+    "checklist": {
+      "pintura": "Sim",
+      "novo_grafismo": "Sim",
+      "grafismo_geral": "Sim",
+      "sinais_sonoros": "Sim",
+      "calota_padrao": "Sim",
+      "luzes_farois": "Sim",
+      "mecanica_geral": "Sim"
+    },
+    "status": "Aprovado",
+    "hasResponse": false
+  },
+  {
+    "id": "sheet_CMM_JEEP_CMT",
+    "opm": "CMM",
+    "prefix": "JEEP CMT",
+    "type": "carro",
+    "driver": "",
+    "encarregado": "",
+    "checklist": {
+      "pintura": "Sim",
+      "novo_grafismo": "Sim",
+      "grafismo_geral": "Sim",
+      "sinais_sonoros": "Sim",
+      "calota_padrao": "Sim",
+      "luzes_farois": "Sim",
+      "mecanica_geral": "Sim"
+    },
+    "status": "Aprovado",
+    "hasResponse": false
+  },
+  {
+    "id": "sheet_CMM_HIST_RICA_1",
+    "opm": "CMM",
+    "prefix": "HISTÓRICA 1",
+    "type": "carro",
+    "driver": "",
+    "encarregado": "",
+    "checklist": {
+      "pintura": "Sim",
+      "novo_grafismo": "Sim",
+      "grafismo_geral": "Sim",
+      "sinais_sonoros": "Sim",
+      "calota_padrao": "Sim",
+      "luzes_farois": "Sim",
+      "mecanica_geral": "Sim"
+    },
+    "status": "Aprovado",
+    "hasResponse": false
+  },
+  {
+    "id": "sheet_CMM_HIST_RICA_2",
+    "opm": "CMM",
+    "prefix": "HISTÓRICA 2",
+    "type": "carro",
+    "driver": "",
+    "encarregado": "",
+    "checklist": {
+      "pintura": "Sim",
+      "novo_grafismo": "Sim",
+      "grafismo_geral": "Sim",
+      "sinais_sonoros": "Sim",
+      "calota_padrao": "Sim",
+      "luzes_farois": "Sim",
+      "mecanica_geral": "Sim"
+    },
+    "status": "Aprovado",
+    "hasResponse": false
+  },
+  {
+    "id": "sheet_CMM_HIST_RICA_3",
+    "opm": "CMM",
+    "prefix": "HISTÓRICA 3",
+    "type": "carro",
+    "driver": "",
+    "encarregado": "",
+    "checklist": {
+      "pintura": "Sim",
+      "novo_grafismo": "Sim",
+      "grafismo_geral": "Sim",
+      "sinais_sonoros": "Sim",
+      "calota_padrao": "Sim",
+      "luzes_farois": "Sim",
+      "mecanica_geral": "Sim"
+    },
+    "status": "Aprovado",
+    "hasResponse": false
+  },
+  {
+    "id": "sheet_CMM_HIST_RICA_4",
+    "opm": "CMM",
+    "prefix": "HISTÓRICA 4",
+    "type": "carro",
+    "driver": "",
+    "encarregado": "",
+    "checklist": {
+      "pintura": "Sim",
+      "novo_grafismo": "Sim",
+      "grafismo_geral": "Sim",
+      "sinais_sonoros": "Sim",
+      "calota_padrao": "Sim",
+      "luzes_farois": "Sim",
+      "mecanica_geral": "Sim"
+    },
+    "status": "Aprovado",
+    "hasResponse": false
+  },
+  {
+    "id": "sheet_CMM_HIST_RICA_5",
+    "opm": "CMM",
+    "prefix": "HISTÓRICA 5",
+    "type": "carro",
+    "driver": "",
+    "encarregado": "",
+    "checklist": {
+      "pintura": "Sim",
+      "novo_grafismo": "Sim",
+      "grafismo_geral": "Sim",
+      "sinais_sonoros": "Sim",
+      "calota_padrao": "Sim",
+      "luzes_farois": "Sim",
+      "mecanica_geral": "Sim"
+    },
+    "status": "Aprovado",
+    "hasResponse": false
+  },
+  {
+    "id": "sheet_CMM_HIST_RICA_6",
+    "opm": "CMM",
+    "prefix": "HISTÓRICA 6",
+    "type": "carro",
+    "driver": "",
+    "encarregado": "",
+    "checklist": {
+      "pintura": "Sim",
+      "novo_grafismo": "Sim",
+      "grafismo_geral": "Sim",
+      "sinais_sonoros": "Sim",
+      "calota_padrao": "Sim",
+      "luzes_farois": "Sim",
+      "mecanica_geral": "Sim"
+    },
+    "status": "Aprovado",
+    "hasResponse": false
+  },
+  {
+    "id": "sheet_2__BPChoq_MOTO_ROCAM_1__Cmt_",
+    "opm": "2º BPChoq",
+    "prefix": "MOTO ROCAM 1 (Cmt)",
+    "type": "moto",
+    "driver": "",
+    "encarregado": "",
+    "checklist": {
+      "pintura": "Sim",
+      "novo_grafismo": "Sim",
+      "grafismo_geral": "Sim",
+      "sinais_sonoros": "Sim",
+      "calota_padrao": "Sim",
+      "luzes_farois": "Sim",
+      "mecanica_geral": "Sim"
+    },
+    "status": "Aprovado",
+    "hasResponse": false
+  },
+  {
+    "id": "sheet_2__BPChoq_MOTO_ROCAM_2",
+    "opm": "2º BPChoq",
+    "prefix": "MOTO ROCAM 2",
+    "type": "moto",
+    "driver": "",
+    "encarregado": "",
+    "checklist": {
+      "pintura": "Sim",
+      "novo_grafismo": "Sim",
+      "grafismo_geral": "Sim",
+      "sinais_sonoros": "Sim",
+      "calota_padrao": "Sim",
+      "luzes_farois": "Sim",
+      "mecanica_geral": "Sim"
+    },
+    "status": "Aprovado",
+    "hasResponse": false
+  },
+  {
+    "id": "sheet_2__BPChoq_MOTO_ROCAM_3",
+    "opm": "2º BPChoq",
+    "prefix": "MOTO ROCAM 3",
+    "type": "moto",
+    "driver": "",
+    "encarregado": "",
+    "checklist": {
+      "pintura": "Sim",
+      "novo_grafismo": "Sim",
+      "grafismo_geral": "Sim",
+      "sinais_sonoros": "Sim",
+      "calota_padrao": "Sim",
+      "luzes_farois": "Sim",
+      "mecanica_geral": "Sim"
+    },
+    "status": "Aprovado",
+    "hasResponse": false
+  },
+  {
+    "id": "sheet_2__BPChoq_MOTO_ROCAM_4",
+    "opm": "2º BPChoq",
+    "prefix": "MOTO ROCAM 4",
+    "type": "moto",
+    "driver": "",
+    "encarregado": "",
+    "checklist": {
+      "pintura": "Sim",
+      "novo_grafismo": "Sim",
+      "grafismo_geral": "Sim",
+      "sinais_sonoros": "Sim",
+      "calota_padrao": "Sim",
+      "luzes_farois": "Sim",
+      "mecanica_geral": "Sim"
+    },
+    "status": "Aprovado",
+    "hasResponse": false
+  },
+  {
+    "id": "sheet_2__BPChoq_MOTO_ROCAM_5",
+    "opm": "2º BPChoq",
+    "prefix": "MOTO ROCAM 5",
+    "type": "moto",
+    "driver": "",
+    "encarregado": "",
+    "checklist": {
+      "pintura": "Sim",
+      "novo_grafismo": "Sim",
+      "grafismo_geral": "Sim",
+      "sinais_sonoros": "Sim",
+      "calota_padrao": "Sim",
+      "luzes_farois": "Sim",
+      "mecanica_geral": "Sim"
+    },
+    "status": "Aprovado",
+    "hasResponse": false
+  },
+  {
+    "id": "sheet_2__BPChoq_MOTO_ROCAM_6",
+    "opm": "2º BPChoq",
+    "prefix": "MOTO ROCAM 6",
+    "type": "moto",
+    "driver": "",
+    "encarregado": "",
+    "checklist": {
+      "pintura": "Sim",
+      "novo_grafismo": "Sim",
+      "grafismo_geral": "Sim",
+      "sinais_sonoros": "Sim",
+      "calota_padrao": "Sim",
+      "luzes_farois": "Sim",
+      "mecanica_geral": "Sim"
+    },
+    "status": "Aprovado",
+    "hasResponse": false
+  },
+  {
+    "id": "sheet_CPTRAN_MOTO_CPTRAN_1",
+    "opm": "CPTRAN",
+    "prefix": "MOTO CPTRAN 1",
+    "type": "moto",
+    "driver": "",
+    "encarregado": "",
+    "checklist": {
+      "pintura": "Sim",
+      "novo_grafismo": "Sim",
+      "grafismo_geral": "Sim",
+      "sinais_sonoros": "Sim",
+      "calota_padrao": "Sim",
+      "luzes_farois": "Sim",
+      "mecanica_geral": "Sim"
+    },
+    "status": "Aprovado",
+    "hasResponse": false
+  },
+  {
+    "id": "sheet_CPTRAN_MOTO_CPTRAN_2",
+    "opm": "CPTRAN",
+    "prefix": "MOTO CPTRAN 2",
+    "type": "moto",
+    "driver": "",
+    "encarregado": "",
+    "checklist": {
+      "pintura": "Sim",
+      "novo_grafismo": "Sim",
+      "grafismo_geral": "Sim",
+      "sinais_sonoros": "Sim",
+      "calota_padrao": "Sim",
+      "luzes_farois": "Sim",
+      "mecanica_geral": "Sim"
+    },
+    "status": "Aprovado",
+    "hasResponse": false
+  },
+  {
+    "id": "sheet_CPTRAN_MOTO_CPTRAN_3",
+    "opm": "CPTRAN",
+    "prefix": "MOTO CPTRAN 3",
+    "type": "moto",
+    "driver": "",
+    "encarregado": "",
+    "checklist": {
+      "pintura": "Sim",
+      "novo_grafismo": "Sim",
+      "grafismo_geral": "Sim",
+      "sinais_sonoros": "Sim",
+      "calota_padrao": "Sim",
+      "luzes_farois": "Sim",
+      "mecanica_geral": "Sim"
+    },
+    "status": "Aprovado",
+    "hasResponse": false
+  },
+  {
+    "id": "sheet_CPTRAN_MOTO_CPTRAN_4",
+    "opm": "CPTRAN",
+    "prefix": "MOTO CPTRAN 4",
+    "type": "moto",
+    "driver": "",
+    "encarregado": "",
+    "checklist": {
+      "pintura": "Sim",
+      "novo_grafismo": "Sim",
+      "grafismo_geral": "Sim",
+      "sinais_sonoros": "Sim",
+      "calota_padrao": "Sim",
+      "luzes_farois": "Sim",
+      "mecanica_geral": "Sim"
+    },
+    "status": "Aprovado",
+    "hasResponse": false
+  },
+  {
+    "id": "sheet_CPTRAN_MOTO_CPTRAN_5",
+    "opm": "CPTRAN",
+    "prefix": "MOTO CPTRAN 5",
+    "type": "moto",
+    "driver": "",
+    "encarregado": "",
+    "checklist": {
+      "pintura": "Sim",
+      "novo_grafismo": "Sim",
+      "grafismo_geral": "Sim",
+      "sinais_sonoros": "Sim",
+      "calota_padrao": "Sim",
+      "luzes_farois": "Sim",
+      "mecanica_geral": "Sim"
+    },
+    "status": "Aprovado",
+    "hasResponse": false
+  },
+  {
+    "id": "sheet_CPTRAN_MOTO_CPTRAN_6",
+    "opm": "CPTRAN",
+    "prefix": "MOTO CPTRAN 6",
+    "type": "moto",
+    "driver": "",
+    "encarregado": "",
+    "checklist": {
+      "pintura": "Sim",
+      "novo_grafismo": "Sim",
+      "grafismo_geral": "Sim",
+      "sinais_sonoros": "Sim",
+      "calota_padrao": "Sim",
+      "luzes_farois": "Sim",
+      "mecanica_geral": "Sim"
+    },
+    "status": "Aprovado",
+    "hasResponse": false
+  },
+  {
+    "id": "sheet_CPRV_MOTO_CPRV_1",
+    "opm": "CPRV",
+    "prefix": "MOTO CPRV 1",
+    "type": "moto",
+    "driver": "",
+    "encarregado": "",
+    "checklist": {
+      "pintura": "Sim",
+      "novo_grafismo": "Sim",
+      "grafismo_geral": "Sim",
+      "sinais_sonoros": "Sim",
+      "calota_padrao": "Sim",
+      "luzes_farois": "Sim",
+      "mecanica_geral": "Sim"
+    },
+    "status": "Aprovado",
+    "hasResponse": false
+  },
+  {
+    "id": "sheet_CPRV_MOTO_CPRV_2",
+    "opm": "CPRV",
+    "prefix": "MOTO CPRV 2",
+    "type": "moto",
+    "driver": "",
+    "encarregado": "",
+    "checklist": {
+      "pintura": "Sim",
+      "novo_grafismo": "Sim",
+      "grafismo_geral": "Sim",
+      "sinais_sonoros": "Sim",
+      "calota_padrao": "Sim",
+      "luzes_farois": "Sim",
+      "mecanica_geral": "Sim"
+    },
+    "status": "Aprovado",
+    "hasResponse": false
+  },
+  {
+    "id": "sheet_CPRV_MOTO_CPRV_3",
+    "opm": "CPRV",
+    "prefix": "MOTO CPRV 3",
+    "type": "moto",
+    "driver": "",
+    "encarregado": "",
+    "checklist": {
+      "pintura": "Sim",
+      "novo_grafismo": "Sim",
+      "grafismo_geral": "Sim",
+      "sinais_sonoros": "Sim",
+      "calota_padrao": "Sim",
+      "luzes_farois": "Sim",
+      "mecanica_geral": "Sim"
+    },
+    "status": "Aprovado",
+    "hasResponse": false
+  },
+  {
+    "id": "sheet_CPRV_MOTO_CPRV_4",
+    "opm": "CPRV",
+    "prefix": "MOTO CPRV 4",
+    "type": "moto",
+    "driver": "",
+    "encarregado": "",
+    "checklist": {
+      "pintura": "Sim",
+      "novo_grafismo": "Sim",
+      "grafismo_geral": "Sim",
+      "sinais_sonoros": "Sim",
+      "calota_padrao": "Sim",
+      "luzes_farois": "Sim",
+      "mecanica_geral": "Sim"
+    },
+    "status": "Aprovado",
+    "hasResponse": false
+  },
+  {
+    "id": "sheet_CPRV_MOTO_CPRV_5",
+    "opm": "CPRV",
+    "prefix": "MOTO CPRV 5",
+    "type": "moto",
+    "driver": "",
+    "encarregado": "",
+    "checklist": {
+      "pintura": "Sim",
+      "novo_grafismo": "Sim",
+      "grafismo_geral": "Sim",
+      "sinais_sonoros": "Sim",
+      "calota_padrao": "Sim",
+      "luzes_farois": "Sim",
+      "mecanica_geral": "Sim"
+    },
+    "status": "Aprovado",
+    "hasResponse": false
+  },
+  {
+    "id": "sheet_CPRV_MOTO_CPRV_6",
+    "opm": "CPRV",
+    "prefix": "MOTO CPRV 6",
+    "type": "moto",
+    "driver": "",
+    "encarregado": "",
+    "checklist": {
+      "pintura": "Sim",
+      "novo_grafismo": "Sim",
+      "grafismo_geral": "Sim",
+      "sinais_sonoros": "Sim",
+      "calota_padrao": "Sim",
+      "luzes_farois": "Sim",
+      "mecanica_geral": "Sim"
+    },
+    "status": "Aprovado",
+    "hasResponse": false
+  },
+  {
+    "id": "sheet_CPC_MOTO_CPC_1",
+    "opm": "CPC",
+    "prefix": "MOTO CPC 1",
+    "type": "moto",
+    "driver": "",
+    "encarregado": "",
+    "checklist": {
+      "pintura": "Sim",
+      "novo_grafismo": "Sim",
+      "grafismo_geral": "Sim",
+      "sinais_sonoros": "Sim",
+      "calota_padrao": "Sim",
+      "luzes_farois": "Sim",
+      "mecanica_geral": "Sim"
+    },
+    "status": "Aprovado",
+    "hasResponse": false
+  },
+  {
+    "id": "sheet_CPC_MOTO_CPC_2",
+    "opm": "CPC",
+    "prefix": "MOTO CPC 2",
+    "type": "moto",
+    "driver": "",
+    "encarregado": "",
+    "checklist": {
+      "pintura": "Sim",
+      "novo_grafismo": "Sim",
+      "grafismo_geral": "Sim",
+      "sinais_sonoros": "Sim",
+      "calota_padrao": "Sim",
+      "luzes_farois": "Sim",
+      "mecanica_geral": "Sim"
+    },
+    "status": "Aprovado",
+    "hasResponse": false
+  },
+  {
+    "id": "sheet_CPC_MOTO_CPC_3",
+    "opm": "CPC",
+    "prefix": "MOTO CPC 3",
+    "type": "moto",
+    "driver": "",
+    "encarregado": "",
+    "checklist": {
+      "pintura": "Sim",
+      "novo_grafismo": "Sim",
+      "grafismo_geral": "Sim",
+      "sinais_sonoros": "Sim",
+      "calota_padrao": "Sim",
+      "luzes_farois": "Sim",
+      "mecanica_geral": "Sim"
+    },
+    "status": "Aprovado",
+    "hasResponse": false
+  },
+  {
+    "id": "sheet_CPC_MOTO_CPC_4",
+    "opm": "CPC",
+    "prefix": "MOTO CPC 4",
+    "type": "moto",
+    "driver": "",
+    "encarregado": "",
+    "checklist": {
+      "pintura": "Sim",
+      "novo_grafismo": "Sim",
+      "grafismo_geral": "Sim",
+      "sinais_sonoros": "Sim",
+      "calota_padrao": "Sim",
+      "luzes_farois": "Sim",
+      "mecanica_geral": "Sim"
+    },
+    "status": "Aprovado",
+    "hasResponse": false
+  },
+  {
+    "id": "sheet_CPC_MOTO_CPC_5",
+    "opm": "CPC",
+    "prefix": "MOTO CPC 5",
+    "type": "moto",
+    "driver": "",
+    "encarregado": "",
+    "checklist": {
+      "pintura": "Sim",
+      "novo_grafismo": "Sim",
+      "grafismo_geral": "Sim",
+      "sinais_sonoros": "Sim",
+      "calota_padrao": "Sim",
+      "luzes_farois": "Sim",
+      "mecanica_geral": "Sim"
+    },
+    "status": "Aprovado",
+    "hasResponse": false
+  },
+  {
+    "id": "sheet_CPC_MOTO_CPC_6",
+    "opm": "CPC",
+    "prefix": "MOTO CPC 6",
+    "type": "moto",
+    "driver": "",
+    "encarregado": "",
+    "checklist": {
+      "pintura": "Sim",
+      "novo_grafismo": "Sim",
+      "grafismo_geral": "Sim",
+      "sinais_sonoros": "Sim",
+      "calota_padrao": "Sim",
+      "luzes_farois": "Sim",
+      "mecanica_geral": "Sim"
+    },
+    "status": "Aprovado",
+    "hasResponse": false
+  },
+  {
+    "id": "sheet_CPC_VTR_CPC_1",
+    "opm": "CPC",
+    "prefix": "VTR CPC 1",
+    "type": "carro",
+    "driver": "",
+    "encarregado": "",
+    "checklist": {
+      "pintura": "Sim",
+      "novo_grafismo": "Sim",
+      "grafismo_geral": "Sim",
+      "sinais_sonoros": "Sim",
+      "calota_padrao": "Sim",
+      "luzes_farois": "Sim",
+      "mecanica_geral": "Sim"
+    },
+    "status": "Aprovado",
+    "hasResponse": false
+  },
+  {
+    "id": "sheet_CPC_VTR_CPC_2",
+    "opm": "CPC",
+    "prefix": "VTR CPC 2",
+    "type": "carro",
+    "driver": "",
+    "encarregado": "",
+    "checklist": {
+      "pintura": "Sim",
+      "novo_grafismo": "Sim",
+      "grafismo_geral": "Sim",
+      "sinais_sonoros": "Sim",
+      "calota_padrao": "Sim",
+      "luzes_farois": "Sim",
+      "mecanica_geral": "Sim"
+    },
+    "status": "Aprovado",
+    "hasResponse": false
+  },
+  {
+    "id": "sheet_CPC_VTR_CPC_3",
+    "opm": "CPC",
+    "prefix": "VTR CPC 3",
+    "type": "carro",
+    "driver": "",
+    "encarregado": "",
+    "checklist": {
+      "pintura": "Sim",
+      "novo_grafismo": "Sim",
+      "grafismo_geral": "Sim",
+      "sinais_sonoros": "Sim",
+      "calota_padrao": "Sim",
+      "luzes_farois": "Sim",
+      "mecanica_geral": "Sim"
+    },
+    "status": "Aprovado",
+    "hasResponse": false
+  },
+  {
+    "id": "sheet_CPC_VTR_CPC_4",
+    "opm": "CPC",
+    "prefix": "VTR CPC 4",
+    "type": "carro",
+    "driver": "",
+    "encarregado": "",
+    "checklist": {
+      "pintura": "Sim",
+      "novo_grafismo": "Sim",
+      "grafismo_geral": "Sim",
+      "sinais_sonoros": "Sim",
+      "calota_padrao": "Sim",
+      "luzes_farois": "Sim",
+      "mecanica_geral": "Sim"
+    },
+    "status": "Aprovado",
+    "hasResponse": false
+  },
+  {
+    "id": "sheet_CPTRAN_VTR_CPTRAN_1",
+    "opm": "CPTRAN",
+    "prefix": "VTR CPTRAN 1",
+    "type": "carro",
+    "driver": "",
+    "encarregado": "",
+    "checklist": {
+      "pintura": "Sim",
+      "novo_grafismo": "Sim",
+      "grafismo_geral": "Sim",
+      "sinais_sonoros": "Sim",
+      "calota_padrao": "Sim",
+      "luzes_farois": "Sim",
+      "mecanica_geral": "Sim"
+    },
+    "status": "Aprovado",
+    "hasResponse": false
+  },
+  {
+    "id": "sheet_CPTRAN_VTR_CPTRAN_2",
+    "opm": "CPTRAN",
+    "prefix": "VTR CPTRAN 2",
+    "type": "carro",
+    "driver": "",
+    "encarregado": "",
+    "checklist": {
+      "pintura": "Sim",
+      "novo_grafismo": "Sim",
+      "grafismo_geral": "Sim",
+      "sinais_sonoros": "Sim",
+      "calota_padrao": "Sim",
+      "luzes_farois": "Sim",
+      "mecanica_geral": "Sim"
+    },
+    "status": "Aprovado",
+    "hasResponse": false
+  },
+  {
+    "id": "sheet_CPTRAN_VTR_CPTRAN_3",
+    "opm": "CPTRAN",
+    "prefix": "VTR CPTRAN 3",
+    "type": "carro",
+    "driver": "",
+    "encarregado": "",
+    "checklist": {
+      "pintura": "Sim",
+      "novo_grafismo": "Sim",
+      "grafismo_geral": "Sim",
+      "sinais_sonoros": "Sim",
+      "calota_padrao": "Sim",
+      "luzes_farois": "Sim",
+      "mecanica_geral": "Sim"
+    },
+    "status": "Aprovado",
+    "hasResponse": false
+  },
+  {
+    "id": "sheet_CPTRAN_VTR_CPTRAN_4",
+    "opm": "CPTRAN",
+    "prefix": "VTR CPTRAN 4",
+    "type": "carro",
+    "driver": "",
+    "encarregado": "",
+    "checklist": {
+      "pintura": "Sim",
+      "novo_grafismo": "Sim",
+      "grafismo_geral": "Sim",
+      "sinais_sonoros": "Sim",
+      "calota_padrao": "Sim",
+      "luzes_farois": "Sim",
+      "mecanica_geral": "Sim"
+    },
+    "status": "Aprovado",
+    "hasResponse": false
+  },
+  {
+    "id": "sheet_CPRV_VTR_CPRV_1",
+    "opm": "CPRV",
+    "prefix": "VTR CPRV 1",
+    "type": "carro",
+    "driver": "",
+    "encarregado": "",
+    "checklist": {
+      "pintura": "Sim",
+      "novo_grafismo": "Sim",
+      "grafismo_geral": "Sim",
+      "sinais_sonoros": "Sim",
+      "calota_padrao": "Sim",
+      "luzes_farois": "Sim",
+      "mecanica_geral": "Sim"
+    },
+    "status": "Aprovado",
+    "hasResponse": false
+  },
+  {
+    "id": "sheet_CPRV_VTR_CPRV_2",
+    "opm": "CPRV",
+    "prefix": "VTR CPRV 2",
+    "type": "carro",
+    "driver": "",
+    "encarregado": "",
+    "checklist": {
+      "pintura": "Sim",
+      "novo_grafismo": "Sim",
+      "grafismo_geral": "Sim",
+      "sinais_sonoros": "Sim",
+      "calota_padrao": "Sim",
+      "luzes_farois": "Sim",
+      "mecanica_geral": "Sim"
+    },
+    "status": "Aprovado",
+    "hasResponse": false
+  },
+  {
+    "id": "sheet_CPRV_VTR_CPRV_3",
+    "opm": "CPRV",
+    "prefix": "VTR CPRV 3",
+    "type": "carro",
+    "driver": "",
+    "encarregado": "",
+    "checklist": {
+      "pintura": "Sim",
+      "novo_grafismo": "Sim",
+      "grafismo_geral": "Sim",
+      "sinais_sonoros": "Sim",
+      "calota_padrao": "Sim",
+      "luzes_farois": "Sim",
+      "mecanica_geral": "Sim"
+    },
+    "status": "Aprovado",
+    "hasResponse": false
+  },
+  {
+    "id": "sheet_CPRV_VTR_CPRV_4",
+    "opm": "CPRV",
+    "prefix": "VTR CPRV 4",
+    "type": "carro",
+    "driver": "",
+    "encarregado": "",
+    "checklist": {
+      "pintura": "Sim",
+      "novo_grafismo": "Sim",
+      "grafismo_geral": "Sim",
+      "sinais_sonoros": "Sim",
+      "calota_padrao": "Sim",
+      "luzes_farois": "Sim",
+      "mecanica_geral": "Sim"
+    },
+    "status": "Aprovado",
+    "hasResponse": false
+  },
+  {
+    "id": "sheet_CPAmb_VTR_CPAmb_1",
+    "opm": "CPAmb",
+    "prefix": "VTR CPAmb 1",
+    "type": "carro",
+    "driver": "",
+    "encarregado": "",
+    "checklist": {
+      "pintura": "Sim",
+      "novo_grafismo": "Sim",
+      "grafismo_geral": "Sim",
+      "sinais_sonoros": "Sim",
+      "calota_padrao": "Sim",
+      "luzes_farois": "Sim",
+      "mecanica_geral": "Sim"
+    },
+    "status": "Aprovado",
+    "hasResponse": false
+  },
+  {
+    "id": "sheet_CPAmb_VTR_CPAmb_2",
+    "opm": "CPAmb",
+    "prefix": "VTR CPAmb 2",
+    "type": "carro",
+    "driver": "",
+    "encarregado": "",
+    "checklist": {
+      "pintura": "Sim",
+      "novo_grafismo": "Sim",
+      "grafismo_geral": "Sim",
+      "sinais_sonoros": "Sim",
+      "calota_padrao": "Sim",
+      "luzes_farois": "Sim",
+      "mecanica_geral": "Sim"
+    },
+    "status": "Aprovado",
+    "hasResponse": false
+  },
+  {
+    "id": "sheet_CPAmb_VTR_CPAmb_3",
+    "opm": "CPAmb",
+    "prefix": "VTR CPAmb 3",
+    "type": "carro",
+    "driver": "",
+    "encarregado": "",
+    "checklist": {
+      "pintura": "Sim",
+      "novo_grafismo": "Sim",
+      "grafismo_geral": "Sim",
+      "sinais_sonoros": "Sim",
+      "calota_padrao": "Sim",
+      "luzes_farois": "Sim",
+      "mecanica_geral": "Sim"
+    },
+    "status": "Aprovado",
+    "hasResponse": false
+  },
+  {
+    "id": "sheet_CPAmb_VTR_CPAmb_4",
+    "opm": "CPAmb",
+    "prefix": "VTR CPAmb 4",
+    "type": "carro",
+    "driver": "",
+    "encarregado": "",
+    "checklist": {
+      "pintura": "Sim",
+      "novo_grafismo": "Sim",
+      "grafismo_geral": "Sim",
+      "sinais_sonoros": "Sim",
+      "calota_padrao": "Sim",
+      "luzes_farois": "Sim",
+      "mecanica_geral": "Sim"
+    },
+    "status": "Aprovado",
+    "hasResponse": false
+  },
+  {
+    "id": "sheet_Corregedoria_VTR_PDO_1",
+    "opm": "Corregedoria",
+    "prefix": "VTR PDO 1",
+    "type": "carro",
+    "driver": "",
+    "encarregado": "",
+    "checklist": {
+      "pintura": "Sim",
+      "novo_grafismo": "Sim",
+      "grafismo_geral": "Sim",
+      "sinais_sonoros": "Sim",
+      "calota_padrao": "Sim",
+      "luzes_farois": "Sim",
+      "mecanica_geral": "Sim"
+    },
+    "status": "Aprovado",
+    "hasResponse": false
+  },
+  {
+    "id": "sheet_Corregedoria_VTR_PDO_2",
+    "opm": "Corregedoria",
+    "prefix": "VTR PDO 2",
+    "type": "carro",
+    "driver": "",
+    "encarregado": "",
+    "checklist": {
+      "pintura": "Sim",
+      "novo_grafismo": "Sim",
+      "grafismo_geral": "Sim",
+      "sinais_sonoros": "Sim",
+      "calota_padrao": "Sim",
+      "luzes_farois": "Sim",
+      "mecanica_geral": "Sim"
+    },
+    "status": "Aprovado",
+    "hasResponse": false
+  },
+  {
+    "id": "sheet_Corregedoria_VTR_PDO_3",
+    "opm": "Corregedoria",
+    "prefix": "VTR PDO 3",
+    "type": "carro",
+    "driver": "",
+    "encarregado": "",
+    "checklist": {
+      "pintura": "Sim",
+      "novo_grafismo": "Sim",
+      "grafismo_geral": "Sim",
+      "sinais_sonoros": "Sim",
+      "calota_padrao": "Sim",
+      "luzes_farois": "Sim",
+      "mecanica_geral": "Sim"
+    },
+    "status": "Aprovado",
+    "hasResponse": false
+  },
+  {
+    "id": "sheet_Corregedoria_VTR_PDO_4",
+    "opm": "Corregedoria",
+    "prefix": "VTR PDO 4",
+    "type": "carro",
+    "driver": "",
+    "encarregado": "",
+    "checklist": {
+      "pintura": "Sim",
+      "novo_grafismo": "Sim",
+      "grafismo_geral": "Sim",
+      "sinais_sonoros": "Sim",
+      "calota_padrao": "Sim",
+      "luzes_farois": "Sim",
+      "mecanica_geral": "Sim"
+    },
+    "status": "Aprovado",
+    "hasResponse": false
+  },
+  {
+    "id": "sheet_1__BPChoq_VTR_ROTA_1",
+    "opm": "1º BPChoq",
+    "prefix": "VTR ROTA 1",
+    "type": "carro",
+    "driver": "",
+    "encarregado": "",
+    "checklist": {
+      "pintura": "Sim",
+      "novo_grafismo": "Sim",
+      "grafismo_geral": "Sim",
+      "sinais_sonoros": "Sim",
+      "calota_padrao": "Sim",
+      "luzes_farois": "Sim",
+      "mecanica_geral": "Sim"
+    },
+    "status": "Aprovado",
+    "hasResponse": false
+  },
+  {
+    "id": "sheet_1__BPChoq_VTR_ROTA_2",
+    "opm": "1º BPChoq",
+    "prefix": "VTR ROTA 2",
+    "type": "carro",
+    "driver": "",
+    "encarregado": "",
+    "checklist": {
+      "pintura": "Sim",
+      "novo_grafismo": "Sim",
+      "grafismo_geral": "Sim",
+      "sinais_sonoros": "Sim",
+      "calota_padrao": "Sim",
+      "luzes_farois": "Sim",
+      "mecanica_geral": "Sim"
+    },
+    "status": "Aprovado",
+    "hasResponse": false
+  },
+  {
+    "id": "sheet_1__BPChoq_VTR_ROTA_3",
+    "opm": "1º BPChoq",
+    "prefix": "VTR ROTA 3",
+    "type": "carro",
+    "driver": "",
+    "encarregado": "",
+    "checklist": {
+      "pintura": "Sim",
+      "novo_grafismo": "Sim",
+      "grafismo_geral": "Sim",
+      "sinais_sonoros": "Sim",
+      "calota_padrao": "Sim",
+      "luzes_farois": "Sim",
+      "mecanica_geral": "Sim"
+    },
+    "status": "Aprovado",
+    "hasResponse": false
+  },
+  {
+    "id": "sheet_1__BPChoq_VTR_ROTA_4",
+    "opm": "1º BPChoq",
+    "prefix": "VTR ROTA 4",
+    "type": "carro",
+    "driver": "",
+    "encarregado": "",
+    "checklist": {
+      "pintura": "Sim",
+      "novo_grafismo": "Sim",
+      "grafismo_geral": "Sim",
+      "sinais_sonoros": "Sim",
+      "calota_padrao": "Sim",
+      "luzes_farois": "Sim",
+      "mecanica_geral": "Sim"
+    },
+    "status": "Aprovado",
+    "hasResponse": false
+  },
+  {
+    "id": "sheet_3__BPChoq_HILUX_1",
+    "opm": "3º BPChoq",
+    "prefix": "HILUX 1",
+    "type": "carro",
+    "driver": "",
+    "encarregado": "",
+    "checklist": {
+      "pintura": "Sim",
+      "novo_grafismo": "Sim",
+      "grafismo_geral": "Sim",
+      "sinais_sonoros": "Sim",
+      "calota_padrao": "Sim",
+      "luzes_farois": "Sim",
+      "mecanica_geral": "Sim"
+    },
+    "status": "Aprovado",
+    "hasResponse": false
+  },
+  {
+    "id": "sheet_3__BPChoq_HILUX_2",
+    "opm": "3º BPChoq",
+    "prefix": "HILUX 2",
+    "type": "carro",
+    "driver": "",
+    "encarregado": "",
+    "checklist": {
+      "pintura": "Sim",
+      "novo_grafismo": "Sim",
+      "grafismo_geral": "Sim",
+      "sinais_sonoros": "Sim",
+      "calota_padrao": "Sim",
+      "luzes_farois": "Sim",
+      "mecanica_geral": "Sim"
+    },
+    "status": "Aprovado",
+    "hasResponse": false
+  },
+  {
+    "id": "sheet_3__BPChoq_VLA",
+    "opm": "3º BPChoq",
+    "prefix": "VLA",
+    "type": "carro",
+    "driver": "",
+    "encarregado": "",
+    "checklist": {
+      "pintura": "Sim",
+      "novo_grafismo": "Sim",
+      "grafismo_geral": "Sim",
+      "sinais_sonoros": "Sim",
+      "calota_padrao": "Sim",
+      "luzes_farois": "Sim",
+      "mecanica_geral": "Sim"
+    },
+    "status": "Aprovado",
+    "hasResponse": false
+  },
+  {
+    "id": "sheet_3__BPChoq_GUARDIER",
+    "opm": "3º BPChoq",
+    "prefix": "GUARDIER",
+    "type": "carro",
+    "driver": "",
+    "encarregado": "",
+    "checklist": {
+      "pintura": "Sim",
+      "novo_grafismo": "Sim",
+      "grafismo_geral": "Sim",
+      "sinais_sonoros": "Sim",
+      "calota_padrao": "Sim",
+      "luzes_farois": "Sim",
+      "mecanica_geral": "Sim"
+    },
+    "status": "Aprovado",
+    "hasResponse": false
+  },
+  {
+    "id": "sheet_4__BPChoq_VTR_GATE_1",
+    "opm": "4º BPChoq",
+    "prefix": "VTR GATE 1",
+    "type": "carro",
+    "driver": "",
+    "encarregado": "",
+    "checklist": {
+      "pintura": "Sim",
+      "novo_grafismo": "Sim",
+      "grafismo_geral": "Sim",
+      "sinais_sonoros": "Sim",
+      "calota_padrao": "Sim",
+      "luzes_farois": "Sim",
+      "mecanica_geral": "Sim"
+    },
+    "status": "Aprovado",
+    "hasResponse": false
+  },
+  {
+    "id": "sheet_4__BPChoq_VTR_GATE_2",
+    "opm": "4º BPChoq",
+    "prefix": "VTR GATE 2",
+    "type": "carro",
+    "driver": "",
+    "encarregado": "",
+    "checklist": {
+      "pintura": "Sim",
+      "novo_grafismo": "Sim",
+      "grafismo_geral": "Sim",
+      "sinais_sonoros": "Sim",
+      "calota_padrao": "Sim",
+      "luzes_farois": "Sim",
+      "mecanica_geral": "Sim"
+    },
+    "status": "Aprovado",
+    "hasResponse": false
+  },
+  {
+    "id": "sheet_4__BPChoq_VTR_COE_1",
+    "opm": "4º BPChoq",
+    "prefix": "VTR COE 1",
+    "type": "carro",
+    "driver": "",
+    "encarregado": "",
+    "checklist": {
+      "pintura": "Sim",
+      "novo_grafismo": "Sim",
+      "grafismo_geral": "Sim",
+      "sinais_sonoros": "Sim",
+      "calota_padrao": "Sim",
+      "luzes_farois": "Sim",
+      "mecanica_geral": "Sim"
+    },
+    "status": "Aprovado",
+    "hasResponse": false
+  },
+  {
+    "id": "sheet_4__BPChoq_VTR_COE_2",
+    "opm": "4º BPChoq",
+    "prefix": "VTR COE 2",
+    "type": "carro",
+    "driver": "",
+    "encarregado": "",
+    "checklist": {
+      "pintura": "Sim",
+      "novo_grafismo": "Sim",
+      "grafismo_geral": "Sim",
+      "sinais_sonoros": "Sim",
+      "calota_padrao": "Sim",
+      "luzes_farois": "Sim",
+      "mecanica_geral": "Sim"
+    },
+    "status": "Aprovado",
+    "hasResponse": false
+  },
+  {
+    "id": "sheet_5__BPChoq_VTR_CANIL_1",
+    "opm": "5º BPChoq",
+    "prefix": "VTR CANIL 1",
+    "type": "carro",
+    "driver": "",
+    "encarregado": "",
+    "checklist": {
+      "pintura": "Sim",
+      "novo_grafismo": "Sim",
+      "grafismo_geral": "Sim",
+      "sinais_sonoros": "Sim",
+      "calota_padrao": "Sim",
+      "luzes_farois": "Sim",
+      "mecanica_geral": "Sim"
+    },
+    "status": "Aprovado",
+    "hasResponse": false
+  },
+  {
+    "id": "sheet_5__BPChoq_VTR_CANIL_2",
+    "opm": "5º BPChoq",
+    "prefix": "VTR CANIL 2",
+    "type": "carro",
+    "driver": "",
+    "encarregado": "",
+    "checklist": {
+      "pintura": "Sim",
+      "novo_grafismo": "Sim",
+      "grafismo_geral": "Sim",
+      "sinais_sonoros": "Sim",
+      "calota_padrao": "Sim",
+      "luzes_farois": "Sim",
+      "mecanica_geral": "Sim"
+    },
+    "status": "Aprovado",
+    "hasResponse": false
+  },
+  {
+    "id": "sheet_RPMon_JEEP_BIGA",
+    "opm": "RPMon",
+    "prefix": "JEEP BIGA",
+    "type": "carro",
+    "driver": "",
+    "encarregado": "",
+    "checklist": {
+      "pintura": "Sim",
+      "novo_grafismo": "Sim",
+      "grafismo_geral": "Sim",
+      "sinais_sonoros": "Sim",
+      "calota_padrao": "Sim",
+      "luzes_farois": "Sim",
+      "mecanica_geral": "Sim"
+    },
+    "status": "Aprovado",
+    "hasResponse": false
+  },
+  {
+    "id": "sheet_CCB_MOB_1",
+    "opm": "CCB",
+    "prefix": "MOB 1",
+    "type": "carro",
+    "driver": "",
+    "encarregado": "",
+    "checklist": {
+      "pintura": "Sim",
+      "novo_grafismo": "Sim",
+      "grafismo_geral": "Sim",
+      "sinais_sonoros": "Sim",
+      "calota_padrao": "Sim",
+      "luzes_farois": "Sim",
+      "mecanica_geral": "Sim"
+    },
+    "status": "Aprovado",
+    "hasResponse": false
+  },
+  {
+    "id": "sheet_CCB_MOB_2",
+    "opm": "CCB",
+    "prefix": "MOB 2",
+    "type": "carro",
+    "driver": "",
+    "encarregado": "",
+    "checklist": {
+      "pintura": "Sim",
+      "novo_grafismo": "Sim",
+      "grafismo_geral": "Sim",
+      "sinais_sonoros": "Sim",
+      "calota_padrao": "Sim",
+      "luzes_farois": "Sim",
+      "mecanica_geral": "Sim"
+    },
+    "status": "Aprovado",
+    "hasResponse": false
+  },
+  {
+    "id": "sheet_CCB_AC",
+    "opm": "CCB",
+    "prefix": "AC",
+    "type": "carro",
+    "driver": "",
+    "encarregado": "",
+    "checklist": {
+      "pintura": "Sim",
+      "novo_grafismo": "Sim",
+      "grafismo_geral": "Sim",
+      "sinais_sonoros": "Sim",
+      "calota_padrao": "Sim",
+      "luzes_farois": "Sim",
+      "mecanica_geral": "Sim"
+    },
+    "status": "Aprovado",
+    "hasResponse": false
+  },
+  {
+    "id": "sheet_CCB_UR",
+    "opm": "CCB",
+    "prefix": "UR",
+    "type": "carro",
+    "driver": "",
+    "encarregado": "",
+    "checklist": {
+      "pintura": "Sim",
+      "novo_grafismo": "Sim",
+      "grafismo_geral": "Sim",
+      "sinais_sonoros": "Sim",
+      "calota_padrao": "Sim",
+      "luzes_farois": "Sim",
+      "mecanica_geral": "Sim"
+    },
+    "status": "Aprovado",
+    "hasResponse": false
+  },
+  {
+    "id": "sheet_CCB_CO_SICOE",
+    "opm": "CCB",
+    "prefix": "CO SICOE",
+    "type": "carro",
+    "driver": "",
+    "encarregado": "",
+    "checklist": {
+      "pintura": "Sim",
+      "novo_grafismo": "Sim",
+      "grafismo_geral": "Sim",
+      "sinais_sonoros": "Sim",
+      "calota_padrao": "Sim",
+      "luzes_farois": "Sim",
+      "mecanica_geral": "Sim"
+    },
+    "status": "Aprovado",
+    "hasResponse": false
+  },
+  {
+    "id": "sheet_CCB_ABSR",
+    "opm": "CCB",
+    "prefix": "ABSR",
+    "type": "carro",
+    "driver": "",
+    "encarregado": "",
+    "checklist": {
+      "pintura": "Sim",
+      "novo_grafismo": "Sim",
+      "grafismo_geral": "Sim",
+      "sinais_sonoros": "Sim",
+      "calota_padrao": "Sim",
+      "luzes_farois": "Sim",
+      "mecanica_geral": "Sim"
+    },
+    "status": "Aprovado",
+    "hasResponse": false
+  },
+  {
+    "id": "sheet_CCB_AB",
+    "opm": "CCB",
+    "prefix": "AB",
+    "type": "carro",
+    "driver": "",
+    "encarregado": "",
+    "checklist": {
+      "pintura": "Sim",
+      "novo_grafismo": "Sim",
+      "grafismo_geral": "Sim",
+      "sinais_sonoros": "Sim",
+      "calota_padrao": "Sim",
+      "luzes_farois": "Sim",
+      "mecanica_geral": "Sim"
+    },
+    "status": "Aprovado",
+    "hasResponse": false
+  },
+  {
+    "id": "sheet_CCB_ABE",
+    "opm": "CCB",
+    "prefix": "ABE",
+    "type": "carro",
+    "driver": "",
+    "encarregado": "",
+    "checklist": {
+      "pintura": "Sim",
+      "novo_grafismo": "Sim",
+      "grafismo_geral": "Sim",
+      "sinais_sonoros": "Sim",
+      "calota_padrao": "Sim",
+      "luzes_farois": "Sim",
+      "mecanica_geral": "Sim"
+    },
+    "status": "Aprovado",
+    "hasResponse": false
+  },
+  {
+    "id": "sheet_CCB_AE",
+    "opm": "CCB",
+    "prefix": "AE",
+    "type": "carro",
+    "driver": "",
+    "encarregado": "",
+    "checklist": {
+      "pintura": "Sim",
+      "novo_grafismo": "Sim",
+      "grafismo_geral": "Sim",
+      "sinais_sonoros": "Sim",
+      "calota_padrao": "Sim",
+      "luzes_farois": "Sim",
+      "mecanica_geral": "Sim"
+    },
+    "status": "Aprovado",
+    "hasResponse": false
+  },
+  {
+    "id": "sheet_CCB_SK",
+    "opm": "CCB",
+    "prefix": "SK",
+    "type": "carro",
+    "driver": "",
+    "encarregado": "",
+    "checklist": {
+      "pintura": "Sim",
+      "novo_grafismo": "Sim",
+      "grafismo_geral": "Sim",
+      "sinais_sonoros": "Sim",
+      "calota_padrao": "Sim",
+      "luzes_farois": "Sim",
+      "mecanica_geral": "Sim"
+    },
+    "status": "Aprovado",
+    "hasResponse": false
+  },
+  {
+    "id": "sheet_CCB_ASE",
+    "opm": "CCB",
+    "prefix": "ASE",
+    "type": "carro",
+    "driver": "",
+    "encarregado": "",
+    "checklist": {
+      "pintura": "Sim",
+      "novo_grafismo": "Sim",
+      "grafismo_geral": "Sim",
+      "sinais_sonoros": "Sim",
+      "calota_padrao": "Sim",
+      "luzes_farois": "Sim",
+      "mecanica_geral": "Sim"
+    },
+    "status": "Aprovado",
+    "hasResponse": false
+  },
+  {
+    "id": "sheet_CCB_PP",
+    "opm": "CCB",
+    "prefix": "PP",
+    "type": "carro",
+    "driver": "",
+    "encarregado": "",
+    "checklist": {
+      "pintura": "Sim",
+      "novo_grafismo": "Sim",
+      "grafismo_geral": "Sim",
+      "sinais_sonoros": "Sim",
+      "calota_padrao": "Sim",
+      "luzes_farois": "Sim",
+      "mecanica_geral": "Sim"
+    },
+    "status": "Aprovado",
+    "hasResponse": false
+  },
+  {
+    "id": "sheet_Defesa_Civil_VTR_DEFESA_CIVIL_1",
+    "opm": "Defesa Civil",
+    "prefix": "VTR DEFESA CIVIL 1",
+    "type": "carro",
+    "driver": "",
+    "encarregado": "",
+    "checklist": {
+      "pintura": "Sim",
+      "novo_grafismo": "Sim",
+      "grafismo_geral": "Sim",
+      "sinais_sonoros": "Sim",
+      "calota_padrao": "Sim",
+      "luzes_farois": "Sim",
+      "mecanica_geral": "Sim"
+    },
+    "status": "Aprovado",
+    "hasResponse": false
+  },
+  {
+    "id": "sheet_Defesa_Civil_VTR_DEFESA_CIVIL_2",
+    "opm": "Defesa Civil",
+    "prefix": "VTR DEFESA CIVIL 2",
+    "type": "carro",
+    "driver": "",
+    "encarregado": "",
+    "checklist": {
+      "pintura": "Sim",
+      "novo_grafismo": "Sim",
+      "grafismo_geral": "Sim",
+      "sinais_sonoros": "Sim",
+      "calota_padrao": "Sim",
+      "luzes_farois": "Sim",
+      "mecanica_geral": "Sim"
+    },
+    "status": "Aprovado",
+    "hasResponse": false
+  },
+  {
+    "id": "sheet_CPTRAN_MOTO_CPTran_1",
+    "opm": "CPTRAN",
+    "prefix": "MOTO CPTran 1",
+    "type": "moto",
+    "driver": "",
+    "encarregado": "",
+    "checklist": {
+      "pintura": "Sim",
+      "novo_grafismo": "Sim",
+      "grafismo_geral": "Sim",
+      "sinais_sonoros": "Sim",
+      "calota_padrao": "Sim",
+      "luzes_farois": "Sim",
+      "mecanica_geral": "Sim"
+    },
+    "status": "Aprovado",
+    "hasResponse": false
+  },
+  {
+    "id": "sheet_CPTRAN_MOTO_CPTran_3",
+    "opm": "CPTRAN",
+    "prefix": "MOTO CPTran 3",
+    "type": "moto",
+    "driver": "",
+    "encarregado": "",
+    "checklist": {
+      "pintura": "Sim",
+      "novo_grafismo": "Sim",
+      "grafismo_geral": "Sim",
+      "sinais_sonoros": "Sim",
+      "calota_padrao": "Sim",
+      "luzes_farois": "Sim",
+      "mecanica_geral": "Sim"
+    },
+    "status": "Aprovado",
+    "hasResponse": false
+  },
+  {
+    "id": "sheet_CMM_JEEP_Cmt",
+    "opm": "CMM",
+    "prefix": "JEEP Cmt",
+    "type": "carro",
+    "driver": "2º Sgt PM Murilo",
+    "encarregado": "",
+    "checklist": {
+      "pintura": "Sim",
+      "novo_grafismo": "Sim",
+      "grafismo_geral": "Sim",
+      "sinais_sonoros": "Sim",
+      "calota_padrao": "Sim",
+      "luzes_farois": "Sim",
+      "mecanica_geral": "Sim"
+    },
+    "status": "Aprovado",
+    "hasResponse": false
+  },
+  {
+    "id": "sheet_2__BPChoq_ESCOLTA2",
+    "opm": "2º BPChoq",
+    "prefix": "ESCOLTA2",
+    "type": "moto",
+    "driver": "Cb Guilly",
+    "encarregado": "",
+    "checklist": {
+      "pintura": "Sim",
+      "novo_grafismo": "Sim",
+      "grafismo_geral": "Sim",
+      "sinais_sonoros": "Sim",
+      "calota_padrao": "Sim",
+      "luzes_farois": "Sim",
+      "mecanica_geral": "Sim"
+    },
+    "status": "Aprovado",
+    "hasResponse": false
+  },
+  {
+    "id": "sheet_CMM_JEEP_CMT_CMM",
+    "opm": "CMM",
+    "prefix": "JEEP CMT CMM",
+    "type": "carro",
+    "driver": "CB ESCAMES",
+    "encarregado": "Ten Cel Demetrius",
+    "checklist": {
+      "pintura": "Sim",
+      "novo_grafismo": "Sim",
+      "grafismo_geral": "Sim",
+      "sinais_sonoros": "Sim",
+      "calota_padrao": "Sim",
+      "luzes_farois": "Sim",
+      "mecanica_geral": "Sim"
+    },
+    "status": "Aprovado",
+    "hasResponse": false
+  },
+  {
+    "id": "sheet_2__BPChoq_ESCOLTA1",
+    "opm": "2º BPChoq",
+    "prefix": "ESCOLTA1",
+    "type": "moto",
+    "driver": "",
+    "encarregado": "",
+    "checklist": {
+      "pintura": "Sim",
+      "novo_grafismo": "Sim",
+      "grafismo_geral": "Sim",
+      "sinais_sonoros": "Sim",
+      "calota_padrao": "Sim",
+      "luzes_farois": "Sim",
+      "mecanica_geral": "Sim"
+    },
+    "status": "Aprovado",
+    "hasResponse": false
+  },
+  {
+    "id": "sheet_2__BPChoq_ESCOLTA3",
+    "opm": "2º BPChoq",
+    "prefix": "ESCOLTA3",
+    "type": "moto",
+    "driver": "",
+    "encarregado": "",
+    "checklist": {
+      "pintura": "Sim",
+      "novo_grafismo": "Sim",
+      "grafismo_geral": "Sim",
+      "sinais_sonoros": "Sim",
+      "calota_padrao": "Sim",
+      "luzes_farois": "Sim",
+      "mecanica_geral": "Sim"
+    },
+    "status": "Aprovado",
+    "hasResponse": false
+  },
+  {
+    "id": "sheet_CMM_HISTORICA_7",
+    "opm": "CMM",
+    "prefix": "HISTORICA 7",
+    "type": "carro",
+    "driver": "",
+    "encarregado": "",
+    "checklist": {
+      "pintura": "Sim",
+      "novo_grafismo": "Sim",
+      "grafismo_geral": "Sim",
+      "sinais_sonoros": "Sim",
+      "calota_padrao": "Sim",
+      "luzes_farois": "Sim",
+      "mecanica_geral": "Sim"
+    },
+    "status": "Aprovado",
+    "hasResponse": false
+  },
+  {
+    "id": "sheet_CMM_HISTORICA_8",
+    "opm": "CMM",
+    "prefix": "HISTORICA 8",
+    "type": "carro",
+    "driver": "",
+    "encarregado": "",
+    "checklist": {
+      "pintura": "Sim",
+      "novo_grafismo": "Sim",
+      "grafismo_geral": "Sim",
+      "sinais_sonoros": "Sim",
+      "calota_padrao": "Sim",
+      "luzes_farois": "Sim",
+      "mecanica_geral": "Sim"
+    },
+    "status": "Aprovado",
+    "hasResponse": false
+  },
+  {
+    "id": "sheet_CMM_HISTORICA_9",
+    "opm": "CMM",
+    "prefix": "HISTORICA 9",
+    "type": "carro",
+    "driver": "",
+    "encarregado": "",
+    "checklist": {
+      "pintura": "Sim",
+      "novo_grafismo": "Sim",
+      "grafismo_geral": "Sim",
+      "sinais_sonoros": "Sim",
+      "calota_padrao": "Sim",
+      "luzes_farois": "Sim",
+      "mecanica_geral": "Sim"
+    },
+    "status": "Aprovado",
+    "hasResponse": false
+  },
+  {
+    "id": "sheet_CMM_HISTORICA_10",
+    "opm": "CMM",
+    "prefix": "HISTORICA 10",
+    "type": "carro",
+    "driver": "",
+    "encarregado": "",
+    "checklist": {
+      "pintura": "Sim",
+      "novo_grafismo": "Sim",
+      "grafismo_geral": "Sim",
+      "sinais_sonoros": "Sim",
+      "calota_padrao": "Sim",
+      "luzes_farois": "Sim",
+      "mecanica_geral": "Sim"
+    },
+    "status": "Aprovado",
+    "hasResponse": false
+  },
+  {
+    "id": "sheet_CPAmb_A_03108",
+    "opm": "CPAmb",
+    "prefix": "A-03108",
+    "type": "carro",
+    "driver": "",
+    "encarregado": "",
+    "checklist": {
+      "pintura": "Sim",
+      "novo_grafismo": "Sim",
+      "grafismo_geral": "Sim",
+      "sinais_sonoros": "Sim",
+      "calota_padrao": "Sim",
+      "luzes_farois": "Sim",
+      "mecanica_geral": "Sim"
+    },
+    "status": "Aprovado",
+    "hasResponse": true
+  },
+  {
+    "id": "sheet_CPAmb_A_03504",
+    "opm": "CPAmb",
+    "prefix": "A-03504",
+    "type": "carro",
+    "driver": "",
+    "encarregado": "",
+    "checklist": {
+      "pintura": "Sim",
+      "novo_grafismo": "Sim",
+      "grafismo_geral": "Sim",
+      "sinais_sonoros": "Sim",
+      "calota_padrao": "Sim",
+      "luzes_farois": "Sim",
+      "mecanica_geral": "Sim"
+    },
+    "status": "Aprovado",
+    "hasResponse": true
+  },
+  {
+    "id": "sheet_CPAmb_A_01214",
+    "opm": "CPAmb",
+    "prefix": "A-01214",
+    "type": "carro",
+    "driver": "",
+    "encarregado": "",
+    "checklist": {
+      "pintura": "Sim",
+      "novo_grafismo": "Sim",
+      "grafismo_geral": "Sim",
+      "sinais_sonoros": "Sim",
+      "calota_padrao": "Sim",
+      "luzes_farois": "Sim",
+      "mecanica_geral": "Sim"
+    },
+    "status": "Aprovado",
+    "hasResponse": true
+  },
+  {
+    "id": "sheet_CPAmb_A_01290",
+    "opm": "CPAmb",
+    "prefix": "A-01290",
+    "type": "carro",
+    "driver": "",
+    "encarregado": "",
+    "checklist": {
+      "pintura": "Sim",
+      "novo_grafismo": "Sim",
+      "grafismo_geral": "Sim",
+      "sinais_sonoros": "Sim",
+      "calota_padrao": "Sim",
+      "luzes_farois": "Sim",
+      "mecanica_geral": "Sim"
+    },
+    "status": "Aprovado",
+    "hasResponse": true
+  },
+  {
+    "id": "sheet_CPRV_R_01180_11",
+    "opm": "CPRV",
+    "prefix": "R-01180-11",
+    "type": "carro",
+    "driver": "",
+    "encarregado": "",
+    "checklist": {
+      "pintura": "Sim",
+      "novo_grafismo": "Sim",
+      "grafismo_geral": "Sim",
+      "sinais_sonoros": "Sim",
+      "calota_padrao": "Sim",
+      "luzes_farois": "Sim",
+      "mecanica_geral": "Sim"
+    },
+    "status": "Aprovado",
+    "hasResponse": true
+  },
+  {
+    "id": "sheet_CPRV_R_01182_11",
+    "opm": "CPRV",
+    "prefix": "R-01182-11",
+    "type": "carro",
+    "driver": "",
+    "encarregado": "",
+    "checklist": {
+      "pintura": "Sim",
+      "novo_grafismo": "Sim",
+      "grafismo_geral": "Sim",
+      "sinais_sonoros": "Sim",
+      "calota_padrao": "Sim",
+      "luzes_farois": "Sim",
+      "mecanica_geral": "Sim"
+    },
+    "status": "Aprovado",
+    "hasResponse": true
+  },
+  {
+    "id": "sheet_CPRV_R_05458_11",
+    "opm": "CPRV",
+    "prefix": "R-05458-11",
+    "type": "carro",
+    "driver": "",
+    "encarregado": "",
+    "checklist": {
+      "pintura": "Sim",
+      "novo_grafismo": "Sim",
+      "grafismo_geral": "Sim",
+      "sinais_sonoros": "Sim",
+      "calota_padrao": "Sim",
+      "luzes_farois": "Sim",
+      "mecanica_geral": "Sim"
+    },
+    "status": "Aprovado",
+    "hasResponse": true
+  },
+  {
+    "id": "sheet_CPRV_R_05460_11",
+    "opm": "CPRV",
+    "prefix": "R-05460-11",
+    "type": "carro",
+    "driver": "",
+    "encarregado": "",
+    "checklist": {
+      "pintura": "Sim",
+      "novo_grafismo": "Sim",
+      "grafismo_geral": "Sim",
+      "sinais_sonoros": "Sim",
+      "calota_padrao": "Sim",
+      "luzes_farois": "Sim",
+      "mecanica_geral": "Sim"
+    },
+    "status": "Aprovado",
+    "hasResponse": true
+  },
+  {
+    "id": "sheet_CPRV_R_061107_11",
+    "opm": "CPRV",
+    "prefix": "R-061107-11",
+    "type": "carro",
+    "driver": "",
+    "encarregado": "",
+    "checklist": {
+      "pintura": "Sim",
+      "novo_grafismo": "Sim",
+      "grafismo_geral": "Sim",
+      "sinais_sonoros": "Sim",
+      "calota_padrao": "Sim",
+      "luzes_farois": "Sim",
+      "mecanica_geral": "Sim"
+    },
+    "status": "Aprovado",
+    "hasResponse": false
+  },
+  {
+    "id": "sheet_CPRV_R_06109_11",
+    "opm": "CPRV",
+    "prefix": "R-06109-11",
+    "type": "carro",
+    "driver": "",
+    "encarregado": "",
+    "checklist": {
+      "pintura": "Sim",
+      "novo_grafismo": "Sim",
+      "grafismo_geral": "Sim",
+      "sinais_sonoros": "Sim",
+      "calota_padrao": "Sim",
+      "luzes_farois": "Sim",
+      "mecanica_geral": "Sim"
+    },
+    "status": "Aprovado",
+    "hasResponse": true
+  },
+  {
+    "id": "sheet_CPRV_R_06107_11",
+    "opm": "CPRV",
+    "prefix": "R-06107-11",
+    "type": "carro",
+    "driver": "",
+    "encarregado": "",
+    "checklist": {
+      "pintura": "Sim",
+      "novo_grafismo": "Sim",
+      "grafismo_geral": "Sim",
+      "sinais_sonoros": "Sim",
+      "calota_padrao": "Sim",
+      "luzes_farois": "Sim",
+      "mecanica_geral": "Sim"
+    },
+    "status": "Aprovado",
+    "hasResponse": true
+  },
+  {
+    "id": "sheet_CPRV_R_00081",
+    "opm": "CPRV",
+    "prefix": "R-00081",
+    "type": "carro",
+    "driver": "",
+    "encarregado": "",
+    "checklist": {
+      "pintura": "Sim",
+      "novo_grafismo": "Sim",
+      "grafismo_geral": "Sim",
+      "sinais_sonoros": "Sim",
+      "calota_padrao": "Sim",
+      "luzes_farois": "Sim",
+      "mecanica_geral": "Sim"
+    },
+    "status": "Aprovado",
+    "hasResponse": true
+  },
+  {
+    "id": "sheet_CPRV_R_00082",
+    "opm": "CPRV",
+    "prefix": "R-00082",
+    "type": "carro",
+    "driver": "",
+    "encarregado": "",
+    "checklist": {
+      "pintura": "Sim",
+      "novo_grafismo": "Sim",
+      "grafismo_geral": "Sim",
+      "sinais_sonoros": "Sim",
+      "calota_padrao": "Sim",
+      "luzes_farois": "Sim",
+      "mecanica_geral": "Sim"
+    },
+    "status": "Aprovado",
+    "hasResponse": true
+  },
+  {
+    "id": "sheet_CPRV_R_00085",
+    "opm": "CPRV",
+    "prefix": "R-00085",
+    "type": "carro",
+    "driver": "",
+    "encarregado": "",
+    "checklist": {
+      "pintura": "Sim",
+      "novo_grafismo": "Sim",
+      "grafismo_geral": "Sim",
+      "sinais_sonoros": "Sim",
+      "calota_padrao": "Sim",
+      "luzes_farois": "Sim",
+      "mecanica_geral": "Sim"
+    },
+    "status": "Aprovado",
+    "hasResponse": true
+  },
+  {
+    "id": "sheet_CPRV_R_00086",
+    "opm": "CPRV",
+    "prefix": "R-00086",
+    "type": "carro",
+    "driver": "",
+    "encarregado": "",
+    "checklist": {
+      "pintura": "Sim",
+      "novo_grafismo": "Sim",
+      "grafismo_geral": "Sim",
+      "sinais_sonoros": "Sim",
+      "calota_padrao": "Sim",
+      "luzes_farois": "Sim",
+      "mecanica_geral": "Sim"
+    },
+    "status": "Aprovado",
+    "hasResponse": true
+  },
+  {
+    "id": "sheet_3__BPChoq_93115",
+    "opm": "3º BPChoq",
+    "prefix": "93115",
+    "type": "carro",
+    "driver": "",
+    "encarregado": "",
+    "checklist": {
+      "pintura": "Sim",
+      "novo_grafismo": "Sim",
+      "grafismo_geral": "Sim",
+      "sinais_sonoros": "Sim",
+      "calota_padrao": "Sim",
+      "luzes_farois": "Sim",
+      "mecanica_geral": "Sim"
+    },
+    "status": "Aprovado",
+    "hasResponse": true
+  },
+  {
+    "id": "sheet_3__BPChoq_93199",
+    "opm": "3º BPChoq",
+    "prefix": "93199",
+    "type": "carro",
+    "driver": "",
+    "encarregado": "",
+    "checklist": {
+      "pintura": "Sim",
+      "novo_grafismo": "Sim",
+      "grafismo_geral": "Sim",
+      "sinais_sonoros": "Sim",
+      "calota_padrao": "Sim",
+      "luzes_farois": "Sim",
+      "mecanica_geral": "Sim"
+    },
+    "status": "Aprovado",
+    "hasResponse": true
+  },
+  {
+    "id": "sheet_3__BPChoq_93001",
+    "opm": "3º BPChoq",
+    "prefix": "93001",
+    "type": "carro",
+    "driver": "",
+    "encarregado": "",
+    "checklist": {
+      "pintura": "Sim",
+      "novo_grafismo": "Sim",
+      "grafismo_geral": "Sim",
+      "sinais_sonoros": "Sim",
+      "calota_padrao": "Sim",
+      "luzes_farois": "Sim",
+      "mecanica_geral": "Sim"
+    },
+    "status": "Aprovado",
+    "hasResponse": true
+  },
+  {
+    "id": "sheet_3__BPChoq_93002",
+    "opm": "3º BPChoq",
+    "prefix": "93002",
+    "type": "carro",
+    "driver": "",
+    "encarregado": "",
+    "checklist": {
+      "pintura": "Sim",
+      "novo_grafismo": "Sim",
+      "grafismo_geral": "Sim",
+      "sinais_sonoros": "Sim",
+      "calota_padrao": "Sim",
+      "luzes_farois": "Sim",
+      "mecanica_geral": "Sim"
+    },
+    "status": "Aprovado",
+    "hasResponse": true
+  },
+  {
+    "id": "sheet_CPC_E_07319",
+    "opm": "CPC",
+    "prefix": "E-07319",
+    "type": "carro",
+    "driver": "",
+    "encarregado": "",
+    "checklist": {
+      "pintura": "Sim",
+      "novo_grafismo": "Sim",
+      "grafismo_geral": "Sim",
+      "sinais_sonoros": "Sim",
+      "calota_padrao": "Sim",
+      "luzes_farois": "Sim",
+      "mecanica_geral": "Sim"
+    },
+    "status": "Aprovado",
+    "hasResponse": true
+  },
+  {
+    "id": "sheet_CPC_E_07343",
+    "opm": "CPC",
+    "prefix": "E-07343",
+    "type": "carro",
+    "driver": "",
+    "encarregado": "",
+    "checklist": {
+      "pintura": "Sim",
+      "novo_grafismo": "Sim",
+      "grafismo_geral": "Sim",
+      "sinais_sonoros": "Sim",
+      "calota_padrao": "Sim",
+      "luzes_farois": "Sim",
+      "mecanica_geral": "Sim"
+    },
+    "status": "Aprovado",
+    "hasResponse": true
+  },
+  {
+    "id": "sheet_CPC_E_07359",
+    "opm": "CPC",
+    "prefix": "E-07359",
+    "type": "carro",
+    "driver": "",
+    "encarregado": "",
+    "checklist": {
+      "pintura": "Sim",
+      "novo_grafismo": "Sim",
+      "grafismo_geral": "Sim",
+      "sinais_sonoros": "Sim",
+      "calota_padrao": "Sim",
+      "luzes_farois": "Sim",
+      "mecanica_geral": "Sim"
+    },
+    "status": "Aprovado",
+    "hasResponse": true
+  },
+  {
+    "id": "sheet_CPC_E_07365",
+    "opm": "CPC",
+    "prefix": "E-07365",
+    "type": "carro",
+    "driver": "",
+    "encarregado": "",
+    "checklist": {
+      "pintura": "Sim",
+      "novo_grafismo": "Sim",
+      "grafismo_geral": "Sim",
+      "sinais_sonoros": "Sim",
+      "calota_padrao": "Sim",
+      "luzes_farois": "Sim",
+      "mecanica_geral": "Sim"
+    },
+    "status": "Aprovado",
+    "hasResponse": true
+  },
+  {
+    "id": "sheet_CPC_E_07369",
+    "opm": "CPC",
+    "prefix": "E-07369",
+    "type": "carro",
+    "driver": "",
+    "encarregado": "",
+    "checklist": {
+      "pintura": "Sim",
+      "novo_grafismo": "Sim",
+      "grafismo_geral": "Sim",
+      "sinais_sonoros": "Sim",
+      "calota_padrao": "Sim",
+      "luzes_farois": "Sim",
+      "mecanica_geral": "Sim"
+    },
+    "status": "Aprovado",
+    "hasResponse": true
+  },
+  {
+    "id": "sheet_CPC_E_07381",
+    "opm": "CPC",
+    "prefix": "E-07381",
+    "type": "carro",
+    "driver": "",
+    "encarregado": "",
+    "checklist": {
+      "pintura": "Sim",
+      "novo_grafismo": "Sim",
+      "grafismo_geral": "Sim",
+      "sinais_sonoros": "Sim",
+      "calota_padrao": "Sim",
+      "luzes_farois": "Sim",
+      "mecanica_geral": "Sim"
+    },
+    "status": "Aprovado",
+    "hasResponse": true
+  },
+  {
+    "id": "sheet_CPTRAN_T_02134_11",
+    "opm": "CPTRAN",
+    "prefix": "T-02134-11",
+    "type": "carro",
+    "driver": "",
+    "encarregado": "",
+    "checklist": {
+      "pintura": "Sim",
+      "novo_grafismo": "Sim",
+      "grafismo_geral": "Sim",
+      "sinais_sonoros": "Sim",
+      "calota_padrao": "Sim",
+      "luzes_farois": "Sim",
+      "mecanica_geral": "Sim"
+    },
+    "status": "Aprovado",
+    "hasResponse": true
+  },
+  {
+    "id": "sheet_CPTRAN_T_02135_11",
+    "opm": "CPTRAN",
+    "prefix": "T-02135-11",
+    "type": "carro",
+    "driver": "",
+    "encarregado": "",
+    "checklist": {
+      "pintura": "Sim",
+      "novo_grafismo": "Sim",
+      "grafismo_geral": "Sim",
+      "sinais_sonoros": "Sim",
+      "calota_padrao": "Sim",
+      "luzes_farois": "Sim",
+      "mecanica_geral": "Sim"
+    },
+    "status": "Aprovado",
+    "hasResponse": true
+  },
+  {
+    "id": "sheet_CPC_M_19336",
+    "opm": "CPC",
+    "prefix": "M-19336",
+    "type": "carro",
+    "driver": "",
+    "encarregado": "",
+    "checklist": {
+      "pintura": "Sim",
+      "novo_grafismo": "Sim",
+      "grafismo_geral": "Sim",
+      "sinais_sonoros": "Sim",
+      "calota_padrao": "Não",
+      "luzes_farois": "Sim",
+      "mecanica_geral": "Sim"
+    },
+    "status": "Pendente",
+    "hasResponse": true
+  },
+  {
+    "id": "sheet_CPC_M_38342",
+    "opm": "CPC",
+    "prefix": "M-38342",
+    "type": "carro",
+    "driver": "",
+    "encarregado": "",
+    "checklist": {
+      "pintura": "Sim",
+      "novo_grafismo": "Sim",
+      "grafismo_geral": "Sim",
+      "sinais_sonoros": "Sim",
+      "calota_padrao": "Não",
+      "luzes_farois": "Sim",
+      "mecanica_geral": "Sim"
+    },
+    "status": "Pendente",
+    "hasResponse": true
+  },
+  {
+    "id": "sheet_Defesa_Civil_Trailblazer_UFL_4I99",
+    "opm": "Defesa Civil",
+    "prefix": "Trailblazer UFL-4I99",
+    "type": "carro",
+    "driver": "",
+    "encarregado": "",
+    "checklist": {
+      "pintura": "Sim",
+      "novo_grafismo": "Sim",
+      "grafismo_geral": "Sim",
+      "sinais_sonoros": "Sim",
+      "calota_padrao": "Sim",
+      "luzes_farois": "Sim",
+      "mecanica_geral": "Sim"
+    },
+    "status": "Aprovado",
+    "hasResponse": true
+  },
+  {
+    "id": "sheet_Defesa_Civil_Trailblazer_UEN_9E33",
+    "opm": "Defesa Civil",
+    "prefix": "Trailblazer UEN-9E33",
+    "type": "carro",
+    "driver": "",
+    "encarregado": "",
+    "checklist": {
+      "pintura": "Sim",
+      "novo_grafismo": "Sim",
+      "grafismo_geral": "Sim",
+      "sinais_sonoros": "Sim",
+      "calota_padrao": "Sim",
+      "luzes_farois": "Sim",
+      "mecanica_geral": "Sim"
+    },
+    "status": "Aprovado",
+    "hasResponse": true
+  },
+  {
+    "id": "sheet_5__BPChoq_95113",
+    "opm": "5º BPChoq",
+    "prefix": "95113",
+    "type": "carro",
+    "driver": "",
+    "encarregado": "",
+    "checklist": {
+      "pintura": "Sim",
+      "novo_grafismo": "Sim",
+      "grafismo_geral": "Sim",
+      "sinais_sonoros": "Sim",
+      "calota_padrao": "Sim",
+      "luzes_farois": "Sim",
+      "mecanica_geral": "Sim"
+    },
+    "status": "Aprovado",
+    "hasResponse": true
+  },
+  {
+    "id": "sheet_5__BPChoq_95208",
+    "opm": "5º BPChoq",
+    "prefix": "95208",
+    "type": "carro",
+    "driver": "",
+    "encarregado": "",
+    "checklist": {
+      "pintura": "Sim",
+      "novo_grafismo": "Sim",
+      "grafismo_geral": "Sim",
+      "sinais_sonoros": "Sim",
+      "calota_padrao": "Sim",
+      "luzes_farois": "Sim",
+      "mecanica_geral": "Sim"
+    },
+    "status": "Aprovado",
+    "hasResponse": true
+  },
+  {
+    "id": "sheet_2__BPChoq_14_51",
+    "opm": "2º BPChoq",
+    "prefix": "14-51",
+    "type": "carro",
+    "driver": "",
+    "encarregado": "",
+    "checklist": {
+      "pintura": "Sim",
+      "novo_grafismo": "Sim",
+      "grafismo_geral": "Sim",
+      "sinais_sonoros": "Sim",
+      "calota_padrao": "Sim",
+      "luzes_farois": "Sim",
+      "mecanica_geral": "Sim"
+    },
+    "status": "Aprovado",
+    "hasResponse": true
+  },
+  {
+    "id": "sheet_2__BPChoq_14_56",
+    "opm": "2º BPChoq",
+    "prefix": "14-56",
+    "type": "carro",
+    "driver": "",
+    "encarregado": "",
+    "checklist": {
+      "pintura": "Sim",
+      "novo_grafismo": "Sim",
+      "grafismo_geral": "Sim",
+      "sinais_sonoros": "Sim",
+      "calota_padrao": "Sim",
+      "luzes_farois": "Sim",
+      "mecanica_geral": "Sim"
+    },
+    "status": "Aprovado",
+    "hasResponse": true
+  },
+  {
+    "id": "sheet_2__BPChoq_14_57",
+    "opm": "2º BPChoq",
+    "prefix": "14-57",
+    "type": "carro",
+    "driver": "",
+    "encarregado": "",
+    "checklist": {
+      "pintura": "Sim",
+      "novo_grafismo": "Sim",
+      "grafismo_geral": "Sim",
+      "sinais_sonoros": "Sim",
+      "calota_padrao": "Sim",
+      "luzes_farois": "Sim",
+      "mecanica_geral": "Sim"
+    },
+    "status": "Aprovado",
+    "hasResponse": true
+  },
+  {
+    "id": "sheet_2__BPChoq_92340",
+    "opm": "2º BPChoq",
+    "prefix": "92340",
+    "type": "carro",
+    "driver": "",
+    "encarregado": "",
+    "checklist": {
+      "pintura": "Sim",
+      "novo_grafismo": "Sim",
+      "grafismo_geral": "Sim",
+      "sinais_sonoros": "Sim",
+      "calota_padrao": "Sim",
+      "luzes_farois": "Sim",
+      "mecanica_geral": "Sim"
+    },
+    "status": "Aprovado",
+    "hasResponse": true
+  },
+  {
+    "id": "sheet_2__BPChoq_92348",
+    "opm": "2º BPChoq",
+    "prefix": "92348",
+    "type": "carro",
+    "driver": "",
+    "encarregado": "",
+    "checklist": {
+      "pintura": "Sim",
+      "novo_grafismo": "Sim",
+      "grafismo_geral": "Sim",
+      "sinais_sonoros": "Sim",
+      "calota_padrao": "Sim",
+      "luzes_farois": "Sim",
+      "mecanica_geral": "Sim"
+    },
+    "status": "Aprovado",
+    "hasResponse": true
+  },
+  {
+    "id": "sheet_2__BPChoq_92366",
+    "opm": "2º BPChoq",
+    "prefix": "92366",
+    "type": "carro",
+    "driver": "",
+    "encarregado": "",
+    "checklist": {
+      "pintura": "Sim",
+      "novo_grafismo": "Sim",
+      "grafismo_geral": "Sim",
+      "sinais_sonoros": "Sim",
+      "calota_padrao": "Sim",
+      "luzes_farois": "Sim",
+      "mecanica_geral": "Sim"
+    },
+    "status": "Aprovado",
+    "hasResponse": true
+  },
+  {
+    "id": "sheet_2__BPChoq_92367",
+    "opm": "2º BPChoq",
+    "prefix": "92367",
+    "type": "carro",
+    "driver": "",
+    "encarregado": "",
+    "checklist": {
+      "pintura": "Sim",
+      "novo_grafismo": "Sim",
+      "grafismo_geral": "Sim",
+      "sinais_sonoros": "Sim",
+      "calota_padrao": "Sim",
+      "luzes_farois": "Sim",
+      "mecanica_geral": "Sim"
+    },
+    "status": "Aprovado",
+    "hasResponse": true
+  },
+  {
+    "id": "sheet_2__BPChoq_92371",
+    "opm": "2º BPChoq",
+    "prefix": "92371",
+    "type": "carro",
+    "driver": "",
+    "encarregado": "",
+    "checklist": {
+      "pintura": "Sim",
+      "novo_grafismo": "Sim",
+      "grafismo_geral": "Sim",
+      "sinais_sonoros": "Sim",
+      "calota_padrao": "Sim",
+      "luzes_farois": "Sim",
+      "mecanica_geral": "Sim"
+    },
+    "status": "Aprovado",
+    "hasResponse": true
+  },
+  {
+    "id": "sheet_2__BPChoq_92372",
+    "opm": "2º BPChoq",
+    "prefix": "92372",
+    "type": "carro",
+    "driver": "",
+    "encarregado": "",
+    "checklist": {
+      "pintura": "Sim",
+      "novo_grafismo": "Sim",
+      "grafismo_geral": "Sim",
+      "sinais_sonoros": "Sim",
+      "calota_padrao": "Sim",
+      "luzes_farois": "Sim",
+      "mecanica_geral": "Sim"
+    },
+    "status": "Aprovado",
+    "hasResponse": true
+  },
+  {
+    "id": "sheet_CPTRAN_T_02303",
+    "opm": "CPTRAN",
+    "prefix": "T-02303",
+    "type": "carro",
+    "driver": "",
+    "encarregado": "",
+    "checklist": {
+      "pintura": "Sim",
+      "novo_grafismo": "Sim",
+      "grafismo_geral": "Sim",
+      "sinais_sonoros": "Sim",
+      "calota_padrao": "Sim",
+      "luzes_farois": "Sim",
+      "mecanica_geral": "Sim"
+    },
+    "status": "Aprovado",
+    "hasResponse": true
+  },
+  {
+    "id": "sheet_CPTRAN_T_02336",
+    "opm": "CPTRAN",
+    "prefix": "T-02336",
+    "type": "carro",
+    "driver": "",
+    "encarregado": "",
+    "checklist": {
+      "pintura": "Sim",
+      "novo_grafismo": "Sim",
+      "grafismo_geral": "Sim",
+      "sinais_sonoros": "Sim",
+      "calota_padrao": "Sim",
+      "luzes_farois": "Sim",
+      "mecanica_geral": "Sim"
+    },
+    "status": "Aprovado",
+    "hasResponse": true
+  },
+  {
+    "id": "sheet_CPTRAN_T_02239",
+    "opm": "CPTRAN",
+    "prefix": "T-02239",
+    "type": "carro",
+    "driver": "",
+    "encarregado": "",
+    "checklist": {
+      "pintura": "Sim",
+      "novo_grafismo": "Sim",
+      "grafismo_geral": "Sim",
+      "sinais_sonoros": "Sim",
+      "calota_padrao": "Sim",
+      "luzes_farois": "Sim",
+      "mecanica_geral": "Sim"
+    },
+    "status": "Aprovado",
+    "hasResponse": true
+  },
+  {
+    "id": "sheet_CPTRAN_T_02127",
+    "opm": "CPTRAN",
+    "prefix": "T-02127",
+    "type": "carro",
+    "driver": "",
+    "encarregado": "",
+    "checklist": {
+      "pintura": "Sim",
+      "novo_grafismo": "Sim",
+      "grafismo_geral": "Sim",
+      "sinais_sonoros": "Sim",
+      "calota_padrao": "Sim",
+      "luzes_farois": "Sim",
+      "mecanica_geral": "Sim"
+    },
+    "status": "Aprovado",
+    "hasResponse": true
+  },
+  {
+    "id": "sheet_CPTRAN_T_02303_11",
+    "opm": "CPTRAN",
+    "prefix": "T-02303-11",
+    "type": "carro",
+    "driver": "",
+    "encarregado": "",
+    "checklist": {
+      "pintura": "Sim",
+      "novo_grafismo": "Sim",
+      "grafismo_geral": "Sim",
+      "sinais_sonoros": "Sim",
+      "calota_padrao": "Sim",
+      "luzes_farois": "Sim",
+      "mecanica_geral": "Sim"
+    },
+    "status": "Aprovado",
+    "hasResponse": true
+  },
+  {
+    "id": "sheet_CPTRAN_T_02302_11",
+    "opm": "CPTRAN",
+    "prefix": "T-02302-11",
+    "type": "carro",
+    "driver": "",
+    "encarregado": "",
+    "checklist": {
+      "pintura": "Sim",
+      "novo_grafismo": "Sim",
+      "grafismo_geral": "Sim",
+      "sinais_sonoros": "Sim",
+      "calota_padrao": "Sim",
+      "luzes_farois": "Sim",
+      "mecanica_geral": "Sim"
+    },
+    "status": "Aprovado",
+    "hasResponse": true
+  },
+  {
+    "id": "sheet_CPTRAN_T_02202_11",
+    "opm": "CPTRAN",
+    "prefix": "T-02202-11",
+    "type": "carro",
+    "driver": "",
+    "encarregado": "",
+    "checklist": {
+      "pintura": "Sim",
+      "novo_grafismo": "Sim",
+      "grafismo_geral": "Sim",
+      "sinais_sonoros": "Sim",
+      "calota_padrao": "Sim",
+      "luzes_farois": "Sim",
+      "mecanica_geral": "Sim"
+    },
+    "status": "Aprovado",
+    "hasResponse": true
+  },
+  {
+    "id": "sheet_CPTRAN_T_02204_11",
+    "opm": "CPTRAN",
+    "prefix": "T-02204-11",
+    "type": "carro",
+    "driver": "",
+    "encarregado": "",
+    "checklist": {
+      "pintura": "Sim",
+      "novo_grafismo": "Sim",
+      "grafismo_geral": "Sim",
+      "sinais_sonoros": "Sim",
+      "calota_padrao": "Sim",
+      "luzes_farois": "Sim",
+      "mecanica_geral": "Sim"
+    },
+    "status": "Aprovado",
+    "hasResponse": true
+  },
+  {
+    "id": "sheet_CPC_M_01332",
+    "opm": "CPC",
+    "prefix": "M-01332",
+    "type": "carro",
+    "driver": "",
+    "encarregado": "",
+    "checklist": {
+      "pintura": "Sim",
+      "novo_grafismo": "Sim",
+      "grafismo_geral": "Sim",
+      "sinais_sonoros": "Sim",
+      "calota_padrao": "Sim",
+      "luzes_farois": "Sim",
+      "mecanica_geral": "Sim"
+    },
+    "status": "Aprovado",
+    "hasResponse": true
+  },
+  {
+    "id": "sheet_CPC_M_22004",
+    "opm": "CPC",
+    "prefix": "M-22004",
+    "type": "carro",
+    "driver": "",
+    "encarregado": "",
+    "checklist": {
+      "pintura": "Sim",
+      "novo_grafismo": "Sim",
+      "grafismo_geral": "Sim",
+      "sinais_sonoros": "Sim",
+      "calota_padrao": "Sim",
+      "luzes_farois": "Sim",
+      "mecanica_geral": "Sim"
+    },
+    "status": "Aprovado",
+    "hasResponse": true
+  },
+  {
+    "id": "sheet_4__BPChoq_94003",
+    "opm": "4º BPChoq",
+    "prefix": "94003",
+    "type": "carro",
+    "driver": "",
+    "encarregado": "",
+    "checklist": {
+      "pintura": "Sim",
+      "novo_grafismo": "Sim",
+      "grafismo_geral": "Sim",
+      "sinais_sonoros": "Sim",
+      "calota_padrao": "Sim",
+      "luzes_farois": "Sim",
+      "mecanica_geral": "Sim"
+    },
+    "status": "Aprovado",
+    "hasResponse": true
+  },
+  {
+    "id": "sheet_4__BPChoq_94300",
+    "opm": "4º BPChoq",
+    "prefix": "94300",
+    "type": "carro",
+    "driver": "",
+    "encarregado": "",
+    "checklist": {
+      "pintura": "Sim",
+      "novo_grafismo": "Sim",
+      "grafismo_geral": "Sim",
+      "sinais_sonoros": "Sim",
+      "calota_padrao": "Sim",
+      "luzes_farois": "Sim",
+      "mecanica_geral": "Sim"
+    },
+    "status": "Aprovado",
+    "hasResponse": true
+  },
+  {
+    "id": "sheet_4__BPChoq_94609",
+    "opm": "4º BPChoq",
+    "prefix": "94609",
+    "type": "carro",
+    "driver": "",
+    "encarregado": "",
+    "checklist": {
+      "pintura": "Sim",
+      "novo_grafismo": "Sim",
+      "grafismo_geral": "Sim",
+      "sinais_sonoros": "Sim",
+      "calota_padrao": "Sim",
+      "luzes_farois": "Sim",
+      "mecanica_geral": "Sim"
+    },
+    "status": "Aprovado",
+    "hasResponse": true
+  },
+  {
+    "id": "sheet_4__BPChoq_94405",
+    "opm": "4º BPChoq",
+    "prefix": "94405",
+    "type": "carro",
+    "driver": "",
+    "encarregado": "",
+    "checklist": {
+      "pintura": "Sim",
+      "novo_grafismo": "Sim",
+      "grafismo_geral": "Sim",
+      "sinais_sonoros": "Sim",
+      "calota_padrao": "Sim",
+      "luzes_farois": "Sim",
+      "mecanica_geral": "Sim"
+    },
+    "status": "Aprovado",
+    "hasResponse": true
+  },
+  {
+    "id": "sheet_CCB_ABE_18101",
+    "opm": "CCB",
+    "prefix": "ABE-18101",
+    "type": "carro",
+    "driver": "",
+    "encarregado": "",
+    "checklist": {
+      "pintura": "Não",
+      "novo_grafismo": "Não",
+      "grafismo_geral": "Sim",
+      "sinais_sonoros": "Sim",
+      "calota_padrao": "Sim",
+      "luzes_farois": "Sim",
+      "mecanica_geral": "Sim"
+    },
+    "status": "Pendente",
+    "hasResponse": true
+  },
+  {
+    "id": "sheet_CCB_UR_01104",
+    "opm": "CCB",
+    "prefix": "UR-01104",
+    "type": "carro",
+    "driver": "",
+    "encarregado": "",
+    "checklist": {
+      "pintura": "Sim",
+      "novo_grafismo": "Sim",
+      "grafismo_geral": "Sim",
+      "sinais_sonoros": "Sim",
+      "calota_padrao": "Sim",
+      "luzes_farois": "Sim",
+      "mecanica_geral": "Sim"
+    },
+    "status": "Aprovado",
+    "hasResponse": true
+  },
+  {
+    "id": "sheet_CCB_AC_01201",
+    "opm": "CCB",
+    "prefix": "AC-01201",
+    "type": "carro",
+    "driver": "",
+    "encarregado": "",
+    "checklist": {
+      "pintura": "Sim",
+      "novo_grafismo": "Sim",
+      "grafismo_geral": "Sim",
+      "sinais_sonoros": "Sim",
+      "calota_padrao": "Sim",
+      "luzes_farois": "Sim",
+      "mecanica_geral": "Sim"
+    },
+    "status": "Aprovado",
+    "hasResponse": true
+  },
+  {
+    "id": "sheet_CCB_SK_03",
+    "opm": "CCB",
+    "prefix": "SK-03",
+    "type": "carro",
+    "driver": "",
+    "encarregado": "",
+    "checklist": {
+      "pintura": "Não",
+      "novo_grafismo": "Não",
+      "grafismo_geral": "Não",
+      "sinais_sonoros": "Sim",
+      "calota_padrao": "Não",
+      "luzes_farois": "Sim",
+      "mecanica_geral": "Sim"
+    },
+    "status": "Pendente",
+    "hasResponse": true
+  },
+  {
+    "id": "sheet_CCB_AB_02102",
+    "opm": "CCB",
+    "prefix": "AB-02102",
+    "type": "carro",
+    "driver": "",
+    "encarregado": "",
+    "checklist": {
+      "pintura": "Não",
+      "novo_grafismo": "Não",
+      "grafismo_geral": "Não",
+      "sinais_sonoros": "Sim",
+      "calota_padrao": "Sim",
+      "luzes_farois": "Sim",
+      "mecanica_geral": "Sim"
+    },
+    "status": "Pendente",
+    "hasResponse": true
+  },
+  {
+    "id": "sheet_CCB_ASE_02203",
+    "opm": "CCB",
+    "prefix": "ASE-02203",
+    "type": "carro",
+    "driver": "",
+    "encarregado": "",
+    "checklist": {
+      "pintura": "Sim",
+      "novo_grafismo": "Não",
+      "grafismo_geral": "Sim",
+      "sinais_sonoros": "Sim",
+      "calota_padrao": "Sim",
+      "luzes_farois": "Não",
+      "mecanica_geral": "Sim"
+    },
+    "status": "Pendente",
+    "hasResponse": true
+  },
+  {
+    "id": "sheet_CCB_MOB_01202",
+    "opm": "CCB",
+    "prefix": "MOB-01202",
+    "type": "carro",
+    "driver": "",
+    "encarregado": "",
+    "checklist": {
+      "pintura": "Sim",
+      "novo_grafismo": "Sim",
+      "grafismo_geral": "Sim",
+      "sinais_sonoros": "Sim",
+      "calota_padrao": "Sim",
+      "luzes_farois": "Sim",
+      "mecanica_geral": "Sim"
+    },
+    "status": "Aprovado",
+    "hasResponse": true
+  },
+  {
+    "id": "sheet_CCB_MOB_01203",
+    "opm": "CCB",
+    "prefix": "MOB-01203",
+    "type": "carro",
+    "driver": "",
+    "encarregado": "",
+    "checklist": {
+      "pintura": "Sim",
+      "novo_grafismo": "Sim",
+      "grafismo_geral": "Sim",
+      "sinais_sonoros": "Sim",
+      "calota_padrao": "Sim",
+      "luzes_farois": "Sim",
+      "mecanica_geral": "Sim"
+    },
+    "status": "Aprovado",
+    "hasResponse": true
+  },
+  {
+    "id": "sheet_1__BPChoq_91100",
+    "opm": "1º BPChoq",
+    "prefix": "91100",
+    "type": "carro",
+    "driver": "",
+    "encarregado": "",
+    "checklist": {
+      "pintura": "Sim",
+      "novo_grafismo": "Sim",
+      "grafismo_geral": "Sim",
+      "sinais_sonoros": "Sim",
+      "calota_padrao": "Sim",
+      "luzes_farois": "Sim",
+      "mecanica_geral": "Sim"
+    },
+    "status": "Aprovado",
+    "hasResponse": true
+  },
+  {
+    "id": "sheet_1__BPChoq_91141",
+    "opm": "1º BPChoq",
+    "prefix": "91141",
+    "type": "carro",
+    "driver": "",
+    "encarregado": "",
+    "checklist": {
+      "pintura": "Sim",
+      "novo_grafismo": "Sim",
+      "grafismo_geral": "Sim",
+      "sinais_sonoros": "Sim",
+      "calota_padrao": "Sim",
+      "luzes_farois": "Sim",
+      "mecanica_geral": "Sim"
+    },
+    "status": "Aprovado",
+    "hasResponse": true
+  },
+  {
+    "id": "sheet_1__BPChoq_91227",
+    "opm": "1º BPChoq",
+    "prefix": "91227",
+    "type": "carro",
+    "driver": "",
+    "encarregado": "",
+    "checklist": {
+      "pintura": "Sim",
+      "novo_grafismo": "Sim",
+      "grafismo_geral": "Sim",
+      "sinais_sonoros": "Sim",
+      "calota_padrao": "Sim",
+      "luzes_farois": "Sim",
+      "mecanica_geral": "Sim"
+    },
+    "status": "Aprovado",
+    "hasResponse": true
+  },
+  {
+    "id": "sheet_1__BPChoq_91233",
+    "opm": "1º BPChoq",
+    "prefix": "91233",
+    "type": "carro",
+    "driver": "",
+    "encarregado": "",
+    "checklist": {
+      "pintura": "Sim",
+      "novo_grafismo": "Sim",
+      "grafismo_geral": "Sim",
+      "sinais_sonoros": "Sim",
+      "calota_padrao": "Sim",
+      "luzes_farois": "Sim",
+      "mecanica_geral": "Sim"
+    },
+    "status": "Aprovado",
+    "hasResponse": true
+  },
+  {
+    "id": "sheet_CPC_M_28221",
+    "opm": "CPC",
+    "prefix": "M-28221",
+    "type": "carro",
+    "driver": "",
+    "encarregado": "",
+    "checklist": {
+      "pintura": "Sim",
+      "novo_grafismo": "Sim",
+      "grafismo_geral": "Sim",
+      "sinais_sonoros": "Sim",
+      "calota_padrao": "Não",
+      "luzes_farois": "Sim",
+      "mecanica_geral": "Sim"
+    },
+    "status": "Pendente",
+    "hasResponse": true
+  },
+  {
+    "id": "sheet_CCB_AB_14",
+    "opm": "CCB",
+    "prefix": "AB-14",
+    "type": "carro",
+    "driver": "",
+    "encarregado": "",
+    "checklist": {
+      "pintura": "Sim",
+      "novo_grafismo": "Sim",
+      "grafismo_geral": "Sim",
+      "sinais_sonoros": "Sim",
+      "calota_padrao": "Sim",
+      "luzes_farois": "Sim",
+      "mecanica_geral": "Sim"
+    },
+    "status": "Aprovado",
+    "hasResponse": true
+  },
+  {
+    "id": "sheet_CCB_CO_03",
+    "opm": "CCB",
+    "prefix": "CO-03",
+    "type": "carro",
+    "driver": "",
+    "encarregado": "",
+    "checklist": {
+      "pintura": "Sim",
+      "novo_grafismo": "Sim",
+      "grafismo_geral": "Sim",
+      "sinais_sonoros": "Sim",
+      "calota_padrao": "Sim",
+      "luzes_farois": "Sim",
+      "mecanica_geral": "Sim"
+    },
+    "status": "Aprovado",
+    "hasResponse": true
+  },
+  {
+    "id": "sheet_CCB_PP_03",
+    "opm": "CCB",
+    "prefix": "PP-03",
+    "type": "carro",
+    "driver": "",
+    "encarregado": "",
+    "checklist": {
+      "pintura": "Não",
+      "novo_grafismo": "Não",
+      "grafismo_geral": "Não",
+      "sinais_sonoros": "Não",
+      "calota_padrao": "Não",
+      "luzes_farois": "Não",
+      "mecanica_geral": "Não"
+    },
+    "status": "Pendente",
+    "hasResponse": true
+  },
+  {
+    "id": "sheet_CCB_AE_01103",
+    "opm": "CCB",
+    "prefix": "AE-01103",
+    "type": "carro",
+    "driver": "",
+    "encarregado": "",
+    "checklist": {
+      "pintura": "Não",
+      "novo_grafismo": "Não",
+      "grafismo_geral": "Não",
+      "sinais_sonoros": "Sim",
+      "calota_padrao": "Não",
+      "luzes_farois": "Não",
+      "mecanica_geral": "Sim"
+    },
+    "status": "Pendente",
+    "hasResponse": true
+  },
+  {
+    "id": "sheet_CPAmb_A_03505",
+    "opm": "CPAmb",
+    "prefix": "A-03505",
+    "type": "carro",
+    "driver": "",
+    "encarregado": "",
+    "checklist": {
+      "pintura": "Sim",
+      "novo_grafismo": "Sim",
+      "grafismo_geral": "Sim",
+      "sinais_sonoros": "Sim",
+      "calota_padrao": "Sim",
+      "luzes_farois": "Sim",
+      "mecanica_geral": "Sim"
+    },
+    "status": "Aprovado",
+    "hasResponse": true
+  },
+  {
+    "id": "sheet_Corregedoria_60001",
+    "opm": "Corregedoria",
+    "prefix": "60001",
+    "type": "carro",
+    "driver": "",
+    "encarregado": "",
+    "checklist": {
+      "pintura": "Sim",
+      "novo_grafismo": "Não",
+      "grafismo_geral": "Sim",
+      "sinais_sonoros": "Sim",
+      "calota_padrao": "Sim",
+      "luzes_farois": "Sim",
+      "mecanica_geral": "Sim"
+    },
+    "status": "Pendente",
+    "hasResponse": true
+  },
+  {
+    "id": "sheet_Corregedoria_60006",
+    "opm": "Corregedoria",
+    "prefix": "60006",
+    "type": "carro",
+    "driver": "",
+    "encarregado": "",
+    "checklist": {
+      "pintura": "Sim",
+      "novo_grafismo": "Não",
+      "grafismo_geral": "Sim",
+      "sinais_sonoros": "Sim",
+      "calota_padrao": "Sim",
+      "luzes_farois": "Sim",
+      "mecanica_geral": "Sim"
+    },
+    "status": "Pendente",
+    "hasResponse": true
+  },
+  {
+    "id": "sheet_Corregedoria_60010",
+    "opm": "Corregedoria",
+    "prefix": "60010",
+    "type": "carro",
+    "driver": "",
+    "encarregado": "",
+    "checklist": {
+      "pintura": "Sim",
+      "novo_grafismo": "Não",
+      "grafismo_geral": "Sim",
+      "sinais_sonoros": "Sim",
+      "calota_padrao": "Sim",
+      "luzes_farois": "Sim",
+      "mecanica_geral": "Sim"
+    },
+    "status": "Pendente",
+    "hasResponse": true
+  },
+  {
+    "id": "sheet_Corregedoria_60013",
+    "opm": "Corregedoria",
+    "prefix": "60013",
+    "type": "carro",
+    "driver": "",
+    "encarregado": "",
+    "checklist": {
+      "pintura": "Sim",
+      "novo_grafismo": "Não",
+      "grafismo_geral": "Sim",
+      "sinais_sonoros": "Sim",
+      "calota_padrao": "Sim",
+      "luzes_farois": "Sim",
+      "mecanica_geral": "Sim"
+    },
+    "status": "Pendente",
+    "hasResponse": true
+  },
+  {
+    "id": "sheet_Corregedoria_60002",
+    "opm": "Corregedoria",
+    "prefix": "60002",
+    "type": "carro",
+    "driver": "",
+    "encarregado": "",
+    "checklist": {
+      "pintura": "Sim",
+      "novo_grafismo": "Não",
+      "grafismo_geral": "Sim",
+      "sinais_sonoros": "Sim",
+      "calota_padrao": "Sim",
+      "luzes_farois": "Sim",
+      "mecanica_geral": "Sim"
+    },
+    "status": "Pendente",
+    "hasResponse": true
+  },
+  {
+    "id": "sheet_CPC_E_07335",
+    "opm": "CPC",
+    "prefix": "E-07335",
+    "type": "carro",
+    "driver": "",
+    "encarregado": "",
+    "checklist": {
+      "pintura": "Sim",
+      "novo_grafismo": "Sim",
+      "grafismo_geral": "Sim",
+      "sinais_sonoros": "Sim",
+      "calota_padrao": "Sim",
+      "luzes_farois": "Sim",
+      "mecanica_geral": "Sim"
+    },
+    "status": "Aprovado",
+    "hasResponse": true
+  },
+  {
+    "id": "sheet_5__BPChoq_95207",
+    "opm": "5º BPChoq",
+    "prefix": "95207",
+    "type": "carro",
+    "driver": "",
+    "encarregado": "",
+    "checklist": {
+      "pintura": "Sim",
+      "novo_grafismo": "Sim",
+      "grafismo_geral": "Sim",
+      "sinais_sonoros": "Sim",
+      "calota_padrao": "Sim",
+      "luzes_farois": "Sim",
+      "mecanica_geral": "Sim"
+    },
+    "status": "Aprovado",
+    "hasResponse": false
+  },
+  {
+    "id": "sheet_CPRV_R_00084",
+    "opm": "CPRV",
+    "prefix": "R-00084",
+    "type": "carro",
+    "driver": "",
+    "encarregado": "",
+    "checklist": {
+      "pintura": "Sim",
+      "novo_grafismo": "Sim",
+      "grafismo_geral": "Sim",
+      "sinais_sonoros": "Sim",
+      "calota_padrao": "Sim",
+      "luzes_farois": "Sim",
+      "mecanica_geral": "Sim"
+    },
+    "status": "Aprovado",
+    "hasResponse": true
+  },
+  {
+    "id": "sheet_CPRV_R_01181_11",
+    "opm": "CPRV",
+    "prefix": "R-01181-11",
+    "type": "carro",
+    "driver": "",
+    "encarregado": "",
+    "checklist": {
+      "pintura": "Sim",
+      "novo_grafismo": "Sim",
+      "grafismo_geral": "Sim",
+      "sinais_sonoros": "Sim",
+      "calota_padrao": "Sim",
+      "luzes_farois": "Sim",
+      "mecanica_geral": "Sim"
+    },
+    "status": "Aprovado",
+    "hasResponse": true
+  },
+  {
+    "id": "sheet_4__BPChoq_94403",
+    "opm": "4º BPChoq",
+    "prefix": "94403",
+    "type": "carro",
+    "driver": "",
+    "encarregado": "",
+    "checklist": {
+      "pintura": "Sim",
+      "novo_grafismo": "Sim",
+      "grafismo_geral": "Sim",
+      "sinais_sonoros": "Sim",
+      "calota_padrao": "Sim",
+      "luzes_farois": "Sim",
+      "mecanica_geral": "Sim"
+    },
+    "status": "Aprovado",
+    "hasResponse": true
+  },
+  {
+    "id": "sheet_4__BPChoq_94600",
+    "opm": "4º BPChoq",
+    "prefix": "94600",
+    "type": "carro",
+    "driver": "",
+    "encarregado": "",
+    "checklist": {
+      "pintura": "Sim",
+      "novo_grafismo": "Sim",
+      "grafismo_geral": "Sim",
+      "sinais_sonoros": "Sim",
+      "calota_padrao": "Sim",
+      "luzes_farois": "Sim",
+      "mecanica_geral": "Sim"
+    },
+    "status": "Aprovado",
+    "hasResponse": true
+  },
+  {
+    "id": "sheet_2__BPChoq_92347",
+    "opm": "2º BPChoq",
+    "prefix": "92347",
+    "type": "carro",
+    "driver": "",
+    "encarregado": "",
+    "checklist": {
+      "pintura": "Sim",
+      "novo_grafismo": "Sim",
+      "grafismo_geral": "Sim",
+      "sinais_sonoros": "Sim",
+      "calota_padrao": "Sim",
+      "luzes_farois": "Sim",
+      "mecanica_geral": "Sim"
+    },
+    "status": "Aprovado",
+    "hasResponse": true
+  },
+  {
+    "id": "sheet_CPRV_R_05462_11",
+    "opm": "CPRV",
+    "prefix": "R-05462-11",
+    "type": "carro",
+    "driver": "",
+    "encarregado": "",
+    "checklist": {
+      "pintura": "Sim",
+      "novo_grafismo": "Sim",
+      "grafismo_geral": "Sim",
+      "sinais_sonoros": "Sim",
+      "calota_padrao": "Sim",
+      "luzes_farois": "Sim",
+      "mecanica_geral": "Sim"
+    },
+    "status": "Aprovado",
+    "hasResponse": true
+  },
+  {
+    "id": "sheet_Defesa_Civil_placa__UEN9E33",
+    "opm": "Defesa Civil",
+    "prefix": "placa: UEN9E33",
+    "type": "carro",
+    "driver": "",
+    "encarregado": "",
+    "checklist": {
+      "pintura": "Sim",
+      "novo_grafismo": "Sim",
+      "grafismo_geral": "Sim",
+      "sinais_sonoros": "Sim",
+      "calota_padrao": "Sim",
+      "luzes_farois": "Sim",
+      "mecanica_geral": "Sim"
+    },
+    "status": "Aprovado",
+    "hasResponse": true
+  },
+  {
+    "id": "sheet_CPRV_R_05461_11",
+    "opm": "CPRV",
+    "prefix": "R-05461-11",
+    "type": "carro",
+    "driver": "",
+    "encarregado": "",
+    "checklist": {
+      "pintura": "SIM",
+      "novo_grafismo": "SIM",
+      "grafismo_geral": "SIM",
+      "sinais_sonoros": "SIM",
+      "calota_padrao": "SIM",
+      "luzes_farois": "SIM",
+      "mecanica_geral": "SIM"
+    },
+    "status": "Aprovado",
+    "hasResponse": true
+  },
+  {
+    "id": "sheet_CPTRAN_T_02136",
+    "opm": "CPTRAN",
+    "prefix": "T-02136",
+    "type": "carro",
+    "driver": "",
+    "encarregado": "",
+    "checklist": {
+      "pintura": "Sim",
+      "novo_grafismo": "Sim",
+      "grafismo_geral": "Sim",
+      "sinais_sonoros": "Sim",
+      "calota_padrao": "Sim",
+      "luzes_farois": "Sim",
+      "mecanica_geral": "Sim"
+    },
+    "status": "Aprovado",
+    "hasResponse": true
+  },
+  {
+    "id": "sheet_CPTRAN_T_02208",
+    "opm": "CPTRAN",
+    "prefix": "T-02208",
+    "type": "carro",
+    "driver": "",
+    "encarregado": "",
+    "checklist": {
+      "pintura": "Sim",
+      "novo_grafismo": "Sim",
+      "grafismo_geral": "Sim",
+      "sinais_sonoros": "Sim",
+      "calota_padrao": "Sim",
+      "luzes_farois": "Sim",
+      "mecanica_geral": "Sim"
+    },
+    "status": "Aprovado",
+    "hasResponse": true
+  }
+]

@@ -369,6 +369,41 @@
         .gauge-circle { width: 45px; height: 45px; border-radius: 50%; background: conic-gradient(var(--color-green) 92%, #1e293b 0); display: flex; align-items: center; justify-content: center; }
         .gauge-inner { width: 35px; height: 35px; border-radius: 50%; background-color: var(--bg-panel); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; color: var(--color-green); }
 
+        /* Tooltip styles */
+        .stat-item, .gauge-container {
+            position: relative;
+            cursor: help;
+        }
+
+        .stat-item::after, .gauge-container::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            bottom: 125%;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #0f172a;
+            color: #f8fafc;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 11px;
+            white-space: normal;
+            width: 200px;
+            text-align: center;
+            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.5), 0 4px 6px -4px rgb(0 0 0 / 0.5);
+            border: 1px solid #334155;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s ease, transform 0.2s ease;
+            z-index: 1000;
+            line-height: 1.4;
+            font-family: inherit;
+        }
+
+        .stat-item:hover::after, .gauge-container:hover::after {
+            opacity: 1;
+            transform: translateX(-50%) translateY(-4px);
+        }
+
         .footer { text-align: center; padding: 10px 0 20px 0; font-size: 10px; color: #475569; letter-spacing: 0.5px; flex-shrink: 0; }
 
         /* Custom Scrollbar */
@@ -377,9 +412,242 @@
         ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
         ::-webkit-scrollbar-thumb:hover { background: #475569; }
 
+        /* TELA DE AUTENTICAÇÃO RESTRITA */
+        .auth-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: var(--bg-main);
+            background-image: radial-gradient(circle at center, #111a24 0%, #060a0d 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 100000;
+            transition: opacity 0.4s ease, visibility 0.4s;
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .auth-overlay.hidden {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+
+        .auth-card {
+            background-color: var(--bg-panel);
+            border: 2px solid var(--border-color);
+            border-top: 5px solid var(--color-green);
+            border-radius: 12px;
+            width: 90%;
+            max-width: 460px;
+            padding: 40px 30px;
+            text-align: center;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7);
+            position: relative;
+        }
+
+        .auth-logos {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+
+        .auth-logo-shield {
+            height: 90px;
+            object-fit: contain;
+        }
+
+        .auth-logo-wing {
+            height: 80px;
+            object-fit: contain;
+        }
+
+        .auth-title {
+            color: var(--color-title);
+            font-size: 17px;
+            font-weight: 900;
+            margin-bottom: 8px;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+
+        .auth-subtitle {
+            color: var(--color-text);
+            font-size: 11px;
+            margin-bottom: 30px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 700;
+        }
+
+        .auth-input-group {
+            position: relative;
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        .auth-input-group label {
+            display: block;
+            color: var(--color-title);
+            font-size: 11px;
+            font-weight: 700;
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .auth-input-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .auth-input-wrapper i {
+            position: absolute;
+            left: 15px;
+            color: #64748b;
+            font-size: 14px;
+        }
+
+        .auth-input {
+            width: 100%;
+            background-color: rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            color: var(--color-title);
+            padding: 12px 15px 12px 42px;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+
+        .auth-input:focus {
+            border-color: var(--color-green);
+            outline: none;
+            box-shadow: 0 0 10px rgba(34, 197, 94, 0.15);
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+
+        .auth-error-msg {
+            color: var(--color-red);
+            font-size: 12px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            display: none;
+            background-color: rgba(239, 68, 68, 0.1);
+            padding: 10px;
+            border-radius: 6px;
+            border: 1px solid var(--border-red);
+            animation: shake 0.3s ease-in-out;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+        .auth-btn {
+            width: 100%;
+            background-color: var(--color-green);
+            color: #ffffff;
+            border: none;
+            border-radius: 6px;
+            padding: 14px;
+            font-size: 14px;
+            font-weight: 900;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+        }
+
+        .auth-btn:hover {
+            background-color: #15803d;
+            transform: translateY(-1px);
+        }
+
+        .auth-btn:active {
+            transform: translateY(0);
+        }
+
+        /* Estilo do menu de logout */
+        .user-widget-menu {
+            position: absolute;
+            top: calc(100% + 5px);
+            right: 0;
+            background-color: var(--bg-panel);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            width: 120px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+            display: none;
+            z-index: 1000;
+            overflow: hidden;
+        }
+
+        .user-widget-menu button {
+            width: 100%;
+            background: none;
+            border: none;
+            color: var(--color-text);
+            padding: 10px 15px;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            text-align: left;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
+        }
+
+        .user-widget-menu button:hover {
+            background-color: rgba(255, 255, 255, 0.05);
+            color: var(--color-red);
+        }
+
     </style>
 </head>
 <body>
+
+    <!-- Tela de Autenticação Restrita CMM -->
+    <div id="authOverlay" class="auth-overlay">
+        <div class="auth-card">
+            <div class="auth-logos">
+                <img src="cmmlogo.png" alt="CMM Shield" class="auth-logo-shield">
+                <img src="cmmasa.png" alt="CMM Wing" class="auth-logo-wing">
+            </div>
+            <h1 class="auth-title">Acesso Restrito</h1>
+            <p class="auth-subtitle">Centro de Motomecanização (CMM)</p>
+            
+            <div id="authErrorMsg" class="auth-error-msg">Usuário ou senha incorretos!</div>
+            
+            <form id="authForm" onsubmit="return false;">
+                <div class="auth-input-group">
+                    <label for="authUsername">Usuário</label>
+                    <div class="auth-input-wrapper">
+                        <i class="fa-solid fa-user"></i>
+                        <input type="text" id="authUsername" class="auth-input" placeholder="Digite o usuário" required autocomplete="off">
+                    </div>
+                </div>
+                <div class="auth-input-group">
+                    <label for="authPassword">Senha</label>
+                    <div class="auth-input-wrapper">
+                        <i class="fa-solid fa-lock"></i>
+                        <input type="password" id="authPassword" class="auth-input" placeholder="Digite a senha" required>
+                    </div>
+                </div>
+                <button type="submit" id="authSubmitBtn" class="auth-btn">Acessar Sistema</button>
+            </form>
+        </div>
+    </div>
 
     <aside class="sidebar" id="sidebar">
         <div class="logo-area">
@@ -426,11 +694,14 @@
                         <span id="current-day-time"></span>
                     </div>
                 </div>
-                <div class="header-widget">
+                <div class="header-widget" id="userWidget" style="position: relative; cursor: pointer;">
                     <i class="fa-solid fa-user"></i>
                     <div class="info">
                         <strong>USUÁRIO</strong>
                         <span>ADM CMM <i class="fa-solid fa-caret-down" style="font-size: 10px; color: #64748b; margin-left: 5px;"></i></span>
+                    </div>
+                    <div class="user-widget-menu" id="userWidgetMenu">
+                        <button id="btnAuthLogout"><i class="fa-solid fa-right-from-bracket"></i> Sair</button>
                     </div>
                 </div>
                 
@@ -665,27 +936,43 @@
         </div>
 
         <div class="stats-bar">
-            <div class="stat-item s-green">
+            <div class="stat-item s-green" data-tooltip="Total de veículos catalogados na Planilha Mãe da Frota 2025-2026.">
                 <i class="fa-solid fa-truck stat-icon"></i>
-                <div class="stat-info"><span class="stat-label">VIATURAS ATIVAS</span><span class="stat-value">1.247</span><span class="stat-sub">+12 este mês</span></div>
+                <div class="stat-info">
+                    <span class="stat-label">AQUISIÇÕES - PLANILHA MÃE</span>
+                    <span class="stat-value" id="statViaturasAtivas">2.274</span>
+                    <span class="stat-sub" id="subViaturasAtivas">Total de aquisições</span>
+                </div>
             </div>
-            <div class="stat-item s-orange">
+            <div class="stat-item s-orange" data-tooltip="Viaturas com entrada na oficina nos últimos 30 dias que ainda não foram liberadas.">
                 <i class="fa-solid fa-screwdriver-wrench stat-icon"></i>
-                <div class="stat-info"><span class="stat-label">MANUTENÇÕES</span><span class="stat-value">86</span><span class="stat-sub">+8 este mês</span></div>
+                <div class="stat-info">
+                    <span class="stat-label">EM MANUTENÇÃO</span>
+                    <span class="stat-value" id="statManutencoes">50</span>
+                    <span class="stat-sub" id="subManutencoes">Mecânica / Serviços</span>
+                </div>
             </div>
-            <div class="stat-item s-blue">
+            <div class="stat-item s-blue" data-tooltip="Soma dos veículos com agendamento ativo a partir de hoje nas seções de Sinalizador e Borracharia.">
                 <i class="fa-regular fa-calendar-check stat-icon"></i>
-                <div class="stat-info"><span class="stat-label">AGENDAMENTOS</span><span class="stat-value">23</span><span class="stat-sub">+5 este mês</span></div>
+                <div class="stat-info">
+                    <span class="stat-label">VTR EM ESPERA</span>
+                    <span class="stat-value" id="statAgendamentos">218</span>
+                    <span class="stat-sub" id="subAgendamentos">Aguardando atendimento</span>
+                </div>
             </div>
-            <div class="stat-item s-purple">
+            <div class="stat-item s-purple" data-tooltip="Veículos na seção de execução contratual com status ativo (oficina, pátio, operando, etc).">
                 <i class="fa-solid fa-file-signature stat-icon"></i>
-                <div class="stat-info"><span class="stat-label">CONTRATOS ATIVOS</span><span class="stat-value">12</span><span class="stat-sub">Em execução</span></div>
+                <div class="stat-info">
+                    <span class="stat-label">EM CONTRATAÇÃO</span>
+                    <span class="stat-value" id="statContratosAtivos">97</span>
+                    <span class="stat-sub" id="subContratosAtivos">Contratações ativas</span>
+                </div>
             </div>
-            <div class="gauge-container">
-                <div class="gauge-circle"><div class="gauge-inner">92%</div></div>
+            <div class="gauge-container" data-tooltip="Proporção de viaturas prontas para serviço em relação à frota base de 950 carros do CMM.">
+                <div class="gauge-circle" id="gaugeCircle"><div class="gauge-inner" id="gaugePercent">85%</div></div>
                 <div class="gauge-text" style="display:flex; flex-direction:column;">
-                    <span class="stat-label">STATUS GERAL</span>
-                    <span style="color: var(--color-green); font-size: 11px; font-weight: 700;">OPERAÇÃO NORMAL</span>
+                    <span class="stat-label">DISPONIBILIDADE</span>
+                    <span id="gaugeStatusText" style="color: var(--color-green); font-size: 11px; font-weight: 700;">OPERAÇÃO NORMAL</span>
                 </div>
             </div>
         </div>
@@ -728,6 +1015,291 @@
 
         updateDateTime();
         setInterval(updateDateTime, 1000);
+
+        // ==========================================
+        // LÓGICA DE SEGURANÇA E AUTENTICAÇÃO RESTRITA
+        // ==========================================
+        (function() {
+            const overlay = document.getElementById('authOverlay');
+            const errorMsg = document.getElementById('authErrorMsg');
+            const form = document.getElementById('authForm');
+            const userWidget = document.getElementById('userWidget');
+            const userMenu = document.getElementById('userWidgetMenu');
+            const btnLogout = document.getElementById('btnAuthLogout');
+
+            // 1. Verificação inicial rápida (antes do carregamento completo para evitar flashes visuais)
+            if (localStorage.getItem('cmm_authenticated') === 'true') {
+                overlay.classList.add('hidden');
+            }
+
+            // 2. Evento do Form de Login
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                const user = document.getElementById('authUsername').value.trim();
+                const pass = document.getElementById('authPassword').value;
+
+                if (user.toLowerCase() === 'cmm' && pass === 'cmm') {
+                    localStorage.setItem('cmm_authenticated', 'true');
+                    overlay.classList.add('hidden');
+                    errorMsg.style.display = 'none';
+                } else {
+                    errorMsg.style.display = 'block';
+                    // Efeito tremor de erro
+                    const card = document.querySelector('.auth-card');
+                    card.style.animation = 'none';
+                    card.offsetHeight; // triggers reflow
+                    card.style.animation = 'shake 0.3s ease-in-out';
+                }
+            });
+
+            // 3. Controle do Dropdown de Usuário (Menu de Logout)
+            if (userWidget) {
+                userWidget.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    userMenu.style.display = userMenu.style.display === 'block' ? 'none' : 'block';
+                });
+            }
+
+            // Fechar o menu de logout ao clicar fora dele
+            document.addEventListener('click', function() {
+                if (userMenu) userMenu.style.display = 'none';
+            });
+
+            // 4. Ação de Logout (Sair)
+            if (btnLogout) {
+                btnLogout.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    localStorage.removeItem('cmm_authenticated');
+                    window.location.reload();
+                });
+            }
+        })();
+
+        // Helper to parse dates in format DD/MM/YYYY
+        function parseSheetDate(str) {
+            if (!str) return null;
+            const parts = str.trim().split('/');
+            if (parts.length === 3) {
+                const day = parseInt(parts[0], 10);
+                const month = parseInt(parts[1], 10) - 1;
+                let year = parseInt(parts[2], 10);
+                if (year < 100) year += 2000;
+                return new Date(year, month, day);
+            }
+            return null;
+        }
+
+        // ==========================================
+        // CARREGAMENTO DINÂMICO DE ESTATÍSTICAS CMM
+        // ==========================================
+        async function carregarEstatisticasCMM() {
+            // IDs das planilhas para consulta direta
+            const ID_MAE_FROTA = "1gI0uSUl7ioSUDo8x_xDKxBum0o7QwSEXOD_9bSUH3hY";
+            const ID_LINHA_MANUT = "1Ga5eQ_AhuOUkgTut2pfkzaZf_6cRcHHXg2ylLUvVQEs";
+            const ID_SINALIZADORES = "1IX-OKAfMYUnPuJ9RYLTHokWP5Phmkk-zSjYg0TcF39Q";
+            const ID_BORRACHARIA = "1HVafYVr1u2IFSBJ-JDFiQZn1Mcyd4H51WyXv_xSZ79Q";
+            const ID_CONTRATOS = "1ws6_IffVkDIK1N1KbuMQoNzjl0bYDL3AqHyd1z_ZW5g";
+
+            try {
+                // Configurar elementos UI
+                const valViaturas = document.getElementById('statViaturasAtivas');
+                const subViaturas = document.getElementById('subViaturasAtivas');
+                const valManut = document.getElementById('statManutencoes');
+                const subManut = document.getElementById('subManutencoes');
+                const valAgend = document.getElementById('statAgendamentos');
+                const subAgend = document.getElementById('subAgendamentos');
+                const valContratos = document.getElementById('statContratosAtivos');
+                const subContratos = document.getElementById('subContratosAtivos');
+                const valGauge = document.getElementById('gaugePercent');
+                const valGaugeCircle = document.getElementById('gaugeCircle');
+                const valStatusText = document.getElementById('gaugeStatusText');
+
+                let totalViaturas = 2274;
+                let manutencoes = 50;
+                let agendamentos = 218;
+                let contratos = 97;
+
+                const today = new Date();
+                today.setHours(0,0,0,0);
+
+                // 1. Consultar Planilha Mãe Frota (AQUISIÇÕES - PLANILHA MÃE)
+                try {
+                    const url = `https://docs.google.com/spreadsheets/d/${ID_MAE_FROTA}/export?format=csv&gid=971139551`;
+                    const res = await fetch(url);
+                    if (res.ok) {
+                        const text = await res.text();
+                        const lines = text.split('\n').filter(line => line.trim() !== '');
+                        if (lines.length > 1) {
+                            totalViaturas = lines.length - 1;
+                            valViaturas.textContent = totalViaturas.toLocaleString('pt-BR');
+                        }
+                    }
+                } catch(e) { console.error("Erro ao carregar frota:", e); }
+
+                // 2. Consultar Linha de Manutenção (Apenas não liberados e com entrada nos últimos 30 dias)
+                try {
+                    const url = `https://docs.google.com/spreadsheets/d/${ID_LINHA_MANUT}/export?format=csv`;
+                    const res = await fetch(url);
+                    if (res.ok) {
+                        const text = await res.text();
+                        const lines = text.split('\n').filter(line => line.trim() !== '');
+                        
+                        let countAtivas = 0;
+                        lines.forEach((line, idx) => {
+                            if (idx === 0) return;
+                            const cols = line.split(',');
+                            const entradaStr = cols[6] ? cols[6].trim() : '';
+                            const saida = cols[9] ? cols[9].trim() : '';
+                            const dest = cols[10] ? cols[10].trim().toUpperCase() : '';
+                            
+                            const entryDate = parseSheetDate(entradaStr);
+                            if (entryDate) {
+                                const diffTime = Math.abs(today - entryDate);
+                                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                                if (diffDays <= 30 && saida === '' && dest !== 'LIBERADO') {
+                                    countAtivas++;
+                                }
+                            }
+                        });
+                        
+                        if (lines.length > 1) {
+                            manutencoes = countAtivas;
+                            valManut.textContent = manutencoes.toLocaleString('pt-BR');
+                        }
+                    }
+                } catch(e) { console.error("Erro ao carregar manutenções:", e); }
+
+                // 3. Consultar VTR EM ESPERA (Sinalizadores e Borracharia >= hoje)
+                try {
+                    let countSinal = 0;
+                    let countBorra = 0;
+                    let maxFutureDate = null;
+
+                    // 3a. Sinalizadores
+                    try {
+                        const resSinal = await fetch(`https://docs.google.com/spreadsheets/d/${ID_SINALIZADORES}/export?format=csv`);
+                        if (resSinal.ok) {
+                            const text = await resSinal.text();
+                            const lines = text.split('\n').filter(line => line.trim() !== '');
+                            lines.forEach((line, idx) => {
+                                if (idx === 0) return;
+                                const cols = line.split(',');
+                                const dataAgendadaStr = cols[1] ? cols[1].trim() : '';
+                                const dataServico = cols[2] ? cols[2].trim() : '';
+                                
+                                const agendDate = parseSheetDate(dataAgendadaStr);
+                                if (agendDate && agendDate >= today && dataServico === '') {
+                                    countSinal++;
+                                    if (!maxFutureDate || agendDate > maxFutureDate) {
+                                        maxFutureDate = agendDate;
+                                    }
+                                }
+                            });
+                        }
+                    } catch(e) { console.error("Erro ao carregar Sinalizadores:", e); }
+
+                    // 3b. Borracharia
+                    try {
+                        const resBorra = await fetch(`https://docs.google.com/spreadsheets/d/${ID_BORRACHARIA}/export?format=csv`);
+                        if (resBorra.ok) {
+                            const text = await resBorra.text();
+                            const lines = text.split('\n').filter(line => line.trim() !== '');
+                            lines.forEach((line, idx) => {
+                                if (idx === 0) return;
+                                const cols = line.split(',');
+                                const dataServico = cols[0] ? cols[0].trim() : '';
+                                const dataSaida = cols[10] ? cols[10].trim() : '';
+                                
+                                const servDate = parseSheetDate(dataServico);
+                                if (servDate && servDate >= today && dataSaida === '') {
+                                    countBorra++;
+                                    if (!maxFutureDate || servDate > maxFutureDate) {
+                                        maxFutureDate = servDate;
+                                    }
+                                }
+                            });
+                        }
+                    } catch(e) { console.error("Erro ao carregar Borracharia:", e); }
+
+                    agendamentos = countSinal + countBorra;
+                    valAgend.textContent = agendamentos.toLocaleString('pt-BR');
+
+                    // Atualizar dinamicamente o tooltip da VTR em espera com a data mais distante
+                    let tooltipText = "Soma dos veículos com agendamento ativo a partir de hoje nas seções de Sinalizador, Borracharia e Grafismo, que ainda aguardam agendamento.";
+                    if (maxFutureDate) {
+                        const day = String(maxFutureDate.getDate()).padStart(2, '0');
+                        const month = String(maxFutureDate.getMonth() + 1).padStart(2, '0');
+                        const year = maxFutureDate.getFullYear();
+                        tooltipText += ` O agendamento mais distante agora é para ${day}/${month}/${year}.`;
+                    }
+                    const elBlue = document.querySelector('.stats-bar .s-blue');
+                    if (elBlue) {
+                        elBlue.setAttribute('data-tooltip', tooltipText);
+                    }
+                } catch(e) { console.error("Erro ao carregar VTR em espera:", e); }
+
+                // 4. Consultar Execução Contratual (EM CONTRATAÇÃO: status da viatura ativo)
+                try {
+                    const url = `https://docs.google.com/spreadsheets/d/${ID_CONTRATOS}/export?format=csv`;
+                    const res = await fetch(url);
+                    if (res.ok) {
+                        const text = await res.text();
+                        const lines = text.split('\n').filter(line => line.trim() !== '');
+                        let countContratacoes = 0;
+                        lines.forEach((line, idx) => {
+                            if (idx === 0) return;
+                            const cols = line.split(',');
+                            const status = cols[7] ? cols[7].trim().toUpperCase() : '';
+                            if (['OFICINA', 'PÁTIO', 'LIBERADA P/ OPM', 'OPERANDO', 'TERRÃO / SAF'].includes(status)) {
+                                countContratacoes++;
+                            }
+                        });
+                        if (lines.length > 1) {
+                            contratos = countContratacoes;
+                            valContratos.textContent = contratos.toLocaleString('pt-BR');
+                        }
+                    }
+                } catch(e) { console.error("Erro ao carregar contratos:", e); }
+
+                // 5. Calcular e atualizar Disponibilidade Operacional da Frota CMM
+                const CMM_TOTAL_FROTA = 950; // Frota total estimada do CMM
+                const parados = manutencoes + contratos; // Subtrai parados de manutenção e contratação
+                const dispPercent = Math.max(0, Math.min(100, Math.round(((CMM_TOTAL_FROTA - parados) / CMM_TOTAL_FROTA) * 100)));
+                valGauge.textContent = `${dispPercent}%`;
+                
+                // Atualizar cor e texto do status com base na disponibilidade operacional
+                if (dispPercent >= 85) {
+                    valStatusText.textContent = "OPERAÇÃO NORMAL";
+                    valStatusText.style.color = "var(--color-green)";
+                    valGaugeCircle.style.background = `conic-gradient(var(--color-green) ${dispPercent}%, #1e293b 0)`;
+                } else if (dispPercent >= 70) {
+                    valStatusText.textContent = "ATENÇÃO OPERACIONAL";
+                    valStatusText.style.color = "var(--color-orange)";
+                    valGaugeCircle.style.background = `conic-gradient(var(--color-orange) ${dispPercent}%, #1e293b 0)`;
+                } else {
+                    valStatusText.textContent = "CRÍTICO";
+                    valStatusText.style.color = "var(--color-red)";
+                    valGaugeCircle.style.background = `conic-gradient(var(--color-red) ${dispPercent}%, #1e293b 0)`;
+                }
+
+            } catch (err) {
+                console.error("Falha geral ao carregar estatísticas:", err);
+            }
+        }
+
+        // Executar após o carregamento da página se estiver autenticado
+        if (localStorage.getItem('cmm_authenticated') === 'true') {
+            carregarEstatisticasCMM();
+        }
+        // Também vincular ao formulário de autenticação para carregar após login
+        document.getElementById('authForm').addEventListener('submit', function() {
+            const user = document.getElementById('authUsername').value.trim();
+            const pass = document.getElementById('authPassword').value;
+            if (user.toLowerCase() === 'cmm' && pass === 'cmm') {
+                carregarEstatisticasCMM();
+            }
+        });
     </script>
 </body>
 </html>
