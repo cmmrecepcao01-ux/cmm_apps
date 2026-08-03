@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel do Gestor - CMM</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+        <div class="logo-area">
+            <img src="../cmmlogo.png" alt="CMM Logo" class="logo-img" onerror="this.style.display='none'">
+            <div class="sidebar-title">CMM GESTÃO</div>
+        </div>
+
+        <nav class="sidebar-menu">
+            <button id="tab-panorama-btn" class="menu-item" style="display: none;">
+                <i class="fa-solid fa-gauge-high"></i>
+                <span>Panorama Geral</span>
+            </button>
+            <button id="tab-tasks-btn" class="menu-item active">
+                <i class="fa-solid fa-list-check"></i>
+                <span>Missões e Rotinas</span>
+            </button>
+            <button id="tab-config-btn" class="menu-item">
+                <i class="fa-solid fa-gear"></i>
+                <span>Configurações</span>
+            </button>
+            
+            <div class="menu-separator"></div>
+            
+            <a href="../1_painel_bordo_cmm/index.html" class="menu-item back-link">
+                <i class="fa-solid fa-arrow-left"></i>
+                <span>Painel de Bordo</span>
+            </a>
+        </nav>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="main-content">
+        <!-- HEADER -->
+        <header class="header">
+            <div class="header-titles">
+                <h1 id="page-title">Missões e Rotinas</h1>
+                <p id="page-subtitle">Anotador oficial de prazos, providências e controle de missões</p>
+            </div>
+            <div class="header-right">
+                <span class="status-indicator-bar" id="sync-status">
+                    <i class="fa-solid fa-circle-dot offline"></i> Offline
+                </span>
+            </div>
+        </header>
+
+        <!-- VIEW CONTAINER -->
+        <div class="view-container">
+            
+            <!-- VIEW 1: PANORAMA GERAL -->
+            <section id="view-panorama" class="view-section">
+                <div class="overview-header-card">
+                    <div class="overview-header-info">
+                        <h2>Painel de Controle de Subseções</h2>
+                        <p>Abaixo estão os indicadores consolidados das subseções da Manutenção de Frota. Clique no indicador numérico para abrir o link da subseção correspondente.</p>
+                    </div>
+                </div>
+
+                <!-- SUBSECTIONS GRID -->
+                <div class="subsections-grid" id="subsections-container">
+                    <!-- Subsection Cards will be rendered dynamically by JavaScript -->
+                    <div class="spinner-wrapper">
+                        <div class="spinner"></div>
+                        <p>Carregando panorama...</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- VIEW 2: MISSÕES E ROTINAS -->
+            <section id="view-tasks" class="view-section active">
+                <!-- METRICS -->
+                <div class="metrics-grid">
+                    <div class="metric-card total">
+                        <div class="metric-info">
+                            <h3>Total de Itens</h3>
+                            <p id="metric-total">0</p>
+                        </div>
+                        <div class="metric-icon">
+                            <i class="fa-solid fa-clipboard-list"></i>
+                        </div>
+                    </div>
+                    <div class="metric-card done">
+                        <div class="metric-info">
+                            <h3>Concluídos / QRV</h3>
+                            <p id="metric-done">0</p>
+                        </div>
+                        <div class="metric-icon">
+                            <i class="fa-solid fa-circle-check"></i>
+                        </div>
+                    </div>
+                    <div class="metric-card progress">
+                        <div class="metric-info">
+                            <h3>Em Andamento</h3>
+                            <p id="metric-progress">0</p>
+                        </div>
+                        <div class="metric-icon">
+                            <i class="fa-solid fa-spinner fa-pulse"></i>
+                        </div>
+                    </div>
+                    <div class="metric-card pending">
+                        <div class="metric-info">
+                            <h3>Pendentes / Atrasados</h3>
+                            <p id="metric-pending">0</p>
+                        </div>
+                        <div class="metric-icon">
+                            <i class="fa-solid fa-clock"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- PLANNERS LAYOUT -->
+                <div class="main-layout">
+                    <!-- LEFT COLUMN: FORM -->
+                    <div class="panel">
+                        <div class="panel-header">
+                            <h2 id="form-title"><i class="fa-solid fa-plus"></i> Nova Missão / Rotina</h2>
+                        </div>
+                        <div class="panel-body">
+                            <form id="task-form">
+                                <input type="hidden" id="task-index">
+                                <input type="hidden" id="task-sheet">
+
+                                <div class="form-group">
+                                    <label for="task-date">Data da Missão</label>
+                                    <input type="date" id="task-date" class="form-control" required>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="task-qru">QRU (Assunto / Viatura / Item)</label>
+                                    <input type="text" id="task-qru" class="form-control" placeholder="Ex: TRAIL BLAZER CEL CARLOS MARQUES" required>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="task-notes">Anotações / Descrição</label>
+                                    <textarea id="task-notes" class="form-control" placeholder="Observações e detalhes..." required></textarea>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="task-actions">Providências Pendentes / Tomadas</label>
+                                    <textarea id="task-actions" class="form-control" placeholder="O que fazer ou o que foi feito..." required></textarea>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="task-status">Situação Final</label>
+                                    <select id="task-status" class="form-control" required>
+                                        <option value="PENDENTE">PENDENTE</option>
+                                        <option value="EM ANDAMENTO">EM ANDAMENTO</option>
+                                        <option value="RETIRADA - QRV">RETIRADA - QRV (CONCLUÍDO)</option>
+                                        <option value="ATUALIZADA ABAIXO">ATUALIZADA ABAIXO</option>
+                                        <option value="FINALIZADO E ENVIADO">FINALIZADO E ENVIADO</option>
+                                    </select>
+                                </div>
+
+                                <div class="form-actions">
+                                    <button type="button" id="btn-cancel" class="btn btn-secondary" style="display: none;">Cancelar</button>
+                                    <button type="submit" id="btn-submit" class="btn btn-primary">
+                                        <i class="fa-solid fa-floppy-disk"></i> Salvar
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- RIGHT COLUMN: TABLE -->
+                    <div class="panel">
+                        <div class="panel-header">
+                            <h2><i class="fa-solid fa-list-check"></i> Missões e Rotinas</h2>
+                            <div>
+                                <button id="btn-refresh" class="btn-icon" title="Sincronizar com Google Sheets">
+                                    <i class="fa-solid fa-sync"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="panel-body">
+                            
+                            <!-- FILTERS -->
+                            <div class="filters-bar">
+                                <div class="search-wrapper">
+                                    <i class="fa-solid fa-magnifying-glass"></i>
+                                    <input type="text" id="search-input" class="form-control" placeholder="Buscar missões...">
+                                </div>
+                                
+                                <select id="filter-month" class="form-control filter-select">
+                                    <option value="">Todos os Meses</option>
+                                    <option value="JANEIRO">Janeiro</option>
+                                    <option value="FEVEREIRO">Fevereiro</option>
+                                    <option value="MARÇO">Março</option>
+                                    <option value="ABRIL">Abril</option>
+                                    <option value="MAIO">Maio</option>
+                                    <option value="Junho">Junho</option>
+                                    <option value="julho">Julho</option>
+                                    <option value="AGOSTO">Agosto</option>
+                                    <option value="SETEMBRO">Setembro</option>
+                                    <option value="OUTUBRO">Outubro</option>
+                                    <option value="NOVEMBRO">Novembro</option>
+                                    <option value="DEZEMBRO">Dezembro</option>
+                                </select>
+
+                                <select id="filter-status" class="form-control filter-select">
+                                    <option value="">Todas as Situações</option>
+                                    <option value="PENDENTE">Pendente</option>
+                                    <option value="EM ANDAMENTO">Em Andamento</option>
+                                    <option value="QRV">Concluído / QRV</option>
+                                </select>
+                            </div>
+
+                            <!-- TABLE -->
+                            <div class="table-responsive">
+                                <table id="tasks-table">
+                                    <thead>
+                                        <tr>
+                                            <th class="col-date">Data</th>
+                                            <th class="col-qru">QRU</th>
+                                            <th class="col-notes">Anotações</th>
+                                            <th class="col-actions">Providências</th>
+                                            <th class="col-status">Situação</th>
+                                            <th class="col-opts">Ações</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="tasks-tbody">
+                                        <!-- Rendered by JS -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- VIEW 3: CONFIGURAÇÕES -->
+            <section id="view-config" class="view-section">
+                <div class="panel" style="max-width: 700px; margin: 0 auto;">
+                    <div class="panel-header">
+                        <h2><i class="fa-solid fa-gears"></i> Integração com Google Sheets</h2>
+                    </div>
+                    <div class="panel-body">
+                        <div class="form-group" style="margin-bottom: 24px;">
+                            <label for="config-gas-url">URL do Aplicativo da Web (Google Apps Script)</label>
+                            <input type="url" id="config-gas-url" class="form-control" style="font-family: monospace; font-size: 13px;" placeholder="https://script.google.com/macros/s/.../exec">
+                            <p style="font-size: 12px; margin-top: 8px; color: var(--color-text);">Insira a URL gerada na implantação do Apps Script para habilitar a gravação e leitura em tempo real.</p>
+                        </div>
+                        <div style="display: flex; gap: 12px;">
+                            <button id="btn-save-config" class="btn btn-primary" style="flex: none; padding: 10px 24px;">
+                                <i class="fa-solid fa-circle-check"></i> Salvar Configuração
+                            </button>
+                            <button id="btn-test-config" class="btn btn-secondary" style="flex: none; padding: 10px 20px;">
+                                <i class="fa-solid fa-wifi"></i> Testar Conexão
+                            </button>
+                        </div>
+                        
+                        <div class="menu-separator" style="margin: 30px 0;"></div>
+                        
+                        <h3>Como Implantar o Script na Planilha</h3>
+                        <ol style="margin-top: 15px; padding-left: 20px; line-height: 1.6; font-size: 13px; display: flex; flex-direction: column; gap: 8px;">
+                            <li>Abra a sua planilha do Google Sheets.</li>
+                            <li>No menu superior, acesse <strong>Extensões</strong> > <strong>Apps Script</strong>.</li>
+                            <li>Copie o código completo do arquivo <strong style="color: var(--color-blue);">code.gs</strong> (presente na pasta do projeto) e cole no editor.</li>
+                            <li>Clique no ícone de disquete para salvar.</li>
+                            <li>Clique em <strong>Implantar</strong> > <strong>Nova implantação</strong>.</li>
+                            <li>Selecione o tipo <strong>Aplicativo da Web</strong> (Web App).</li>
+                            <li>Configure: Executar como <em>"Você"</em> e Quem tem acesso: <em>"Qualquer um"</em>.</li>
+                            <li>Clique em <strong>Implantar</strong>, conceda as autorizações necessárias e copie a URL gerada para colar no campo acima.</li>
+                        </ol>
+                    </div>
+                </div>
+            </section>
+
+        </div>
+    </main>
+
+    <!-- MODAL DE EDIÇÃO DE SUBSEÇÃO (PANORAMA GERAL) -->
+    <div class="modal-overlay" id="edit-sub-modal">
+        <div class="modal-container">
+            <div class="panel-header">
+                <h2><i class="fa-solid fa-pencil"></i> Editar Indicador de Subseção</h2>
+            </div>
+            <div class="panel-body">
+                <form id="edit-sub-form">
+                    <input type="hidden" id="edit-sub-index">
+                    
+                    <div class="form-group">
+                        <label for="edit-sub-title">Subseção</label>
+                        <input type="text" id="edit-sub-title" class="form-control" readonly style="opacity: 0.7;">
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 8px;">
+                        <div class="form-group" style="margin-bottom: 0;">
+                            <label for="edit-sub-lbl1">Legenda Indicador 1</label>
+                            <input type="text" id="edit-sub-lbl1" class="form-control" placeholder="Ex: Carros na Linha" required>
+                        </div>
+                        <div class="form-group" style="margin-bottom: 0;">
+                            <label for="edit-sub-val1">Valor Indicador 1</label>
+                            <input type="text" id="edit-sub-val1" class="form-control" placeholder="Ex: 8" required>
+                        </div>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 8px;">
+                        <div class="form-group" style="margin-bottom: 0;">
+                            <label for="edit-sub-lbl2">Legenda Indicador 2</label>
+                            <input type="text" id="edit-sub-lbl2" class="form-control" placeholder="Ex: Maior Tempo" required>
+                        </div>
+                        <div class="form-group" style="margin-bottom: 0;">
+                            <label for="edit-sub-val2">Valor Indicador 2</label>
+                            <input type="text" id="edit-sub-val2" class="form-control" placeholder="Ex: 15 Dias" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="edit-sub-status">Status de Alerta</label>
+                        <select id="edit-sub-status" class="form-control" required>
+                            <option value="NORMAL">NORMAL (VERDE)</option>
+                            <option value="ALERTA">ALERTA (LARANJA)</option>
+                            <option value="CRÍTICO">CRÍTICO (VERMELHO)</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="edit-sub-alert">Descrição do Alerta / Observação</label>
+                        <textarea id="edit-sub-alert" class="form-control" placeholder="Descreva problemas pendentes ou o estado atual da subseção..." required></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="edit-sub-link">Link da Subseção</label>
+                        <input type="url" id="edit-sub-link" class="form-control" placeholder="https://..." required>
+                    </div>
+
+                    <div style="display: flex; gap: 12px; justify-content: flex-end; margin-top: 20px;">
+                        <button type="button" id="btn-edit-sub-cancel" class="btn btn-secondary" style="flex: 0 0 100px;">Cancelar</button>
+                        <button type="submit" class="btn btn-primary" style="flex: 0 0 120px;">
+                            <i class="fa-solid fa-floppy-disk"></i> Salvar
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL DE CONFIRMAÇÃO DE EXCLUSÃO DE MISSÃO -->
+    <div class="modal-overlay" id="delete-modal">
+        <div class="modal-container">
+            <div class="panel-header">
+                <h2><i class="fa-solid fa-triangle-exclamation" style="color: var(--color-red);"></i> Confirmar Exclusão</h2>
+            </div>
+            <div class="panel-body">
+                <p style="margin-bottom: 20px; line-height: 1.5; color: var(--color-title);">Você tem certeza de que deseja remover esta missão? Essa alteração será refletida diretamente na planilha Google Sheets correspondente.</p>
+                <div style="display: flex; gap: 12px; justify-content: flex-end;">
+                    <button id="btn-delete-cancel" class="btn btn-secondary" style="flex: 0 0 100px;">Cancelar</button>
+                    <button id="btn-delete-confirm" class="btn btn-primary" style="flex: 0 0 120px; background-color: var(--color-red); color: white;">
+                        <i class="fa-solid fa-trash"></i> Excluir
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- TOAST NOTIFICATION -->
+    <div class="toast" id="toast-notification">
+        <i class="fa-solid fa-circle-info" id="toast-icon"></i>
+        <span id="toast-message">Mensagem do sistema</span>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

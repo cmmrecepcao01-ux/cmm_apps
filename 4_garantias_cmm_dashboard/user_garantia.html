@@ -1,0 +1,1461 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CMM - Registro de Garantias e Baixas</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #050505;
+            --card-bg: #121212;
+            --border-color: #222;
+            --accent-green: #00ff90;
+            --accent-blue: #00aaff;
+            --accent-red: #ff4d6d;
+            --accent-orange: #ff8c00;
+            --text-color: #f0f0f0;
+            --text-muted: #aaa;
+            --input-bg: #1a1a1a;
+            --input-border: #333;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            padding-bottom: 40px;
+        }
+
+        header {
+            background-color: var(--card-bg);
+            border-bottom: 1px solid rgba(0, 255, 144, 0.15);
+            padding: 20px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .header-title span {
+            color: var(--accent-green);
+        }
+
+        main {
+            padding: 24px;
+            max-width: 900px;
+            margin: 0 auto;
+            width: 100%;
+            flex: 1;
+        }
+
+        /* NAVIGATION TABS */
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 25px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 10px;
+        }
+
+        .tab-btn {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            font-weight: 600;
+            padding: 10px 20px;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+            position: relative;
+        }
+
+        .tab-btn:hover {
+            color: #fff;
+            background: rgba(255, 255, 255, 0.03);
+        }
+
+        .tab-btn.active {
+            color: #fff;
+            background: rgba(0, 255, 144, 0.1);
+        }
+
+        .tab-btn.active::after {
+            content: '';
+            position: absolute;
+            bottom: -11px;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background-color: var(--accent-green);
+            border-radius: 3px 3px 0 0;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* CARDS AND FORMS */
+        .card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+            margin-bottom: 20px;
+        }
+
+        .form-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            border-left: 4px solid var(--accent-green);
+            padding-left: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+
+        @media (max-width: 600px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .full-width {
+            grid-column: span 2;
+        }
+
+        @media (max-width: 600px) {
+            .full-width {
+                grid-column: span 1;
+            }
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            position: relative;
+        }
+
+        .form-group label {
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            letter-spacing: 0.5px;
+        }
+
+        .form-group input, 
+        .form-group select, 
+        .form-group textarea {
+            width: 100%;
+            padding: 12px 14px;
+            background-color: var(--input-bg);
+            border: 1px solid var(--input-border);
+            color: #fff;
+            border-radius: 8px;
+            outline: none;
+            font-size: 0.95rem;
+            font-family: inherit;
+            transition: all 0.2s ease;
+        }
+
+        .form-group input:focus, 
+        .form-group select:focus, 
+        .form-group textarea:focus {
+            border-color: var(--accent-green);
+            box-shadow: 0 0 8px rgba(0, 255, 144, 0.15);
+        }
+
+        /* AUTOCOMPLETE / PLACA SEARCH STYLE */
+        .autocomplete-container {
+            position: relative;
+        }
+
+        .autocomplete-list {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background-color: #1a1a1a;
+            border: 1px solid #333;
+            border-radius: 8px;
+            max-height: 180px;
+            overflow-y: auto;
+            z-index: 1000;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.6);
+            display: none;
+            margin-top: 4px;
+        }
+
+        .autocomplete-item {
+            padding: 10px 14px;
+            cursor: pointer;
+            border-bottom: 1px solid #262626;
+            font-size: 0.95rem;
+            font-weight: 500;
+        }
+
+        .autocomplete-item:hover {
+            background-color: #262626;
+            color: var(--accent-green);
+        }
+
+        .selected-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background-color: rgba(0, 255, 144, 0.15);
+            border: 1px solid var(--accent-green);
+            color: var(--accent-green);
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-top: 5px;
+            align-self: flex-start;
+        }
+
+        .clear-btn {
+            background: none;
+            border: none;
+            color: var(--accent-red);
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 1rem;
+            padding: 0 4px;
+        }
+
+        /* DESCRICAO TAGS */
+        .tag-container {
+            display: flex;
+            gap: 10px;
+            margin-top: 5px;
+        }
+
+        .tag-btn {
+            background-color: #222;
+            border: 1px solid #444;
+            color: var(--text-muted);
+            padding: 6px 14px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            text-transform: uppercase;
+            transition: all 0.2s ease;
+        }
+
+        .tag-btn:hover {
+            border-color: var(--accent-blue);
+            color: #fff;
+        }
+
+        .tag-btn.active {
+            background-color: rgba(0, 170, 255, 0.15);
+            border-color: var(--accent-blue);
+            color: #fff;
+        }
+
+        .char-counter {
+            font-size: 0.7rem;
+            align-self: flex-end;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+
+        .address-helper {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-top: 4px;
+            line-height: 1.3;
+        }
+
+        /* SUBMIT BUTTON */
+        .submit-btn {
+            background: linear-gradient(135deg, #00ff90 0%, #00b365 100%);
+            color: #000;
+            border: none;
+            padding: 14px 28px;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            transition: all 0.2s ease-in-out;
+            box-shadow: 0 4px 15px rgba(0, 255, 144, 0.2);
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 255, 144, 0.35);
+        }
+
+        .submit-btn:active {
+            transform: translateY(0);
+        }
+
+        /* OPTIONAL SECTIONS */
+        .hidden-section {
+            display: none;
+        }
+
+        .file-upload-wrapper {
+            border: 1px dashed var(--input-border);
+            border-radius: 8px;
+            padding: 16px;
+            text-align: center;
+            background-color: var(--input-bg);
+            cursor: pointer;
+            position: relative;
+            transition: border-color 0.2s ease;
+        }
+
+        .file-upload-wrapper:hover {
+            border-color: var(--accent-blue);
+        }
+
+        .file-upload-wrapper input[type="file"] {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        .upload-icon {
+            font-size: 1.5rem;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        .upload-filename {
+            font-size: 0.85rem;
+            color: var(--accent-blue);
+            margin-top: 5px;
+            font-weight: 500;
+        }
+
+        /* TAB 2: UPDATE STATUS */
+        .search-row {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 25px;
+        }
+
+        .search-btn {
+            background-color: var(--accent-blue);
+            color: #000;
+            border: none;
+            padding: 0 24px;
+            border-radius: 8px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .search-btn:hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
+        }
+
+        .ticket-item {
+            background-color: #161616;
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .ticket-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #222;
+            padding-bottom: 10px;
+        }
+
+        .ticket-plate {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--accent-blue);
+        }
+
+        .ticket-date {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        .ticket-details {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px 20px;
+            font-size: 0.9rem;
+        }
+
+        .detail-row {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .detail-row span:first-child {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+
+        .detail-row span:last-child {
+            color: #fff;
+        }
+
+        .ticket-action {
+            display: grid;
+            grid-template-columns: auto 1fr auto;
+            align-items: center;
+            gap: 15px;
+            background-color: #1e1e1e;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #2d2d2d;
+            margin-top: 5px;
+        }
+
+        @media (max-width: 500px) {
+            .ticket-action {
+                grid-template-columns: 1fr;
+                gap: 12px;
+            }
+        }
+
+        .checkbox-container {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 600;
+            user-select: none;
+        }
+
+        .checkbox-container input {
+            width: 18px;
+            height: 18px;
+            accent-color: var(--accent-green);
+        }
+
+        .action-save-btn {
+            background-color: var(--accent-green);
+            color: #000;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-weight: 700;
+            font-size: 0.85rem;
+            cursor: pointer;
+            text-transform: uppercase;
+            transition: all 0.2s ease;
+        }
+
+        .action-save-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 10px rgba(0, 255, 144, 0.2);
+        }
+
+        /* LOADING AND STATUS MESSAGES */
+        .overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0,0,0,0.85);
+            z-index: 10000;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid rgba(0, 255, 144, 0.1);
+            border-top: 4px solid var(--accent-green);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .overlay-text {
+            font-weight: bold;
+            letter-spacing: 1px;
+            color: var(--accent-green);
+        }
+
+        /* CONFIG BUTTON FOR API URL */
+        .config-bar {
+            background-color: #111;
+            padding: 12px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            border-top: 1px solid #222;
+            margin-top: auto;
+        }
+
+        .config-btn {
+            background: none;
+            border: 1px solid #444;
+            color: var(--text-muted);
+            padding: 4px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .config-btn:hover {
+            color: #fff;
+            border-color: #666;
+        }
+
+        #configModal {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 90%;
+            max-width: 500px;
+            background-color: #1a1a1a;
+            border: 2px solid var(--accent-blue);
+            border-radius: 12px;
+            padding: 24px;
+            z-index: 20000;
+            box-shadow: 0 0 30px rgba(0, 170, 255, 0.4);
+        }
+
+        #modalOverlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0,0,0,0.8);
+            z-index: 19999;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="header-title">CMM — Portal de Garantias e Baixas <span>[Usuário]</span></div>
+    </header>
+
+    <main>
+        <div class="tabs">
+            <button class="tab-btn active" onclick="switchTab('tab-cadastrar', this)">Cadastrar Acionamento</button>
+            <button class="tab-btn" onclick="switchTab('tab-status', this)">Informar se foi Resolvido</button>
+        </div>
+
+        <!-- ABA 1: CADASTRAR ACIONAMENTO -->
+        <div id="tab-cadastrar" class="tab-content active">
+            <div class="card">
+                <div class="form-title">Cadastrar Acionamento de Garantia</div>
+                <form id="formAcionamento" onsubmit="submitAcionamento(event)">
+                    <div class="form-grid">
+                        
+                        <!-- Unidade (OPM) -->
+                        <div class="form-group">
+                            <label for="opmSelect">Unidade (OPM) *</label>
+                            <select id="opmSelect" required>
+                                <option value="">Selecione a OPM...</option>
+                            </select>
+                        </div>
+
+                        <!-- Placa do Veículo -->
+                        <div class="form-group autocomplete-container">
+                            <label for="placaInput">Placa do Veículo *</label>
+                            <input type="text" id="placaInput" placeholder="Busque a placa digitando..." oninput="filterPlacas()" autocomplete="off">
+                            <div id="placaSuggestions" class="autocomplete-list"></div>
+                            <div id="selectedPlacaBadge" class="selected-badge hidden-section">
+                                <span id="selectedPlacaText"></span>
+                                <button type="button" class="clear-btn" onclick="clearSelectedPlaca()">✕</button>
+                            </div>
+                            <span id="placaErrorLabel" style="font-size: 0.75rem; color: var(--accent-orange); display: none; margin-top: 4px; font-weight: 500;"></span>
+                        </div>
+
+                        <!-- Marca -->
+                        <div class="form-group">
+                            <label for="marcaSelect">Marca do Veículo *</label>
+                            <select id="marcaSelect" onchange="updateModelOptions()" required>
+                                <option value="">Selecione...</option>
+                                <option value="Toyota">Toyota</option>
+                                <option value="Chevrolet">Chevrolet</option>
+                                <option value="Ford">Ford</option>
+                                <option value="Mitsubishi">Mitsubishi</option>
+                                <option value="Volkswagen">Volkswagen</option>
+                                <option value="Renault">Renault</option>
+                                <option value="Fiat">Fiat</option>
+                                <option value="Iveco">Iveco</option>
+                                <option value="Hyundai">Hyundai</option>
+                            </select>
+                        </div>
+
+                        <!-- Modelo -->
+                        <div class="form-group">
+                            <label for="modeloSelect">Modelo do Veículo *</label>
+                            <select id="modeloSelect" required>
+                                <option value="">Selecione a Marca primeiro...</option>
+                            </select>
+                        </div>
+
+                        <!-- Ano de Fabricação -->
+                        <div class="form-group">
+                            <label for="anoSelect">Ano de Fabricação *</label>
+                            <select id="anoSelect" required>
+                                <option value="">Selecione...</option>
+                            </select>
+                        </div>
+
+                        <!-- Quilometragem Atual -->
+                        <div class="form-group">
+                            <label for="kmInput">Quilometragem Atual (números apenas) *</label>
+                            <input type="text" id="kmInput" placeholder="Ex: 10325" oninput="cleanKMInput(this)" required>
+                        </div>
+
+                        <!-- Razão do Acionamento -->
+                        <div class="form-group full-width">
+                            <label for="razaoSelect">Razão do Acionamento *</label>
+                            <select id="razaoSelect" required>
+                                <option value="">Selecione...</option>
+                                <option value="Item de Fábrica (mecânico/ elétrico/ estrutura)">Item de Fábrica (mecânico / elétrico / estrutura)</option>
+                                <option value="Item de Adaptação (sonoros e luminosos, rádio, grafismo, blindagem)">Item de Adaptação (sonoros, rádio, blindagem, etc)</option>
+                                <option value="revisão (troca de óleo, filtros, etc)">Revisão (troca de óleo, filtros, etc)</option>
+                            </select>
+                        </div>
+
+                        <!-- Descrição Curta -->
+                        <div class="form-group full-width">
+                            <label for="descricaoInput">Descrição Curta do Serviço/Problema *</label>
+                            <div class="tag-container">
+                                <button type="button" class="tag-btn" onclick="applyDescPrefix('REVISÃO')">Revisão</button>
+                                <button type="button" class="tag-btn" onclick="applyDescPrefix('GARANTIA')">Garantia</button>
+                            </div>
+                            <textarea id="descricaoInput" rows="3" placeholder="⚠️ Selecione a tag REVISÃO ou GARANTIA acima para liberar este campo..." oninput="updateCharCount()" disabled required></textarea>
+                            <span id="charCountLabel" class="char-counter">0 caracteres (mínimo 10 adicionais)</span>
+                        </div>
+
+                        <!-- Endereço da Concessionária -->
+                        <div class="form-group full-width">
+                            <label for="enderecoInput">Endereço da Concessionária *</label>
+                            <input type="text" id="enderecoInput" placeholder="Copie o endereço do Google Maps..." required>
+                            <span class="address-helper">Ex: Av. General Pedro Leon Schneider, 59 - Santana, São Paulo - SP, 02012-110</span>
+                        </div>
+
+                        <!-- Foto do problema -->
+                        <div class="form-group">
+                            <label>Foto do Problema (Opcional)</label>
+                            <div class="file-upload-wrapper">
+                                <span class="upload-icon">📷</span>
+                                <span id="fotoUploadLabel">Tirar foto ou escolher arquivo</span>
+                                <input type="file" id="fotoInput" accept="image/*" onchange="handleFileSelected(this, 'fotoUploadLabel', 'fotoFileObj', 'fotoPreviewContainer')">
+                            </div>
+                            <span id="fotoFileName" class="upload-filename"></span>
+                            <div id="fotoPreviewContainer" style="margin-top: 10px; display: none;"></div>
+                        </div>
+
+                        <!-- Veículo permaneceu baixado? -->
+                        <div class="form-group">
+                            <label for="baixadoSelect">Veículo permaneceu baixado? *</label>
+                            <select id="baixadoSelect" required>
+                                <option value="NÃO">NÃO (resolveu no mesmo dia)</option>
+                                <option value="SIM">SIM (ficou parado sem poder operar)</option>
+                            </select>
+                        </div>
+
+                        <!-- Houve Negativa da Concessionária? -->
+                        <div class="form-group full-width">
+                            <label for="negativaSelect">Houve Negativa da Concessionária? *</label>
+                            <select id="negativaSelect" onchange="toggleNegativaSection(this.value)" required>
+                                <option value="NÃO">NÃO</option>
+                                <option value="SIM">SIM</option>
+                            </select>
+                        </div>
+
+                        <!-- OS de Negativa (Obrigatório se Negativa = SIM) -->
+                        <div class="form-group full-width hidden-section" id="negativaFileSection">
+                            <label>Anexar Ordem de Serviço com Negativa / Formulário de Negativa (padrão CMM) *</label>
+                            <div class="file-upload-wrapper">
+                                <span class="upload-icon">📄</span>
+                                <span id="negativaUploadLabel">Escolher PDF ou Imagem do documento</span>
+                                <input type="file" id="negativaInput" accept="image/*,application/pdf" onchange="handleFileSelected(this, 'negativaUploadLabel', 'negativaFileObj', 'negativaPreviewContainer')">
+                            </div>
+                            <span id="negativaFileName" class="upload-filename"></span>
+                            <div id="negativaPreviewContainer" style="margin-top: 10px; display: none;"></div>
+                        </div>
+
+                        <!-- Observações -->
+                        <div class="form-group full-width">
+                            <label for="observacaoInput">Observações (opcional)</label>
+                            <textarea id="observacaoInput" rows="2" placeholder="Ex: ACIDENTE, SINDICÂNCIA, OUTROS..."></textarea>
+                        </div>
+
+                    </div>
+                    <button type="submit" class="submit-btn" style="margin-top: 30px;">Enviar Acionamento</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- ABA 2: INFORMAR SE FOI RESOLVIDO -->
+        <div id="tab-status" class="tab-content">
+            <div class="card">
+                <div class="form-title">Informar se foi Resolvido</div>
+                
+                <div class="search-row" style="display: flex; gap: 15px; flex-wrap: wrap; margin-bottom: 25px;">
+                    <div class="form-group" style="flex: 1; min-width: 200px; margin-bottom: 0;">
+                        <label for="searchOpmStatus" style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 4px; display: block;">Filtrar por Unidade (OPM)</label>
+                        <select id="searchOpmStatus" style="width: 100%; height: 45px; background-color: var(--input-bg); border: 1px solid var(--border-color); color: #fff; border-radius: 8px; padding: 0 12px; font-size: 0.9rem; outline: none; transition: border-color 0.2s;">
+                            <option value="">Todas as Unidades (OPM)...</option>
+                        </select>
+                    </div>
+                    <div class="form-group" style="flex: 1; min-width: 200px; margin-bottom: 0;">
+                        <label for="searchPlateStatus" style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 4px; display: block;">Filtrar por Placa</label>
+                        <input type="text" id="searchPlateStatus" placeholder="Buscar por placa..." style="text-transform: uppercase; height: 45px; width: 100%; margin-bottom: 0;">
+                    </div>
+                    <div class="form-group" style="display: flex; align-items: flex-end; min-width: 120px; margin-bottom: 0;">
+                        <button type="button" class="search-btn" onclick="buscarTicketsAtivos()" style="height: 45px; width: 100%;">Buscar</button>
+                    </div>
+                </div>
+
+                <div id="ticketsListContainer">
+                    <div style="text-align: center; color: var(--text-muted); font-style: italic; padding: 20px 0;">
+                        Selecione a OPM ou digite a placa acima para carregar as garantias pendentes.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- CONFIGURATION FOOTER -->
+    <div class="config-bar">
+        <span>CMM Frota &copy; 2026</span>
+    </div>
+
+    <!-- LOADING OVERLAY -->
+    <div class="overlay" id="loadingOverlay">
+        <div class="spinner"></div>
+        <div class="overlay-text" id="overlayText">ENVIANDO DADOS...</div>
+    </div>
+
+    <!-- CONFIG MODAL OVERLAY -->
+    <div id="modalOverlay" style="display:none; position:fixed; top:0; left:0; right:0; bottom:0; background-color:rgba(0,0,0,0.8); z-index:19999;"></div>
+
+    <script>
+        // LISTA DE OPMS
+        const OPMS = ["1.BAEP","1.BPAMB","1.BPCHQ","1.BPM/I","1.BPM/M","1.BPRV","1.BPTRAN","1.EM/PM","10.BAEP","10.BPM/I","10.BPM/M","11.BAEP","11.BPM/I","11.BPM/M","12.BAEP","12.BPM/I","12.BPM/M","13.BAEP","13.BPM/I","13.BPM/M","14.BAEP","14.BPM/I","14.BPM/M","15.BAEP","15.BPM/I","15.BPM/M","16.BPM/I","16.BPM/M","17.BPM/I","17.BPM/M","18.BPM/I","18.BPM/M","19.BPM/I","19.BPM/M","2.BAEP","2.BPAMB","2.BPCHQ","2.BPM/I","2.BPM/M","2.BPRV","2.BPTRAN","20.BPM/I","20.BPM/M","21.BPM/I","21.BPM/M","22.BPM/I","22.BPM/M","23.BPM/I","23.BPM/M","24.BPM/I","24.BPM/M","25.BPM/I","25.BPM/M","26.BPM/I","26.BPM/M","27.BPM/I","27.BPM/M","28.BPM/I","28.BPM/M","29.BPM/I","29.BPM/M","3.BAEP","3.BPAMB","3.BPCHQ","3.BPM/I","3.BPM/M","3.BPRV","3.EM/PM","30.BPM/I","30.BPM/M","31.BPM/I","31.BPM/M","32.BPM/I","32.BPM/M","33.BPM/I","33.BPM/M","34.BPM/I","34.BPM/M","35.BPM/I","35.BPM/M","36.BPM/I","36.BPM/M","37.BPM/I","37.BPM/M","38.BPM/I","38.BPM/M","39.BPM/I","39.BPM/M","4.BAEP","4.BPAMB","4.BPCHQ","4.BPM/I","4.BPM/M","4.BPRV","4.EM/PM","40.BPM/I","40.BPM/M","41.BPM/I","42.BPM/I","43.BPM/I","43.BPM/M","44.BPM/I","45.BPM/I","46.BPM/I","46.BPM/M","47.BPM/I","48.BPM/I","48.BPM/M","49.BPM/I","49.BPM/M","5.BAEP","5.BPAMB","5.BPCHQ","5.BPM/I","5.BPM/M","5.BPRV","50.BPM/I","51.BPM/I","52.BPM/I","53.BPM/I","54.BPM/I","55.BPM/I","6.BAEP","6.BPM/I","6.BPM/M","6.BPRV","6.EM/PM","7.BAEP","7.BPM/I","7.BPM/M","8.BAEP","8.BPM/I","8.BPM/M","9.BAEP","9.BPM/I","9.BPM/M","APMAL","APMBB","APMCGE","APMCMSP","APMPGJ","APMPMSP","APMSAP","APMSSP","APMTCE","APMTJ","APMTJM","C COM SOC","C MED","C MIL","C MUS","C ODONT","CAES","CAJ","CAPS","CAVPM","CIAF","CIAP","CIPM","CMB","CMM","CMT GERAL","COORD OP PM","COPOM","CORREG PM","CPA/M-1","CPA/M-10","CPA/M-11","CPA/M-12","CPA/M-2","CPA/M-3","CPA/M-4","CPA/M-5","CPA/M-6","CPA/M-7","CPA/M-8","CPA/M-9","CPAMB","CPC","CPCHQ","CPI-1","CPI-10","CPI-2","CPI-3","CPI-4","CPI-5","CPI-6","CPI-7","CPI-8","CPI-9","CPM","CPRV","CPTRAN","CRPM","DEC","DF","DL","DP","DPCDH","DS","DSA/CG","DTIC","EEF","EM/PM","ESSD","ESSGT","GAB CMT G","PMRG","RPMON"];
+        
+        // DICIONÁRIO DE MARCA E MODELOS
+        const MARCAS_MODELOS = {
+            "Toyota": ["Corolla Cross", "Corolla", "Hilux", "Yaris", "Etios"],
+            "Chevrolet": ["Spin", "S-10", "Trailblazer", "Cruze", "Onix"],
+            "Ford": ["Ranger", "Territory", "Transit"],
+            "Mitsubishi": ["L200", "Pajero", "Outlander", "ASX"],
+            "Volkswagen": ["Virtus", "Gol", "T-Cross", "Amarok", "Polo"],
+            "Renault": ["Duster", "Logan", "Sandero", "Kwid", "Master"],
+            "Fiat": ["Scudo", "Cronos", "Toro", "Strada", "Fiorino", "Ducato"],
+            "Iveco": ["Daily"],
+            "Hyundai": ["Creta", "HB20", "Tucson"]
+        };
+
+        // VARIÁVEIS DE CONFIGURAÇÃO E CACHE
+        const API_URL = "https://script.google.com/macros/s/AKfycbxPloG_YjMC01xXQnTUsiTpBd7dcPxairGe9_i2DUzRiY59nuMl6eGsITtke5cjOAdb/exec";
+        let placasBancoDados = [];
+        let selectedPlaca = "";
+        let dbPlacasCarregado = false;
+        
+        // Objetos temporários de arquivo em Base64
+        const fileBuffers = {
+            fotoFileObj: null,
+            negativaFileObj: null
+        };
+
+        // INICIALIZAÇÃO
+        function initPage() {
+            // Preenche OPMs de cadastro
+            const opmSelect = document.getElementById("opmSelect");
+            OPMS.forEach(opm => {
+                const opt = document.createElement("option");
+                opt.value = opm;
+                opt.textContent = opm;
+                opmSelect.appendChild(opt);
+            });
+
+            // Preenche OPMs de busca
+            const searchOpmSelect = document.getElementById("searchOpmStatus");
+            OPMS.forEach(opm => {
+                const opt = document.createElement("option");
+                opt.value = opm;
+                opt.textContent = opm;
+                searchOpmSelect.appendChild(opt);
+            });
+
+            // Preenche anos de 2020 a 2030
+            const anoSelect = document.getElementById("anoSelect");
+            for (let ano = 2020; ano <= 2030; ano++) {
+                const opt = document.createElement("option");
+                opt.value = ano;
+                opt.textContent = ano;
+                anoSelect.appendChild(opt);
+            }
+
+            // Baixa placas automaticamente
+            baixarPlacas();
+        }
+
+        // BAIXAR PLACAS DO BANCO DE DADOS
+        function baixarPlacas() {
+            if (!API_URL) return;
+            
+            showLoading("CARREGANDO PLACAS...");
+            fetch(API_URL + "?action=getPlacas")
+                .then(res => res.json())
+                .then(data => {
+                    hideLoading();
+                    if (Array.isArray(data)) {
+                        placasBancoDados = data;
+                        dbPlacasCarregado = true;
+                        document.getElementById("placaErrorLabel").style.display = "none";
+                    } else {
+                        console.error(data.error || "Dados inválidos recebidos.");
+                        showPlacaErrorOffline();
+                    }
+                })
+                .catch(err => {
+                    hideLoading();
+                    console.error("Erro ao baixar placas:", err);
+                    showPlacaErrorOffline();
+                });
+        }
+
+        function showPlacaErrorOffline() {
+            dbPlacasCarregado = false;
+            const errLabel = document.getElementById("placaErrorLabel");
+            errLabel.textContent = "⚠️ Conexão offline com banco de dados. Digitação manual liberada.";
+            errLabel.style.display = "block";
+        }
+
+        // BUSCA E FILTRAGEM DE PLACAS
+        function filterPlacas() {
+            const input = document.getElementById("placaInput");
+            const filter = input.value.toUpperCase().replace(/[^A-Z0-9]/g, "");
+            input.value = filter; // Força apenas letras e números sem hífens
+            
+            if (!dbPlacasCarregado) {
+                // Se a API falhou, a placa é o que ele digitar diretamente
+                selectedPlaca = filter;
+                return;
+            }
+            
+            const listDiv = document.getElementById("placaSuggestions");
+            listDiv.innerHTML = "";
+            
+            if (filter.length < 2) {
+                listDiv.style.display = "none";
+                return;
+            }
+            
+            const filtered = placasBancoDados.filter(p => p.includes(filter));
+            
+            if (filtered.length === 0) {
+                listDiv.style.display = "none";
+                return;
+            }
+            
+            filtered.slice(0, 10).forEach(placa => {
+                const item = document.createElement("div");
+                item.className = "autocomplete-item";
+                item.textContent = placa;
+                item.onclick = function() {
+                    selectPlaca(placa);
+                };
+                listDiv.appendChild(item);
+            });
+            
+            listDiv.style.display = "block";
+        }
+
+        function selectPlaca(placa) {
+            selectedPlaca = placa;
+            document.getElementById("placaInput").classList.add("hidden-section");
+            document.getElementById("placaSuggestions").style.display = "none";
+            
+            const badge = document.getElementById("selectedPlacaBadge");
+            const textSpan = document.getElementById("selectedPlacaText");
+            textSpan.textContent = placa;
+            badge.classList.remove("hidden-section");
+        }
+
+        function clearSelectedPlaca() {
+            selectedPlaca = "";
+            const input = document.getElementById("placaInput");
+            input.value = "";
+            input.classList.remove("hidden-section");
+            
+            const badge = document.getElementById("selectedPlacaBadge");
+            badge.classList.add("hidden-section");
+            input.focus();
+        }
+
+        // FECHAR DROPDOWNS AO CLICAR FORA
+        document.addEventListener("click", function(e) {
+            if (!e.target.closest(".autocomplete-container")) {
+                document.getElementById("placaSuggestions").style.display = "none";
+            }
+        });
+
+        // POPULAR MODELOS DINAMICAMENTE
+        function updateModelOptions() {
+            const marca = document.getElementById("marcaSelect").value;
+            const modeloSelect = document.getElementById("modeloSelect");
+            modeloSelect.innerHTML = "";
+
+            if (!marca || !MARCAS_MODELOS[marca]) {
+                const opt = document.createElement("option");
+                opt.value = "";
+                opt.textContent = "Selecione a Marca primeiro...";
+                modeloSelect.appendChild(opt);
+                return;
+            }
+
+            const optDefault = document.createElement("option");
+            optDefault.value = "";
+            optDefault.textContent = "Selecione o Modelo...";
+            modeloSelect.appendChild(optDefault);
+
+            MARCAS_MODELOS[marca].forEach(modelo => {
+                const opt = document.createElement("option");
+                opt.value = modelo;
+                opt.textContent = modelo;
+                modeloSelect.appendChild(opt);
+            });
+            
+            // Adiciona opção "Outro" no final
+            const optOutro = document.createElement("option");
+            optOutro.value = "OUTRO";
+            optOutro.textContent = "Outro modelo...";
+            modeloSelect.appendChild(optOutro);
+        }
+
+        // LIMPAR KM INPUT (APENAS NÚMEROS)
+        function cleanKMInput(el) {
+            el.value = el.value.replace(/[^0-9]/g, "");
+        }
+
+        // PREFIXO DA DESCRIÇÃO
+        let activePrefix = "";
+        function applyDescPrefix(type) {
+            const textarea = document.getElementById("descricaoInput");
+            
+            // Habilita a escrita e ajusta placeholder
+            textarea.disabled = false;
+            textarea.placeholder = "Descreva com detalhes o problema ou serviço realizado...";
+            
+            const prefix = `[${type}] `;
+            
+            // Remove o prefixo antigo se houver
+            let currentText = textarea.value;
+            if (currentText.startsWith("[REVISÃO] ")) {
+                currentText = currentText.substring(10);
+            } else if (currentText.startsWith("[GARANTIA] ")) {
+                currentText = currentText.substring(11);
+            }
+
+            textarea.value = prefix + currentText;
+            activePrefix = prefix;
+
+            // Destaca o botão da tag
+            document.querySelectorAll(".tag-btn").forEach(btn => {
+                btn.classList.remove("active");
+                if (btn.textContent.toUpperCase() === type) {
+                    btn.classList.add("active");
+                }
+            });
+
+            updateCharCount();
+            textarea.focus();
+        }
+
+        function updateCharCount() {
+            const textarea = document.getElementById("descricaoInput");
+            const label = document.getElementById("charCountLabel");
+            const content = textarea.value;
+            
+            let userLength = content.length;
+            if (activePrefix && content.startsWith(activePrefix)) {
+                userLength = content.length - activePrefix.length;
+            }
+
+            if (userLength < 0) userLength = 0;
+            
+            label.textContent = `${userLength} caracteres (mínimo 10 adicionais)`;
+            
+            if (userLength >= 10) {
+                label.style.color = "var(--accent-green)";
+            } else {
+                label.style.color = "var(--text-muted)";
+            }
+        }
+
+        // CONVERSÃO DE ARQUIVO PARA BASE64 E PRÉ-VISUALIZAÇÃO
+        function handleFileSelected(inputEl, labelId, bufferKey, previewContainerId) {
+            const file = inputEl.files[0];
+            const label = document.getElementById(labelId);
+            const fileNameSpan = document.getElementById(inputEl.id.replace("Input", "") + "FileName");
+            const previewContainer = document.getElementById(previewContainerId);
+            
+            previewContainer.innerHTML = "";
+            previewContainer.style.display = "none";
+            
+            if (!file) {
+                fileBuffers[bufferKey] = null;
+                label.textContent = "Escolher arquivo...";
+                if (fileNameSpan) fileNameSpan.textContent = "";
+                return;
+            }
+
+            label.textContent = "Arquivo selecionado";
+            fileNameSpan.textContent = `${file.name} (${(file.size / 1024).toFixed(1)} KB)`;
+
+            // Exibir feedback visual e pré-visualização na tela
+            previewContainer.style.display = "flex";
+            previewContainer.style.alignItems = "center";
+            previewContainer.style.gap = "12px";
+            previewContainer.style.backgroundColor = "rgba(255, 255, 255, 0.02)";
+            previewContainer.style.padding = "10px";
+            previewContainer.style.borderRadius = "8px";
+            previewContainer.style.border = "1px solid #333";
+            previewContainer.style.marginTop = "10px";
+            
+            if (file.type.startsWith("image/")) {
+                const img = document.createElement("img");
+                img.src = URL.createObjectURL(file);
+                img.style.maxWidth = "80px";
+                img.style.maxHeight = "80px";
+                img.style.borderRadius = "4px";
+                img.style.border = "1px solid #555";
+                previewContainer.appendChild(img);
+            } else {
+                const icon = document.createElement("span");
+                icon.innerHTML = "📄";
+                icon.style.fontSize = "2rem";
+                previewContainer.appendChild(icon);
+            }
+
+            const infoDiv = document.createElement("div");
+            infoDiv.style.flex = "1";
+            infoDiv.style.textAlign = "left";
+            infoDiv.style.fontSize = "0.8rem";
+            infoDiv.innerHTML = `<span style="color: var(--accent-green); font-weight: bold;">✓ Arquivo preparado</span><br><span style="color: #aaa; max-width: 200px; display: inline-block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${file.name}</span>`;
+            previewContainer.appendChild(infoDiv);
+
+            const deleteBtn = document.createElement("button");
+            deleteBtn.type = "button";
+            deleteBtn.style.backgroundColor = "transparent";
+            deleteBtn.style.border = "1px solid var(--accent-red)";
+            deleteBtn.style.color = "var(--accent-red)";
+            deleteBtn.style.padding = "4px 10px";
+            deleteBtn.style.borderRadius = "6px";
+            deleteBtn.style.cursor = "pointer";
+            deleteBtn.style.fontSize = "0.75rem";
+            deleteBtn.textContent = "Remover";
+            deleteBtn.onclick = function() {
+                inputEl.value = "";
+                handleFileSelected(inputEl, labelId, bufferKey, previewContainerId);
+            };
+            previewContainer.appendChild(deleteBtn);
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const base64String = e.target.result.split(',')[1];
+                fileBuffers[bufferKey] = {
+                    base64: base64String,
+                    filename: file.name,
+                    mimeType: file.type
+                };
+            };
+            reader.readAsDataURL(file);
+        }
+
+        // EXIBIR OU OCULTAR OS ARQUIVOS DA NEGATIVA
+        function toggleNegativaSection(val) {
+            const section = document.getElementById("negativaFileSection");
+            const input = document.getElementById("negativaInput");
+            
+            if (val === "SIM") {
+                section.classList.remove("hidden-section");
+                input.required = true;
+            } else {
+                section.classList.add("hidden-section");
+                input.required = false;
+                input.value = "";
+                fileBuffers.negativaFileObj = null;
+                document.getElementById("negativaUploadLabel").textContent = "Escolher PDF ou Imagem do documento";
+                document.getElementById("negativaFileName").textContent = "";
+                document.getElementById("negativaPreviewContainer").innerHTML = "";
+                document.getElementById("negativaPreviewContainer").style.display = "none";
+            }
+        }
+
+        // ENVIAR FORMULÁRIO DE ACIONAMENTO
+        function submitAcionamento(e) {
+            e.preventDefault();
+
+            if (!API_URL) {
+                alert("Erro: URL do Web App não configurada!");
+                return;
+            }
+
+            // Validar Placa
+            let placaFinal = "";
+            if (dbPlacasCarregado) {
+                if (!selectedPlaca) {
+                    alert("Erro: Você deve escolher uma placa válida a partir da lista de buscas!");
+                    document.getElementById("placaInput").focus();
+                    return;
+                }
+                placaFinal = selectedPlaca;
+            } else {
+                const typedPlaca = document.getElementById("placaInput").value.trim().toUpperCase();
+                const regexPlaca = /^[A-Z]{3}[0-9][A-Z0-9][0-9]{2}$/;
+                if (!regexPlaca.test(typedPlaca)) {
+                    alert("Erro: Informe uma placa válida no padrão nacional (ex: ABC1D23 ou ABC1234, sem hífen).");
+                    document.getElementById("placaInput").focus();
+                    return;
+                }
+                placaFinal = typedPlaca;
+            }
+
+            // Validar Endereço da Concessionária (Rua, Número - Cidade - Estado)
+            const endereco = document.getElementById("enderecoInput").value.trim();
+            const regexEndereco = /.+,.+-\s*[A-Z]{2}/i;
+            if (!regexEndereco.test(endereco)) {
+                alert("Erro no Endereço: Por favor, siga o formato padrão esperado (Ex: Av. Paulista, 1000 - São Paulo - SP). Certifique-se de incluir vírgula e a sigla do estado.");
+                document.getElementById("enderecoInput").focus();
+                return;
+            }
+
+            // Validação da descrição
+            const descValue = document.getElementById("descricaoInput").value;
+            let userLength = descValue.length;
+            if (activePrefix && descValue.startsWith(activePrefix)) {
+                userLength = descValue.length - activePrefix.length;
+            }
+
+            if (!activePrefix) {
+                alert("Erro: Você deve clicar no botão da tag REVISÃO ou GARANTIA antes de preencher a descrição!");
+                return;
+            }
+
+            if (userLength < 10) {
+                alert("Erro: Descreva detalhadamente o problema com no mínimo 10 caracteres adicionais!");
+                document.getElementById("descricaoInput").focus();
+                return;
+            }
+
+            if (document.getElementById("negativaSelect").value === "SIM" && !fileBuffers.negativaFileObj) {
+                alert("Erro: Anexe o documento da OS com a Negativa de Atendimento.");
+                return;
+            }
+
+            showLoading("CADASTRANDO ACIONAMENTO...");
+
+            const payload = {
+                action: "criarAcionamento",
+                opm: document.getElementById("opmSelect").value,
+                placa: placaFinal,
+                marca: document.getElementById("marcaSelect").value,
+                modelo: document.getElementById("modeloSelect").value,
+                ano: document.getElementById("anoSelect").value,
+                km: document.getElementById("kmInput").value,
+                razao: document.getElementById("razaoSelect").value,
+                descricao: descValue,
+                endereco: endereco,
+                baixado: document.getElementById("baixadoSelect").value,
+                negativa: document.getElementById("negativaSelect").value,
+                observacao: document.getElementById("observacaoInput").value,
+                fotoFile: fileBuffers.fotoFileObj,
+                negativaFile: fileBuffers.negativaFileObj
+            };
+
+            fetch(API_URL, {
+                method: "POST",
+                mode: "no-cors",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(payload)
+            })
+            .then(() => {
+                hideLoading();
+                alert("Acionamento cadastrado com sucesso! Os dados foram enviados para o Google Sheets.");
+                resetForm();
+            })
+            .catch(err => {
+                hideLoading();
+                alert("Erro ao enviar dados. Verifique a URL do Web App ou sua conexão.");
+                console.error(err);
+            });
+        }
+
+        function resetForm() {
+            document.getElementById("formAcionamento").reset();
+            clearSelectedPlaca();
+            document.querySelectorAll(".tag-btn").forEach(btn => btn.classList.remove("active"));
+            activePrefix = "";
+            fileBuffers.fotoFileObj = null;
+            fileBuffers.negativaFileObj = null;
+            document.getElementById("fotoUploadLabel").textContent = "Tirar foto ou escolher arquivo";
+            document.getElementById("fotoFileName").textContent = "";
+            document.getElementById("fotoPreviewContainer").innerHTML = "";
+            document.getElementById("fotoPreviewContainer").style.display = "none";
+            document.getElementById("negativaPreviewContainer").innerHTML = "";
+            document.getElementById("negativaPreviewContainer").style.display = "none";
+            
+            const descArea = document.getElementById("descricaoInput");
+            descArea.disabled = true;
+            descArea.placeholder = "⚠️ Selecione a tag REVISÃO ou GARANTIA acima para liberar este campo...";
+            
+            // Limpa filtros de busca
+            document.getElementById("searchPlateStatus").value = "";
+            document.getElementById("searchOpmStatus").value = "";
+            document.getElementById("ticketsListContainer").innerHTML = `<div style="text-align: center; color: var(--text-muted); font-style: italic; padding: 20px 0;">Selecione a OPM ou digite a placa acima para carregar as garantias pendentes.</div>`;
+            
+            toggleNegativaSection("NÃO");
+            updateCharCount();
+        }
+
+        // TABS NAVIGATION LÓGICA
+        function switchTab(tabId, btnEl) {
+            document.querySelectorAll(".tab-content").forEach(c => c.classList.remove("active"));
+            document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+
+            document.getElementById(tabId).classList.add("active");
+            btnEl.classList.add("active");
+            
+            if (tabId === "tab-status") {
+                document.getElementById("searchPlateStatus").focus();
+            }
+        }
+
+        // ABA 2: BUSCA DE ACIONAMENTOS ATIVOS (PENDENTES)
+        function buscarTicketsAtivos() {
+            const opmSelect = document.getElementById("searchOpmStatus");
+            const opmVal = opmSelect.value;
+            const input = document.getElementById("searchPlateStatus");
+            const filterPlaca = input.value.trim().toUpperCase();
+            
+            if (!API_URL) {
+                alert("Erro: URL do Web App não configurada!");
+                return;
+            }
+
+            if (!opmVal && !filterPlaca) {
+                alert("Por favor, selecione uma Unidade (OPM) ou informe uma placa para buscar.");
+                return;
+            }
+
+            const container = document.getElementById("ticketsListContainer");
+            container.innerHTML = `<div style="text-align: center; color: var(--accent-blue); font-weight: 500; padding: 20px 0;">
+                Buscando garantias ativas... ⏳
+            </div>`;
+
+            // Chama doGet no Web App com os filtros
+            const url = `${API_URL}?action=getTicketsAtivos&placa=${encodeURIComponent(filterPlaca)}&opm=${encodeURIComponent(opmVal)}`;
+
+            fetch(url)
+                .then(res => res.json())
+                .then(tickets => {
+                    if (tickets.error) {
+                        container.innerHTML = `<div style="color: var(--accent-red); font-weight: 500; text-align: center; padding: 20px 0;">
+                            ❌ Erro: ${tickets.error}
+                        </div>`;
+                        return;
+                    }
+
+                    if (!Array.isArray(tickets) || tickets.length === 0) {
+                        const descFiltro = filterPlaca ? `para a placa ${filterPlaca}` : `para a OPM ${opmVal}`;
+                        container.innerHTML = `<div style="color: var(--accent-green); font-weight: 500; text-align: center; padding: 20px 0;">
+                            ✅ Nenhuma garantia pendente aberta ${descFiltro}.
+                        </div>`;
+                        return;
+                    }
+
+                    let html = "";
+                    tickets.forEach(ticket => {
+                        const hoje = new Date().toISOString().split('T')[0];
+                        html += `
+                            <div class="ticket-item">
+                                <div class="ticket-header">
+                                    <span class="ticket-plate">${ticket.placa}</span>
+                                    <span class="ticket-date">Aberto em: ${ticket.data}</span>
+                                </div>
+                                <div class="ticket-details">
+                                    <div class="detail-row">
+                                        <span>Unidade OPM</span>
+                                        <span>${ticket.opm}</span>
+                                    </div>
+                                    <div class="detail-row">
+                                        <span>Veículo</span>
+                                        <span>${ticket.marca} - ${ticket.modelo}</span>
+                                    </div>
+                                    <div class="detail-row" style="grid-column: span 2;">
+                                        <span>Problema / Descrição</span>
+                                        <span>${ticket.descricao}</span>
+                                    </div>
+                                </div>
+                                <div class="ticket-action">
+                                    <label class="checkbox-container">
+                                        <input type="checkbox" id="check_resolvido_${ticket.rowNum}" onchange="toggleDateInput(${ticket.rowNum})">
+                                        Marcar como Resolvido
+                                    </label>
+                                    <div class="form-group" style="margin-bottom: 0;">
+                                        <input type="date" id="date_resolvido_${ticket.rowNum}" value="${hoje}" style="padding: 8px 12px; font-size: 0.85rem;">
+                                    </div>
+                                    <button class="action-save-btn" onclick="salvarStatusTicket(${ticket.rowNum}, '${ticket.placa}')">Salvar</button>
+                                </div>
+                            </div>
+                        `;
+                    });
+                    container.innerHTML = html;
+                })
+                .catch(err => {
+                    container.innerHTML = `<div style="color: var(--accent-red); font-weight: 500; text-align: center; padding: 20px 0;">
+                        ❌ Erro ao conectar com o servidor. Verifique o URL cadastrado na API.
+                    </div>`;
+                    console.error("Erro ao buscar tickets:", err);
+                });
+        }
+
+        function toggleDateInput(rowNum) {
+            // Mantido habilitado sempre para permitir seleção de datas retroativas
+        }
+
+        // SALVAR A ATUALIZAÇÃO DO STATUS
+        function salvarStatusTicket(rowNum, placa) {
+            const checkbox = document.getElementById(`check_resolvido_${rowNum}`);
+            const dateInput = document.getElementById(`date_resolvido_${rowNum}`);
+
+            if (!checkbox.checked) {
+                alert("Erro: Para salvar a atualização, você deve marcar a caixa 'Marcar como Resolvido' primeiro.");
+                return;
+            }
+
+            if (!dateInput.value) {
+                alert("Erro: Informe a data em que o problema do veículo foi resolvido.");
+                dateInput.focus();
+                return;
+            }
+
+            showLoading("ATUALIZANDO STATUS...");
+
+            const payload = {
+                action: "atualizarStatus",
+                placa: placa,
+                rowNum: rowNum,
+                dataSolucao: dateInput.value
+            };
+
+            fetch(API_URL, {
+                method: "POST",
+                mode: "no-cors",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(payload)
+            })
+            .then(() => {
+                hideLoading();
+                alert(`Garantia do veículo ${placa} marcada como resolvida com sucesso no Sheets!`);
+                buscarTicketsAtivos(); // Recarrega a busca para remover o item resolvido
+            })
+            .catch(err => {
+                hideLoading();
+                alert("Erro ao gravar dados no Sheets.");
+                console.error(err);
+            });
+        }
+
+        // CONFIG LÓGICA DESATIVADA (URL FIXADA NO CÓDIGO)
+
+        // LOADING OVERLAYS
+        function showLoading(msg) {
+            document.getElementById("overlayText").textContent = msg;
+            document.getElementById("loadingOverlay").style.display = "flex";
+        }
+
+        function hideLoading() {
+            document.getElementById("loadingOverlay").style.display = "none";
+        }
+
+        // Inicializa a página ao carregar
+        window.onload = initPage;
+    </script>
+</body>
+</html>
