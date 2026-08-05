@@ -201,7 +201,7 @@ function doPost(e) {
   }
 }
 
-// Retorna todas as placas da aba "banco_dados"
+// Retorna todas as placas e metadados de veículos da aba "banco_dados"
 function handleGetPlacas() {
   const ss = SpreadsheetApp.getActiveSpreadsheet();
   const sheet = ss.getSheetByName("banco_dados");
@@ -216,22 +216,65 @@ function handleGetPlacas() {
   
   const headers = data[0].map(h => h.toString().toLowerCase().trim());
   const placaIdx = headers.indexOf("placa");
+  const btlIdx = headers.indexOf("btl");
+  const marcaModIdx = headers.indexOf("marca/modelo");
+  const anoIdx = headers.indexOf("ano");
   
   if (placaIdx === -1) {
-    return jsonResponse({ error: "Coluna 'Placa' não encontrada na aba banco_dados." });
+    return jsonResponse({ error: "Coluna 'PLACA' não encontrada na aba banco_dados." });
   }
   
-  const placas = [];
+  const placasObj = [];
   for (let i = 1; i < data.length; i++) {
-    const val = data[i][placaIdx];
+    const row = data[i];
+    const val = row[placaIdx];
     if (val) {
-      placas.push(val.toString().toUpperCase().trim());
+      const brandModelRaw = marcaModIdx !== -1 ? row[marcaModIdx].toString().trim() : "";
+      let brand = "";
+      let model = "";
+      if (brandModelRaw.includes("/")) {
+        const parts = brandModelRaw.split("/");
+        brand = parts[0].trim();
+        model = parts[1].trim();
+      } else {
+        brand = brandModelRaw;
+      }
+      
+      // Normalização de marcas para corresponder aos selects do HTML
+      const uBrand = brand.toUpperCase();
+      if (uBrand === "GM" || uBrand === "CHEVROLET") {
+        brand = "Chevrolet";
+      } else if (uBrand === "TOYOTA") {
+        brand = "Toyota";
+      } else if (uBrand === "RENAULT") {
+        brand = "Renault";
+      } else if (uBrand === "FORD") {
+        brand = "Ford";
+      } else if (uBrand === "MITSUBISHI") {
+        brand = "Mitsubishi";
+      } else if (uBrand === "VOLKSWAGEN" || uBrand === "VW") {
+        brand = "Volkswagen";
+      } else if (uBrand === "FIAT") {
+        brand = "Fiat";
+      } else if (uBrand === "HYUNDAI") {
+        brand = "Hyundai";
+      } else if (uBrand === "IVECO") {
+        brand = "Iveco";
+      }
+      
+      placasObj.push({
+        placa: val.toString().toUpperCase().trim(),
+        opm: btlIdx !== -1 ? row[btlIdx].toString().trim() : "",
+        marca: brand,
+        modelo: model,
+        ano: anoIdx !== -1 ? row[anoIdx].toString().trim() : ""
+      });
     }
   }
   
-  // Retorna ordenado
-  placas.sort();
-  return jsonResponse(placas);
+  // Ordena por placa
+  placasObj.sort((a, b) => a.placa.localeCompare(b.placa));
+  return jsonResponse(placasObj);
 }
 
 // Retorna os acionamentos pendentes de resolução (aba dados_garantia)
@@ -285,6 +328,17 @@ function handleGetTicketsAtivos(opm, placa) {
   return jsonResponse(tickets);
 }
 
+// Encontra a primeira linha física vazia (coluna A vazia) para evitar pular linhas por formatações fantasmas
+function getFirstEmptyRow(sheet) {
+  const values = sheet.getRange("A:A").getValues();
+  for (let i = 0; i < values.length; i++) {
+    if (!values[i][0]) {
+      return i + 1; // Retorna a linha física (1-based)
+    }
+  }
+  return values.length + 1;
+}
+
 // Cria uma nova linha na aba "dados_preenchimento"
 function handleCriarAcionamento(postData) {
   const ss = SpreadsheetApp.getActiveSpreadsheet();
@@ -293,22 +347,9 @@ function handleCriarAcionamento(postData) {
     return jsonResponse({ success: false, error: "Aba 'dados_preenchimento' não encontrada." });
   }
   
-  let fotoUrl = "";
-  let negativaUrl = "";
-  
-  // Trata upload de Foto do problema
-  if (postData.fotoFile && postData.fotoFile.base64) {
-    fotoUrl = uploadToDrive(postData.fotoFile.base64, postData.fotoFile.filename, postData.fotoFile.mimeType);
-  }
-  
-  // Trata upload de documento de Negativa da concessionária
-  if (postData.negativaFile && postData.negativaFile.base64) {
-    negativaUrl = uploadToDrive(postData.negativaFile.base64, postData.negativaFile.filename, postData.negativaFile.mimeType);
-  }
-  
   const timestamp = new Date();
   
-  // Monta a linha conforme a estrutura A a O (15 colunas)
+  // Monta a linha com os dados básicos e os dados do preenchedor (Colunas P, Q, R)
   const newRow = [
     timestamp,                                   // Col A: Carimbo de data/hora
     postData.opm || "",                          // Col B: Unidade (OPM)
@@ -319,15 +360,47 @@ function handleCriarAcionamento(postData) {
     postData.km ? Number(postData.km) : "",      // Col G: Quilometragem Atual
     postData.razao || "",                        // Col H: Razão do acionamento
     postData.descricao || "",                    // Col I: Descrição Curta
-    fotoUrl,                                     // Col J: FOTO DO PROBLEMA (Drive Link)
+    "",                                          // Col J: FOTO DO PROBLEMA (Removido)
     postData.endereco || "",                     // Col K: Endereço da Concessionária
     postData.baixado || "NÃO",                   // Col L: Veículo permaneceu baixado?
     postData.resolvido || "NÃO",                 // Col M: Foi resolvido?
-    postData.negativa === "SIM" ? negativaUrl || "SIM" : "NÃO", // Col N: Houve Negativa da Concessionária?
-    postData.observacao || ""                    // Col O: Observação
+    postData.negativa === "SIM" ? "SIM (ENVIADO VIA WHATSAPP)" : "NÃO", // Col N: Houve Negativa da Concessionária?
+    postData.observacao || "",                   // Col O: Observação
+    postData.preenchedorPosto || "",             // Col P: Posto/Graduação
+    postData.preenchedorRE || "",                // Col Q: RE
+    postData.preenchedorNome ? postData.preenchedorNome.toString().toUpperCase().trim() : "" // Col R: Nome do Preenchedor (Auto uppercase backend)
   ];
   
-  sheet.appendRow(newRow);
+  const cleanedRow = limparDados(newRow);
+  const targetRow = getFirstEmptyRow(sheet);
+  sheet.getRange(targetRow, 1, 1, cleanedRow.length).setValues([cleanedRow]);
+  
+  // Se foi marcado como resolvido na criação, atualiza diretamente a aba dados_garantia
+  if (postData.resolvido === "SIM") {
+    const shGarantia = ss.getSheetByName("dados_garantia");
+    if (shGarantia) {
+      shGarantia.getRange(targetRow, 18).setValue(true); // Coluna R (Resolvido)
+      shGarantia.getRange(targetRow, 19).setValue(timestamp); // Coluna S (Data Resolução)
+      
+      const cellL = shGarantia.getRange(targetRow, 12); // Coluna L (data_baixa)
+      const cellM = shGarantia.getRange(targetRow, 13); // Coluna M (tempo_baixa)
+      
+      // Se houver data de baixa, calcula os dias. Senão, calcula com base no Carimbo (A)
+      let dataBaixaVal = cellL.getValue();
+      let d1 = dataBaixaVal ? new Date(dataBaixaVal) : timestamp;
+      if (isNaN(d1.getTime()) && dataBaixaVal) {
+        let partes = dataBaixaVal.toString().split(" ")[0].split("/");
+        if (partes.length === 3) {
+          d1 = new Date(partes[2], partes[1] - 1, partes[0]);
+        }
+      }
+      d1.setHours(0,0,0,0);
+      timestamp.setHours(0,0,0,0);
+      let diff = Math.floor((timestamp - d1) / (1000 * 60 * 60 * 24));
+      cellM.setValue(diff >= 0 ? diff : 0);
+    }
+  }
+  
   return jsonResponse({ success: true, message: "Acionamento de garantia cadastrado com sucesso!" });
 }
 
@@ -627,7 +700,7 @@ function normalizarPlaca(txt) {
 function limparDados(linha) {
   if (linha[2]) linha[2] = normalizarPlaca(linha[2]);  // Coluna C: Placa
   if (linha[3]) linha[3] = normalizarMarca(linha[3]);  // Coluna D: Marca
-  if (linha[4]) inline = normalizarModelo(linha[4]);   // Coluna E: Modelo
+  if (linha[4]) linha[4] = normalizarModelo(linha[4]); // Coluna E: Modelo
   if (linha[5]) linha[5] = normalizarAno(linha[5]);    // Coluna F: Ano
   if (linha[6]) linha[6] = normalizarKM(linha[6]);     // Coluna G: KM
   return linha;
@@ -948,4 +1021,10 @@ function CLASSIFICAR_MOTIVO(motivo) {
   
   // 3. Caso padrão (Problemas mecânicos/elétricos em geral)
   return "GARANTIA";
+}
+
+// Executar esta função manualmente no editor do Apps Script para conceder acesso de escrita ao Google Drive
+function autorizarAcessoGoogleDrive() {
+  DriveApp.getRootFolder().getName();
+  Logger.log("✓ Acesso ao Google Drive autorizado com sucesso!");
 }

@@ -338,6 +338,15 @@
             transform: translateY(0);
         }
 
+        .submit-btn:disabled {
+            background: #222;
+            color: #555;
+            border: 1px solid #333;
+            cursor: not-allowed;
+            box-shadow: none;
+            transform: none !important;
+        }
+
         /* OPTIONAL SECTIONS */
         .hidden-section {
             display: none;
@@ -600,6 +609,13 @@
             background-color: rgba(0,0,0,0.8);
             z-index: 19999;
         }
+
+        .disabled-section {
+            opacity: 0.3;
+            pointer-events: none;
+            user-select: none;
+            transition: all 0.3s ease;
+        }
     </style>
 </head>
 <body>
@@ -621,14 +637,6 @@
                 <form id="formAcionamento" onsubmit="submitAcionamento(event)">
                     <div class="form-grid">
                         
-                        <!-- Unidade (OPM) -->
-                        <div class="form-group">
-                            <label for="opmSelect">Unidade (OPM) *</label>
-                            <select id="opmSelect" required>
-                                <option value="">Selecione a OPM...</option>
-                            </select>
-                        </div>
-
                         <!-- Placa do Veículo -->
                         <div class="form-group autocomplete-container">
                             <label for="placaInput">Placa do Veículo *</label>
@@ -641,10 +649,18 @@
                             <span id="placaErrorLabel" style="font-size: 0.75rem; color: var(--accent-orange); display: none; margin-top: 4px; font-weight: 500;"></span>
                         </div>
 
+                        <!-- Unidade (OPM) -->
+                        <div class="form-group">
+                            <label for="opmSelect">Unidade (OPM) *</label>
+                            <select id="opmSelect" disabled required>
+                                <option value="">Selecione a OPM...</option>
+                            </select>
+                        </div>
+
                         <!-- Marca -->
                         <div class="form-group">
                             <label for="marcaSelect">Marca do Veículo *</label>
-                            <select id="marcaSelect" onchange="updateModelOptions()" required>
+                            <select id="marcaSelect" onchange="updateModelOptions()" disabled required>
                                 <option value="">Selecione...</option>
                                 <option value="Toyota">Toyota</option>
                                 <option value="Chevrolet">Chevrolet</option>
@@ -661,7 +677,7 @@
                         <!-- Modelo -->
                         <div class="form-group">
                             <label for="modeloSelect">Modelo do Veículo *</label>
-                            <select id="modeloSelect" required>
+                            <select id="modeloSelect" disabled required>
                                 <option value="">Selecione a Marca primeiro...</option>
                             </select>
                         </div>
@@ -669,7 +685,7 @@
                         <!-- Ano de Fabricação -->
                         <div class="form-group">
                             <label for="anoSelect">Ano de Fabricação *</label>
-                            <select id="anoSelect" required>
+                            <select id="anoSelect" disabled required>
                                 <option value="">Selecione...</option>
                             </select>
                         </div>
@@ -680,85 +696,116 @@
                             <input type="text" id="kmInput" placeholder="Ex: 10325" oninput="cleanKMInput(this)" required>
                         </div>
 
-                        <!-- Razão do Acionamento -->
-                        <div class="form-group full-width">
-                            <label for="razaoSelect">Razão do Acionamento *</label>
-                            <select id="razaoSelect" required>
-                                <option value="">Selecione...</option>
-                                <option value="Item de Fábrica (mecânico/ elétrico/ estrutura)">Item de Fábrica (mecânico / elétrico / estrutura)</option>
-                                <option value="Item de Adaptação (sonoros e luminosos, rádio, grafismo, blindagem)">Item de Adaptação (sonoros, rádio, blindagem, etc)</option>
-                                <option value="revisão (troca de óleo, filtros, etc)">Revisão (troca de óleo, filtros, etc)</option>
-                            </select>
-                        </div>
-
-                        <!-- Descrição Curta -->
-                        <div class="form-group full-width">
-                            <label for="descricaoInput">Descrição Curta do Serviço/Problema *</label>
-                            <div class="tag-container">
-                                <button type="button" class="tag-btn" onclick="applyDescPrefix('REVISÃO')">Revisão</button>
-                                <button type="button" class="tag-btn" onclick="applyDescPrefix('GARANTIA')">Garantia</button>
-                            </div>
-                            <textarea id="descricaoInput" rows="3" placeholder="⚠️ Selecione a tag REVISÃO ou GARANTIA acima para liberar este campo..." oninput="updateCharCount()" disabled required></textarea>
-                            <span id="charCountLabel" class="char-counter">0 caracteres (mínimo 10 adicionais)</span>
-                        </div>
-
-                        <!-- Endereço da Concessionária -->
-                        <div class="form-group full-width">
-                            <label for="enderecoInput">Endereço da Concessionária *</label>
-                            <input type="text" id="enderecoInput" placeholder="Copie o endereço do Google Maps..." required>
-                            <span class="address-helper">Ex: Av. General Pedro Leon Schneider, 59 - Santana, São Paulo - SP, 02012-110</span>
-                        </div>
-
-                        <!-- Foto do problema -->
-                        <div class="form-group">
-                            <label>Foto do Problema (Opcional)</label>
-                            <div class="file-upload-wrapper">
-                                <span class="upload-icon">📷</span>
-                                <span id="fotoUploadLabel">Tirar foto ou escolher arquivo</span>
-                                <input type="file" id="fotoInput" accept="image/*" onchange="handleFileSelected(this, 'fotoUploadLabel', 'fotoFileObj', 'fotoPreviewContainer')">
-                            </div>
-                            <span id="fotoFileName" class="upload-filename"></span>
-                            <div id="fotoPreviewContainer" style="margin-top: 10px; display: none;"></div>
-                        </div>
-
-                        <!-- Veículo permaneceu baixado? -->
-                        <div class="form-group">
-                            <label for="baixadoSelect">Veículo permaneceu baixado? *</label>
-                            <select id="baixadoSelect" required>
-                                <option value="NÃO">NÃO (resolveu no mesmo dia)</option>
-                                <option value="SIM">SIM (ficou parado sem poder operar)</option>
-                            </select>
-                        </div>
-
-                        <!-- Houve Negativa da Concessionária? -->
-                        <div class="form-group full-width">
-                            <label for="negativaSelect">Houve Negativa da Concessionária? *</label>
-                            <select id="negativaSelect" onchange="toggleNegativaSection(this.value)" required>
-                                <option value="NÃO">NÃO</option>
-                                <option value="SIM">SIM</option>
-                            </select>
-                        </div>
-
-                        <!-- OS de Negativa (Obrigatório se Negativa = SIM) -->
-                        <div class="form-group full-width hidden-section" id="negativaFileSection">
-                            <label>Anexar Ordem de Serviço com Negativa / Formulário de Negativa (padrão CMM) *</label>
-                            <div class="file-upload-wrapper">
-                                <span class="upload-icon">📄</span>
-                                <span id="negativaUploadLabel">Escolher PDF ou Imagem do documento</span>
-                                <input type="file" id="negativaInput" accept="image/*,application/pdf" onchange="handleFileSelected(this, 'negativaUploadLabel', 'negativaFileObj', 'negativaPreviewContainer')">
-                            </div>
-                            <span id="negativaFileName" class="upload-filename"></span>
-                            <div id="negativaPreviewContainer" style="margin-top: 10px; display: none;"></div>
-                        </div>
-
-                        <!-- Observações -->
-                        <div class="form-group full-width">
-                            <label for="observacaoInput">Observações (opcional)</label>
-                            <textarea id="observacaoInput" rows="2" placeholder="Ex: ACIDENTE, SINDICÂNCIA, OUTROS..."></textarea>
+                        <!-- Checkbox Confirmação -->
+                        <div class="form-group full-width" style="display: flex; align-items: center; gap: 10px; padding: 15px 0; border-top: 1px solid #222; margin-top: 10px;">
+                            <input type="checkbox" id="confirmOpmVehicle" onchange="toggleServiceSection(this.checked)" style="width: 20px; height: 20px; cursor: pointer;">
+                            <label for="confirmOpmVehicle" style="font-weight: 600; cursor: pointer; color: var(--accent-green);">Confirmo que este é o veículo de minha OPM que desejo cadastrar *</label>
                         </div>
 
                     </div>
-                    <button type="submit" class="submit-btn" style="margin-top: 30px;">Enviar Acionamento</button>
+
+                    <!-- SEÇÃO DE SERVIÇOS (DESABILITADA POR PADRÃO) -->
+                    <div id="serviceDetailsSection" class="disabled-section" style="margin-top: 20px;">
+                        <div class="form-grid">
+                            
+                            <!-- Razão do Acionamento -->
+                            <div class="form-group full-width">
+                                <label for="razaoSelect">Razão do Acionamento *</label>
+                                <select id="razaoSelect" onchange="handleRazaoChange(this.value)" required>
+                                    <option value="">Selecione...</option>
+                                    <option value="Item de Fábrica (mecânico/ elétrico/ estrutura)">Item de Fábrica (mecânico / elétrico / estrutura)</option>
+                                    <option value="Item de Adaptação (sonoros e luminosos, rádio, grafismo, blindagem)">Item de Adaptação (sonoros, rádio, blindagem, etc)</option>
+                                    <option value="revisão (troca de óleo, filtros, etc)">Revisão (troca de óleo, filtros, etc)</option>
+                                </select>
+                            </div>
+
+                            <!-- Descrição Curta -->
+                            <div class="form-group full-width">
+                                <label for="descricaoInput">Descrição Curta do Serviço/Problema *</label>
+                                <textarea id="descricaoInput" rows="3" placeholder="⚠️ Selecione a razão do acionamento acima primeiro..." oninput="checkDescPrefix()" disabled required></textarea>
+                                <span id="charCountLabel" class="char-counter">0 caracteres (mínimo 10 adicionais)</span>
+                            </div>
+
+                            <!-- Endereço da Concessionária -->
+                            <div class="form-group full-width">
+                                <label for="enderecoInput">Endereço da Concessionária *</label>
+                                <input type="text" id="enderecoInput" placeholder="Copie o endereço do Google Maps..." required>
+                                <span class="address-helper">Ex: Av. General Pedro Leon Schneider, 59 - Santana, São Paulo - SP, 02012-110</span>
+                            </div>
+
+                            <!-- Veículo permaneceu baixado? -->
+                            <div class="form-group">
+                                <label for="baixadoSelect">Veículo permaneceu baixado? *</label>
+                                <select id="baixadoSelect" required>
+                                    <option value="NÃO">NÃO</option>
+                                    <option value="SIM">SIM</option>
+                                </select>
+                            </div>
+
+                            <!-- Houve Negativa da Concessionária? -->
+                            <div class="form-group">
+                                <label for="negativaSelect">Houve Negativa da Concessionária? *</label>
+                                <select id="negativaSelect" required>
+                                    <option value="NÃO">NÃO</option>
+                                    <option value="SIM">SIM</option>
+                                </select>
+                            </div>
+
+                            <!-- Observações -->
+                            <div class="form-group full-width">
+                                <label for="observacaoInput">Observações (opcional)</label>
+                                <textarea id="observacaoInput" rows="2" placeholder="Ex: ACIDENTE, SINDICÂNCIA, OUTROS..."></textarea>
+                            </div>
+
+                            <!-- Dados do Preenchedor -->
+                            <div class="form-group full-width" style="border-top: 1px solid #222; padding-top: 20px; margin-top: 10px;">
+                                <h3 style="color: var(--accent-green); font-size: 1.1rem; margin-bottom: 5px;">DADOS DO PREENCHEDOR</h3>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="preenchedorPosto">Posto/Graduação *</label>
+                                <select id="preenchedorPosto" required>
+                                    <option value="">Selecione...</option>
+                                    <option value="Sd PM">Sd PM</option>
+                                    <option value="Cb PM">Cb PM</option>
+                                    <option value="3º Sgt PM">3º Sgt PM</option>
+                                    <option value="2º Sgt PM">2º Sgt PM</option>
+                                    <option value="1º Sgt PM">1º Sgt PM</option>
+                                    <option value="Subten PM">Subten PM</option>
+                                    <option value="2º Ten PM">2º Ten PM</option>
+                                    <option value="1º Ten PM">1º Ten PM</option>
+                                    <option value="Cap PM">Cap PM</option>
+                                    <option value="Maj PM">Maj PM</option>
+                                    <option value="Ten Cel PM">Ten Cel PM</option>
+                                    <option value="Cel PM">Cel PM</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="preenchedorRE">RE *</label>
+                                <input type="text" id="preenchedorRE" placeholder="Ex: 123456-7" required>
+                            </div>
+
+                            <div class="form-group full-width">
+                                <label for="preenchedorNome">Nome Completo *</label>
+                                <input type="text" id="preenchedorNome" placeholder="Ex: JOÃO SILVA" oninput="this.value = this.value.toUpperCase();" required>
+                            </div>
+
+                            <!-- Marcar como Resolvido no Cadastro -->
+                            <div class="form-group full-width" style="display: flex; align-items: center; gap: 10px; padding: 10px 0; border-top: 1px solid #222; margin-top: 10px;">
+                                <input type="checkbox" id="markAsResolvedCheckbox" style="width: 20px; height: 20px; cursor: pointer;">
+                                <label for="markAsResolvedCheckbox" style="font-weight: 600; cursor: pointer; color: var(--accent-blue);">⚠️O veículo já foi atendido/concluído hoje (registrar como RESOLVIDO)⚠️</label>
+                            </div>
+
+                            <!-- Checkbox de Confirmação Final -->
+                            <div class="form-group full-width" style="display: flex; align-items: center; gap: 10px; padding: 15px 0; border-top: 1px solid #222; margin-top: 10px;">
+                                <input type="checkbox" id="confirmCorrectData" onchange="toggleSubmitButton(this.checked)" style="width: 20px; height: 20px; cursor: pointer;">
+                                <label for="confirmCorrectData" style="font-weight: 600; cursor: pointer; color: var(--accent-green);">Confirmo que as informações prestadas estão corretas *</label>
+                            </div>
+
+                        </div>
+                        <button type="submit" id="submitBtnAcionamento" class="submit-btn" style="margin-top: 30px;" disabled>Enviar Acionamento</button>
+                    </div>
                 </form>
             </div>
         </div>
@@ -807,6 +854,27 @@
     <!-- CONFIG MODAL OVERLAY -->
     <div id="modalOverlay" style="display:none; position:fixed; top:0; left:0; right:0; bottom:0; background-color:rgba(0,0,0,0.8); z-index:19999;"></div>
 
+    <!-- SUCCESS MODAL FOR OPTION 3 -->
+    <div id="successModal" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 90%; max-width: 500px; background-color: #1a1a1a; border: 2px solid var(--accent-green); border-radius: 12px; padding: 30px; z-index: 20000; box-shadow: 0 0 40px rgba(0, 255, 144, 0.4); text-align: center;">
+        <span style="font-size: 3rem; display: block; margin-bottom: 15px;">✓</span>
+        <h3 style="color: var(--accent-green); margin-bottom: 15px; font-size: 1.4rem;">Acionamento Registrado!</h3>
+        <p style="color: #ccc; font-size: 0.95rem; line-height: 1.6; margin-bottom: 25px;" id="successModalText">
+            Os dados do acionamento foram salvos no Google Sheets.
+        </p>
+        <div id="whatsappActionContainer" style="display: none; background-color: #222; border: 1px dashed var(--accent-green); border-radius: 8px; padding: 15px; margin-bottom: 20px;">
+            <p id="whatsWarningText" style="color: var(--accent-orange); font-size: 0.85rem; font-weight: 700; margin-bottom: 10px;">
+                ⚠️ ATENÇÃO: Envie o documento da OS/Negativa!
+            </p>
+            <p id="whatsHelperText" style="color: #bbb; font-size: 0.8rem; line-height: 1.4; margin-bottom: 15px;">
+                Clique no botão abaixo para abrir o WhatsApp e enviar o arquivo PDF/Imagem da negativa para a equipe responsável.
+            </p>
+            <a id="whatsappBtn" href="#" target="_blank" class="submit-btn" style="background-color: #25D366; color: #fff; text-decoration: none; display: inline-flex; align-items: center; justify-content: center; gap: 10px; font-weight: bold; width: 100%; height: 45px; border-radius: 6px;">
+                💬 Enviar OS / Negativa por WhatsApp
+            </a>
+        </div>
+        <button type="button" class="config-btn" onclick="closeSuccessModal()" style="margin-top: 10px; width: 100%; height: 40px; font-weight: 600;">Fechar e Voltar</button>
+    </div>
+
     <script>
         // LISTA DE OPMS
         const OPMS = ["1.BAEP","1.BPAMB","1.BPCHQ","1.BPM/I","1.BPM/M","1.BPRV","1.BPTRAN","1.EM/PM","10.BAEP","10.BPM/I","10.BPM/M","11.BAEP","11.BPM/I","11.BPM/M","12.BAEP","12.BPM/I","12.BPM/M","13.BAEP","13.BPM/I","13.BPM/M","14.BAEP","14.BPM/I","14.BPM/M","15.BAEP","15.BPM/I","15.BPM/M","16.BPM/I","16.BPM/M","17.BPM/I","17.BPM/M","18.BPM/I","18.BPM/M","19.BPM/I","19.BPM/M","2.BAEP","2.BPAMB","2.BPCHQ","2.BPM/I","2.BPM/M","2.BPRV","2.BPTRAN","20.BPM/I","20.BPM/M","21.BPM/I","21.BPM/M","22.BPM/I","22.BPM/M","23.BPM/I","23.BPM/M","24.BPM/I","24.BPM/M","25.BPM/I","25.BPM/M","26.BPM/I","26.BPM/M","27.BPM/I","27.BPM/M","28.BPM/I","28.BPM/M","29.BPM/I","29.BPM/M","3.BAEP","3.BPAMB","3.BPCHQ","3.BPM/I","3.BPM/M","3.BPRV","3.EM/PM","30.BPM/I","30.BPM/M","31.BPM/I","31.BPM/M","32.BPM/I","32.BPM/M","33.BPM/I","33.BPM/M","34.BPM/I","34.BPM/M","35.BPM/I","35.BPM/M","36.BPM/I","36.BPM/M","37.BPM/I","37.BPM/M","38.BPM/I","38.BPM/M","39.BPM/I","39.BPM/M","4.BAEP","4.BPAMB","4.BPCHQ","4.BPM/I","4.BPM/M","4.BPRV","4.EM/PM","40.BPM/I","40.BPM/M","41.BPM/I","42.BPM/I","43.BPM/I","43.BPM/M","44.BPM/I","45.BPM/I","46.BPM/I","46.BPM/M","47.BPM/I","48.BPM/I","48.BPM/M","49.BPM/I","49.BPM/M","5.BAEP","5.BPAMB","5.BPCHQ","5.BPM/I","5.BPM/M","5.BPRV","50.BPM/I","51.BPM/I","52.BPM/I","53.BPM/I","54.BPM/I","55.BPM/I","6.BAEP","6.BPM/I","6.BPM/M","6.BPRV","6.EM/PM","7.BAEP","7.BPM/I","7.BPM/M","8.BAEP","8.BPM/I","8.BPM/M","9.BAEP","9.BPM/I","9.BPM/M","APMAL","APMBB","APMCGE","APMCMSP","APMPGJ","APMPMSP","APMSAP","APMSSP","APMTCE","APMTJ","APMTJM","C COM SOC","C MED","C MIL","C MUS","C ODONT","CAES","CAJ","CAPS","CAVPM","CIAF","CIAP","CIPM","CMB","CMM","CMT GERAL","COORD OP PM","COPOM","CORREG PM","CPA/M-1","CPA/M-10","CPA/M-11","CPA/M-12","CPA/M-2","CPA/M-3","CPA/M-4","CPA/M-5","CPA/M-6","CPA/M-7","CPA/M-8","CPA/M-9","CPAMB","CPC","CPCHQ","CPI-1","CPI-10","CPI-2","CPI-3","CPI-4","CPI-5","CPI-6","CPI-7","CPI-8","CPI-9","CPM","CPRV","CPTRAN","CRPM","DEC","DF","DL","DP","DPCDH","DS","DSA/CG","DTIC","EEF","EM/PM","ESSD","ESSGT","GAB CMT G","PMRG","RPMON"];
@@ -830,12 +898,6 @@
         let selectedPlaca = "";
         let dbPlacasCarregado = false;
         
-        // Objetos temporários de arquivo em Base64
-        const fileBuffers = {
-            fotoFileObj: null,
-            negativaFileObj: null
-        };
-
         // INICIALIZAÇÃO
         function initPage() {
             // Preenche OPMs de cadastro
@@ -881,35 +943,26 @@
                     if (Array.isArray(data)) {
                         placasBancoDados = data;
                         dbPlacasCarregado = true;
-                        document.getElementById("placaErrorLabel").style.display = "none";
-                    } else {
-                        console.error(data.error || "Dados inválidos recebidos.");
-                        showPlacaErrorOffline();
                     }
                 })
                 .catch(err => {
                     hideLoading();
                     console.error("Erro ao baixar placas:", err);
-                    showPlacaErrorOffline();
                 });
-        }
-
-        function showPlacaErrorOffline() {
-            dbPlacasCarregado = false;
-            const errLabel = document.getElementById("placaErrorLabel");
-            errLabel.textContent = "⚠️ Conexão offline com banco de dados. Digitação manual liberada.";
-            errLabel.style.display = "block";
         }
 
         // BUSCA E FILTRAGEM DE PLACAS
         function filterPlacas() {
             const input = document.getElementById("placaInput");
             const filter = input.value.toUpperCase().replace(/[^A-Z0-9]/g, "");
-            input.value = filter; // Força apenas letras e números sem hífens
+            input.value = filter;
             
             if (!dbPlacasCarregado) {
-                // Se a API falhou, a placa é o que ele digitar diretamente
                 selectedPlaca = filter;
+                document.getElementById("opmSelect").disabled = false;
+                document.getElementById("marcaSelect").disabled = false;
+                document.getElementById("modeloSelect").disabled = false;
+                document.getElementById("anoSelect").disabled = false;
                 return;
             }
             
@@ -921,19 +974,19 @@
                 return;
             }
             
-            const filtered = placasBancoDados.filter(p => p.includes(filter));
+            const filtered = placasBancoDados.filter(p => p.placa.includes(filter));
             
             if (filtered.length === 0) {
                 listDiv.style.display = "none";
                 return;
             }
             
-            filtered.slice(0, 10).forEach(placa => {
+            filtered.slice(0, 10).forEach(pObj => {
                 const item = document.createElement("div");
                 item.className = "autocomplete-item";
-                item.textContent = placa;
+                item.textContent = pObj.placa;
                 item.onclick = function() {
-                    selectPlaca(placa);
+                    selectPlaca(pObj);
                 };
                 listDiv.appendChild(item);
             });
@@ -941,15 +994,81 @@
             listDiv.style.display = "block";
         }
 
-        function selectPlaca(placa) {
-            selectedPlaca = placa;
+        function selectPlaca(placaObj) {
+            selectedPlaca = placaObj.placa;
             document.getElementById("placaInput").classList.add("hidden-section");
             document.getElementById("placaSuggestions").style.display = "none";
             
             const badge = document.getElementById("selectedPlacaBadge");
             const textSpan = document.getElementById("selectedPlacaText");
-            textSpan.textContent = placa;
+            textSpan.textContent = selectedPlaca;
             badge.classList.remove("hidden-section");
+
+            // Auto-preenche OPM, Marca, Modelo, Ano se vier do banco com lógica defensiva
+            if (dbPlacasCarregado) {
+                const opmSelect = document.getElementById("opmSelect");
+                const marcaSelect = document.getElementById("marcaSelect");
+                const modeloSelect = document.getElementById("modeloSelect");
+                const anoSelect = document.getElementById("anoSelect");
+
+                if (placaObj.opm) {
+                    // Normalização fuzzy de OPM (ex: "3º BPM/M" -> "3.BPM/M")
+                    const normOpm = placaObj.opm.toUpperCase().replace(/[ºº°ª]/g, ".").replace(/\s+/g, "").trim();
+                    let matchedOpmValue = "";
+                    
+                    Array.from(opmSelect.options).forEach(opt => {
+                        const normOpt = opt.value.toUpperCase().replace(/[ºº°ª]/g, ".").replace(/\s+/g, "").trim();
+                        if (normOpt && normOpt === normOpm) {
+                            matchedOpmValue = opt.value;
+                        }
+                    });
+
+                    if (matchedOpmValue) {
+                        opmSelect.value = matchedOpmValue;
+                    } else {
+                        // Se não encontrar na lista, adiciona dinamicamente a opção correspondente
+                        const opt = document.createElement("option");
+                        opt.value = placaObj.opm;
+                        opt.textContent = placaObj.opm;
+                        opmSelect.appendChild(opt);
+                        opmSelect.value = placaObj.opm;
+                    }
+                    opmSelect.disabled = true;
+                }
+
+                if (placaObj.marca) {
+                    marcaSelect.value = placaObj.marca;
+                    updateModelOptions(); // Carrega modelos da marca selecionada
+                    
+                    if (placaObj.modelo) {
+                        // Se o modelo não estiver na lista padrão, adiciona dinamicamente
+                        let matchedModel = Array.from(modeloSelect.options).some(o => o.value === placaObj.modelo);
+                        if (!matchedModel) {
+                            const opt = document.createElement("option");
+                            opt.value = placaObj.modelo;
+                            opt.textContent = placaObj.modelo;
+                            modeloSelect.appendChild(opt);
+                        }
+                        modeloSelect.value = placaObj.modelo;
+                    }
+                    
+                    marcaSelect.disabled = true;
+                    modeloSelect.disabled = true;
+                }
+
+                if (placaObj.ano) {
+                    // Se o ano do banco não estiver no dropdown 2020-2030, adiciona
+                    let matchedAno = Array.from(anoSelect.options).some(o => o.value === placaObj.ano);
+                    if (!matchedAno) {
+                        const opt = document.createElement("option");
+                        opt.value = placaObj.ano;
+                        opt.textContent = placaObj.ano;
+                        anoSelect.appendChild(opt);
+                    }
+                    anoSelect.value = placaObj.ano;
+                    anoSelect.disabled = true;
+                }
+            }
         }
 
         function clearSelectedPlaca() {
@@ -960,6 +1079,28 @@
             
             const badge = document.getElementById("selectedPlacaBadge");
             badge.classList.add("hidden-section");
+
+            // Limpa e desabilita campos por padrão
+            const opmSelect = document.getElementById("opmSelect");
+            const marcaSelect = document.getElementById("marcaSelect");
+            const modeloSelect = document.getElementById("modeloSelect");
+            const anoSelect = document.getElementById("anoSelect");
+
+            opmSelect.value = "";
+            opmSelect.disabled = true;
+            marcaSelect.value = "";
+            marcaSelect.disabled = true;
+            modeloSelect.innerHTML = "<option value=''>Selecione a Marca primeiro...</option>";
+            modeloSelect.disabled = true;
+            anoSelect.value = "";
+            anoSelect.disabled = true;
+
+            // Desmarca a confirmação e resolvido
+            const chk = document.getElementById("confirmOpmVehicle");
+            chk.checked = false;
+            document.getElementById("markAsResolvedCheckbox").checked = false;
+            toggleServiceSection(false);
+
             input.focus();
         }
 
@@ -996,7 +1137,6 @@
                 modeloSelect.appendChild(opt);
             });
             
-            // Adiciona opção "Outro" no final
             const optOutro = document.createElement("option");
             optOutro.value = "OUTRO";
             optOutro.textContent = "Outro modelo...";
@@ -1008,18 +1148,45 @@
             el.value = el.value.replace(/[^0-9]/g, "");
         }
 
-        // PREFIXO DA DESCRIÇÃO
+        // PREFIXO DA DESCRIÇÃO E BOTÃO DE VALIDAÇÃO
+        function toggleServiceSection(checked) {
+            const section = document.getElementById("serviceDetailsSection");
+            if (checked) {
+                section.classList.remove("disabled-section");
+            } else {
+                section.classList.add("disabled-section");
+            }
+        }
+
+        function toggleSubmitButton(checked) {
+            document.getElementById("submitBtnAcionamento").disabled = !checked;
+        }
+
         let activePrefix = "";
+        function handleRazaoChange(val) {
+            if (!val) {
+                activePrefix = "";
+                const textarea = document.getElementById("descricaoInput");
+                textarea.value = "";
+                textarea.disabled = true;
+                textarea.placeholder = "⚠️ Selecione a razão do acionamento acima primeiro...";
+                updateCharCount();
+                return;
+            }
+
+            if (val.toLowerCase().includes("revisão")) {
+                applyDescPrefix("REVISÃO");
+            } else {
+                applyDescPrefix("GARANTIA");
+            }
+        }
+
         function applyDescPrefix(type) {
             const textarea = document.getElementById("descricaoInput");
-            
-            // Habilita a escrita e ajusta placeholder
             textarea.disabled = false;
             textarea.placeholder = "Descreva com detalhes o problema ou serviço realizado...";
             
             const prefix = `[${type}] `;
-            
-            // Remove o prefixo antigo se houver
             let currentText = textarea.value;
             if (currentText.startsWith("[REVISÃO] ")) {
                 currentText = currentText.substring(10);
@@ -1029,17 +1196,16 @@
 
             textarea.value = prefix + currentText;
             activePrefix = prefix;
-
-            // Destaca o botão da tag
-            document.querySelectorAll(".tag-btn").forEach(btn => {
-                btn.classList.remove("active");
-                if (btn.textContent.toUpperCase() === type) {
-                    btn.classList.add("active");
-                }
-            });
-
             updateCharCount();
             textarea.focus();
+        }
+
+        function checkDescPrefix() {
+            const textarea = document.getElementById("descricaoInput");
+            if (activePrefix && !textarea.value.startsWith(activePrefix)) {
+                textarea.value = activePrefix + textarea.value.replace(/^\[.*?\]\s*/, "");
+            }
+            updateCharCount();
         }
 
         function updateCharCount() {
@@ -1052,115 +1218,7 @@
                 userLength = content.length - activePrefix.length;
             }
 
-            if (userLength < 0) userLength = 0;
-            
-            label.textContent = `${userLength} caracteres (mínimo 10 adicionais)`;
-            
-            if (userLength >= 10) {
-                label.style.color = "var(--accent-green)";
-            } else {
-                label.style.color = "var(--text-muted)";
-            }
-        }
-
-        // CONVERSÃO DE ARQUIVO PARA BASE64 E PRÉ-VISUALIZAÇÃO
-        function handleFileSelected(inputEl, labelId, bufferKey, previewContainerId) {
-            const file = inputEl.files[0];
-            const label = document.getElementById(labelId);
-            const fileNameSpan = document.getElementById(inputEl.id.replace("Input", "") + "FileName");
-            const previewContainer = document.getElementById(previewContainerId);
-            
-            previewContainer.innerHTML = "";
-            previewContainer.style.display = "none";
-            
-            if (!file) {
-                fileBuffers[bufferKey] = null;
-                label.textContent = "Escolher arquivo...";
-                if (fileNameSpan) fileNameSpan.textContent = "";
-                return;
-            }
-
-            label.textContent = "Arquivo selecionado";
-            fileNameSpan.textContent = `${file.name} (${(file.size / 1024).toFixed(1)} KB)`;
-
-            // Exibir feedback visual e pré-visualização na tela
-            previewContainer.style.display = "flex";
-            previewContainer.style.alignItems = "center";
-            previewContainer.style.gap = "12px";
-            previewContainer.style.backgroundColor = "rgba(255, 255, 255, 0.02)";
-            previewContainer.style.padding = "10px";
-            previewContainer.style.borderRadius = "8px";
-            previewContainer.style.border = "1px solid #333";
-            previewContainer.style.marginTop = "10px";
-            
-            if (file.type.startsWith("image/")) {
-                const img = document.createElement("img");
-                img.src = URL.createObjectURL(file);
-                img.style.maxWidth = "80px";
-                img.style.maxHeight = "80px";
-                img.style.borderRadius = "4px";
-                img.style.border = "1px solid #555";
-                previewContainer.appendChild(img);
-            } else {
-                const icon = document.createElement("span");
-                icon.innerHTML = "📄";
-                icon.style.fontSize = "2rem";
-                previewContainer.appendChild(icon);
-            }
-
-            const infoDiv = document.createElement("div");
-            infoDiv.style.flex = "1";
-            infoDiv.style.textAlign = "left";
-            infoDiv.style.fontSize = "0.8rem";
-            infoDiv.innerHTML = `<span style="color: var(--accent-green); font-weight: bold;">✓ Arquivo preparado</span><br><span style="color: #aaa; max-width: 200px; display: inline-block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${file.name}</span>`;
-            previewContainer.appendChild(infoDiv);
-
-            const deleteBtn = document.createElement("button");
-            deleteBtn.type = "button";
-            deleteBtn.style.backgroundColor = "transparent";
-            deleteBtn.style.border = "1px solid var(--accent-red)";
-            deleteBtn.style.color = "var(--accent-red)";
-            deleteBtn.style.padding = "4px 10px";
-            deleteBtn.style.borderRadius = "6px";
-            deleteBtn.style.cursor = "pointer";
-            deleteBtn.style.fontSize = "0.75rem";
-            deleteBtn.textContent = "Remover";
-            deleteBtn.onclick = function() {
-                inputEl.value = "";
-                handleFileSelected(inputEl, labelId, bufferKey, previewContainerId);
-            };
-            previewContainer.appendChild(deleteBtn);
-
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                const base64String = e.target.result.split(',')[1];
-                fileBuffers[bufferKey] = {
-                    base64: base64String,
-                    filename: file.name,
-                    mimeType: file.type
-                };
-            };
-            reader.readAsDataURL(file);
-        }
-
-        // EXIBIR OU OCULTAR OS ARQUIVOS DA NEGATIVA
-        function toggleNegativaSection(val) {
-            const section = document.getElementById("negativaFileSection");
-            const input = document.getElementById("negativaInput");
-            
-            if (val === "SIM") {
-                section.classList.remove("hidden-section");
-                input.required = true;
-            } else {
-                section.classList.add("hidden-section");
-                input.required = false;
-                input.value = "";
-                fileBuffers.negativaFileObj = null;
-                document.getElementById("negativaUploadLabel").textContent = "Escolher PDF ou Imagem do documento";
-                document.getElementById("negativaFileName").textContent = "";
-                document.getElementById("negativaPreviewContainer").innerHTML = "";
-                document.getElementById("negativaPreviewContainer").style.display = "none";
-            }
+            label.textContent = `${userLength} caracteres digitados (mínimo 10 adicionais)`;
         }
 
         // ENVIAR FORMULÁRIO DE ACIONAMENTO
@@ -1172,11 +1230,18 @@
                 return;
             }
 
+            const chk = document.getElementById("confirmOpmVehicle");
+            if (!chk.checked) {
+                alert("Erro: Você deve confirmar que este é o veículo de sua OPM marcando a caixa de seleção!");
+                chk.focus();
+                return;
+            }
+
             // Validar Placa
             let placaFinal = "";
             if (dbPlacasCarregado) {
                 if (!selectedPlaca) {
-                    alert("Erro: Você deve escolher uma placa válida a partir da lista de buscas!");
+                    alert("Erro: Escolha uma placa válida a partir da lista de buscas!");
                     document.getElementById("placaInput").focus();
                     return;
                 }
@@ -1192,7 +1257,7 @@
                 placaFinal = typedPlaca;
             }
 
-            // Validar Endereço da Concessionária (Rua, Número - Cidade - Estado)
+            // Validar Endereço
             const endereco = document.getElementById("enderecoInput").value.trim();
             const regexEndereco = /.+,.+-\s*[A-Z]{2}/i;
             if (!regexEndereco.test(endereco)) {
@@ -1208,23 +1273,21 @@
                 userLength = descValue.length - activePrefix.length;
             }
 
-            if (!activePrefix) {
-                alert("Erro: Você deve clicar no botão da tag REVISÃO ou GARANTIA antes de preencher a descrição!");
-                return;
-            }
-
             if (userLength < 10) {
                 alert("Erro: Descreva detalhadamente o problema com no mínimo 10 caracteres adicionais!");
                 document.getElementById("descricaoInput").focus();
                 return;
             }
 
-            if (document.getElementById("negativaSelect").value === "SIM" && !fileBuffers.negativaFileObj) {
-                alert("Erro: Anexe o documento da OS com a Negativa de Atendimento.");
-                return;
-            }
+            const negativaVal = document.getElementById("negativaSelect").value;
+            const baixadoVal = document.getElementById("baixadoSelect").value;
+            const resolvidoVal = document.getElementById("markAsResolvedCheckbox").checked ? "SIM" : "NÃO";
 
             showLoading("CADASTRANDO ACIONAMENTO...");
+
+            const preenchedorPosto = document.getElementById("preenchedorPosto").value;
+            const preenchedorRE = document.getElementById("preenchedorRE").value.trim();
+            const preenchedorNome = document.getElementById("preenchedorNome").value.trim().toUpperCase();
 
             const payload = {
                 action: "criarAcionamento",
@@ -1237,58 +1300,94 @@
                 razao: document.getElementById("razaoSelect").value,
                 descricao: descValue,
                 endereco: endereco,
-                baixado: document.getElementById("baixadoSelect").value,
-                negativa: document.getElementById("negativaSelect").value,
+                baixado: baixadoVal,
+                negativa: negativaVal,
+                resolvido: resolvidoVal,
                 observacao: document.getElementById("observacaoInput").value,
-                fotoFile: fileBuffers.fotoFileObj,
-                negativaFile: fileBuffers.negativaFileObj
+                preenchedorPosto: preenchedorPosto,
+                preenchedorRE: preenchedorRE,
+                preenchedorNome: preenchedorNome,
+                fotoFile: null,
+                negativaFile: null
             };
 
             fetch(API_URL, {
                 method: "POST",
                 mode: "no-cors",
-                headers: {
-                    "Content-Type": "application/json"
-                },
+                headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(payload)
             })
             .then(() => {
                 hideLoading();
-                alert("Acionamento cadastrado com sucesso! Os dados foram enviados para o Google Sheets.");
-                resetForm();
+                const opm = document.getElementById("opmSelect").value;
+                const marca = document.getElementById("marcaSelect").value;
+                const modelo = document.getElementById("modeloSelect").value;
+                showSuccessModal(placaFinal, opm, marca, modelo, (negativaVal === "SIM"), preenchedorPosto, preenchedorRE, preenchedorNome, baixadoVal, negativaVal);
             })
             .catch(err => {
                 hideLoading();
                 alert("Erro ao enviar dados. Verifique a URL do Web App ou sua conexão.");
-                console.error(err);
             });
+        }
+
+        function showSuccessModal(placa, opm, marca, modelo, hasNegativa, posto, re, nome, baixado, negativa) {
+            document.getElementById("modalOverlay").style.display = "block";
+            const modal = document.getElementById("successModal");
+            modal.style.display = "block";
+            
+            const textEl = document.getElementById("successModalText");
+            const whatsContainer = document.getElementById("whatsappActionContainer");
+            const whatsBtn = document.getElementById("whatsappBtn");
+            const warningEl = document.getElementById("whatsWarningText");
+            const helperEl = document.getElementById("whatsHelperText");
+            
+            // Mensagem formatada do WhatsApp com quebras de linhas duplas conforme solicitado e removida a sigla PM duplicada
+            const textMsg = `Acionamento de revisão/garantia.\n\nOPM: ${opm}\n\nVeículo: ${marca}/${modelo}\n\nPLACA: ${placa}\nVTR PERMANECEU BAIXADA: ${baixado}\nHOUVE NEGATIVA DE ATENDIMENTO: ${negativa}\n\nPREENCHEDOR: ${posto} RE ${re} ${nome}`;
+            
+            whatsBtn.href = `https://api.whatsapp.com/send?text=${encodeURIComponent(textMsg)}`;
+            whatsContainer.style.display = "block";
+            
+            if (hasNegativa) {
+                textEl.innerHTML = `O acionamento para o veículo <b>${placa}</b> foi registrado com sucesso na planilha.<br><br>Para anexar o Formulário de Negativa, envie o arquivo pelo WhatsApp ao seu Oficial Subfrota/Motomec.`;
+                if (warningEl) warningEl.style.display = "block";
+                if (helperEl) {
+                    helperEl.textContent = "Clique no botão abaixo para abrir o WhatsApp e enviar o arquivo PDF/Imagem da negativa para a equipe responsável.";
+                }
+                whatsBtn.innerHTML = "💬 Enviar OS / Negativa por WhatsApp";
+                whatsBtn.style.background = "#25D366";
+            } else {
+                textEl.innerHTML = `O acionamento para o veículo <b>${placa}</b> foi registrado com sucesso na planilha.`;
+                if (warningEl) warningEl.style.display = "none";
+                if (helperEl) {
+                    helperEl.textContent = "Clique no botão abaixo para notificar o seu Oficial Subfrota/Motomec sobre este acionamento no WhatsApp.";
+                }
+                whatsBtn.innerHTML = "💬 Notificar por WhatsApp";
+                whatsBtn.style.background = "#007BFF";
+            }
+        }
+
+        function closeSuccessModal() {
+            document.getElementById("modalOverlay").style.display = "none";
+            document.getElementById("successModal").style.display = "none";
+            resetForm();
         }
 
         function resetForm() {
             document.getElementById("formAcionamento").reset();
             clearSelectedPlaca();
-            document.querySelectorAll(".tag-btn").forEach(btn => btn.classList.remove("active"));
             activePrefix = "";
-            fileBuffers.fotoFileObj = null;
-            fileBuffers.negativaFileObj = null;
-            document.getElementById("fotoUploadLabel").textContent = "Tirar foto ou escolher arquivo";
-            document.getElementById("fotoFileName").textContent = "";
-            document.getElementById("fotoPreviewContainer").innerHTML = "";
-            document.getElementById("fotoPreviewContainer").style.display = "none";
-            document.getElementById("negativaPreviewContainer").innerHTML = "";
-            document.getElementById("negativaPreviewContainer").style.display = "none";
             
             const descArea = document.getElementById("descricaoInput");
             descArea.disabled = true;
-            descArea.placeholder = "⚠️ Selecione a tag REVISÃO ou GARANTIA acima para liberar este campo...";
+            descArea.placeholder = "⚠️ Selecione a razão do acionamento acima primeiro...";
             
-            // Limpa filtros de busca
             document.getElementById("searchPlateStatus").value = "";
             document.getElementById("searchOpmStatus").value = "";
             document.getElementById("ticketsListContainer").innerHTML = `<div style="text-align: center; color: var(--text-muted); font-style: italic; padding: 20px 0;">Selecione a OPM ou digite a placa acima para carregar as garantias pendentes.</div>`;
             
-            toggleNegativaSection("NÃO");
+            document.getElementById("markAsResolvedCheckbox").checked = false;
             updateCharCount();
+            document.getElementById("submitBtnAcionamento").disabled = true;
         }
 
         // TABS NAVIGATION LÓGICA
