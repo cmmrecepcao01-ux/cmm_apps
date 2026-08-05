@@ -200,6 +200,12 @@
             transition: all 0.2s ease;
         }
 
+        /* DESTACAR ÍCONE DO CALENDÁRIO */
+        input[type="date"]::-webkit-calendar-picker-indicator {
+            filter: invert(58%) sepia(91%) saturate(1512%) hue-rotate(113deg) brightness(103%) contrast(103%);
+            cursor: pointer;
+        }
+
         .form-group input:focus, 
         .form-group select:focus, 
         .form-group textarea:focus {
