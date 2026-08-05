@@ -983,7 +983,13 @@
             const filtered = placasBancoDados.filter(p => p.placa.includes(filter));
             
             if (filtered.length === 0) {
-                listDiv.style.display = "none";
+                const item = document.createElement("div");
+                item.className = "autocomplete-item";
+                item.textContent = "placa não encontrada";
+                item.style.cursor = "default";
+                item.style.color = "#aaa";
+                listDiv.appendChild(item);
+                listDiv.style.display = "block";
                 return;
             }
             
