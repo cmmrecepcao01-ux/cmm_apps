@@ -310,7 +310,11 @@ function handleGetTicketsAtivos(opm, placa) {
     if (!resolvido && ticketPlaca) {
       // Filtragem opcional no servidor para economizar banda
       if (placa && ticketPlaca !== placa.toUpperCase().trim()) continue;
-      if (opm && !ticketOpm.toLowerCase().includes(opm.toLowerCase().trim())) continue;
+      if (opm) {
+        const normQuery = opm.toUpperCase().replace(/[º°ª]/g, ".").replace(/\s+/g, "").trim();
+        const normTicket = ticketOpm.toUpperCase().replace(/[º°ª]/g, ".").replace(/\s+/g, "").trim();
+        if (normQuery !== normTicket) continue;
+      }
       
       const ticket = {
         rowNum: i + 1, // Guarda o número físico da linha (1-based)
