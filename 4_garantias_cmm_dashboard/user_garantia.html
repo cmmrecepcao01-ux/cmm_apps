@@ -758,12 +758,6 @@
                                 </select>
                             </div>
 
-                            <!-- Observações -->
-                            <div class="form-group full-width">
-                                <label for="observacaoInput">Observações (opcional)</label>
-                                <textarea id="observacaoInput" rows="2" placeholder="Ex: ACIDENTE, SINDICÂNCIA, OUTROS..." oninput="handleObservacaoInput()"></textarea>
-                            </div>
-
                             <!-- Pergunta de Resolução -->
                             <div class="form-group full-width" style="text-align: center; padding: 15px 0; border-top: 1px solid #222; margin-top: 15px;">
                                 <label style="font-weight: bold; color: var(--accent-blue); display: block; margin-bottom: 12px; font-size: 0.95rem;">
@@ -783,6 +777,12 @@
                                 </div>
                                 <!-- Input real oculto que envia os dados para a planilha -->
                                 <input type="checkbox" id="markAsResolvedCheckbox" style="display: none;">
+                            </div>
+
+                            <!-- Observações -->
+                            <div class="form-group full-width">
+                                <label for="observacaoInput">Observações (opcional)</label>
+                                <textarea id="observacaoInput" rows="2" placeholder="Ex: ACIDENTE, SINDICÂNCIA, OUTROS..." oninput="handleObservacaoInput()"></textarea>
                             </div>
 
                             <!-- Seção de Dados do Preenchedor (Bloqueada por padrão) -->
