@@ -1604,6 +1604,15 @@
                         return;
                     }
 
+                    // Filtro estrito secundário no frontend para evitar problemas de cache/versões antigas do script do Apps Script
+                    if (opmVal) {
+                        const normQuery = opmVal.toUpperCase().replace(/[º°ª]/g, ".").replace(/\s+/g, "").trim();
+                        tickets = tickets.filter(ticket => {
+                            const normTicket = (ticket.opm || "").toUpperCase().replace(/[º°ª]/g, ".").replace(/\s+/g, "").trim();
+                            return normTicket === normQuery;
+                        });
+                    }
+
                     if (!Array.isArray(tickets) || tickets.length === 0) {
                         const descFiltro = filterPlaca ? `para a placa ${filterPlaca}` : `para a OPM ${opmVal}`;
                         container.innerHTML = `<div style="color: var(--accent-green); font-weight: 500; text-align: center; padding: 20px 0;">
