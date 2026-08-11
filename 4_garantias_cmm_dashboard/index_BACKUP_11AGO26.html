@@ -506,6 +506,8 @@ let rawHistoryData = [];
 let charts = {};
 const URL_BANCO_DADOS = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSwYd0zPPCAVAWrx2XMWfPNY1ko6UGt9--kHygtU-UpVGVRGQUyirFry2CSmU7MB6on-R0nwt3LStbl/pub?gid=1127142228&single=true&output=csv";
 let cacheBancoDados = null;
+const CONTATOS_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSwYd0zPPCAVAWrx2XMWfPNY1ko6UGt9--kHygtU-UpVGVRGQUyirFry2CSmU7MB6on-R0nwt3LStbl/pub?gid=743010356&single=true&output=csv";
+let contatosMap = {};
 // BANCO DE DADOS DE LINKS DO PROCESSO SEI
 const MAPA_LINKS_SEI = {
     "057.00394330/2024-67": "https://sei.sp.gov.br/sei/controlador.php?acao=procedimento_trabalhar&acao_origem=procedimento_controlar&acao_retorno=procedimento_controlar&id_procedimento=46785914&infra_sistema=100000100&infra_unidade_atual=110023083&infra_hash=ca9b2786197603af32a275b62bc8e80f7f3844180f0cd14fe5749cef6126c72a",
@@ -564,12 +566,16 @@ function getDias(row) {
     }
     
     // Fallback: Se a coluna M falhar ou não estiver no cache, calcula pela data
-    const dtBaixaStr = findVal(row, MAP.baixa);
+    let dtBaixaStr = findVal(row, MAP.baixa);
+    if (!dtBaixaStr) {
+        // Se a data de baixa estiver vazia, usamos a data do Carimbo como data de entrada/registro
+        dtBaixaStr = findVal(row, MAP.data);
+    }
     const dtEnvioStr = findVal(row, MAP.envio);
     const resolvido = String(findVal(row, MAP.situacao)).toLowerCase() === 'true';
     if (!dtBaixaStr) return 0;
 
-    const parts = dtBaixaStr.split('/');
+    const parts = dtBaixaStr.split(' ')[0].split('/');
     if (parts.length < 3) return 0;
     const dataBaixa = new Date(parts[2], parts[1]-1, parts[0]);
     let dataFim = new Date();
@@ -802,6 +808,96 @@ function showEntry(placa, idx, btnEl = null) {
                     <strong style="font-size:1.6rem; color:#fff">${dias} DIAS</strong>
                 </div><br>`;
                 
+    // Obtenção dos contatos da OPM
+    const unidade = findVal(row, MAP.unidade);
+    const normalizedUnidade = normalizeOPM(unidade);
+    const contatoInfo = contatosMap[normalizedUnidade];
+    
+    let contatosHtml = "";
+    if (contatoInfo) {
+        const msgTemplate = (cargo, oficial) => {
+            const placa = findVal(row, MAP.placa);
+            const modelo = findVal(row, MAP.modelo);
+            const defeito = findVal(row, MAP.desc);
+            
+            const texto = `Bom dia. Como vai?\nEquipe do CMM, setor de garantias.\nEm nome do Cap PM Maycon (gestor de contratos) gostaria de tratar sobre a viatura ${modelo} (Placa: ${placa}), OPM ${unidade}, referente ao defeito: ${defeito}.\n\nAguardo vossa resposta.`;
+            return encodeURIComponent(texto);
+        };
+        
+        contatosHtml = `
+            <div style="margin-bottom: 20px; background: #121212; border: 1px solid #333; border-radius: 12px; padding: 15px; display: flex; flex-direction: column; gap: 12px;">
+                <div style="font-size: 0.75rem; color: #00ff90; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;">📞 CANAIS DE CONTATO DA OPM</div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+        `;
+        
+        // Botão Oficial Subfrota
+        if (contatoInfo.subfrota && contatoInfo.subfrota.whatsapp) {
+            const num = sanitizePhoneNumber(contatoInfo.subfrota.whatsapp);
+            const text = msgTemplate("Oficial Subfrota", contatoInfo.subfrota.qra);
+            const link = num ? `https://wa.me/${num}?text=${text}` : "#";
+            const disabledStyle = num ? "" : "opacity: 0.5; pointer-events: none;";
+            
+            contatosHtml += `
+                <a href="${link}" target="_blank" class="nav-btn" style="background: rgba(0, 170, 255, 0.15); border-color: #00aaff; color: #00aaff; justify-content: center; font-size: 0.8rem; padding: 10px; border-radius: 8px; text-decoration: none; text-align: center; display: flex; flex-direction: column; gap: 4px; ${disabledStyle}">
+                    <svg viewBox="0 0 24 24" style="width:16px; height:16px; fill:currentColor;"><path d="M12.012 2c-5.506 0-9.989 4.478-9.99 9.984a9.96 9.96 0 001.335 4.978L2 22l5.177-1.356a9.95 9.95 0 004.83 1.256h.005c5.507 0 9.99-4.478 9.99-9.986 0-2.67-1.037-5.178-2.924-7.066A9.92 9.92 0 0012.012 2zm5.72 14.12c-.25.703-1.442 1.298-1.986 1.356-.497.054-1.147.085-1.838-.135a10.22 10.22 0 01-4.733-2.937 10.35 10.35 0 01-2.92-4.743c-.4-.954-.066-1.745.244-2.112.274-.326.607-.367.81-.367.202 0 .405.001.574.009.183.008.43-.075.674.514.25.603.856 2.083.93 2.235.074.152.124.33.023.53-.1.2-.15.327-.3.5-.15.174-.316.388-.45.52-.15.152-.307.319-.132.619.175.3.774 1.274 1.66 2.062.887.787 1.636 1.031 1.938 1.157.301.127.478.106.657-.1.18-.205.77-.9 1.0-.12.23.78 1.54 2.19 1.68 2.47.14.28.07.477-.055.702z"/></svg>
+                    <div style="text-align: center;">
+                        <div style="font-weight:700; font-size:0.75rem; text-transform: uppercase;">Subfrota</div>
+                        <div style="font-size:0.65rem; color:#aaa; font-weight:normal; max-width: 180px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${contatoInfo.subfrota.qra || "Não Cadastrado"}</div>
+                    </div>
+                </a>
+            `;
+        } else {
+            contatosHtml += `
+                <div class="nav-btn" style="background: rgba(255, 255, 255, 0.05); border-color: #444; color: #888; justify-content: center; font-size: 0.8rem; padding: 10px; border-radius: 8px; text-align: center; display: flex; flex-direction: column; gap: 4px; cursor: not-allowed;">
+                    <div style="text-align: center;">
+                        <div style="font-weight:700; font-size:0.75rem; text-transform: uppercase;">Subfrota</div>
+                        <div style="font-size:0.65rem; font-weight:normal;">Não Disponível</div>
+                    </div>
+                </div>
+            `;
+        }
+        
+        // Botão Oficial Motomec
+        if (contatoInfo.motomec && contatoInfo.motomec.whatsapp) {
+            const num = sanitizePhoneNumber(contatoInfo.motomec.whatsapp);
+            const text = msgTemplate("Oficial Motomec", contatoInfo.motomec.qra);
+            const link = num ? `https://wa.me/${num}?text=${text}` : "#";
+            const disabledStyle = num ? "" : "opacity: 0.5; pointer-events: none;";
+            
+            contatosHtml += `
+                <a href="${link}" target="_blank" class="nav-btn" style="background: rgba(0, 255, 144, 0.15); border-color: #00ff90; color: #00ff90; justify-content: center; font-size: 0.8rem; padding: 10px; border-radius: 8px; text-decoration: none; text-align: center; display: flex; flex-direction: column; gap: 4px; ${disabledStyle}">
+                    <svg viewBox="0 0 24 24" style="width:16px; height:16px; fill:currentColor;"><path d="M12.012 2c-5.506 0-9.989 4.478-9.99 9.984a9.96 9.96 0 001.335 4.978L2 22l5.177-1.356a9.95 9.95 0 004.83 1.256h.005c5.507 0 9.99-4.478 9.99-9.986 0-2.67-1.037-5.178-2.924-7.066A9.92 9.92 0 0012.012 2zm5.72 14.12c-.25.703-1.442 1.298-1.986 1.356-.497.054-1.147.085-1.838-.135a10.22 10.22 0 01-4.733-2.937 10.35 10.35 0 01-2.92-4.743c-.4-.954-.066-1.745.244-2.112.274-.326.607-.367.81-.367.202 0 .405.001.574.009.183.008.43-.075.674.514.25.603.856 2.083.93 2.235.074.152.124.33.023.53-.1.2-.15.327-.3.5-.15.174-.316.388-.45.52-.15.152-.307.319-.132.619.175.3.774 1.274 1.66 2.062.887.787 1.636 1.031 1.938 1.157.301.127.478.106.657-.1.18-.205.77-.9 1.0-.12.23.78 1.54 2.19 1.68 2.47.14.28.07.477-.055.702z"/></svg>
+                    <div style="text-align: center;">
+                        <div style="font-weight:700; font-size:0.75rem; text-transform: uppercase;">Motomec</div>
+                        <div style="font-size:0.65rem; color:#aaa; font-weight:normal; max-width: 180px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${contatoInfo.motomec.qra || "Não Cadastrado"}</div>
+                    </div>
+                </a>
+            `;
+        } else {
+            contatosHtml += `
+                <div class="nav-btn" style="background: rgba(255, 255, 255, 0.05); border-color: #444; color: #888; justify-content: center; font-size: 0.8rem; padding: 10px; border-radius: 8px; text-align: center; display: flex; flex-direction: column; gap: 4px; cursor: not-allowed;">
+                    <div style="text-align: center;">
+                        <div style="font-weight:700; font-size:0.75rem; text-transform: uppercase;">Motomec</div>
+                        <div style="font-size:0.65rem; font-weight:normal;">Não Disponível</div>
+                    </div>
+                </div>
+            `;
+        }
+        
+        contatosHtml += `
+                </div>
+            </div>
+        `;
+    } else {
+        contatosHtml = `
+            <div style="margin-bottom: 20px; background: #121212; border: 1px solid rgba(255, 77, 109, 0.25); border-radius: 12px; padding: 12px; text-align: center;">
+                <span style="font-size: 0.75rem; color: #ff4d6d; font-weight: 700; text-transform: uppercase;">⚠️ Contatos não encontrados para a OPM: ${unidade}</span>
+            </div>
+        `;
+    }
+    
+    html += contatosHtml;
+
     Object.keys(row).forEach(key => {
         if(row[key] && !key.includes("Unnamed")) {
             let valorItem = String(row[key]).trim();
@@ -1370,10 +1466,88 @@ function gerarRelatorioPDF(prefix) {
     window.print();
 }
 
-function init() {
-    Papa.parse(CSV_URL, {
-        download: true, header: true, skipEmptyLines: true,
+function normalizeOPM(name) {
+    if (!name) return "";
+    return name.toLowerCase().replace(/[\.\-\/º\s]/g, "");
+}
+
+function sanitizePhoneNumber(phone) {
+    if (!phone) return "";
+    let cleaned = phone.replace(/\D/g, "");
+    if (cleaned.length === 0) return "";
+    if (cleaned.length === 10 || cleaned.length === 11) {
+        cleaned = "55" + cleaned;
+    }
+    return cleaned;
+}
+
+function loadContatos(callback) {
+    Papa.parse(CONTATOS_CSV_URL, {
+        download: true,
+        header: false,
+        skipEmptyLines: true,
         complete(results) {
+            try {
+                let currentComando = "";
+                let currentSubcomando = "";
+                let currentSubfrotaQra = "";
+                let currentSubfrotaWhatsApp = "";
+                let currentSubfrotaEmail = "";
+                
+                for (let i = 1; i < results.data.length; i++) {
+                    const row = results.data[i];
+                    if (row.length < 6) continue;
+                    
+                    const comando = row[0] ? row[0].trim() : "";
+                    const subcomando = row[1] ? row[1].trim() : "";
+                    const subfrotaQra = row[2] ? row[2].trim() : "";
+                    const subfrotaWhatsApp = row[3] ? row[3].trim() : "";
+                    const subfrotaEmail = row[4] ? row[4].trim() : "";
+                    const batalhao = row[5] ? row[5].trim() : "";
+                    const motomecQra = row[6] ? row[6].trim() : "";
+                    const motomecWhatsApp = row[7] ? row[7].trim() : "";
+                    
+                    if (comando !== "") currentComando = comando;
+                    if (subcomando !== "") currentSubcomando = subcomando;
+                    if (subfrotaQra !== "") currentSubfrotaQra = subfrotaQra;
+                    if (subfrotaWhatsApp !== "") currentSubfrotaWhatsApp = subfrotaWhatsApp;
+                    if (subfrotaEmail !== "") currentSubfrotaEmail = subfrotaEmail;
+                    
+                    if (batalhao !== "") {
+                        const normalizedBatalhao = normalizeOPM(batalhao);
+                        contatosMap[normalizedBatalhao] = {
+                            batalhao: batalhao,
+                            comando: currentComando,
+                            subcomando: currentSubcomando,
+                            subfrota: {
+                                qra: currentSubfrotaQra,
+                                whatsapp: currentSubfrotaWhatsApp,
+                                email: currentSubfrotaEmail
+                            },
+                            motomec: {
+                                qra: motomecQra,
+                                whatsapp: motomecWhatsApp
+                            }
+                        };
+                    }
+                }
+            } catch (e) {
+                console.error("Erro ao processar contatos:", e);
+            }
+            if (callback) callback();
+        },
+        error(err) {
+            console.error("Erro ao baixar contatos:", err);
+            if (callback) callback();
+        }
+    });
+}
+
+function init() {
+    loadContatos(() => {
+        Papa.parse(CSV_URL, {
+            download: true, header: true, skipEmptyLines: true,
+            complete(results) {
             try {
                 // Guarda TUDO no histórico
                 rawHistoryData = results.data.filter(r => findVal(r, MAP.placa).length > 3);
@@ -1410,6 +1584,7 @@ function init() {
                 ❌ ERRO DE CONEXÃO:<br><span style="font-size:0.9rem; color:#aaa;">Não foi possível baixar os dados da planilha. Verifique a sua conexão de rede.</span>
             </div>`;
         }
+        });
     });
 }
 init();

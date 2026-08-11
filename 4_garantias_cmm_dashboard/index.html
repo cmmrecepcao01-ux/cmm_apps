@@ -264,6 +264,70 @@
                 float: right;
             }
         }
+        
+        /* ESTILO DAS TOOLTIPS EXPLICATIVAS */
+        .tooltip-container {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            cursor: help;
+            margin-left: 6px;
+            vertical-align: middle;
+        }
+        .tooltip-icon {
+            color: #00ff90;
+            background: rgba(0, 255, 144, 0.1);
+            border: 1px solid rgba(0, 255, 144, 0.3);
+            border-radius: 50%;
+            width: 16px;
+            height: 16px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+            font-weight: bold;
+            transition: all 0.2s ease;
+        }
+        .tooltip-container:hover .tooltip-icon {
+            background: #00ff90;
+            color: #000;
+            box-shadow: 0 0 8px rgba(0, 255, 144, 0.6);
+        }
+        .tooltip-text {
+            visibility: hidden;
+            width: 250px;
+            background-color: #161616;
+            color: #f0f0f0;
+            text-align: left;
+            border: 1px solid #333;
+            border-top: 2px solid #00ff90;
+            border-radius: 8px;
+            padding: 10px 14px;
+            position: absolute;
+            z-index: 200;
+            bottom: 125%;
+            left: 50%;
+            transform: translateX(-50%);
+            opacity: 0;
+            transition: opacity 0.2s ease, transform 0.2s ease;
+            font-size: 0.75rem;
+            line-height: 1.4;
+            pointer-events: none;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.8);
+            font-weight: normal;
+            text-transform: none;
+            letter-spacing: normal;
+        }
+        .tooltip-text strong {
+            color: #00ff90;
+            display: block;
+            margin-bottom: 4px;
+        }
+        .tooltip-container:hover .tooltip-text {
+            visibility: visible;
+            opacity: 1;
+            transform: translateX(-50%) translateY(-2px);
+        }
     </style>
 <base target="_blank">
 </head>
@@ -506,6 +570,8 @@ let rawHistoryData = [];
 let charts = {};
 const URL_BANCO_DADOS = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSwYd0zPPCAVAWrx2XMWfPNY1ko6UGt9--kHygtU-UpVGVRGQUyirFry2CSmU7MB6on-R0nwt3LStbl/pub?gid=1127142228&single=true&output=csv";
 let cacheBancoDados = null;
+const CONTATOS_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSwYd0zPPCAVAWrx2XMWfPNY1ko6UGt9--kHygtU-UpVGVRGQUyirFry2CSmU7MB6on-R0nwt3LStbl/pub?gid=743010356&single=true&output=csv";
+let contatosMap = {};
 // BANCO DE DADOS DE LINKS DO PROCESSO SEI
 const MAPA_LINKS_SEI = {
     "057.00394330/2024-67": "https://sei.sp.gov.br/sei/controlador.php?acao=procedimento_trabalhar&acao_origem=procedimento_controlar&acao_retorno=procedimento_controlar&id_procedimento=46785914&infra_sistema=100000100&infra_unidade_atual=110023083&infra_hash=ca9b2786197603af32a275b62bc8e80f7f3844180f0cd14fe5749cef6126c72a",
@@ -596,34 +662,128 @@ function toggleDropdown(event, id) {
 }
 
 function renderKPIs(data) {
-    const resolvidos = data.filter(row => String(findVal(row, MAP.situacao)).toLowerCase() === 'true').length;
-    const pendentes = data.length - resolvidos;
-    const diasArray = data.map(r => getDias(r));
-    const maxAtraso = Math.max(...diasArray, 0);
-    const topAtrasos = [...data].sort((a,b) => getDias(b) - getDias(a)).slice(0,10);
-    
-    // Filtro do novo indicador de atenção especial
-    const casosCriticos = data.filter(r => categorizeDefect(findVal(r, MAP.desc)) === "🚨 CASOS CRÍTICOS");
+    // Agrupa por placas para cálculo de Veículos Únicos
+    let plates = {};
+    data.forEach(row => {
+        const p = findVal(row, MAP.placa);
+        if (!p) return;
+        const sit = String(findVal(row, MAP.situacao)).toLowerCase() === 'true';
+        if (!plates[p]) {
+            plates[p] = { total: 0, resolvidos: 0, pendentes: 0, rows: [] };
+        }
+        plates[p].total++;
+        if (sit) {
+            plates[p].resolvidos++;
+        } else {
+            plates[p].pendentes++;
+        }
+        plates[p].rows.push(row);
+    });
 
-    // KPI PRINCIPAL COM CLIQUES E DROPDOWNS RESTAURADOS
+    const totalUniquePlates = Object.keys(plates).length;
+    // Um veículo está pendente se tiver pelo menos 1 acionamento pendente
+    const pendingUniquePlates = Object.values(plates).filter(pInfo => pInfo.pendentes > 0).length;
+
+    // Métricas de Acionamentos
+    const totalAcionamentos = data.length;
+    const pendingAcionamentos = data.filter(row => String(findVal(row, MAP.situacao)).toLowerCase() !== 'true').length;
+
+    // Cálculo do recorde de atraso (apenas chamados que estão pendentes)
+    const pendingRows = data.filter(row => String(findVal(row, MAP.situacao)).toLowerCase() !== 'true');
+    const diasArray = pendingRows.map(r => getDias(r));
+    const maxAtraso = diasArray.length > 0 ? Math.max(...diasArray, 0) : 0;
+    const topAtrasos = [...pendingRows].sort((a,b) => getDias(b) - getDias(a)).slice(0,10);
+
+    // Filtro de casos críticos pendentes
+    const casosCriticos = pendingRows.filter(r => categorizeDefect(findVal(r, MAP.desc)) === "🚨 CASOS CRÍTICOS");
+
+    // Ordena veículos por tempo máximo de atraso pendente
+    const sortedUniquePlates = Object.keys(plates).map(p => {
+        const pInfo = plates[p];
+        const pPendingRows = pInfo.rows.filter(r => String(findVal(r, MAP.situacao)).toLowerCase() !== 'true');
+        const maxDelay = pPendingRows.length > 0 ? Math.max(...pPendingRows.map(r => getDias(r)), 0) : 0;
+        return { placa: p, info: pInfo, maxDelay: maxDelay };
+    }).sort((a, b) => b.maxDelay - a.maxDelay);
+
+    // Renderiza KPIs Principais com Tooltips
     document.getElementById("main-kpis").innerHTML = `
         <div class="kpi-card" style="--accent:#00ff90" onclick="toggleDropdown(event, 'list-total')">
-            <div class="kpi-label">Veículos reportados</div>
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+                <div class="kpi-label" style="margin-bottom:0;">
+                    Veículos reportados
+                    <div class="tooltip-container" onclick="event.stopPropagation()">
+                        <span class="tooltip-icon">i</span>
+                        <span class="tooltip-text">
+                            <strong>Veículos Reportados (Placas)</strong>
+                            Mede a quantidade total de veículos distintos (placas individuais). O contador de pendentes exibe quantos desses veículos possuem pelo menos um chamado ativo.
+                        </span>
+                    </div>
+                </div>
+            </div>
             <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 5px;">
-                <div class="kpi-value" style="margin-bottom: 0;">${data.length}</div>
+                <div class="kpi-value" style="margin-bottom: 0;">${totalUniquePlates}</div>
                 <div style="text-align: center;">
-                    <div style="font-size: 1.25rem; font-weight: 700; color: #ff4d6d; line-height: 1;">${pendentes}</div>
+                    <div style="font-size: 1.25rem; font-weight: 700; color: #ff4d6d; line-height: 1;">${pendingUniquePlates}</div>
                     <div style="font-size: 0.65rem; color: #aaa; margin-top: 2px;">pendentes</div>
                 </div>
             </div>
-            <div class="kpi-sub" style="color:#00ff90; font-weight:bold">VER FROTA COMPLETA ▼</div>
+            <div class="kpi-sub" style="color:#00ff90; font-weight:bold">VER VEÍCULOS ▼</div>
             <div id="list-total" class="dropdown-list" onclick="event.stopPropagation()">
-                ${data.slice(0,15).map(r => `<div class="dropdown-item"><span>${findVal(r, MAP.placa)} - <span style="color:#aaa">${findVal(r, MAP.marca)}</span></span><strong>${getDias(r)} d</strong></div>`).join('')}
+                ${sortedUniquePlates.slice(0,15).map(item => `
+                    <div class="dropdown-item">
+                        <span>${item.placa} - <span style="color:#aaa">${findVal(item.info.rows[0], MAP.marca)}</span></span>
+                        <strong>${item.info.pendentes > 0 ? `${item.maxDelay} d` : 'OK'}</strong>
+                    </div>
+                `).join('')}
+            </div>
+        </div>
+
+        <div class="kpi-card" style="--accent:#00aaff" onclick="toggleDropdown(event, 'list-acionamentos')">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+                <div class="kpi-label" style="margin-bottom:0;">
+                    Acionamentos (Garantias)
+                    <div class="tooltip-container" onclick="event.stopPropagation()">
+                        <span class="tooltip-icon">i</span>
+                        <span class="tooltip-text">
+                            <strong>Total de Acionamentos</strong>
+                            Mede o volume total de solicitações de garantia ou revisões registradas. O número de pendentes indica o total de chamados de garantia individuais que ainda não foram solucionados.
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 5px;">
+                <div class="kpi-value" style="margin-bottom: 0;">${totalAcionamentos}</div>
+                <div style="text-align: center;">
+                    <div style="font-size: 1.25rem; font-weight: 700; color: #ff4d6d; line-height: 1;">${pendingAcionamentos}</div>
+                    <div style="font-size: 0.65rem; color: #aaa; margin-top: 2px;">pendentes</div>
+                </div>
+            </div>
+            <div class="kpi-sub" style="color:#00aaff; font-weight:bold">VER HISTÓRICO ▼</div>
+            <div id="list-acionamentos" class="dropdown-list" onclick="event.stopPropagation()">
+                ${data.slice(-15).reverse().map(r => `
+                    <div class="dropdown-item">
+                        <span>${findVal(r, MAP.placa)} - <span style="color:#aaa">${findVal(r, MAP.desc).slice(0, 20)}...</span></span>
+                        <strong style="color:${String(findVal(r, MAP.situacao)).toLowerCase() === 'true' ? '#00ff90' : '#ff8c00'}">
+                            ${String(findVal(r, MAP.situacao)).toLowerCase() === 'true' ? 'OK' : 'PD'}
+                        </strong>
+                    </div>
+                `).join('')}
             </div>
         </div>
         
         <div class="kpi-card" style="--accent:#ff4d6d" onclick="toggleDropdown(event, 'list-max')">
-            <div class="kpi-label">Recorde de Atraso</div>
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+                <div class="kpi-label" style="margin-bottom:0;">
+                    Recorde de Atraso
+                    <div class="tooltip-container" onclick="event.stopPropagation()">
+                        <span class="tooltip-icon">i</span>
+                        <span class="tooltip-text">
+                            <strong>Recorde de Atraso</strong>
+                            Exibe o tempo máximo de paralisação/atraso (em dias) entre todas as viaturas atualmente com chamados de garantia pendentes.
+                        </span>
+                    </div>
+                </div>
+            </div>
             <div class="kpi-value">${maxAtraso} d</div>
             <div class="kpi-sub" style="color:#ff4d6d; font-weight:bold">RANKING DE BAIXAS ▼</div>
             <div id="list-max" class="dropdown-list" onclick="event.stopPropagation()">
@@ -632,8 +792,17 @@ function renderKPIs(data) {
         </div>
 
         <div class="kpi-card" style="--accent:#ff4d6d" onclick="toggleDropdown(event, 'list-criticos')">
-            <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:12px;">
-                <div class="kpi-label" style="margin-bottom:0; color:#ff4d6d;">Casos Críticos</div>
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+                <div class="kpi-label" style="margin-bottom:0; color:#ff4d6d;">
+                    Casos Críticos
+                    <div class="tooltip-container" onclick="event.stopPropagation()">
+                        <span class="tooltip-icon">i</span>
+                        <span class="tooltip-text">
+                            <strong>Casos Críticos</strong>
+                            Identifica o total de chamados ativos associados a falhas graves (ex: motor fundido, pane no bloco, imobilizados sob atenção especial).
+                        </span>
+                    </div>
+                </div>
                 
                 <button onclick="event.stopPropagation(); openCriticoView()" 
                         style="background:#ff4d6d20; color:#ff4d6d; border:1px solid #ff4d6d; border-radius:4px; padding:4px 8px; font-size:0.65rem; font-weight:bold; cursor:pointer; text-transform:uppercase; transition:0.2s;">
@@ -650,17 +819,57 @@ function renderKPIs(data) {
         </div>
     `;
 
-    // KPI MARCAS COM CLIQUES RESTAURADOS E BOTÃO NO TOPO
+    // KPI MARCAS COM CLIQUES RESTAURADOS E LÓGICA DE PLACAS ACUMULADAS
     const marcas = [...new Set(data.map(r => findVal(r, MAP.marca)).filter(Boolean))];
     document.getElementById("brand-kpis").innerHTML = marcas.map((m, i) => {
         const vtrs = data.filter(r => findVal(r, MAP.marca) === m);
-        const maxM = Math.max(...vtrs.map(r => getDias(r)), 0);
-        const pendentesMarca = vtrs.filter(r => String(findVal(r, MAP.situacao)).toLowerCase() !== 'true').length;
+        
+        // Agrupa por placas na marca
+        const platesMarca = {};
+        vtrs.forEach(r => {
+            const p = findVal(r, MAP.placa);
+            if (!p) return;
+            const sit = String(findVal(r, MAP.situacao)).toLowerCase() === 'true';
+            if (!platesMarca[p]) {
+                platesMarca[p] = { total: 0, resolvidos: 0, pendentes: 0, rows: [] };
+            }
+            platesMarca[p].total++;
+            if (sit) {
+                platesMarca[p].resolvidos++;
+            } else {
+                platesMarca[p].pendentes++;
+            }
+            platesMarca[p].rows.push(r);
+        });
+
+        const totalVtrsMarca = Object.keys(platesMarca).length;
+        const pendentesVtrsMarca = Object.values(platesMarca).filter(pInfo => pInfo.pendentes > 0).length;
+
+        const pendingVtrs = vtrs.filter(r => String(findVal(r, MAP.situacao)).toLowerCase() !== 'true');
+        const maxM = pendingVtrs.length > 0 ? Math.max(...pendingVtrs.map(r => getDias(r)), 0) : 0;
+        
+        // Ordena placas da marca por atraso máximo pendente
+        const sortedBrandPlates = Object.keys(platesMarca).map(p => {
+            const pInfo = platesMarca[p];
+            const pPendingRows = pInfo.rows.filter(r => String(findVal(r, MAP.situacao)).toLowerCase() !== 'true');
+            const maxDelay = pPendingRows.length > 0 ? Math.max(...pPendingRows.map(r => getDias(r)), 0) : 0;
+            return { placa: p, info: pInfo, maxDelay: maxDelay };
+        }).sort((a, b) => b.maxDelay - a.maxDelay);
+
         return `
             <div class="kpi-card" style="--accent:#00aaff" onclick="toggleDropdown(event, 'brand-${i}')">
                 
-                <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:12px;">
-                    <div class="kpi-label" style="margin-bottom:0;">${m}</div>
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+                    <div class="kpi-label" style="margin-bottom:0;">
+                        ${m}
+                        <div class="tooltip-container" onclick="event.stopPropagation()">
+                            <span class="tooltip-icon">i</span>
+                            <span class="tooltip-text">
+                                <strong>Monitoramento de ${m}</strong>
+                                Quantidade de veículos (placas únicas) registrados para a marca ${m}. O veículo continua listado como pendente até que todos os seus chamados de garantia/revisão sejam solucionados.
+                            </span>
+                        </div>
+                    </div>
                     
                     <button onclick="event.stopPropagation(); openBrandView('${m}')" 
                             style="background:#00aaff20; color:#00aaff; border:1px solid #00aaff; border-radius:4px; padding:4px 8px; font-size:0.65rem; font-weight:bold; cursor:pointer; text-transform:uppercase; transition:0.2s;">
@@ -669,16 +878,23 @@ function renderKPIs(data) {
                 </div>
 
                 <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 5px;">
-                    <div class="kpi-value" style="margin-bottom: 0;">${vtrs.length} <small style="font-size:1rem">VTRs</small></div>
+                    <div class="kpi-value" style="margin-bottom: 0;">${totalVtrsMarca} <small style="font-size:1rem">VTRs</small></div>
                     <div style="text-align: center;">
-                        <div style="font-size: 1.25rem; font-weight: 700; color: #ff4d6d; line-height: 1;">${pendentesMarca}</div>
+                        <div style="font-size: 1.25rem; font-weight: 700; color: #ff4d6d; line-height: 1;">${pendentesVtrsMarca}</div>
                         <div style="font-size: 0.65rem; color: #aaa; margin-top: 2px;">pendentes</div>
                     </div>
                 </div>
                 <div class="kpi-sub" style="color:#00aaff; font-weight:bold">Máximo: ${maxM} d ▼</div>
                 
                 <div id="brand-${i}" class="dropdown-list" onclick="event.stopPropagation()">
-                    ${vtrs.sort((a,b) => getDias(b)-getDias(a)).slice(0,15).map(r => `<div class="dropdown-item"><span>${findVal(r, MAP.placa)}</span><strong style="color:#00aaff">${getDias(r)} d</strong></div>`).join('')}
+                    ${sortedBrandPlates.slice(0,15).map(item => `
+                        <div class="dropdown-item">
+                            <span>${item.placa}</span>
+                            <strong style="color:${item.info.pendentes > 0 ? '#ff4d6d' : '#00ff90'}">
+                                ${item.info.pendentes > 0 ? `${item.maxDelay} d` : 'OK'}
+                            </strong>
+                        </div>
+                    `).join('')}
                 </div>
             </div>
         `;
@@ -806,6 +1022,96 @@ function showEntry(placa, idx, btnEl = null) {
                     <strong style="font-size:1.6rem; color:#fff">${dias} DIAS</strong>
                 </div><br>`;
                 
+    // Obtenção dos contatos da OPM
+    const unidade = findVal(row, MAP.unidade);
+    const normalizedUnidade = normalizeOPM(unidade);
+    const contatoInfo = contatosMap[normalizedUnidade];
+    
+    let contatosHtml = "";
+    if (contatoInfo) {
+        const msgTemplate = (cargo, oficial) => {
+            const placa = findVal(row, MAP.placa);
+            const modelo = findVal(row, MAP.modelo);
+            const defeito = findVal(row, MAP.desc);
+            
+            const texto = `Bom dia. Como vai?\nEquipe do CMM, setor de garantias.\nEm nome do Cap PM Maycon (gestor de contratos) gostaria de tratar sobre a viatura ${modelo} (Placa: ${placa}), OPM ${unidade}, referente ao defeito: ${defeito}.\n\nAguardo vossa resposta.`;
+            return encodeURIComponent(texto);
+        };
+        
+        contatosHtml = `
+            <div style="margin-bottom: 20px; background: #121212; border: 1px solid #333; border-radius: 12px; padding: 15px; display: flex; flex-direction: column; gap: 12px;">
+                <div style="font-size: 0.75rem; color: #00ff90; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;">📞 CANAIS DE CONTATO DA OPM</div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+        `;
+        
+        // Botão Oficial Subfrota
+        if (contatoInfo.subfrota && contatoInfo.subfrota.whatsapp) {
+            const num = sanitizePhoneNumber(contatoInfo.subfrota.whatsapp);
+            const text = msgTemplate("Oficial Subfrota", contatoInfo.subfrota.qra);
+            const link = num ? `https://wa.me/${num}?text=${text}` : "#";
+            const disabledStyle = num ? "" : "opacity: 0.5; pointer-events: none;";
+            
+            contatosHtml += `
+                <a href="${link}" target="_blank" class="nav-btn" style="background: rgba(0, 170, 255, 0.15); border-color: #00aaff; color: #00aaff; justify-content: center; font-size: 0.8rem; padding: 10px; border-radius: 8px; text-decoration: none; text-align: center; display: flex; flex-direction: column; gap: 4px; ${disabledStyle}">
+                    <svg viewBox="0 0 24 24" style="width:16px; height:16px; fill:currentColor;"><path d="M12.012 2c-5.506 0-9.989 4.478-9.99 9.984a9.96 9.96 0 001.335 4.978L2 22l5.177-1.356a9.95 9.95 0 004.83 1.256h.005c5.507 0 9.99-4.478 9.99-9.986 0-2.67-1.037-5.178-2.924-7.066A9.92 9.92 0 0012.012 2zm5.72 14.12c-.25.703-1.442 1.298-1.986 1.356-.497.054-1.147.085-1.838-.135a10.22 10.22 0 01-4.733-2.937 10.35 10.35 0 01-2.92-4.743c-.4-.954-.066-1.745.244-2.112.274-.326.607-.367.81-.367.202 0 .405.001.574.009.183.008.43-.075.674.514.25.603.856 2.083.93 2.235.074.152.124.33.023.53-.1.2-.15.327-.3.5-.15.174-.316.388-.45.52-.15.152-.307.319-.132.619.175.3.774 1.274 1.66 2.062.887.787 1.636 1.031 1.938 1.157.301.127.478.106.657-.1.18-.205.77-.9 1.0-.12.23.78 1.54 2.19 1.68 2.47.14.28.07.477-.055.702z"/></svg>
+                    <div style="text-align: center;">
+                        <div style="font-weight:700; font-size:0.75rem; text-transform: uppercase;">Subfrota</div>
+                        <div style="font-size:0.65rem; color:#aaa; font-weight:normal; max-width: 180px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${contatoInfo.subfrota.qra || "Não Cadastrado"}</div>
+                    </div>
+                </a>
+            `;
+        } else {
+            contatosHtml += `
+                <div class="nav-btn" style="background: rgba(255, 255, 255, 0.05); border-color: #444; color: #888; justify-content: center; font-size: 0.8rem; padding: 10px; border-radius: 8px; text-align: center; display: flex; flex-direction: column; gap: 4px; cursor: not-allowed;">
+                    <div style="text-align: center;">
+                        <div style="font-weight:700; font-size:0.75rem; text-transform: uppercase;">Subfrota</div>
+                        <div style="font-size:0.65rem; font-weight:normal;">Não Disponível</div>
+                    </div>
+                </div>
+            `;
+        }
+        
+        // Botão Oficial Motomec
+        if (contatoInfo.motomec && contatoInfo.motomec.whatsapp) {
+            const num = sanitizePhoneNumber(contatoInfo.motomec.whatsapp);
+            const text = msgTemplate("Oficial Motomec", contatoInfo.motomec.qra);
+            const link = num ? `https://wa.me/${num}?text=${text}` : "#";
+            const disabledStyle = num ? "" : "opacity: 0.5; pointer-events: none;";
+            
+            contatosHtml += `
+                <a href="${link}" target="_blank" class="nav-btn" style="background: rgba(0, 255, 144, 0.15); border-color: #00ff90; color: #00ff90; justify-content: center; font-size: 0.8rem; padding: 10px; border-radius: 8px; text-decoration: none; text-align: center; display: flex; flex-direction: column; gap: 4px; ${disabledStyle}">
+                    <svg viewBox="0 0 24 24" style="width:16px; height:16px; fill:currentColor;"><path d="M12.012 2c-5.506 0-9.989 4.478-9.99 9.984a9.96 9.96 0 001.335 4.978L2 22l5.177-1.356a9.95 9.95 0 004.83 1.256h.005c5.507 0 9.99-4.478 9.99-9.986 0-2.67-1.037-5.178-2.924-7.066A9.92 9.92 0 0012.012 2zm5.72 14.12c-.25.703-1.442 1.298-1.986 1.356-.497.054-1.147.085-1.838-.135a10.22 10.22 0 01-4.733-2.937 10.35 10.35 0 01-2.92-4.743c-.4-.954-.066-1.745.244-2.112.274-.326.607-.367.81-.367.202 0 .405.001.574.009.183.008.43-.075.674.514.25.603.856 2.083.93 2.235.074.152.124.33.023.53-.1.2-.15.327-.3.5-.15.174-.316.388-.45.52-.15.152-.307.319-.132.619.175.3.774 1.274 1.66 2.062.887.787 1.636 1.031 1.938 1.157.301.127.478.106.657-.1.18-.205.77-.9 1.0-.12.23.78 1.54 2.19 1.68 2.47.14.28.07.477-.055.702z"/></svg>
+                    <div style="text-align: center;">
+                        <div style="font-weight:700; font-size:0.75rem; text-transform: uppercase;">Motomec</div>
+                        <div style="font-size:0.65rem; color:#aaa; font-weight:normal; max-width: 180px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${contatoInfo.motomec.qra || "Não Cadastrado"}</div>
+                    </div>
+                </a>
+            `;
+        } else {
+            contatosHtml += `
+                <div class="nav-btn" style="background: rgba(255, 255, 255, 0.05); border-color: #444; color: #888; justify-content: center; font-size: 0.8rem; padding: 10px; border-radius: 8px; text-align: center; display: flex; flex-direction: column; gap: 4px; cursor: not-allowed;">
+                    <div style="text-align: center;">
+                        <div style="font-weight:700; font-size:0.75rem; text-transform: uppercase;">Motomec</div>
+                        <div style="font-size:0.65rem; font-weight:normal;">Não Disponível</div>
+                    </div>
+                </div>
+            `;
+        }
+        
+        contatosHtml += `
+                </div>
+            </div>
+        `;
+    } else {
+        contatosHtml = `
+            <div style="margin-bottom: 20px; background: #121212; border: 1px solid rgba(255, 77, 109, 0.25); border-radius: 12px; padding: 12px; text-align: center;">
+                <span style="font-size: 0.75rem; color: #ff4d6d; font-weight: 700; text-transform: uppercase;">⚠️ Contatos não encontrados para a OPM: ${unidade}</span>
+            </div>
+        `;
+    }
+    
+    html += contatosHtml;
+
     Object.keys(row).forEach(key => {
         if(row[key] && !key.includes("Unnamed")) {
             let valorItem = String(row[key]).trim();
@@ -1374,27 +1680,94 @@ function gerarRelatorioPDF(prefix) {
     window.print();
 }
 
-function init() {
-    Papa.parse(CSV_URL, {
-        download: true, header: true, skipEmptyLines: true,
+function normalizeOPM(name) {
+    if (!name) return "";
+    return name.toLowerCase().replace(/[\.\-\/º\s]/g, "");
+}
+
+function sanitizePhoneNumber(phone) {
+    if (!phone) return "";
+    let cleaned = phone.replace(/\D/g, "");
+    if (cleaned.length === 0) return "";
+    if (cleaned.length === 10 || cleaned.length === 11) {
+        cleaned = "55" + cleaned;
+    }
+    return cleaned;
+}
+
+function loadContatos(callback) {
+    Papa.parse(CONTATOS_CSV_URL, {
+        download: true,
+        header: false,
+        skipEmptyLines: true,
         complete(results) {
+            try {
+                let currentComando = "";
+                let currentSubcomando = "";
+                let currentSubfrotaQra = "";
+                let currentSubfrotaWhatsApp = "";
+                let currentSubfrotaEmail = "";
+                
+                for (let i = 1; i < results.data.length; i++) {
+                    const row = results.data[i];
+                    if (row.length < 6) continue;
+                    
+                    const comando = row[0] ? row[0].trim() : "";
+                    const subcomando = row[1] ? row[1].trim() : "";
+                    const subfrotaQra = row[2] ? row[2].trim() : "";
+                    const subfrotaWhatsApp = row[3] ? row[3].trim() : "";
+                    const subfrotaEmail = row[4] ? row[4].trim() : "";
+                    const batalhao = row[5] ? row[5].trim() : "";
+                    const motomecQra = row[6] ? row[6].trim() : "";
+                    const motomecWhatsApp = row[7] ? row[7].trim() : "";
+                    
+                    if (comando !== "") currentComando = comando;
+                    if (subcomando !== "") currentSubcomando = subcomando;
+                    if (subfrotaQra !== "") currentSubfrotaQra = subfrotaQra;
+                    if (subfrotaWhatsApp !== "") currentSubfrotaWhatsApp = subfrotaWhatsApp;
+                    if (subfrotaEmail !== "") currentSubfrotaEmail = subfrotaEmail;
+                    
+                    if (batalhao !== "") {
+                        const normalizedBatalhao = normalizeOPM(batalhao);
+                        contatosMap[normalizedBatalhao] = {
+                            batalhao: batalhao,
+                            comando: currentComando,
+                            subcomando: currentSubcomando,
+                            subfrota: {
+                                qra: currentSubfrotaQra,
+                                whatsapp: currentSubfrotaWhatsApp,
+                                email: currentSubfrotaEmail
+                            },
+                            motomec: {
+                                qra: motomecQra,
+                                whatsapp: motomecWhatsApp
+                            }
+                        };
+                    }
+                }
+            } catch (e) {
+                console.error("Erro ao processar contatos:", e);
+            }
+            if (callback) callback();
+        },
+        error(err) {
+            console.error("Erro ao baixar contatos:", err);
+            if (callback) callback();
+        }
+    });
+}
+
+function init() {
+    loadContatos(() => {
+        Papa.parse(CSV_URL, {
+            download: true, header: true, skipEmptyLines: true,
+            complete(results) {
             try {
                 // Guarda TUDO no histórico
                 rawHistoryData = results.data.filter(r => findVal(r, MAP.placa).length > 3);
                 
-                // Cria um dicionário para agrupar por placa
-                let grouped = {};
-                rawHistoryData.forEach(row => {
-                    let p = findVal(row, MAP.placa);
-                    if (!grouped[p]) grouped[p] = [];
-                    grouped[p].push(row);
-                });
-                
-                // allData agora será apenas o ÚLTIMO lançamento de cada placa
-                allData = Object.keys(grouped).map(p => {
-                    let history = grouped[p];
-                    return history[history.length - 1]; // Pega sempre o mais recente
-                });
+                // allData agora será a lista de todos os registros históricos (acionamentos)
+                allData = rawHistoryData;
 
                 document.getElementById("loader").style.display = "none";
                 document.getElementById("dashboard").style.display = "block";
@@ -1414,6 +1787,7 @@ function init() {
                 ❌ ERRO DE CONEXÃO:<br><span style="font-size:0.9rem; color:#aaa;">Não foi possível baixar os dados da planilha. Verifique a sua conexão de rede.</span>
             </div>`;
         }
+        });
     });
 }
 init();
