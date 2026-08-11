@@ -564,12 +564,16 @@ function getDias(row) {
     }
     
     // Fallback: Se a coluna M falhar ou não estiver no cache, calcula pela data
-    const dtBaixaStr = findVal(row, MAP.baixa);
+    let dtBaixaStr = findVal(row, MAP.baixa);
+    if (!dtBaixaStr) {
+        // Se a data de baixa estiver vazia, usamos a data do Carimbo como data de entrada/registro
+        dtBaixaStr = findVal(row, MAP.data);
+    }
     const dtEnvioStr = findVal(row, MAP.envio);
     const resolvido = String(findVal(row, MAP.situacao)).toLowerCase() === 'true';
     if (!dtBaixaStr) return 0;
 
-    const parts = dtBaixaStr.split('/');
+    const parts = dtBaixaStr.split(' ')[0].split('/');
     if (parts.length < 3) return 0;
     const dataBaixa = new Date(parts[2], parts[1]-1, parts[0]);
     let dataFim = new Date();
