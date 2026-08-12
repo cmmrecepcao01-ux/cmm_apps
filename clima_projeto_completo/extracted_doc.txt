@@ -1,0 +1,403 @@
+﻿CRIAR APLICATIVO DE PESQUISA DE CLIMA ORGANIZACIONAL E SUGESTÕES
+Quero desenvolver um aplicativo web institucional para realização de pesquisas de clima organizacional, satisfação, percepção do ambiente de trabalho e coleta de sugestões, com foco absoluto em confidencialidade e anonimato dos participantes.
+O sistema deverá possuir duas áreas completamente separadas:
+Área do participante, utilizada para responder à pesquisa.
+Área administrativa, utilizada exclusivamente pela administradora para visualizar os resultados consolidados em dashboards.
+O objetivo é permitir que os colaboradores respondam com segurança, tendo plena confiança de que suas respostas individuais não poderão ser associadas à sua identidade.
+
+1. PRINCÍPIO FUNDAMENTAL: ANONIMATO
+O anonimato deve ser uma característica estrutural do sistema e não apenas uma mensagem informativa.
+NÃO armazenar junto às respostas:
+nome;
+matrícula;
+CPF;
+e-mail;
+telefone;
+endereço;
+IP;
+localização;
+identificador do dispositivo;
+navegador;
+cookies identificadores;
+UUID individual associado à resposta;
+qualquer outro identificador que permita descobrir quem respondeu.
+Também NÃO registrar data e hora com precisão suficiente para permitir associação indireta entre uma pessoa e uma resposta.
+Caso seja necessário utilizar algum identificador técnico para funcionamento do sistema, ele não poderá ser armazenado junto à resposta nem permitir a identificação do participante.
+O administrador deverá visualizar somente dados agregados.
+
+2. TELA INICIAL
+Criar uma tela institucional, moderna, limpa e profissional.
+Título:
+"Pesquisa de Clima Organizacional"
+Subtítulo:
+"Queremos ouvir você."
+Texto explicativo:
+"Esta pesquisa tem como objetivo compreender a percepção dos colaboradores sobre o ambiente de trabalho, identificar pontos positivos, oportunidades de melhoria e sugestões.
+Sua participação é muito importante.
+As respostas são ANÔNIMAS e serão analisadas exclusivamente de forma consolidada. Não serão coletados nome, matrícula, e-mail, IP ou qualquer outro dado destinado a identificar o participante.
+Responda com sinceridade. Não existem respostas certas ou erradas."
+Adicionar botão:
+"INICIAR PESQUISA"
+Antes de iniciar, apresentar uma confirmação:
+"Estou ciente de que esta pesquisa é anônima e desejo participar."
+Botão:
+"CONTINUAR"
+
+3. ESTRUTURA DA PESQUISA
+Criar uma pesquisa dividida em blocos.
+Mostrar uma barra de progresso, por exemplo:
+"Etapa 2 de 7"
+Não mostrar informações pessoais do participante.
+
+4. BLOCO 1 — PERFIL GERAL
+As perguntas de perfil devem ser utilizadas apenas para análise estatística e jamais permitir identificação individual.
+Perguntas sugeridas:
+Há quanto tempo você trabalha na instituição?
+Menos de 1 ano
+De 1 a 3 anos
+De 3 a 5 anos
+De 5 a 10 anos
+Mais de 10 anos
+Em qual grande área você atua?
+Utilizar categorias amplas, evitando setores muito pequenos.
+Exemplo:
+Área Administrativa
+Área Operacional
+Área Técnica
+Área de Apoio
+Outra
+IMPORTANTE:
+Nunca permitir que o administrador crie filtros capazes de identificar uma pessoa por combinação de respostas demográficas.
+Se determinada categoria possuir poucos respondentes, ocultar automaticamente os resultados daquela categoria.
+
+5. BLOCO 2 — CLIMA ORGANIZACIONAL
+Utilizar escala Likert de 1 a 5.
+Escala:
+1 — Discordo totalmente2 — Discordo3 — Nem concordo nem discordo4 — Concordo5 — Concordo totalmente
+Criar as seguintes dimensões:
+Liderança
+Perguntas:
+Minha liderança comunica claramente as expectativas.
+Minha liderança está aberta a ouvir sugestões.
+Recebo orientações adequadas para realizar meu trabalho.
+Sinto que minha liderança trata as pessoas com respeito.
+Minha liderança reconhece um trabalho bem realizado.
+As decisões da liderança são comunicadas de maneira adequada.
+Comunicação
+As informações importantes chegam às pessoas que precisam delas.
+A comunicação interna é clara.
+Existe abertura para tirar dúvidas.
+Sinto que posso expressar minha opinião.
+As mudanças relevantes são comunicadas adequadamente.
+Ambiente de trabalho
+Sinto-me respeitado(a) no ambiente de trabalho.
+Existe um bom relacionamento entre os integrantes da equipe.
+O ambiente favorece a colaboração.
+Sinto segurança para expressar opiniões.
+Existe respeito às diferenças de opinião.
+Considero o ambiente de trabalho saudável.
+Reconhecimento e valorização
+Meu trabalho é reconhecido.
+Sinto que minha contribuição é importante.
+Tenho oportunidades para desenvolver minhas competências.
+Meu esforço é valorizado.
+Existe justiça na distribuição das responsabilidades.
+Desenvolvimento
+Tenho oportunidades de capacitação.
+Recebo orientações que contribuem para meu desenvolvimento.
+Tenho oportunidade de aprender coisas novas.
+A instituição demonstra interesse no desenvolvimento dos colaboradores.
+Organização e processos
+Os processos de trabalho são claros.
+Tenho acesso aos recursos necessários para executar minhas atividades.
+As responsabilidades são bem definidas.
+Existe boa organização das atividades.
+Os procedimentos facilitam a realização do trabalho.
+Motivação
+Sinto-me motivado(a) para realizar meu trabalho.
+Tenho orgulho de fazer parte da instituição.
+Considero meu trabalho significativo.
+Pretendo continuar trabalhando na instituição.
+Recomendaria a instituição como um bom local para trabalhar.
+
+6. BLOCO 3 — PERGUNTAS DE AVALIAÇÃO GERAL
+Criar perguntas com escala de 0 a 10:
+"De 0 a 10, quanto você recomendaria a instituição como um bom lugar para trabalhar?"
+"De 0 a 10, qual é o seu nível geral de satisfação com o ambiente de trabalho?"
+"De 0 a 10, quanto você acredita que a instituição está aberta a ouvir seus colaboradores?"
+Calcular automaticamente:
+média;
+distribuição das respostas;
+percentual de respostas positivas;
+percentual de respostas neutras;
+percentual de respostas negativas.
+
+7. BLOCO 4 — PRINCIPAIS PONTOS POSITIVOS
+Pergunta:
+"Na sua opinião, quais são os principais pontos positivos da instituição?"
+Permitir resposta aberta.
+Adicionar campo opcional:
+"Se desejar, conte-nos um pouco mais."
+
+8. BLOCO 5 — OPORTUNIDADES DE MELHORIA
+Pergunta:
+"Quais aspectos você acredita que precisam ser melhorados?"
+Permitir resposta aberta.
+Adicionar campo opcional:
+"Se desejar, explique sua resposta."
+
+9. BLOCO 6 — SUGESTÕES
+Pergunta:
+"Se você pudesse implementar uma mudança na instituição, qual seria?"
+Campo de resposta aberta.
+Pergunta adicional:
+"Existe alguma sugestão, ideia ou iniciativa que você gostaria de propor?"
+Campo de resposta aberta.
+
+10. BLOCO 7 — COMENTÁRIO FINAL
+Pergunta:
+"Há algo mais que você gostaria de dizer e que não foi abordado nesta pesquisa?"
+Campo aberto opcional.
+
+11. FINALIZAÇÃO
+Ao concluir a pesquisa, mostrar:
+"Obrigado pela sua participação!"
+"Suas respostas foram registradas de forma anônima e serão analisadas de maneira consolidada."
+Não mostrar ao participante qualquer identificador da resposta.
+Não gerar código de rastreamento individual.
+
+12. DASHBOARD ADMINISTRATIVO
+Criar uma área administrativa protegida por autenticação.
+A administradora deverá visualizar os dados exclusivamente de forma consolidada.
+Criar um dashboard visual, moderno e intuitivo.
+Indicadores principais
+Exibir cards com:
+Número total de participantes;
+Índice geral de clima;
+Índice de satisfação;
+Índice de confiança na liderança;
+Índice de comunicação;
+Índice de reconhecimento;
+Índice de motivação;
+Índice de ambiente de trabalho.
+
+13. CÁLCULO DO ÍNDICE DE CLIMA
+Criar um índice geral de clima organizacional de 0 a 100.
+Converter a escala Likert:
+1 = 02 = 253 = 504 = 755 = 100
+Calcular a média das perguntas relacionadas ao clima.
+Apresentar o resultado em gráfico visual.
+Classificação sugerida:
+0–39: Crítico40–59: Necessita atenção60–74: Regular75–89: Bom90–100: Excelente
+Permitir alterar posteriormente esses parâmetros na área administrativa.
+
+14. DASHBOARD POR DIMENSÃO
+Criar gráficos para:
+Liderança
+Comunicação
+Ambiente de trabalho
+Reconhecimento
+Desenvolvimento
+Organização e processos
+Motivação
+Mostrar:
+pontuação;
+percentual positivo;
+percentual neutro;
+percentual negativo;
+quantidade de respostas.
+Criar gráfico de barras comparando todas as dimensões.
+Criar gráfico radar para visualização geral do clima.
+
+15. ANÁLISE DAS RESPOSTAS ABERTAS
+Criar uma área chamada:
+"Percepções e sugestões"
+Organizar as respostas abertas de forma que a administradora possa identificar:
+principais temas positivos;
+principais reclamações;
+sugestões recorrentes;
+oportunidades de melhoria.
+Se houver recurso de inteligência artificial disponível, utilizar IA para classificar as respostas abertas em categorias, SEM tentar identificar a pessoa que escreveu.
+Exemplos de categorias:
+Comunicação
+Liderança
+Recursos
+Processos
+Reconhecimento
+Capacitação
+Ambiente de trabalho
+Infraestrutura
+Tecnologia
+Gestão
+Outros
+Nunca utilizar IA para tentar descobrir a identidade do participante.
+
+16. REGRA FUNDAMENTAL PARA EVITAR IDENTIFICAÇÃO
+Criar uma regra de anonimato estatístico:
+NENHUM resultado segmentado deverá ser apresentado quando o número de participantes daquela categoria for inferior a 5.
+Exemplo:
+Se determinada área tiver apenas 3 participantes, não mostrar o resultado daquela área.
+Mostrar:
+"Dados indisponíveis para este grupo devido à proteção do anonimato."
+Preferencialmente utilizar um limite configurável, com padrão de 5 participantes.
+
+17. FILTROS DO DASHBOARD
+Permitir filtros somente quando houver quantidade suficiente de respostas.
+Filtros possíveis:
+período da pesquisa;
+área ampla;
+tempo de instituição;
+dimensão avaliada.
+O sistema deverá impedir combinações de filtros que resultem em grupos pequenos.
+Exemplo:
+Não permitir que a administradora filtre:
+"Área X + 1 a 3 anos + determinado perfil"
+se isso resultar em poucos participantes.
+O sistema deve priorizar a proteção do anonimato acima da capacidade de detalhamento do dashboard.
+
+18. BANCO DE DADOS
+Estruturar o banco de dados separando:
+configuração da pesquisa;
+perguntas;
+alternativas;
+respostas;
+categorias;
+resultados agregados.
+As respostas não devem possuir campos de identificação pessoal.
+Não criar relacionamento entre resposta e identidade do participante.
+
+19. PLANILHA DE RESULTADOS
+Além do dashboard dentro do aplicativo, criar uma estrutura de exportação para uma planilha separada.
+A planilha deverá conter apenas dados consolidados.
+Criar abas:
+Aba 1 — Resumo Executivo
+Número de participantes
+Índice geral
+Índice de satisfação
+Melhor dimensão
+Dimensão que necessita mais atenção
+Aba 2 — Dimensões
+Dimensão
+Pontuação
+Percentual positivo
+Percentual neutro
+Percentual negativo
+Aba 3 — Perguntas
+Pergunta
+Média
+Percentual 1
+Percentual 2
+Percentual 3
+Percentual 4
+Percentual 5
+Aba 4 — Sugestões
+Apresentar apenas as respostas abertas, sem qualquer identificador.
+Aba 5 — Evolução
+Caso sejam realizadas novas pesquisas:
+período;
+índice geral;
+dimensões;
+evolução percentual.
+
+20. SEGURANÇA
+Implementar autenticação segura para a área administrativa.
+A área administrativa NÃO pode ser acessada pelos participantes.
+Não armazenar senhas em texto puro.
+Utilizar controle de acesso adequado.
+As respostas devem ser protegidas contra acesso não autorizado.
+Implementar regras de segurança no banco de dados.
+Não disponibilizar uma API pública que permita consultar respostas individuais.
+
+21. EXPERIÊNCIA DO PARTICIPANTE
+O formulário deve ser:
+responsivo;
+fácil de utilizar pelo celular;
+rápido;
+visualmente agradável;
+acessível;
+com poucos elementos por tela.
+Utilizar cartões para as perguntas.
+Para perguntas Likert, utilizar botões grandes de seleção.
+Mostrar barra de progresso.
+Permitir voltar para a pergunta anterior.
+Evitar que o participante precise preencher informações pessoais.
+
+22. IDENTIDADE VISUAL
+Criar uma interface institucional, profissional e discreta.
+Utilizar:
+fundo claro;
+azul institucional como cor predominante;
+branco;
+tons neutros;
+gráficos limpos;
+tipografia moderna;
+boa hierarquia visual.
+Evitar aparência de formulário genérico.
+O aplicativo deve transmitir:
+"segurança + confiança + profissionalismo + imparcialidade".
+
+23. TEXTO DE GARANTIA DE ANONIMATO
+Na primeira página, incluir uma seção visual destacada:
+"SEU SIGILO É UMA PRIORIDADE"
+Texto:
+"Esta pesquisa foi projetada para preservar o anonimato dos participantes. Não solicitamos nome, matrícula, e-mail ou outros dados destinados a identificar você. Os resultados serão apresentados somente de forma consolidada e grupos com poucos participantes não terão seus resultados exibidos."
+
+24. REQUISITO CRÍTICO
+Antes de considerar o projeto concluído, faça uma auditoria técnica do sistema procurando possíveis formas de identificação indireta dos participantes.
+Verifique especialmente:
+IP;
+logs;
+cookies;
+identificadores;
+timestamps;
+banco de dados;
+APIs;
+autenticação;
+parâmetros de URL;
+armazenamento local;
+analytics;
+identificadores de sessão;
+exportação dos dados.
+Caso exista qualquer mecanismo que possa permitir associar uma resposta a uma pessoa, elimine-o ou altere sua arquitetura.
+
+25. TESTE DE ANONIMATO
+Criar uma rotina de teste simulando pelo menos 20 participantes diferentes.
+Após as respostas serem enviadas, verificar se o administrador consegue descobrir qual participante respondeu determinada pergunta.
+O resultado esperado deve ser:
+"Não é possível associar uma resposta individual a um participante."
+Também testar:
+participantes respondendo pelo mesmo computador;
+participantes respondendo pelo celular;
+respostas em horários diferentes;
+respostas simultâneas;
+grupos com menos de 5 participantes.
+
+26. PRINCÍPIO DE GOVERNANÇA
+O sistema deve seguir o princípio:
+"Quanto menos informação for coletada, menor o risco de identificação."
+Portanto, não criar campos de dados pessoais simplesmente porque tecnicamente seria possível coletá-los.
+A prioridade do projeto é:
+anonimato;
+segurança;
+confiabilidade dos resultados;
+facilidade de resposta;
+qualidade do dashboard.
+
+27. ENTREGA
+Antes de finalizar:
+Criar a aplicação completa.
+Criar o banco de dados.
+Criar a interface do participante.
+Criar a área administrativa.
+Criar o dashboard.
+Criar os cálculos estatísticos.
+Criar o mecanismo de exportação para planilha.
+Implementar as regras de anonimato.
+Realizar testes.
+Fazer uma auditoria de segurança e anonimato.
+Apresentar um resumo da arquitetura criada.
+Explicar exatamente quais dados são armazenados e quais NÃO são armazenados.
+Explicar como a administradora acessará os resultados.
+Informar qualquer limitação técnica que possa comprometer a promessa de anonimato.
+IMPORTANTE: não declarar que a pesquisa é "100% anônima" se tecnicamente existir alguma possibilidade de identificação. Nesse caso, explicar a limitação antes de considerar o projeto concluído.
+

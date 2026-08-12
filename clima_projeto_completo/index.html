@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pesquisa de Clima Organizacional e Sugestões</title>
+  
+  <!-- CSS Stylesheet -->
+  <link rel="stylesheet" href="css/style.css">
+  
+  <!-- External Libraries: Chart.js for Graphs & SheetJS for Multi-tab Excel Export -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+</head>
+<body>
+
+  <!-- Header & Institutional Navbar -->
+  <header class="navbar">
+    <a href="#" class="navbar-brand">
+      <svg viewBox="0 0 24 24">
+        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+      </svg>
+      <span>Clima & Sugestões</span>
+    </a>
+    <div class="nav-actions">
+      <button id="btn-nav-admin" class="btn-nav">
+        <svg style="width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2;" viewBox="0 0 24 24">
+          <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+          <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+        </svg>
+        Área Administrativa
+      </button>
+      <button id="btn-nav-user" class="btn-nav hidden">
+        <svg style="width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2;" viewBox="0 0 24 24">
+          <path d="M19 12H5M12 19l-7-7 7-7"/>
+        </svg>
+        Área do Participante
+      </button>
+    </div>
+  </header>
+
+  <main class="main-container">
+
+    <!-- VIEW 1: WELCOME & ANONYMITY GUARANTEE -->
+    <section id="view-welcome" class="card">
+      <div class="card-header text-center">
+        <h1 class="card-title" style="font-size: 2rem;">Pesquisa de Clima Organizacional</h1>
+        <p class="card-subtitle" style="font-size: 1.15rem; color: var(--accent); font-weight: 600;">Queremos ouvir você.</p>
+      </div>
+
+      <div style="margin: 1.5rem 0; font-size: 1rem; color: var(--neutral-gray);">
+        <p>Esta pesquisa tem como objetivo compreender a percepção dos colaboradores sobre o ambiente de trabalho, identificar pontos positivos, oportunidades de melhoria e sugestões.</p>
+        <p style="margin-top: 0.75rem;"><strong>Sua participação é muito importante.</strong> As respostas são <strong>ANÔNIMAS</strong> e serão analisadas exclusivamente de forma consolidada. Não serão coletados nome, matrícula, e-mail, IP ou qualquer outro dado destinado a identificar o participante.</p>
+        <p style="margin-top: 0.75rem;">Responda com sinceridade. Não existem respostas certas ou erradas.</p>
+      </div>
+
+      <!-- VISUAL ANONYMITY GUARANTEE SECTION (Requirement 23) -->
+      <div class="security-banner">
+        <div class="security-banner-header">
+          <svg style="width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2.5;" viewBox="0 0 24 24">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+          </svg>
+          <span>SEU SIGILO É UMA PRIORIDADE</span>
+        </div>
+        <p>Esta pesquisa foi projetada para preservar o anonimato dos participantes. Não solicitamos nome, matrícula, e-mail ou outros dados destinados a identificar você. Os resultados serão apresentados somente de forma consolidada e grupos com poucos participantes não terão seus resultados exibidos.</p>
+      </div>
+
+      <div class="text-center mt-4">
+        <button id="btn-start-survey" class="btn btn-primary" style="font-size: 1.1rem; padding: 0.9rem 2.5rem;">
+          INICIAR PESQUISA
+        </button>
+      </div>
+    </section>
+
+    <!-- VIEW 2: PARTICIPANT SURVEY -->
+    <section id="view-survey" class="card hidden">
+      <!-- Progress Bar -->
+      <div class="progress-container">
+        <div class="progress-header">
+          <span id="progress-text">Etapa 1 de 7</span>
+          <span id="progress-pct">0%</span>
+        </div>
+        <div class="progress-bar-bg">
+          <div id="progress-fill" class="progress-bar-fill"></div>
+        </div>
+      </div>
+
+      <!-- Dynamic Questions Container -->
+      <div id="questions-container"></div>
+
+      <!-- Survey Navigation Buttons -->
+      <div class="form-actions">
+        <button id="btn-prev" class="btn btn-secondary" style="display:none;">
+          ← VOLTAR
+        </button>
+        <div></div>
+        <button id="btn-next" class="btn btn-primary">
+          PRÓXIMA ETAPA →
+        </button>
+      </div>
+    </section>
+
+    <!-- VIEW 3: SURVEY SUBMITTED SUCCESS -->
+    <section id="view-success" class="card text-center hidden">
+      <div style="color: var(--success); margin-bottom: 1rem;">
+        <svg style="width:64px;height:64px;fill:none;stroke:currentColor;stroke-width:2;" viewBox="0 0 24 24">
+          <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+          <polyline points="22 4 12 14.01 9 11.01"/>
+        </svg>
+      </div>
+      <h2 class="card-title" style="font-size: 1.75rem;">Obrigado pela sua participação!</h2>
+      <p style="font-size: 1.05rem; color: var(--neutral-gray); margin-top: 1rem; max-width: 600px; margin-left: auto; margin-right: auto;">
+        Suas respostas foram registradas de forma anônima e serão analisadas de maneira consolidada.
+      </p>
+      <div style="margin-top: 2rem;">
+        <button onclick="showParticipantView()" class="btn btn-outline">
+          Voltar ao Início
+        </button>
+      </div>
+    </section>
+
+    <!-- VIEW 4: ADMIN LOGIN -->
+    <section id="view-admin-login" class="card hidden" style="max-width: 450px; margin: 3rem auto;">
+      <div class="card-header text-center">
+        <h2 class="card-title">Acesso Administrativo</h2>
+        <p class="card-subtitle">Área restrita à gestão de relatórios e consolidação</p>
+      </div>
+      <form id="form-admin-login">
+        <div style="margin-bottom: 1.5rem;">
+          <label style="display:block; font-size: 0.875rem; font-weight: 600; margin-bottom: 0.5rem;">Senha de Acesso</label>
+          <input type="password" id="input-admin-password" class="input-custom" placeholder="Sua senha..." required value="admin123">
+          <small style="color: var(--neutral-gray); font-size: 0.8rem; display:block; margin-top:0.4rem;">Dica para teste: admin123</small>
+        </div>
+        <button type="submit" class="btn btn-primary btn-block">ENTRAR NO DASHBOARD</button>
+      </form>
+    </section>
+
+    <!-- VIEW 5: ADMIN DASHBOARD -->
+    <section id="view-admin" class="hidden">
+      <!-- Admin Header Bar -->
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 1.5rem;">
+        <div>
+          <h1 style="font-size: 1.75rem; font-weight: 700; color: var(--primary);">Dashboard de Clima Organizacional</h1>
+          <p style="color: var(--neutral-gray); font-size: 0.95rem;">Resultados estatísticos consolidados e proteção de anonimato</p>
+        </div>
+        <button id="btn-admin-logout" class="btn btn-secondary btn-sm">Sair do Painel</button>
+      </div>
+
+      <!-- Filter Bar (Requirement 17) -->
+      <div class="filter-bar">
+        <div class="filter-group">
+          <label class="filter-label">Filtrar por Área Ampla</label>
+          <select id="filter-area" class="select-custom">
+            <option value="">Todas as Áreas (Consolidado)</option>
+            <option value="Área Administrativa">Área Administrativa</option>
+            <option value="Área Operacional">Área Operacional</option>
+            <option value="Área Técnica">Área Técnica</option>
+            <option value="Área de Apoio">Área de Apoio</option>
+            <option value="Outra">Outra</option>
+          </select>
+        </div>
+        <div class="filter-group">
+          <label class="filter-label">Filtrar por Tempo de Instituição</label>
+          <select id="filter-tempo" class="select-custom">
+            <option value="">Todos os Tempos (Consolidado)</option>
+            <option value="Menos de 1 ano">Menos de 1 ano</option>
+            <option value="De 1 a 3 anos">De 1 a 3 anos</option>
+            <option value="De 3 a 5 anos">De 3 a 5 anos</option>
+            <option value="De 5 a 10 anos">De 5 a 10 anos</option>
+            <option value="Mais de 10 anos">Mais de 10 anos</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Masked Anonymity Warning Box (Triggered if sample < N) -->
+      <div id="anonymity-warning-box" class="anonymity-warning hidden"></div>
+
+      <!-- Main Dashboard Content Container -->
+      <div id="admin-dashboard-content">
+        <!-- KPI Cards Grid (Requirement 12 & 13) -->
+        <div class="dashboard-grid">
+          <div class="kpi-card">
+            <span class="kpi-label">Total Participantes</span>
+            <span id="kpi-total-participants" class="kpi-value">0</span>
+            <span class="kpi-badge badge-bom">Amostra Válida</span>
+          </div>
+
+          <div class="kpi-card">
+            <span class="kpi-label">Índice Geral de Clima</span>
+            <span id="kpi-climate-index" class="kpi-value">0</span>
+            <span id="kpi-climate-badge" class="kpi-badge badge-excelente">Excelente</span>
+          </div>
+
+          <div class="kpi-card">
+            <span class="kpi-label">Satisfação Geral</span>
+            <span id="kpi-satisfaction-index" class="kpi-value">0.0</span>
+            <span class="kpi-badge badge-bom">Escala 0-10</span>
+          </div>
+
+          <div class="kpi-card">
+            <span class="kpi-label">Confiança Liderança</span>
+            <span id="kpi-leadership-index" class="kpi-value">0</span>
+            <span class="kpi-badge badge-bom">Escala 0-100</span>
+          </div>
+
+          <div class="kpi-card">
+            <span class="kpi-label">Comunicação</span>
+            <span id="kpi-comm-index" class="kpi-value">0</span>
+            <span class="kpi-badge badge-bom">Escala 0-100</span>
+          </div>
+
+          <div class="kpi-card">
+            <span class="kpi-label">Reconhecimento</span>
+            <span id="kpi-recognition-index" class="kpi-value">0</span>
+            <span class="kpi-badge badge-bom">Escala 0-100</span>
+          </div>
+
+          <div class="kpi-card">
+            <span class="kpi-label">Motivação</span>
+            <span id="kpi-motivation-index" class="kpi-value">0</span>
+            <span class="kpi-badge badge-bom">Escala 0-100</span>
+          </div>
+        </div>
+
+        <!-- Dashboard Tabs -->
+        <div class="admin-tabs">
+          <button class="tab-btn active" data-tab="tab-graficos">Visão Geral & Gráficos</button>
+          <button class="tab-btn" data-tab="tab-percepcoes">Percepções e Sugestões (Análise IA)</button>
+          <button class="tab-btn" data-tab="tab-exportacao">Exportação Planilha Excel</button>
+          <button class="tab-btn" data-tab="tab-auditoria">Auditoria & Simulação</button>
+          <button class="tab-btn" data-tab="tab-configuracoes">Configurações de Parâmetros</button>
+        </div>
+
+        <!-- TAB 1: GRAPHICS & DIMENSIONS -->
+        <div id="tab-graficos" class="tab-content">
+          <div class="charts-grid">
+            <div class="chart-card">
+              <h3 style="font-size: 1.1rem; color: var(--primary); margin-bottom: 1rem;">Distribuição por Dimensão (% Positivo, Neutro, Negativo)</h3>
+              <div class="chart-container">
+                <canvas id="chart-dimensions-bar"></canvas>
+              </div>
+            </div>
+
+            <div class="chart-card">
+              <h3 style="font-size: 1.1rem; color: var(--primary); margin-bottom: 1rem;">Visão Radar Holística do Clima</h3>
+              <div class="chart-container">
+                <canvas id="chart-radar"></canvas>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB 2: OPEN RESPONSES & IA CATEGORIZATION (Requirement 15) -->
+        <div id="tab-percepcoes" class="tab-content hidden">
+          <div class="card">
+            <div class="card-header">
+              <h3 class="card-title">Percepções e Sugestões Classificadas por IA</h3>
+              <p class="card-subtitle">As respostas abertas são automaticamente categorizadas por tema sem qualquer tentativa de identificação da autoria.</p>
+            </div>
+            <div id="open-responses-container"></div>
+          </div>
+        </div>
+
+        <!-- TAB 3: EXCEL EXPORT (Requirement 19) -->
+        <div id="tab-exportacao" class="tab-content hidden">
+          <div class="card">
+            <div class="card-header">
+              <h3 class="card-title">Exportar Planilha de Resultados (.xlsx)</h3>
+              <p class="card-subtitle">Gere a planilha consolidada em 5 abas conforme requisito técnico da instituição.</p>
+            </div>
+            <div style="background: var(--neutral-light); padding: 1.5rem; border-radius: var(--radius-sm); margin-bottom: 1.5rem;">
+              <h4 style="color: var(--primary); margin-bottom: 0.5rem;">Estrutura da Planilha Exportada:</h4>
+              <ul style="margin-left: 1.5rem; line-height: 1.8; color: var(--neutral-gray);">
+                <li><strong>Aba 1 - Resumo Executivo:</strong> Número de participantes, índice geral e classificação.</li>
+                <li><strong>Aba 2 - Dimensões:</strong> Pontuação e percentuais positivo, neutro e negativo.</li>
+                <li><strong>Aba 3 - Perguntas:</strong> Média por pergunta Likert e distribuição de alternativas.</li>
+                <li><strong>Aba 4 - Sugestões:</strong> Respostas abertas categorizadas sem identificadores.</li>
+                <li><strong>Aba 5 - Evolução:</strong> Registro histórico consolidado para acompanhamento.</li>
+              </ul>
+            </div>
+            <button id="btn-export-excel" class="btn btn-success" style="font-size: 1rem; padding: 0.875rem 2rem;">
+              <svg style="width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2;" viewBox="0 0 24 24">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                <polyline points="7 10 12 15 17 10"/>
+                <line x1="12" y1="15" x2="12" y2="3"/>
+              </svg>
+              BAIXAR PLANILHA EXCEL MULTI-ABA
+            </button>
+          </div>
+        </div>
+
+        <!-- TAB 4: AUDIT & TEST SIMULATION (Requirement 24 & 25) -->
+        <div id="tab-auditoria" class="tab-content hidden">
+          <div class="card">
+            <div class="card-header">
+              <h3 class="card-title">Auditoria de Anonimato & Testes Simulados</h3>
+              <p class="card-subtitle">Ferramentas de governança para verificar e comprovar o sigilo absoluto do sistema.</p>
+            </div>
+
+            <div style="display:flex; gap:1rem; flex-wrap:wrap; margin-bottom: 1.5rem;">
+              <button id="btn-generate-test-data" class="btn btn-outline">
+                ⚡ Gerar 20 Respostas Simuladas de Teste
+              </button>
+              <button id="btn-run-audit" class="btn btn-accent">
+                🔍 Executar Auditoria Técnica de Anonimato
+              </button>
+            </div>
+
+            <div style="background: #0f172a; color: #38bdf8; padding: 1.25rem; border-radius: var(--radius-sm); font-family: monospace; font-size: 0.9rem; min-height: 180px; white-space: pre-wrap;" id="audit-results-content">
+Clique em "Executar Auditoria Técnica de Anonimato" para iniciar a verificação de segurança dos dados armazenados.
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB 5: SETTINGS -->
+        <div id="tab-configuracoes" class="tab-content hidden">
+          <div class="card">
+            <div class="card-header">
+              <h3 class="card-title">Configurações da Área Administrativa</h3>
+              <p class="card-subtitle">Ajuste os parâmetros de limiar de anonimato e faixas de classificação.</p>
+            </div>
+
+            <div style="max-width: 500px;">
+              <div style="margin-bottom: 1.5rem;">
+                <label style="display:block; font-weight: 600; margin-bottom: 0.5rem;">Limite Mínimo de Participantes para Exibição de Filtros (N)</label>
+                <input type="number" id="input-min-threshold" class="input-custom" value="5" min="2" max="50">
+                <small style="color: var(--neutral-gray); display:block; margin-top: 0.4rem;">Padrão recomendado: 5 participantes. Grupos menores serão mascarados.</small>
+              </div>
+
+              <button id="btn-save-settings" class="btn btn-primary">Salvar Parâmetros</button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+
+  <!-- MODAL DE CONFIRMAÇÃO DE ANONIMATO (Requirement 2 & 23) -->
+  <div id="modal-anonymity" class="modal-overlay">
+    <div class="modal-box">
+      <h3 style="font-size: 1.25rem; color: var(--primary); font-weight: 700; margin-bottom: 1rem;">Confirmação de Ciência e Sigilo</h3>
+      <p style="font-size: 0.95rem; color: var(--neutral-gray); margin-bottom: 1.5rem;">
+        Antes de prosseguir, confirme que você está ciente de que a pesquisa é 100% anônima e consolidada.
+      </p>
+      
+      <label class="checkbox-container" style="margin-bottom: 1.5rem;">
+        <input type="checkbox" id="chk-confirm-anonymity" checked>
+        <span style="font-weight: 600;">Estou ciente de que esta pesquisa é anônima e desejo participar.</span>
+      </label>
+
+      <div style="display:flex; justify-content: flex-end; gap: 1rem;">
+        <button id="btn-cancel-modal" class="btn btn-secondary">Cancelar</button>
+        <button id="btn-confirm-start" class="btn btn-primary">CONTINUAR</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main JavaScript File -->
+  <script src="js/app.js"></script>
+</body>
+</html>
