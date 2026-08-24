@@ -1,11 +1,13 @@
 /**
- * Aplicativo de Pesquisa de Clima Organizacional e Sugestões
- * Sistema com Foco Absoluto em Anonimato, Governança e Segurança
+ * Aplicativo de Pesquisa de Clima Organizacional e Sugestões — PMESP
+ * Sistema com Foco Absoluto em Anonimato, Governança e Ciclos Semestrais
  */
 
-// Data storage key
+// Storage Keys
 const STORAGE_KEY_RESPONSES = 'clima_organizacional_respostas';
 const STORAGE_KEY_SETTINGS = 'clima_organizacional_config';
+const STORAGE_KEY_HISTORY = 'clima_organizacional_historico';
+const STORAGE_KEY_ACTIVE_CYCLE = 'clima_organizacional_ciclo_nome';
 
 // Default Settings
 const DEFAULT_SETTINGS = {
@@ -19,7 +21,7 @@ const DEFAULT_SETTINGS = {
   }
 };
 
-// Survey Questions Definition
+// Survey Questions Definition (Updated per explicit requirements)
 const SURVEY_BLOCKS = [
   {
     id: 'bloco1',
@@ -31,23 +33,32 @@ const SURVEY_BLOCKS = [
         type: 'radio_card',
         text: 'Há quanto tempo você trabalha na instituição?',
         options: [
-          'Menos de 1 ano',
-          'De 1 a 3 anos',
-          'De 3 a 5 anos',
-          'De 5 a 10 anos',
-          'Mais de 10 anos'
+          'menos de 05 anos',
+          '05 à 10 anos',
+          '10 à 20 anos',
+          '20 à 30 anos',
+          'mais de 30 anos'
         ]
       },
       {
-        id: 'area_ampla',
+        id: 'departamento',
         type: 'radio_card',
-        text: 'Em qual grande área você atua?',
+        text: 'Em qual departamento você está?',
         options: [
-          'Área Administrativa',
-          'Área Operacional',
-          'Área Técnica',
-          'Área de Apoio',
-          'Outra'
+          'DPC',
+          'DAS',
+          'DCI'
+        ]
+      },
+      {
+        id: 'tempo_dtic',
+        type: 'radio_card',
+        text: 'Quanto tempo está na DTIC?',
+        options: [
+          'menos de 02 anos',
+          '02 à 05 anos',
+          '05 à 10 anos',
+          'mais de 10 anos'
         ]
       }
     ]
@@ -140,7 +151,7 @@ const SURVEY_BLOCKS = [
   },
   {
     id: 'bloco4_5_6_7',
-    title: 'Blocos 4, 5, 6 e 7 — Percepções e Sugestões',
+    title: 'Percepções e Sugestões',
     subtitle: 'Sua opinião é fundamental para construirmos uma instituição melhor. Respostas totalmente anônimas.',
     questions: [
       { id: 'pos_1', type: 'textarea', text: 'Quais são os principais pontos positivos da instituição?', placeholder: 'Descreva os aspectos mais positivos...' },
@@ -148,6 +159,7 @@ const SURVEY_BLOCKS = [
       { id: 'mel_1', type: 'textarea', text: 'Quais aspectos você acredita que precisam ser melhorados?', placeholder: 'Indique oportunidades de melhoria...' },
       { id: 'sug_1', type: 'textarea', text: 'Se você pudesse implementar uma mudança na instituição, qual seria?', placeholder: 'Sua mudança prioritária...' },
       { id: 'sug_2', type: 'textarea', text: 'Existe alguma sugestão, ideia ou iniciativa que gostaria de propor?', placeholder: 'Sua ideia ou projeto...' },
+      { id: 'sug_unidades_anteriores', type: 'textarea', text: 'Há alguma melhoria aplicável que dentro da sua experiência em unidades anteriores já deu certo e gostaria de sugerir?', placeholder: 'Descreva a experiência ou boa prática vivenciada em outra unidade...' },
       { id: 'com_final', type: 'textarea', text: 'Há algo mais que gostaria de dizer e que não foi abordado? (Opcional)', placeholder: 'Comentário livre...' }
     ]
   }
@@ -181,6 +193,8 @@ function setupNavigation() {
   document.getElementById('btn-generate-test-data').addEventListener('click', generateSimulatedData);
   document.getElementById('btn-run-audit').addEventListener('click', runAnonymityAudit);
   document.getElementById('btn-save-settings').addEventListener('click', saveAdminSettings);
+  document.getElementById('btn-archive-cycle').addEventListener('click', archiveCurrentCycleHandler);
+  document.getElementById('btn-reset-current').addEventListener('click', resetCurrentCycleOnlyHandler);
 
   // Tab switching in Admin
   document.querySelectorAll('.tab-btn').forEach(btn => {
@@ -190,12 +204,17 @@ function setupNavigation() {
       e.target.classList.add('active');
       const tabId = e.target.getAttribute('data-tab');
       document.getElementById(tabId).classList.remove('hidden');
+
+      if (tabId === 'tab-evolucao') {
+        renderEvolutionTab();
+      }
     });
   });
 
   // Filter change handlers
-  document.getElementById('filter-area').addEventListener('change', renderAdminDashboard);
+  document.getElementById('filter-dept').addEventListener('change', renderAdminDashboard);
   document.getElementById('filter-tempo').addEventListener('change', renderAdminDashboard);
+  document.getElementById('filter-tempo-dtic').addEventListener('change', renderAdminDashboard);
 }
 
 function startSurveyModal() {
@@ -235,16 +254,17 @@ function showAdminLogin() {
   document.getElementById('view-success').classList.add('hidden');
   document.getElementById('view-admin').classList.add('hidden');
   document.getElementById('view-admin-login').classList.remove('hidden');
+  document.getElementById('input-admin-password').value = '';
 }
 
 function handleAdminLogin(e) {
   e.preventDefault();
   const password = document.getElementById('input-admin-password').value;
-  if (password === 'admin123' || password === 'admin') {
+  if (password === 'PMESP') {
     isAdminLoggedIn = true;
     showAdminDashboard();
   } else {
-    alert('Senha incorreta! Utilize admin123');
+    alert('Senha incorreta!');
   }
 }
 
@@ -253,11 +273,20 @@ function handleAdminLogout() {
   showParticipantView();
 }
 
+function getActiveCycleName() {
+  return localStorage.getItem(STORAGE_KEY_ACTIVE_CYCLE) || 'Ciclo Vigente (Semestre Atual)';
+}
+
+function setActiveCycleName(name) {
+  localStorage.setItem(STORAGE_KEY_ACTIVE_CYCLE, name);
+}
+
 function showAdminDashboard() {
   document.getElementById('view-admin-login').classList.add('hidden');
   document.getElementById('view-admin').classList.remove('hidden');
   document.getElementById('btn-nav-admin').classList.add('hidden');
   document.getElementById('btn-nav-user').classList.remove('hidden');
+  document.getElementById('lbl-active-cycle-name').innerText = getActiveCycleName();
   renderAdminDashboard();
 }
 
@@ -385,11 +414,7 @@ function goToNextStep() {
 
 // Submit Anonymous Survey
 function submitSurvey() {
-  // STRICT ANONYMITY RULE (Requirement 1 & 18 & 24):
-  // We ONLY store answer values. Zero metadata (No IP, No timestamp, No user ID, No session cookies).
   const existing = getStoredResponses();
-  
-  // Clean answers copy
   const cleanRecord = { ...currentAnswers };
   existing.push(cleanRecord);
 
@@ -405,6 +430,11 @@ function getStoredResponses() {
   return data ? JSON.parse(data) : [];
 }
 
+function getHistoricalCycles() {
+  const data = localStorage.getItem(STORAGE_KEY_HISTORY);
+  return data ? JSON.parse(data) : [];
+}
+
 function getSettings() {
   const data = localStorage.getItem(STORAGE_KEY_SETTINGS);
   return data ? JSON.parse(data) : DEFAULT_SETTINGS;
@@ -416,22 +446,22 @@ function renderAdminDashboard() {
   const settings = getSettings();
   const minThreshold = settings.minAnonymityThreshold || 5;
 
-  const areaFilter = document.getElementById('filter-area').value;
+  const deptFilter = document.getElementById('filter-dept').value;
   const tempoFilter = document.getElementById('filter-tempo').value;
+  const tempoDticFilter = document.getElementById('filter-tempo-dtic').value;
 
   // Filter responses
   let filtered = allResponses.filter(r => {
     let match = true;
-    if (areaFilter && r.area_ampla !== areaFilter) match = false;
+    if (deptFilter && r.departamento !== deptFilter) match = false;
     if (tempoFilter && r.tempo_instituicao !== tempoFilter) match = false;
+    if (tempoDticFilter && r.tempo_dtic !== tempoDticFilter) match = false;
     return match;
   });
 
   const totalCount = filtered.length;
   document.getElementById('kpi-total-participants').innerText = totalCount;
 
-  // STATISTICAL ANONYMITY RULE (Requirement 16 & 17):
-  // If filtered sample count < minThreshold (default 5), hide/mask detailed data!
   const contentArea = document.getElementById('admin-dashboard-content');
   const warningArea = document.getElementById('anonymity-warning-box');
 
@@ -463,15 +493,12 @@ function renderAdminDashboard() {
     return;
   }
 
-  // Calculate Metrics & Likert to 0-100 conversion
-  // Likert conversion: 1=0, 2=25, 3=50, 4=75, 5=100
   const convertLikert = (val) => {
     val = Number(val);
     if (!val) return null;
     return (val - 1) * 25;
   };
 
-  // Dimensions grouping
   const dimQuestions = {
     'Liderança': ['lid_1', 'lid_2', 'lid_3', 'lid_4', 'lid_5', 'lid_6'],
     'Comunicação': ['com_1', 'com_2', 'com_3', 'com_4', 'com_5'],
@@ -483,7 +510,7 @@ function renderAdminDashboard() {
   };
 
   let dimScores = {};
-  let dimStats = {}; // % positive, neutral, negative
+  let dimStats = {};
   let allClimateValues = [];
 
   Object.keys(dimQuestions).forEach(dimName => {
@@ -519,17 +546,14 @@ function renderAdminDashboard() {
     };
   });
 
-  // Overall General Climate Index
   const overallClimate = allClimateValues.length > 0 ? Math.round(allClimateValues.reduce((a,b)=>a+b,0) / allClimateValues.length) : 0;
   
-  // Satisfaction & eNPS averages (Scale 0-10)
   let satSum = 0, satCount = 0;
   filtered.forEach(r => {
     if (r.nps_2 !== undefined) { satSum += Number(r.nps_2); satCount++; }
   });
   const avgSatScore = satCount > 0 ? (satSum / satCount).toFixed(1) : '-';
 
-  // Render KPI Badges & Values
   document.getElementById('kpi-climate-index').innerText = overallClimate;
   const climateBadge = getClassificationBadge(overallClimate);
   document.getElementById('kpi-climate-badge').className = `kpi-badge ${climateBadge.class}`;
@@ -541,10 +565,7 @@ function renderAdminDashboard() {
   document.getElementById('kpi-recognition-index').innerText = dimScores['Reconhecimento'] || 0;
   document.getElementById('kpi-motivation-index').innerText = dimScores['Motivação'] || 0;
 
-  // Render Charts
   renderCharts(dimScores, dimStats);
-
-  // Render Open Text Perception Analysis & AI Categorization
   renderOpenResponses(filtered);
 }
 
@@ -556,12 +577,11 @@ function getClassificationBadge(score) {
   return { label: 'Crítico', class: 'badge-critico' };
 }
 
-// Render Interactive Bar & Radar Charts using Chart.js
+// Render Interactive Bar & Radar Charts
 function renderCharts(dimScores, dimStats) {
   const dimensions = Object.keys(dimScores);
   const scores = dimensions.map(d => dimScores[d]);
 
-  // Bar Chart (Dimension Scores & Percentages)
   const ctxBar = document.getElementById('chart-dimensions-bar').getContext('2d');
   if (chartInstances.bar) chartInstances.bar.destroy();
 
@@ -600,7 +620,6 @@ function renderCharts(dimScores, dimStats) {
     }
   });
 
-  // Radar Chart (Holistic View)
   const ctxRadar = document.getElementById('chart-radar').getContext('2d');
   if (chartInstances.radar) chartInstances.radar.destroy();
 
@@ -634,7 +653,160 @@ function renderCharts(dimScores, dimStats) {
   });
 }
 
-// AI Keyword-Based Open Text Categorization (Requirement 15)
+// Historical Semester Evolution Render
+function renderEvolutionTab() {
+  const history = getHistoricalCycles();
+  const currentResponses = getStoredResponses();
+  const currentName = getActiveCycleName();
+
+  let allTimeline = [...history];
+
+  if (currentResponses.length > 0) {
+    const currentStats = computeCycleStats(currentResponses, currentName);
+    allTimeline.push(currentStats);
+  }
+
+  const tableBody = document.getElementById('tbl-history-evolution-body');
+  tableBody.innerHTML = '';
+
+  if (allTimeline.length === 0) {
+    tableBody.innerHTML = `<tr><td colspan="8" style="padding:1.5rem; text-align:center; color:var(--neutral-gray);">Nenhum ciclo arquivado ou ativo registrado até o momento.</td></tr>`;
+    return;
+  }
+
+  allTimeline.forEach((cycle, idx) => {
+    const row = document.createElement('tr');
+    row.style.borderBottom = '1px solid var(--neutral-border)';
+    const badge = getClassificationBadge(cycle.overallClimate);
+    const isCurrent = idx === allTimeline.length - 1 && currentResponses.length > 0;
+
+    row.innerHTML = `
+      <td style="padding:0.75rem 1rem; font-weight:600; color:var(--primary);">${cycle.name}</td>
+      <td style="padding:0.75rem 1rem;">${cycle.date || 'Atual'}</td>
+      <td style="padding:0.75rem 1rem;">${cycle.totalParticipants}</td>
+      <td style="padding:0.75rem 1rem;"><strong style="font-size:1.05rem;">${cycle.overallClimate}</strong>/100</td>
+      <td style="padding:0.75rem 1rem;">${cycle.dimScores['Liderança'] || '-'}</td>
+      <td style="padding:0.75rem 1rem;">${cycle.dimScores['Comunicação'] || '-'}</td>
+      <td style="padding:0.75rem 1rem;">${cycle.dimScores['Ambiente de trabalho'] || '-'}</td>
+      <td style="padding:0.75rem 1rem;"><span class="kpi-badge ${badge.class}">${isCurrent ? 'Em Andamento' : badge.label}</span></td>
+    `;
+    tableBody.appendChild(row);
+  });
+
+  const labels = allTimeline.map(c => c.name);
+  const dataClimate = allTimeline.map(c => c.overallClimate);
+
+  const ctxLine = document.getElementById('chart-evolution-line').getContext('2d');
+  if (chartInstances.evolution) chartInstances.evolution.destroy();
+
+  chartInstances.evolution = new Chart(ctxLine, {
+    type: 'line',
+    data: {
+      labels: labels,
+      datasets: [{
+        label: 'Índice Geral de Clima (0-100)',
+        data: dataClimate,
+        borderColor: '#2563eb',
+        backgroundColor: 'rgba(37, 99, 235, 0.1)',
+        fill: true,
+        tension: 0.3,
+        pointRadius: 6,
+        pointBackgroundColor: '#1e3a8a'
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      scales: {
+        y: { min: 0, max: 100, title: { display: true, text: 'Pontuação de Clima' } }
+      }
+    }
+  });
+}
+
+function computeCycleStats(responses, cycleName) {
+  const convertLikert = (val) => (Number(val) - 1) * 25;
+  const dimQuestions = {
+    'Liderança': ['lid_1', 'lid_2', 'lid_3', 'lid_4', 'lid_5', 'lid_6'],
+    'Comunicação': ['com_1', 'com_2', 'com_3', 'com_4', 'com_5'],
+    'Ambiente de trabalho': ['amb_1', 'amb_2', 'amb_3', 'amb_4', 'amb_5', 'amb_6'],
+    'Reconhecimento': ['rec_1', 'rec_2', 'rec_3', 'rec_4', 'rec_5'],
+    'Desenvolvimento': ['des_1', 'des_2', 'des_3', 'des_4'],
+    'Organização e processos': ['prc_1', 'prc_2', 'prc_3', 'prc_4', 'prc_5'],
+    'Motivação': ['mot_1', 'mot_2', 'mot_3', 'mot_4', 'mot_5']
+  };
+
+  let dimScores = {};
+  let allClimate = [];
+
+  Object.keys(dimQuestions).forEach(dim => {
+    let sum = 0, count = 0;
+    responses.forEach(r => {
+      dimQuestions[dim].forEach(qid => {
+        const val = Number(r[qid]);
+        if (val) {
+          const conv = convertLikert(val);
+          sum += conv;
+          allClimate.push(conv);
+          count++;
+        }
+      });
+    });
+    dimScores[dim] = count > 0 ? Math.round(sum / count) : 0;
+  });
+
+  const overall = allClimate.length > 0 ? Math.round(allClimate.reduce((a,b)=>a+b,0) / allClimate.length) : 0;
+
+  return {
+    name: cycleName,
+    date: new Date().toLocaleDateString('pt-BR'),
+    totalParticipants: responses.length,
+    overallClimate: overall,
+    dimScores: dimScores
+  };
+}
+
+// Archive and Reset Current Cycle
+function archiveCurrentCycleHandler() {
+  const responses = getStoredResponses();
+  if (responses.length === 0) {
+    alert('Não há respostas ativas para arquivar neste ciclo!');
+    return;
+  }
+
+  const defaultName = `Ciclo ${new Date().getFullYear()}/${new Date().getMonth() < 6 ? '1' : '2'} - ${new Date().toLocaleDateString('pt-BR')}`;
+  const inputName = document.getElementById('input-cycle-name').value.trim();
+  const cycleName = inputName || defaultName;
+
+  if (!confirm(`Confirma o encerramento e arquivamento do ciclo "${cycleName}" com ${responses.length} respostas?`)) {
+    return;
+  }
+
+  const cycleStats = computeCycleStats(responses, cycleName);
+  const history = getHistoricalCycles();
+  history.push(cycleStats);
+  localStorage.setItem(STORAGE_KEY_HISTORY, JSON.stringify(history));
+
+  localStorage.setItem(STORAGE_KEY_RESPONSES, JSON.stringify([]));
+  setActiveCycleName(`Novo Ciclo (Pós-${cycleName})`);
+
+  document.getElementById('input-cycle-name').value = '';
+  alert(`Ciclo "${cycleName}" arquivado com sucesso no histórico de semestres! O formulário está pronto para a nova pesquisa.`);
+  
+  document.getElementById('lbl-active-cycle-name').innerText = getActiveCycleName();
+  renderAdminDashboard();
+  renderEvolutionTab();
+}
+
+function resetCurrentCycleOnlyHandler() {
+  if (confirm('ATENÇÃO: Deseja realmente zerar todas as respostas ativas do ciclo atual sem arquivar no histórico? Esta ação não pode ser desfeita.')) {
+    localStorage.setItem(STORAGE_KEY_RESPONSES, JSON.stringify([]));
+    alert('Respostas do ciclo atual zeradas com sucesso!');
+    renderAdminDashboard();
+  }
+}
+
+// AI Keyword-Based Open Text Categorization
 function classifyOpenText(text) {
   if (!text) return 'Outros';
   const t = text.toLowerCase();
@@ -660,9 +832,10 @@ function renderOpenResponses(filtered) {
       { field: 'pos_1', title: 'Ponto Positivo' },
       { field: 'pos_2', title: 'Detalhamento Ponto Positivo' },
       { field: 'mel_1', title: 'Oportunidade de Melhoria' },
-      { field: 'sug_1', typeTitle: 'Mudança Prioritária' },
-      { field: 'sug_2', typeTitle: 'Iniciativa Proposed' },
-      { field: 'com_final', typeTitle: 'Comentário Final' }
+      { field: 'sug_1', title: 'Mudança Prioritária' },
+      { field: 'sug_2', title: 'Iniciativa Proposta' },
+      { field: 'sug_unidades_anteriores', title: 'Melhoria de Unidade Anterior' },
+      { field: 'com_final', title: 'Comentário Final' }
     ];
 
     textFields.forEach(tf => {
@@ -674,7 +847,7 @@ function renderOpenResponses(filtered) {
         card.innerHTML = `
           <div>
             <span class="tag">${category}</span>
-            <strong style="color: var(--primary); font-size: 0.85rem;">${tf.title || tf.typeTitle}</strong>
+            <strong style="color: var(--primary); font-size: 0.85rem;">${tf.title}</strong>
           </div>
           <p style="margin-top: 0.5rem; font-size: 0.95rem; color: var(--neutral-dark);">${escapeHtml(r[tf.field])}</p>
         `;
@@ -684,7 +857,7 @@ function renderOpenResponses(filtered) {
   });
 
   if (!hasText) {
-    container.innerHTML = '<p style="color: var(--neutral-gray); font-style: italic;">Nenhuma resposta aberta registrada até o momento.</p>';
+    container.innerHTML = '<p style="color: var(--neutral-gray); font-style: italic;">Nenhuma resposta aberta registrada até o momento neste ciclo.</p>';
   }
 }
 
@@ -692,11 +865,13 @@ function escapeHtml(str) {
   return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 }
 
-// Multi-Tab Excel Export using SheetJS (Requirement 19)
+// Multi-Tab Excel Export using SheetJS
 function exportToExcel() {
   const responses = getStoredResponses();
-  if (responses.length === 0) {
-    alert('Não há respostas registradas para exportação!');
+  const history = getHistoricalCycles();
+
+  if (responses.length === 0 && history.length === 0) {
+    alert('Não há dados ativos ou históricos para exportação!');
     return;
   }
 
@@ -715,12 +890,14 @@ function exportToExcel() {
   const avgClimate = climateScores.length > 0 ? Math.round(climateScores.reduce((a,b)=>a+b,0)/climateScores.length) : 0;
 
   const summaryData = [
-    ['PESQUISA DE CLIMA ORGANIZACIONAL - RESUMO EXECUTIVO'],
+    ['PESQUISA DE CLIMA ORGANIZACIONAL - RESUMO EXECUTIVO (PMESP)'],
     [''],
+    ['Ciclo Vigente', getActiveCycleName()],
     ['Métrica', 'Valor'],
-    ['Número de Participantes', total],
+    ['Número de Participantes no Ciclo Atual', total],
     ['Índice Geral de Clima (0-100)', avgClimate],
     ['Classificação do Clima', getClassificationBadge(avgClimate).label],
+    ['Total de Ciclos Arquivados no Histórico', history.length],
     ['Regra de Anonimato Aplicada', 'N ≥ 5 Respondentes']
   ];
   const ws1 = XLSX.utils.aoa_to_sheet(summaryData);
@@ -765,7 +942,7 @@ function exportToExcel() {
   XLSX.utils.book_append_sheet(wb, ws2, 'Dimensões');
 
   // Aba 3: Perguntas
-  const questionRows = [['Código Pergunta', 'Média Likert (1-5)', '% Discordo Totalmente', '% Discordo', '% Neutro', '% Concordo', '% Concordo Totalmente']];
+  const questionRows = [['Pergunta', 'Média Likert (1-5)', '% Discordo Totalmente', '% Discordo', '% Neutro', '% Concordo', '% Concordo Totalmente']];
   SURVEY_BLOCKS.forEach(block => {
     block.questions.forEach(q => {
       if (q.type === 'likert') {
@@ -794,10 +971,10 @@ function exportToExcel() {
   const ws3 = XLSX.utils.aoa_to_sheet(questionRows);
   XLSX.utils.book_append_sheet(wb, ws3, 'Perguntas');
 
-  // Aba 4: Sugestões Anônimas
+  // Aba 4: Sugestões Anônimas (Iniciativas + Unidades Anteriores)
   const sugRows = [['Categoria IA', 'Tipo de Pergunta', 'Resposta Aberta Anônima']];
   responses.forEach(r => {
-    ['pos_1', 'pos_2', 'mel_1', 'sug_1', 'sug_2', 'com_final'].forEach(f => {
+    ['pos_1', 'pos_2', 'mel_1', 'sug_1', 'sug_2', 'sug_unidades_anteriores', 'com_final'].forEach(f => {
       if (r[f] && r[f].trim()) {
         sugRows.push([classifyOpenText(r[f]), f, r[f]]);
       }
@@ -806,44 +983,64 @@ function exportToExcel() {
   const ws4 = XLSX.utils.aoa_to_sheet(sugRows);
   XLSX.utils.book_append_sheet(wb, ws4, 'Sugestões');
 
-  // Aba 5: Evolução Histórica
+  // Aba 5: Evolução Semestral / Histórico de Ciclos
   const evoRows = [
-    ['Período', 'Índice Geral', 'Liderança', 'Comunicação', 'Ambiente', 'Evolução (%)'],
-    ['Pesquisa Atual (Consolidada)', avgClimate, dimRows[1][1], dimRows[2][1], dimRows[3][1], 'Base Baseline']
+    ['Ciclo / Semestre', 'Data de Arquivamento', 'Participantes', 'Índice Geral (0-100)', 'Liderança', 'Comunicação', 'Ambiente']
   ];
+  
+  history.forEach(h => {
+    evoRows.push([
+      h.name,
+      h.date,
+      h.totalParticipants,
+      h.overallClimate,
+      h.dimScores['Liderança'] || 0,
+      h.dimScores['Comunicação'] || 0,
+      h.dimScores['Ambiente de trabalho'] || 0
+    ]);
+  });
+
+  if (responses.length > 0) {
+    const activeStats = computeCycleStats(responses, getActiveCycleName());
+    evoRows.push([
+      `${activeStats.name} (Em Andamento)`,
+      'Atual',
+      activeStats.totalParticipants,
+      activeStats.overallClimate,
+      activeStats.dimScores['Liderança'] || 0,
+      activeStats.dimScores['Comunicação'] || 0,
+      activeStats.dimScores['Ambiente de trabalho'] || 0
+    ]);
+  }
+
   const ws5 = XLSX.utils.aoa_to_sheet(evoRows);
   XLSX.utils.book_append_sheet(wb, ws5, 'Evolução');
 
-  XLSX.writeFile(wb, 'Pesquisa_Clima_Organizacional_Consolidada.xlsx');
+  XLSX.writeFile(wb, 'Pesquisa_Clima_Organizacional_PMESP_Consolidada.xlsx');
 }
 
-// Generate 20 Simulated Responses for Testing (Requirement 25)
+// Generate 20 Simulated Responses for Testing (Updated with new Profile fields)
 function generateSimulatedData() {
-  const areas = ['Área Administrativa', 'Área Operacional', 'Área Técnica', 'Área de Apoio', 'Outra'];
-  const tempos = ['Menos de 1 ano', 'De 1 a 3 anos', 'De 3 a 5 anos', 'De 5 a 10 anos', 'Mais de 10 anos'];
+  const depts = ['DPC', 'DAS', 'DCI'];
+  const temposInst = ['menos de 05 anos', '05 à 10 anos', '10 à 20 anos', '20 à 30 anos', 'mais de 30 anos'];
+  const temposDtic = ['menos de 02 anos', '02 à 05 anos', '05 à 10 anos', 'mais de 10 anos'];
   
   const sampleSuggestions = [
-    'Excelente ambiente de trabalho e colegas proativos.',
-    'Necessitamos de maior agilidade na aprovação de processos internos.',
-    'A liderança atual escuta com atenção nossas demandas.',
-    'Sugerimos treinamento constante em novas ferramentas digitais.',
-    'A comunicação entre os departamentos pode ser aprimorada.',
-    'Reconhecimento financeiro e plano de cargos mais estruturado.',
-    'Ótima integração e respeito no ambiente diário.'
+    'Excelente ambiente de trabalho e suporte técnico proativo.',
+    'Necessitamos de maior agilidade nos processos administrativos.',
+    'A liderança demonstra respeito e abertura para dialogar.',
+    'Na unidade anterior utilizávamos um sistema automatizado de chamados que reduziu o tempo de espera.'
   ];
 
   const simulatedList = [];
 
   for (let i = 0; i < 20; i++) {
-    const area = areas[i % areas.length];
-    const tempo = tempos[i % tempos.length];
-    
     let resp = {
-      tempo_instituicao: tempo,
-      area_ampla: area
+      tempo_instituicao: temposInst[i % temposInst.length],
+      departamento: depts[i % depts.length],
+      tempo_dtic: temposDtic[i % temposDtic.length]
     };
 
-    // Fill likert answers randomly (weighted towards 3-5)
     SURVEY_BLOCKS.forEach(b => {
       b.questions.forEach(q => {
         if (q.type === 'likert') {
@@ -856,18 +1053,18 @@ function generateSimulatedData() {
 
     if (i % 3 === 0) {
       resp.pos_1 = sampleSuggestions[i % sampleSuggestions.length];
-      resp.sug_1 = 'Implementar mais momentos de feedback contínuo.';
+      resp.sug_unidades_anteriores = 'Na minha unidade anterior, o fluxo digitalizável de triagem facilitou muito a produtividade.';
     }
 
     simulatedList.push(resp);
   }
 
   localStorage.setItem(STORAGE_KEY_RESPONSES, JSON.stringify(simulatedList));
-  alert('20 respostas simuladas geradas com sucesso!');
+  alert('20 respostas simuladas geradas com sucesso para os novos perfis!');
   renderAdminDashboard();
 }
 
-// Anonymity Security Audit Routine (Requirement 24 & 25)
+// Anonymity Security Audit Routine
 function runAnonymityAudit() {
   const responses = getStoredResponses();
   let auditLogs = [];
@@ -910,7 +1107,6 @@ function runAnonymityAudit() {
 function checkExistingData() {
   const responses = getStoredResponses();
   if (responses.length === 0) {
-    // Generate initial test set if empty so admin has data right away
     generateSimulatedData();
   }
 }

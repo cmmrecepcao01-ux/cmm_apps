@@ -20,7 +20,7 @@
       <svg viewBox="0 0 24 24">
         <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
       </svg>
-      <span>Clima & Sugestões</span>
+      <span>Clima & Sugestões — PMESP</span>
     </a>
     <div class="nav-actions">
       <button id="btn-nav-admin" class="btn-nav">
@@ -128,8 +128,7 @@
       <form id="form-admin-login">
         <div style="margin-bottom: 1.5rem;">
           <label style="display:block; font-size: 0.875rem; font-weight: 600; margin-bottom: 0.5rem;">Senha de Acesso</label>
-          <input type="password" id="input-admin-password" class="input-custom" placeholder="Sua senha..." required value="admin123">
-          <small style="color: var(--neutral-gray); font-size: 0.8rem; display:block; margin-top:0.4rem;">Dica para teste: admin123</small>
+          <input type="password" id="input-admin-password" class="input-custom" placeholder="Digite a senha administrativa..." required autocomplete="off">
         </div>
         <button type="submit" class="btn btn-primary btn-block">ENTRAR NO DASHBOARD</button>
       </form>
@@ -138,36 +137,44 @@
     <!-- VIEW 5: ADMIN DASHBOARD -->
     <section id="view-admin" class="hidden">
       <!-- Admin Header Bar -->
-      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 1.5rem;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 1.5rem; flex-wrap:wrap; gap:1rem;">
         <div>
           <h1 style="font-size: 1.75rem; font-weight: 700; color: var(--primary);">Dashboard de Clima Organizacional</h1>
-          <p style="color: var(--neutral-gray); font-size: 0.95rem;">Resultados estatísticos consolidados e proteção de anonimato</p>
+          <p style="color: var(--neutral-gray); font-size: 0.95rem;">Ciclo Ativo: <strong id="lbl-active-cycle-name" style="color:var(--accent);">Ciclo Atual</strong></p>
         </div>
         <button id="btn-admin-logout" class="btn btn-secondary btn-sm">Sair do Painel</button>
       </div>
 
-      <!-- Filter Bar (Requirement 17) -->
+      <!-- Filter Bar -->
       <div class="filter-bar">
         <div class="filter-group">
-          <label class="filter-label">Filtrar por Área Ampla</label>
-          <select id="filter-area" class="select-custom">
-            <option value="">Todas as Áreas (Consolidado)</option>
-            <option value="Área Administrativa">Área Administrativa</option>
-            <option value="Área Operacional">Área Operacional</option>
-            <option value="Área Técnica">Área Técnica</option>
-            <option value="Área de Apoio">Área de Apoio</option>
-            <option value="Outra">Outra</option>
+          <label class="filter-label">Filtrar por Departamento</label>
+          <select id="filter-dept" class="select-custom">
+            <option value="">Todos os Departamentos</option>
+            <option value="DPC">DPC</option>
+            <option value="DAS">DAS</option>
+            <option value="DCI">DCI</option>
           </select>
         </div>
         <div class="filter-group">
-          <label class="filter-label">Filtrar por Tempo de Instituição</label>
+          <label class="filter-label">Filtrar por Tempo na Instituição</label>
           <select id="filter-tempo" class="select-custom">
-            <option value="">Todos os Tempos (Consolidado)</option>
-            <option value="Menos de 1 ano">Menos de 1 ano</option>
-            <option value="De 1 a 3 anos">De 1 a 3 anos</option>
-            <option value="De 3 a 5 anos">De 3 a 5 anos</option>
-            <option value="De 5 a 10 anos">De 5 a 10 anos</option>
-            <option value="Mais de 10 anos">Mais de 10 anos</option>
+            <option value="">Todos os Tempos na Instituição</option>
+            <option value="menos de 05 anos">menos de 05 anos</option>
+            <option value="05 à 10 anos">05 à 10 anos</option>
+            <option value="10 à 20 anos">10 à 20 anos</option>
+            <option value="20 à 30 anos">20 à 30 anos</option>
+            <option value="mais de 30 anos">mais de 30 anos</option>
+          </select>
+        </div>
+        <div class="filter-group">
+          <label class="filter-label">Filtrar por Tempo na DTIC</label>
+          <select id="filter-tempo-dtic" class="select-custom">
+            <option value="">Todos os Tempos na DTIC</option>
+            <option value="menos de 02 anos">menos de 02 anos</option>
+            <option value="02 à 05 anos">02 à 05 anos</option>
+            <option value="05 à 10 anos">05 à 10 anos</option>
+            <option value="mais de 10 anos">mais de 10 anos</option>
           </select>
         </div>
       </div>
@@ -177,7 +184,7 @@
 
       <!-- Main Dashboard Content Container -->
       <div id="admin-dashboard-content">
-        <!-- KPI Cards Grid (Requirement 12 & 13) -->
+        <!-- KPI Cards Grid -->
         <div class="dashboard-grid">
           <div class="kpi-card">
             <span class="kpi-label">Total Participantes</span>
@@ -225,10 +232,12 @@
         <!-- Dashboard Tabs -->
         <div class="admin-tabs">
           <button class="tab-btn active" data-tab="tab-graficos">Visão Geral & Gráficos</button>
+          <button class="tab-btn" data-tab="tab-evolucao">Evolução Semestral (Comparativo)</button>
           <button class="tab-btn" data-tab="tab-percepcoes">Percepções e Sugestões (Análise IA)</button>
           <button class="tab-btn" data-tab="tab-exportacao">Exportação Planilha Excel</button>
+          <button class="tab-btn" data-tab="tab-ciclos">Gestão de Ciclos & Reset</button>
           <button class="tab-btn" data-tab="tab-auditoria">Auditoria & Simulação</button>
-          <button class="tab-btn" data-tab="tab-configuracoes">Configurações de Parâmetros</button>
+          <button class="tab-btn" data-tab="tab-configuracoes">Configurações</button>
         </div>
 
         <!-- TAB 1: GRAPHICS & DIMENSIONS -->
@@ -250,7 +259,44 @@
           </div>
         </div>
 
-        <!-- TAB 2: OPEN RESPONSES & IA CATEGORIZATION (Requirement 15) -->
+        <!-- TAB 2: SEMESTER COMPARISON & EVOLUTION -->
+        <div id="tab-evolucao" class="tab-content hidden">
+          <div class="card">
+            <div class="card-header">
+              <h3 class="card-title">Comparação de Clima entre Semestres / Ciclos</h3>
+              <p class="card-subtitle">Acompanhamento evolutivo dos índices gerais e por dimensão ao longo dos ciclos arquivados.</p>
+            </div>
+            
+            <div class="chart-card mb-4" style="min-height:350px;">
+              <h4 style="color:var(--primary); margin-bottom: 1rem;">Evolução do Índice Geral de Clima</h4>
+              <div class="chart-container">
+                <canvas id="chart-evolution-line"></canvas>
+              </div>
+            </div>
+
+            <div style="overflow-x: auto;">
+              <table style="width: 100%; border-collapse: collapse; font-size: 0.925rem; text-align: left;">
+                <thead>
+                  <tr style="background: var(--primary); color: white;">
+                    <th style="padding: 0.75rem 1rem;">Ciclo / Semestre</th>
+                    <th style="padding: 0.75rem 1rem;">Data Arquivamento</th>
+                    <th style="padding: 0.75rem 1rem;">Participantes</th>
+                    <th style="padding: 0.75rem 1rem;">Índice Geral (0-100)</th>
+                    <th style="padding: 0.75rem 1rem;">Liderança</th>
+                    <th style="padding: 0.75rem 1rem;">Comunicação</th>
+                    <th style="padding: 0.75rem 1rem;">Ambiente</th>
+                    <th style="padding: 0.75rem 1rem;">Status</th>
+                  </tr>
+                </thead>
+                <tbody id="tbl-history-evolution-body">
+                  <!-- History rows generated dynamically -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB 3: OPEN RESPONSES & IA CATEGORIZATION -->
         <div id="tab-percepcoes" class="tab-content hidden">
           <div class="card">
             <div class="card-header">
@@ -261,7 +307,7 @@
           </div>
         </div>
 
-        <!-- TAB 3: EXCEL EXPORT (Requirement 19) -->
+        <!-- TAB 4: EXCEL EXPORT -->
         <div id="tab-exportacao" class="tab-content hidden">
           <div class="card">
             <div class="card-header">
@@ -275,7 +321,7 @@
                 <li><strong>Aba 2 - Dimensões:</strong> Pontuação e percentuais positivo, neutro e negativo.</li>
                 <li><strong>Aba 3 - Perguntas:</strong> Média por pergunta Likert e distribuição de alternativas.</li>
                 <li><strong>Aba 4 - Sugestões:</strong> Respostas abertas categorizadas sem identificadores.</li>
-                <li><strong>Aba 5 - Evolução:</strong> Registro histórico consolidado para acompanhamento.</li>
+                <li><strong>Aba 5 - Evolução:</strong> Registro histórico consolidado comparando ciclos semestrais arquivados.</li>
               </ul>
             </div>
             <button id="btn-export-excel" class="btn btn-success" style="font-size: 1rem; padding: 0.875rem 2rem;">
@@ -289,7 +335,44 @@
           </div>
         </div>
 
-        <!-- TAB 4: AUDIT & TEST SIMULATION (Requirement 24 & 25) -->
+        <!-- TAB 5: CYCLE MANAGEMENT & RESET -->
+        <div id="tab-ciclos" class="tab-content hidden">
+          <div class="card">
+            <div class="card-header">
+              <h3 class="card-title">Gestão de Ciclos de Pesquisa & Reset</h3>
+              <p class="card-subtitle">Finalize a pesquisa atual, arquive os dados consolidados para histórico semestral e inicie um novo ciclo zerado.</p>
+            </div>
+
+            <div style="background: var(--primary-light); padding: 1.5rem; border-radius: var(--radius-sm); border-left: 4px solid var(--accent); margin-bottom: 1.5rem;">
+              <h4 style="color: var(--primary); margin-bottom: 0.5rem;">🔄 Finalizar e Arquivar Ciclo Atual</h4>
+              <p style="font-size: 0.95rem; color: var(--neutral-gray); margin-bottom: 1rem;">
+                Ao finalizar um ciclo (ex: <em>2026/1 - 1º Semestre</em>), todos os relatórios e respostas anônimas da pesquisa corrente serão guardados de forma segura na memória de evolução. As respostas ativas serão limpas para que uma nova pesquisa possa ser iniciada.
+              </p>
+
+              <div style="display:flex; gap: 1rem; flex-wrap:wrap; align-items:flex-end;">
+                <div style="flex:1; min-width: 250px;">
+                  <label style="display:block; font-size: 0.85rem; font-weight: 600; margin-bottom: 0.35rem;">Nome do Ciclo a Arquivar</label>
+                  <input type="text" id="input-cycle-name" class="input-custom" placeholder="Ex: 2026/1 - 1º Semestre 2026">
+                </div>
+                <button id="btn-archive-cycle" class="btn btn-primary">
+                  💾 Finalizar e Arquivar Ciclo
+                </button>
+              </div>
+            </div>
+
+            <div style="border-top: 1px solid var(--neutral-border); padding-top: 1.5rem; margin-top: 1.5rem;">
+              <h4 style="color: var(--danger); margin-bottom: 0.5rem;">⚠️ Reset Direto (Limpar Respostas Sem Arquivar)</h4>
+              <p style="font-size: 0.9rem; color: var(--neutral-gray); margin-bottom: 1rem;">
+                Utilize esta opção caso queira apenas zerar os dados da pesquisa atual de testes sem salvar no histórico semestral.
+              </p>
+              <button id="btn-reset-current" class="btn btn-secondary" style="color: var(--danger); border-color: var(--danger);">
+                🗑️ Zerar Respostas Atuais do Ciclo
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB 6: AUDIT & TEST SIMULATION -->
         <div id="tab-auditoria" class="tab-content hidden">
           <div class="card">
             <div class="card-header">
@@ -312,7 +395,7 @@ Clique em "Executar Auditoria Técnica de Anonimato" para iniciar a verificaçã
           </div>
         </div>
 
-        <!-- TAB 5: SETTINGS -->
+        <!-- TAB 7: SETTINGS -->
         <div id="tab-configuracoes" class="tab-content hidden">
           <div class="card">
             <div class="card-header">
@@ -337,7 +420,7 @@ Clique em "Executar Auditoria Técnica de Anonimato" para iniciar a verificaçã
 
   </main>
 
-  <!-- MODAL DE CONFIRMAÇÃO DE ANONIMATO (Requirement 2 & 23) -->
+  <!-- MODAL DE CONFIRMAÇÃO DE ANONIMATO -->
   <div id="modal-anonymity" class="modal-overlay">
     <div class="modal-box">
       <h3 style="font-size: 1.25rem; color: var(--primary); font-weight: 700; margin-bottom: 1rem;">Confirmação de Ciência e Sigilo</h3>

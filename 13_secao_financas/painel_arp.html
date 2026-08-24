@@ -1,0 +1,1178 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel de Controle - ARP Viaturas UGE</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=Roboto:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- Configuração do Tailwind -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        bgMain: '#0b1116',
+                        bgPanel: '#121921',
+                        borderPanel: '#202c38',
+                        textMuted: '#94a3b8',
+                        textLight: '#f8fafc',
+                        brandBlue: '#3b82f6',
+                        brandGreen: '#22c55e',
+                        brandRed: '#ef4444',
+                        brandOrange: '#f97316'
+                    },
+                    fontFamily: {
+                        sans: ['Roboto', 'sans-serif'],
+                        montserrat: ['Montserrat', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #0b1116;
+            color: #cbd5e1;
+            font-size: 14px;
+        }
+        .chart-container {
+            position: relative;
+            height: 320px;
+            width: 100%;
+        }
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0b1116;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #202c38;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #3b82f6;
+        }
+    </style>
+</head>
+<body class="font-sans antialiased min-h-screen pb-12">
+
+    <!-- Top Navigation / Header -->
+    <header class="bg-bgPanel border-b border-borderPanel py-5 px-6 sticky top-0 z-50 shadow-lg">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+            <div>
+                <h1 class="font-montserrat text-xl md:text-2xl font-bold text-textLight flex items-center gap-3 tracking-wider">
+                    <i class="fa-solid fa-chart-line text-brandGreen"></i> PAINEL DE CONTROLE - ARP VIATURAS
+                </h1>
+                <p class="text-xs md:text-sm text-textMuted font-bold mt-1 tracking-wide uppercase">
+                    Divisão de Administração e Finanças • Seção de Finanças da UGE do CMM
+                </p>
+            </div>
+            
+            <div class="flex flex-wrap items-center gap-3">
+                <!-- Status da Conexão -->
+                <div id="connectionStatus" class="flex items-center gap-2 bg-black/40 border border-borderPanel px-4 py-2 rounded-full text-xs md:text-sm font-semibold text-textLight">
+                    <span class="h-2.5 w-2.5 rounded-full bg-brandOrange animate-pulse" id="statusDot"></span>
+                    <span id="statusText">Inicializando...</span>
+                </div>
+                
+                <!-- Botão Recarregar -->
+                <button onclick="reloadData()" class="bg-black/30 hover:bg-black/60 border border-borderPanel text-textLight hover:text-brandGreen p-2.5 rounded-lg text-sm transition-all" title="Forçar Atualização do Google Sheets">
+                    <i class="fa-solid fa-rotate"></i>
+                </button>
+
+                <!-- Link Planilha -->
+                <a href="https://docs.google.com/spreadsheets/d/1BYIBo5y41VWrTRPvVyhvC4MeU7CGLRqlG8aoMY9Aans/edit" target="_blank" class="bg-brandBlue/10 hover:bg-brandBlue/20 border border-brandBlue/35 text-brandBlue hover:text-white px-4 py-2 rounded-lg text-xs md:text-sm font-bold tracking-wider uppercase transition-all flex items-center gap-2">
+                    <i class="fa-solid fa-table-list"></i> Planilha Original
+                </a>
+
+                <!-- Botão Voltar -->
+                <a href="./index.html" class="bg-black/20 hover:bg-black/40 border border-borderPanel text-textLight px-4 py-2 rounded-lg text-xs md:text-sm font-bold tracking-wider uppercase transition-all">
+                    <i class="fa-solid fa-arrow-left mr-1"></i> Voltar
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Barra de carregamento do cache -->
+    <div id="cacheProgressContainer" class="w-full bg-bgPanel h-1.5 border-b border-borderPanel hidden">
+        <div id="cacheProgressBar" class="h-full bg-brandGreen transition-all duration-350" style="width: 0%"></div>
+    </div>
+
+    <!-- Main Container -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8">
+
+        <!-- Banner de erro -->
+        <div id="errorBanner" class="hidden bg-brandRed/10 border border-brandRed/30 text-brandRed p-5 rounded-xl mb-8 flex items-start gap-4">
+            <i class="fa-solid fa-triangle-exclamation text-2xl mt-0.5"></i>
+            <div>
+                <h3 class="font-bold text-textLight text-base uppercase">Erro de Conexão com o Google Sheets</h3>
+                <p class="text-sm text-textMuted mt-1" id="errorMessageText">Não foi possível recuperar os dados da planilha online. Verifique sua conexão de rede ou as permissões de acesso.</p>
+                <button onclick="reloadData()" class="bg-brandRed/20 hover:bg-brandRed/30 border border-brandRed/45 text-textLight text-xs font-bold px-3 py-1.5 rounded-lg mt-3 transition-all uppercase">
+                    Tentar Novamente
+                </button>
+            </div>
+        </div>
+
+        <div id="dashboardContent" class="opacity-0 transition-opacity duration-300">
+            <!-- Barra de Busca Global -->
+            <section class="bg-bgPanel border border-borderPanel rounded-xl p-5 md:p-6 mb-8 shadow-md">
+                <h2 class="font-montserrat font-bold text-textLight text-base md:text-lg mb-3 flex items-center gap-2 uppercase tracking-wide">
+                    <i class="fa-solid fa-magnifying-glass text-brandGreen"></i> Busca Global Unificada de Acionamentos
+                </h2>
+                <p class="text-xs md:text-sm text-textMuted mb-4">
+                    Digite qualquer termo para localizar em todas as abas da planilha (ex: convênio federal, emenda impositiva, nº de empenho, NC, marca, viatura, OPM, CNPJ, status da fatura ou valor).
+                </p>
+                <div class="relative">
+                    <input type="text" id="globalSearchInput" oninput="handleSearch()" placeholder="BUSCAR POR RENAULT, DUSTER, CRETA, CONVÊNIO FEDERAL, EMENDA, 2026NC, PAGO, ETC..." 
+                           class="w-full bg-black/40 border border-borderPanel focus:border-brandGreen focus:ring-1 focus:ring-brandGreen rounded-xl py-4 pl-12 pr-4 text-textLight font-medium text-sm md:text-base placeholder-textMuted/50 outline-none transition-all uppercase">
+                    <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-textMuted text-xl"></i>
+                    <button id="clearSearchBtn" onclick="clearSearch()" class="absolute right-4 top-1/2 -translate-y-1/2 text-textMuted hover:text-brandRed hidden">
+                        <i class="fa-solid fa-xmark text-xl"></i>
+                    </button>
+                </div>
+                <div id="searchProgressIndicator" class="text-xs md:text-sm text-brandGreen mt-2 font-medium hidden">
+                    <i class="fa-solid fa-circle-notch animate-spin mr-1"></i> Indexando base de dados detalhada em segundo plano para busca instantânea... <span id="searchIndexPercent">0%</span>
+                </div>
+            </section>
+
+            <!-- Resultados da Busca -->
+            <section id="searchResultsSection" class="hidden mb-8">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="font-montserrat font-bold text-textLight text-base md:text-lg uppercase tracking-wider flex items-center gap-2">
+                        <i class="fa-solid fa-list-check text-brandGreen"></i> Resultados Encontrados (<span id="resultsCount">0</span>)
+                    </h3>
+                    <button onclick="clearSearch()" class="text-xs md:text-sm font-semibold text-brandRed hover:underline uppercase">
+                        Fechar Resultados
+                    </button>
+                </div>
+                
+                <div class="space-y-4 max-h-[600px] overflow-y-auto pr-2" id="searchResultsContainer">
+                    <!-- Dinâmico via JS -->
+                </div>
+            </section>
+
+            <!-- Painel de Indicadores (Dashboard) -->
+            <section id="dashboardPanel">
+                
+                <!-- Cards de Indicadores Financeiros / Quantitativos -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+                    <!-- Card 1: Total da Ata -->
+                    <div class="bg-bgPanel border border-borderPanel rounded-xl p-5 shadow-sm">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <span class="text-xs md:text-sm font-bold text-textMuted tracking-wider uppercase">Quantidade Total ARP</span>
+                                <h3 class="text-2xl md:text-3xl font-bold text-textLight mt-1" id="kpiTotalAta">--</h3>
+                            </div>
+                            <div class="h-10 w-10 bg-brandBlue/10 rounded-lg flex items-center justify-center text-brandBlue">
+                                <i class="fa-solid fa-file-contract text-lg"></i>
+                            </div>
+                        </div>
+                        <div class="text-[12px] text-textMuted mt-3 flex items-center gap-1.5 font-medium">
+                            <i class="fa-solid fa-calculator text-brandBlue"></i> Soma de todos os lotes de viaturas
+                        </div>
+                    </div>
+
+                    <!-- Card 2: Total Acionado -->
+                    <div class="bg-bgPanel border border-borderPanel rounded-xl p-5 shadow-sm">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <span class="text-xs md:text-sm font-bold text-textMuted tracking-wider uppercase">Quantidade Acionada</span>
+                                <h3 class="text-2xl md:text-3xl font-bold text-brandGreen mt-1" id="kpiTotalAcionado">--</h3>
+                            </div>
+                            <div class="h-10 w-10 bg-brandGreen/10 rounded-lg flex items-center justify-center text-brandGreen">
+                                <i class="fa-solid fa-truck-pickup text-lg"></i>
+                            </div>
+                        </div>
+                        <div class="text-[12px] text-textMuted mt-3 font-semibold">
+                            Comprometimento de: <span class="font-bold text-brandGreen" id="kpiComprometimento">--%</span>
+                        </div>
+                    </div>
+
+                    <!-- Card 3: Saldo Disponível -->
+                    <div class="bg-bgPanel border border-borderPanel rounded-xl p-5 shadow-sm">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <span class="text-xs md:text-sm font-bold text-textMuted tracking-wider uppercase">Saldo p/ Acionamento</span>
+                                <h3 class="text-2xl md:text-3xl font-bold text-brandOrange mt-1" id="kpiSaldoDisponivel">--</h3>
+                            </div>
+                            <div class="h-10 w-10 bg-brandOrange/10 rounded-lg flex items-center justify-center text-brandOrange">
+                                <i class="fa-solid fa-boxes-stacked text-lg"></i>
+                            </div>
+                        </div>
+                        <div class="text-[12px] text-textMuted mt-3 font-semibold">
+                            Disponível em atas vigentes: <span class="font-bold text-brandOrange" id="kpiPercentDisponivel">--%</span>
+                        </div>
+                    </div>
+
+                    <!-- Card 4: Critico de Vencimento -->
+                    <div class="bg-bgPanel border border-borderPanel rounded-xl p-5 shadow-sm">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <span class="text-xs md:text-sm font-bold text-textMuted tracking-wider uppercase">Vencimentos Críticos</span>
+                                <h3 class="text-2xl md:text-3xl font-bold text-brandRed mt-1" id="kpiAtasCriticas">--</h3>
+                            </div>
+                            <div class="h-10 w-10 bg-brandRed/10 rounded-lg flex items-center justify-center text-brandRed">
+                                <i class="fa-solid fa-clock-rotate-left text-lg animate-pulse"></i>
+                            </div>
+                        </div>
+                        <div class="text-[12px] mt-3 font-medium" id="kpiAtasCriticasDesc">
+                            <span class="text-textMuted">Atas vencendo em &lt; 60 dias</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Painel de Gráficos (Espelhando foto1 do Excel) -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+                    <!-- Grafico 1: Quantidade Acionada vs Disponível -->
+                    <div class="bg-bgPanel border border-borderPanel rounded-xl p-5 shadow-sm flex flex-col justify-between">
+                        <div>
+                            <h3 class="font-montserrat font-bold text-textLight text-sm md:text-base flex items-center gap-2 uppercase tracking-wide border-b border-borderPanel pb-3 mb-4">
+                                <i class="fa-solid fa-chart-column text-brandGreen"></i> Qtdade Acionada e Disponível para Acionamento
+                            </h3>
+                            <p class="text-[12px] text-textMuted mb-2 -mt-2">Monitoramento de consumo das viaturas em Ata de Registro de Preços.</p>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="chartAcionamento"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Grafico 3: Dias Restantes até Vencimento -->
+                    <div class="bg-bgPanel border border-borderPanel rounded-xl p-5 shadow-sm flex flex-col justify-between">
+                        <div>
+                            <h3 class="font-montserrat font-bold text-textLight text-sm md:text-base flex items-center gap-2 uppercase tracking-wide border-b border-borderPanel pb-3 mb-4">
+                                <i class="fa-solid fa-calendar-check text-brandRed"></i> Dias Restantes até Vencimento das Atas
+                            </h3>
+                            <p class="text-[12px] text-textMuted mb-2 -mt-2">Cores indicativas: Vermelho (&lt; 60 dias ou vencidas) e Cinza (&gt; 60 dias).</p>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="chartVencimento"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Grafico 2: Monitoramento de Aditamentos -->
+                    <div class="bg-bgPanel border border-borderPanel rounded-xl p-5 shadow-sm flex flex-col justify-between lg:col-span-2">
+                        <div>
+                            <h3 class="font-montserrat font-bold text-textLight text-sm md:text-base flex items-center gap-2 uppercase tracking-wide border-b border-borderPanel pb-3 mb-4">
+                                <i class="fa-solid fa-circle-plus text-brandBlue"></i> Monitoramento de Aditamentos por Viatura
+                            </h3>
+                            <p class="text-[12px] text-textMuted mb-2 -mt-2">Demonstrativo de acréscimos legais (aditamentos) de cotas contratadas.</p>
+                        </div>
+                        <div class="chart-container !h-[300px]">
+                            <canvas id="chartAditamento"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tabela de Resumo de Contratos de Viaturas (Calc_Data) -->
+                <div class="bg-bgPanel border border-borderPanel rounded-xl p-5 md:p-6 shadow-sm">
+                    <h3 class="font-montserrat font-bold text-textLight text-sm md:text-base mb-4 flex items-center gap-2 uppercase tracking-wide">
+                        <i class="fa-solid fa-list text-brandBlue"></i> Quadro Geral de Vigência e Status de Viaturas
+                    </h3>
+                    
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-sm border-collapse">
+                            <thead>
+                                <tr class="border-b border-borderPanel text-textMuted uppercase font-bold tracking-wider bg-black/25 text-xs md:text-sm">
+                                    <th class="p-3.5">Viatura</th>
+                                    <th class="p-3.5 text-right">Valor Unitário</th>
+                                    <th class="p-3.5 text-center">Qtd. Ata</th>
+                                    <th class="p-3.5 text-center">Acionada</th>
+                                    <th class="p-3.5 text-center">Remanescente</th>
+                                    <th class="p-3.5 text-center">Aditado</th>
+                                    <th class="p-3.5 text-center">Possib. Adit.</th>
+                                    <th class="p-3.5 text-center">Dias Venc.</th>
+                                    <th class="p-3.5 text-center">Vencimento</th>
+                                    <th class="p-3.5 text-center">Status</th>
+                                    <th class="p-3.5 text-center">Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody id="summaryTableBody" class="divide-y divide-borderPanel/60 text-xs md:text-sm">
+                                <!-- Inserido dinamicamente via JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </section>
+        </div>
+
+    </main>
+
+    <!-- Código Javascript do Dashboard -->
+    <script>
+        // Mapeamento estático e exato de GIDs
+        const GIDS_MAPPING = {
+            "Dashboard": "1002",
+            "12. RP CRETA": "1117120591",
+            "GERAL": "753973552",
+            "5. RP DUSTER": "2134960979",
+            "7. RPM_ROCAM - SCRAMBLER 400X": "1368646116",
+            "3. SEDAN DESCARACTERIZA HB20": "352314430",
+            "4. MOTO SIPOM - KAWASAKI/VERSYS X300": "1701665260",
+            "14. SUV_CANIL - TRAILBLAZER 4X4": "1919516705",
+            "6. FT_BAEP_TRAILBLAZER": "675345919",
+            "8. RE PCD - FIAT SCUDO": "1962368380",
+            "9. PICK-UP RURAL S-10": "1470554405",
+            "10. PICK-UP COE - HILUX 4X4": "520992120",
+            "11. BCM FIAT DUCATO": "1941685695",
+            "13. SUV SIPOM DESCARACTERIZADA - KARDIAN": "1733973448",
+            "1. AMBULANCIA DUCATO": "1732549002",
+            "RP TOYOTA": "593867800",
+            "2. HATCH DESCARACTERIZADA HB20": "837621365",
+            "LISTA": "359660423",
+            "Calc_Data": "1001"
+        };
+
+        const SPREADSHEET_ID = '1BYIBo5y41VWrTRPvVyhvC4MeU7CGLRqlG8aoMY9Aans';
+        const BASE_GVIZ_URL = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx=out:json`;
+
+        // Cache local de dados
+        let dbCalcData = [];
+        let dbAllSheets = {};
+        
+        // Instâncias de Gráficos
+        let chartAcionamentoInst = null;
+        let chartAditamentoInst = null;
+        let chartVencimentoInst = null;
+
+        // Início
+        window.addEventListener('DOMContentLoaded', () => {
+            initDashboard();
+        });
+
+        // Inicializador
+        async function initDashboard() {
+            setConnectionStatus('connecting', 'Conectando ao Google Sheets...');
+            hideErrorBanner();
+            
+            try {
+                // 1. Carrega dados da aba consolidada Calc_Data
+                dbCalcData = await fetchSheetData('Calc_Data');
+                setConnectionStatus('online', 'Google Sheets (Tempo Real)');
+                
+                // Exibe conteúdo e renderiza dashboard
+                document.getElementById('dashboardContent').classList.remove('opacity-0');
+                renderDashboard();
+
+                // 2. Carrega todas as abas das viaturas em background para busca global
+                loadDetailedSheetsBackground();
+            } catch (err) {
+                console.error("Falha ao ler do Sheets.", err);
+                setConnectionStatus('offline', 'Google Sheets Inacessível');
+                showErrorBanner("Não foi possível carregar os dados em tempo real da planilha do Google Sheets. Verifique se o computador possui acesso à internet ou se o link da planilha está ativo.");
+            }
+        }
+
+        // Força atualização
+        async function reloadData() {
+            setConnectionStatus('connecting', 'Atualizando...');
+            hideErrorBanner();
+            try {
+                dbCalcData = await fetchSheetData('Calc_Data');
+                setConnectionStatus('online', 'Google Sheets (Tempo Real)');
+                renderDashboard();
+                loadDetailedSheetsBackground();
+            } catch (err) {
+                setConnectionStatus('offline', 'Google Sheets Inacessível');
+                showErrorBanner("Erro ao tentar atualizar os dados. Por favor, cheque sua conexão de internet.");
+            }
+        }
+
+        function setConnectionStatus(type, text) {
+            const dot = document.getElementById('statusDot');
+            const statusTxt = document.getElementById('statusText');
+            
+            dot.className = "h-3 w-3 rounded-full";
+            
+            if (type === 'online') {
+                dot.classList.add('bg-brandGreen');
+                statusTxt.innerText = text;
+            } else if (type === 'connecting') {
+                dot.classList.add('bg-brandOrange', 'animate-pulse');
+                statusTxt.innerText = text;
+            } else {
+                dot.classList.add('bg-brandRed');
+                statusTxt.innerText = text;
+            }
+        }
+
+        function showErrorBanner(msg) {
+            document.getElementById('errorBanner').classList.remove('hidden');
+            document.getElementById('errorMessageText').innerText = msg;
+            document.getElementById('dashboardContent').classList.add('opacity-0');
+        }
+
+        function hideErrorBanner() {
+            document.getElementById('errorBanner').classList.add('hidden');
+        }
+
+        // Busca dados de Calc_Data com sanitização de nomes de coluna
+        async function fetchSheetData(sheetName) {
+            const url = `${BASE_GVIZ_URL}&sheet=${encodeURIComponent(sheetName)}`;
+            const response = await fetch(url);
+            if (!response.ok) throw new Error("Erro de rede.");
+            const text = await response.text();
+            
+            const match = text.match(/google\.visualization\.Query\.setResponse\(([\s\S]*?)\);/);
+            if (!match) throw new Error("Resposta inválida.");
+            
+            const json = JSON.parse(match[1]);
+            if (json.status === 'error') throw new Error(json.errors[0].detailed_message);
+            
+            const table = json.table;
+            const cols = table.cols.map(c => (c.label || '').replace(/\s+/g, ' ').trim());
+            
+            return table.rows.map(r => {
+                const rowObj = {};
+                r.c.forEach((cell, idx) => {
+                    const colName = cols[idx];
+                    if (colName) {
+                        rowObj[colName] = cell ? cell.v : null;
+                    }
+                });
+                return rowObj;
+            });
+        }
+
+        // Parser cirúrgico para abas de viaturas a partir de arrays de células da Visualization API (Independente da linha 0!)
+        async function fetchDetailedSheet(sheetName) {
+            const url = `${BASE_GVIZ_URL}&sheet=${encodeURIComponent(sheetName)}`;
+            const response = await fetch(url);
+            if (!response.ok) throw new Error("Erro de rede.");
+            const text = await response.text();
+            
+            const match = text.match(/google\.visualization\.Query\.setResponse\(([\s\S]*?)\);/);
+            if (!match) throw new Error("Resposta inválida.");
+            
+            const json = JSON.parse(match[1]);
+            if (json.status === 'error') throw new Error(json.errors[0].detailed_message);
+            
+            const rows = json.table.rows;
+            
+            const parsedRows = rows.map(r => {
+                return r.c ? r.c.map(cell => cell ? (cell.v !== null ? cell.v : '') : '') : [];
+            });
+            
+            let arpInfo = {};
+            const acionamentos = [];
+            
+            // 1. Ler cabeçalho e dados da ARP (linha 0 e linha 1)
+            if (parsedRows.length > 1) {
+                const arpHeaders = parsedRows[0].map(h => String(h || '').replace(/\s+/g, ' ').trim());
+                const arpValues = parsedRows[1];
+                
+                arpHeaders.forEach((h, idx) => {
+                    if (h && idx < arpValues.length && arpValues[idx] !== '') {
+                        arpInfo[h] = arpValues[idx];
+                    }
+                });
+            }
+            
+            // 2. Tabela de acionamentos (Localiza o cabeçalho dinamicamente baseado na Coluna A contendo SEI)
+            if (parsedRows.length > 2) {
+                let headerIdx = -1;
+                for (let i = 0; i < parsedRows.length; i++) {
+                    const row = parsedRows[i];
+                    if (row && row[0] && String(row[0]).toUpperCase().includes('SEI')) {
+                        headerIdx = i;
+                        break;
+                    }
+                }
+                
+                if (headerIdx !== -1) {
+                    const rawHeaders = parsedRows[headerIdx] || [];
+                    const acHeaders = rawHeaders.map(h => String(h || '').replace(/\s+/g, ' ').trim());
+                    
+                    // Da linha subsequente em diante são os acionamentos
+                    for (let i = headerIdx + 1; i < parsedRows.length; i++) {
+                        const rowValues = parsedRows[i];
+                        if (rowValues && rowValues.some(v => v !== null && v !== '')) {
+                            // Ignorar linhas de totais
+                            const colAStr = String(rowValues[0] || '').toUpperCase();
+                            const colFStr = String(rowValues[5] || '').toUpperCase();
+                            if (colAStr.includes('TOTAL') || colFStr.includes('TOTAIS') || colFStr.includes('TOTAL')) {
+                                continue;
+                            }
+
+                            const acObj = {};
+                            acHeaders.forEach((h, idx) => {
+                                if (h && idx < rowValues.length && rowValues[idx] !== '') {
+                                    acObj[h] = rowValues[idx];
+                                }
+                            });
+                            acionamentos.push(acObj);
+                        }
+                    }
+                }
+            }
+            
+            return {
+                arp_info: arpInfo,
+                acionamentos: acionamentos
+            };
+        }
+
+        // Carrega todas as planilhas das viaturas em background
+        async function loadDetailedSheetsBackground() {
+            const progressContainer = document.getElementById('cacheProgressContainer');
+            const searchIndicator = document.getElementById('searchProgressIndicator');
+            const percentLabel = document.getElementById('searchIndexPercent');
+            const progressBar = document.getElementById('cacheProgressBar');
+            
+            progressContainer.classList.remove('hidden');
+            searchIndicator.classList.remove('hidden');
+            percentLabel.innerText = "0%";
+            progressBar.style.width = "0%";
+
+            const vehicleSheets = Object.keys(GIDS_MAPPING).filter(
+                k => k !== "Dashboard" && k !== "Calc_Data" && k !== "LISTA" && k !== "PREGÃO ARP" && k !== "GERAL"
+            );
+
+            let loadedCount = 0;
+            const totalSheets = vehicleSheets.length;
+
+            const promises = vehicleSheets.map(async (sheet) => {
+                try {
+                    const sheetData = await fetchDetailedSheet(sheet);
+                    dbAllSheets[sheet] = sheetData;
+                } catch (err) {
+                    console.error(`Erro ao indexar aba ${sheet}:`, err);
+                } finally {
+                    loadedCount++;
+                    const percent = Math.round((loadedCount / totalSheets) * 100);
+                    percentLabel.innerText = `${percent}%`;
+                    progressBar.style.width = `${percent}%`;
+                }
+            });
+
+            await Promise.all(promises);
+            
+            setTimeout(() => {
+                progressContainer.classList.add('hidden');
+                searchIndicator.classList.add('hidden');
+            }, 1000);
+        }
+
+        // Renderização de dados no Dashboard
+        function renderDashboard() {
+            const activeRows = dbCalcData.filter(row => row['VIATURA'] && row['VIATURA'] !== 'None' && row['VIATURA'] !== '');
+            renderKPIs(activeRows);
+            renderCharts(activeRows);
+            renderSummaryTable(activeRows);
+        }
+
+        // Renderização dos KPIs
+        function renderKPIs(rows) {
+            let totalAta = 0;
+            let totalAcionado = 0;
+            let totalRemanescente = 0;
+            let atasCriticas = 0;
+
+            rows.forEach(r => {
+                const qAta = parseInt(r['QTDADE ATA']) || 0;
+                const qAcionada = parseFloat(r['Qtdade Acionada']) || parseFloat(r['QTDADE ACIONADA']) || 0;
+                const qReman = parseFloat(r['QTDADE REMANESCENTE']) || parseFloat(r['Qtdade Remanescente']) || 0;
+                
+                totalAta += qAta;
+                totalAcionado += qAcionada;
+                totalRemanescente += qReman;
+
+                const diasText = String(r['DIAS RESTANTES ATÉ O VENCIMENTO'] || '').toUpperCase();
+                const diasNum = parseFloat(r['Dias Restantes Numérico']);
+                
+                if (diasText.includes('VENCIDA') || (!isNaN(diasNum) && diasNum <= 60)) {
+                    atasCriticas++;
+                }
+            });
+
+            document.getElementById('kpiTotalAta').innerText = totalAta;
+            document.getElementById('kpiTotalAcionado').innerText = Math.round(totalAcionado);
+            document.getElementById('kpiSaldoDisponivel').innerText = Math.round(totalRemanescente);
+            document.getElementById('kpiAtasCriticas').innerText = atasCriticas;
+
+            const compPercent = totalAta > 0 ? Math.round((totalAcionado / totalAta) * 100) : 0;
+            document.getElementById('kpiComprometimento').innerText = `${compPercent}%`;
+            document.getElementById('kpiPercentDisponivel').innerText = `${100 - compPercent}%`;
+
+            if (atasCriticas > 0) {
+                document.getElementById('kpiAtasCriticas').className = "text-2xl md:text-3xl font-bold text-brandRed mt-1";
+                document.getElementById('kpiAtasCriticasDesc').innerHTML = `<span class="text-brandRed font-semibold text-xs md:text-sm"><i class="fa-solid fa-triangle-exclamation"></i> Requer atenção imediata</span>`;
+            } else {
+                document.getElementById('kpiAtasCriticas').className = "text-2xl md:text-3xl font-bold text-brandGreen mt-1";
+                document.getElementById('kpiAtasCriticasDesc').innerHTML = `<span class="text-brandGreen font-semibold text-xs md:text-sm"><i class="fa-solid fa-circle-check"></i> Tudo regular</span>`;
+            }
+        }
+
+        // Renderização dos Gráficos com Chart.js
+        function renderCharts(rows) {
+            if (chartAcionamentoInst) chartAcionamentoInst.destroy();
+            if (chartAditamentoInst) chartAditamentoInst.destroy();
+            if (chartVencimentoInst) chartVencimentoInst.destroy();
+
+            const vtrNames = rows.map(r => r['VIATURA']);
+            const vtrAcionadas = rows.map(r => parseFloat(r['Qtdade Acionada']) || parseFloat(r['QTDADE ACIONADA']) || 0);
+            const vtrDisponiveis = rows.map(r => parseFloat(r['Quantidade Disponível para Acionamento']) || parseFloat(r['QTDADE REMANESCENTE']) || 0);
+
+            // Gráfico 1: Acionamento
+            const ctx1 = document.getElementById('chartAcionamento').getContext('2d');
+            chartAcionamentoInst = new Chart(ctx1, {
+                type: 'bar',
+                data: {
+                    labels: vtrNames,
+                    datasets: [
+                        {
+                            label: 'Qtdade Acionada',
+                            data: vtrAcionadas,
+                            backgroundColor: '#3b82f6',
+                            borderWidth: 0
+                        },
+                        {
+                            label: 'Quantidade Disponível',
+                            data: vtrDisponiveis,
+                            backgroundColor: '#f97316',
+                            borderWidth: 0
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: {
+                            stacked: true,
+                            ticks: { color: '#cbd5e1', font: { size: 12, weight: 'bold' } },
+                            grid: { color: '#202c38' }
+                        },
+                        y: {
+                            stacked: true,
+                            ticks: { color: '#cbd5e1', font: { size: 12 } },
+                            grid: { color: '#202c38' }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            labels: { color: '#f8fafc', font: { size: 12, weight: '500' } }
+                        }
+                    }
+                }
+            });
+
+            // Gráfico 2: Aditamentos
+            const aditRows = rows.filter(r => {
+                const aditado = parseFloat(r['QTDADE ADITADO']);
+                const possib = parseFloat(r['POSSIBILIDADE DE ADITAMENTO']);
+                return !isNaN(aditado) || !isNaN(possib);
+            });
+
+            const aditNames = aditRows.map(r => r['VIATURA']);
+            const aditQtd = aditRows.map(r => parseFloat(r['QTDADE ADITADO']) || 0);
+            const aditPoss = aditRows.map(r => parseFloat(r['POSSIBILIDADE DE ADITAMENTO']) || 0);
+
+            const ctx2 = document.getElementById('chartAditamento').getContext('2d');
+            chartAditamentoInst = new Chart(ctx2, {
+                type: 'bar',
+                data: {
+                    labels: aditNames,
+                    datasets: [
+                        {
+                            label: 'Qtdade Aditado',
+                            data: aditQtd,
+                            backgroundColor: '#22c55e',
+                            borderWidth: 0
+                        },
+                        {
+                            label: 'Possibilidade de Aditamento',
+                            data: aditPoss,
+                            backgroundColor: '#eab308',
+                            borderWidth: 0
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: {
+                            ticks: { color: '#cbd5e1', font: { size: 12, weight: 'bold' } },
+                            grid: { color: '#202c38' }
+                        },
+                        y: {
+                            ticks: { color: '#cbd5e1', font: { size: 12 } },
+                            grid: { color: '#202c38' }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            labels: { color: '#f8fafc', font: { size: 12, weight: '500' } }
+                        }
+                    }
+                }
+            });
+
+            // Gráfico 3: Vencimentos
+            const vtrRestantesLabels = rows.map(r => r['VIATURA']);
+            const vtrDiasRestantes = rows.map(r => {
+                const valStr = String(r['DIAS RESTANTES ATÉ O VENCIMENTO'] || '').toUpperCase();
+                if (valStr.includes('VENCIDA') || valStr.includes('VENCIDO')) return 0;
+                const num = parseFloat(r['Dias Restantes Numérico']);
+                return isNaN(num) ? 0 : num;
+            });
+
+            const colors = vtrDiasRestantes.map((dias, idx) => {
+                const originalStatus = String(rows[idx]['DIAS RESTANTES ATÉ O VENCIMENTO'] || '').toUpperCase();
+                if (originalStatus.includes('VENCIDA') || originalStatus.includes('VENCIDO') || dias <= 60) {
+                    return '#ef4444';
+                }
+                return '#475569';
+            });
+
+            const ctx3 = document.getElementById('chartVencimento').getContext('2d');
+            chartVencimentoInst = new Chart(ctx3, {
+                type: 'bar',
+                data: {
+                    labels: vtrRestantesLabels,
+                    datasets: [{
+                        label: 'Dias Restantes',
+                        data: vtrDiasRestantes,
+                        backgroundColor: colors,
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: {
+                            ticks: { color: '#cbd5e1', font: { size: 12, weight: 'bold' } },
+                            grid: { color: '#202c38' }
+                        },
+                        y: {
+                            ticks: { color: '#cbd5e1', font: { size: 12 } },
+                            grid: { color: '#202c38' }
+                        }
+                    },
+                    plugins: {
+                        legend: { display: false }
+                    }
+                }
+            });
+        }
+
+        // Tabela de Resumos de Viaturas
+        function renderSummaryTable(rows) {
+            const tbody = document.getElementById('summaryTableBody');
+            tbody.innerHTML = '';
+
+            rows.forEach(r => {
+                const viatura = r['VIATURA'];
+                const valUnit = formatCurrency(r['VALOR UNITÁRIO']);
+                const qtdAta = r['QTDADE ATA'] || '0';
+                const qtdAcionada = Math.round(parseFloat(r['Qtdade Acionada']) || parseFloat(r['QTDADE ACIONADA']) || 0);
+                const qtdReman = Math.round(parseFloat(r['Quantidade Disponível para Acionamento']) || parseFloat(r['QTDADE REMANESCENTE']) || 0);
+                const aditado = r['QTDADE ADITADO'] || '---';
+                const possib = r['POSSIBILIDADE DE ADITAMENTO'] || '---';
+                
+                const diasText = String(r['DIAS RESTANTES ATÉ O VENCIMENTO'] || '');
+                const vencimento = r['VENCIMENTO'] ? formatDate(r['VENCIMENTO']) : '---';
+                const status = r['Status'] || '---';
+                
+                const gid = GIDS_MAPPING[viatura] || '1002';
+                const linkSheets = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/edit?gid=${gid}#gid=${gid}`;
+
+                let statusColor = "bg-brandGreen/10 text-brandGreen border-brandGreen/25";
+                if (status.toUpperCase().includes('VENCIDO')) {
+                    statusColor = "bg-brandRed/10 text-brandRed border-brandRed/25";
+                }
+
+                let diasColor = "text-textLight font-medium";
+                if (diasText.toUpperCase().includes('VENCIDA') || (parseFloat(diasText) <= 60)) {
+                    diasColor = "text-brandRed font-bold";
+                }
+
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-black/15 border-b border-borderPanel/40 transition-all";
+                tr.innerHTML = `
+                    <td class="p-4 font-bold text-textLight">${viatura}</td>
+                    <td class="p-4 text-right font-medium text-textLight">${valUnit}</td>
+                    <td class="p-4 text-center font-medium">${qtdAta}</td>
+                    <td class="p-4 text-center text-brandGreen font-bold">${qtdAcionada}</td>
+                    <td class="p-4 text-center text-brandOrange font-bold">${qtdReman}</td>
+                    <td class="p-4 text-center font-medium">${aditado}</td>
+                    <td class="p-4 text-center font-medium">${possib}</td>
+                    <td class="p-4 text-center ${diasColor}">${diasText}</td>
+                    <td class="p-4 text-center font-semibold text-textLight">${vencimento}</td>
+                    <td class="p-4 text-center">
+                        <span class="px-2.5 py-1 rounded-full border text-[11px] font-bold ${statusColor}">${status}</span>
+                    </td>
+                    <td class="p-4 text-center">
+                        <a href="${linkSheets}" target="_blank" class="text-brandBlue hover:text-white transition-all font-bold" title="Abrir esta aba no Sheets">
+                            <i class="fa-solid fa-up-right-from-square"></i> Abrir
+                        </a>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // Compêndio de dados (Mapeador de sinônimos de colunas)
+        function getStandardFields(ac) {
+            const normalizedAc = {};
+            Object.keys(ac).forEach(k => {
+                normalizedAc[normalizeString(k)] = ac[k];
+            });
+
+            const getVal = (possibleKeys) => {
+                for (let key of possibleKeys) {
+                    const normKey = normalizeString(key);
+                    if (normalizedAc[normKey] !== undefined && normalizedAc[normKey] !== null && normalizedAc[normKey] !== '') {
+                        return String(normalizedAc[normKey]);
+                    }
+                }
+                return '---';
+            };
+
+            return {
+                sei: getVal(['Nº SEI DO ACIONAMENTO', 'N.º SEI DO ACIONAMENTO', 'N SEI DO ACIONAMENTO', 'PROCESSO SEI', 'SEI']),
+                status: getVal(['STATUS', 'STATUS FATURA', 'SITUAÇÃO']),
+                nc: getVal(['N.º NC', 'Nº NC', 'N. NC', 'NC', 'N.º EMPENHO', 'Nº EMPENHO', 'N. EMPENHO']),
+                nr: getVal(['N.º NR', 'Nº NR', 'N. NR', 'NR', 'N.º NL COTA', 'Nº NL COTA', 'N. NL COTA']),
+                valor: getVal(['VALOR NC', 'VALOR\nNC', 'VALOR_NC', 'VALOR EMPENHO', 'VALOR PAGO', 'VALOR CONTRATO / ADITAMENTO']),
+                opm: getVal(['OPM BENEFICIADA', 'OPM', 'OPM_BENEFICIADA']),
+                origem: getVal(['ORIGEM DO RECURSO', 'ORIGEM_RECURSO', 'TIPO DE EMENDA / CONVÊNIO', 'TIPO DE EMENDA / CONVNIO', 'PARLAMENTAR / EMENDA', 'ORIGEM', 'RECURSO']),
+                vencimento: getVal(['DATA DE VENCIMENTO DO CONTRATO', 'DATA VENCIMENTO', 'VENCIMENTO'])
+            };
+        }
+
+        // Lógica de Busca Global Avançada (Normalização Unicode, Uppercase Automático e Mapeamento Geral)
+        function handleSearch() {
+            const queryRaw = document.getElementById('globalSearchInput').value;
+            const query = normalizeString(queryRaw);
+            
+            const resultsSection = document.getElementById('searchResultsSection');
+            const resultsContainer = document.getElementById('searchResultsContainer');
+            const resultsCount = document.getElementById('resultsCount');
+            const clearBtn = document.getElementById('clearSearchBtn');
+
+            if (!query) {
+                clearSearch();
+                return;
+            }
+
+            clearBtn.classList.remove('hidden');
+            resultsSection.classList.remove('hidden');
+            resultsContainer.innerHTML = '';
+
+            let matches = [];
+
+            // Varre as abas detalhadas das viaturas
+            Object.keys(dbAllSheets).forEach(sheetName => {
+                const sheetData = dbAllSheets[sheetName];
+                
+                // 1. Acionamentos
+                if (sheetData.acionamentos && sheetData.acionamentos.length > 0) {
+                    sheetData.acionamentos.forEach((ac, idx) => {
+                        let rowMatch = false;
+                        let matchedFields = [];
+
+                        Object.keys(ac).forEach(col => {
+                            const rawVal = String(ac[col] || '');
+                            const valStrNorm = normalizeString(rawVal);
+                            
+                            if (valStrNorm.includes(query)) {
+                                rowMatch = true;
+                                matchedFields.push({
+                                    col: col,
+                                    val: rawVal
+                                });
+                            }
+                        });
+
+                        if (rowMatch) {
+                            matches.push({
+                                type: 'acionamento',
+                                sheet: sheetName,
+                                rowData: ac,
+                                matchedFields: matchedFields,
+                                index: idx
+                            });
+                        }
+                    });
+                }
+
+                // 2. Dados Gerais da ARP
+                if (sheetData.arp_info) {
+                    let arpMatch = false;
+                    let matchedFields = [];
+                    
+                    Object.keys(sheetData.arp_info).forEach(col => {
+                        const rawVal = String(sheetData.arp_info[col] || '');
+                        const valStrNorm = normalizeString(rawVal);
+                        
+                        if (valStrNorm.includes(query)) {
+                            arpMatch = true;
+                            matchedFields.push({
+                                col: col,
+                                val: rawVal
+                            });
+                        }
+                    });
+
+                    if (arpMatch) {
+                        matches.push({
+                            type: 'arp',
+                            sheet: sheetName,
+                            rowData: sheetData.arp_info,
+                            matchedFields: matchedFields
+                        });
+                    }
+                }
+            });
+
+            resultsCount.innerText = matches.length;
+
+            if (matches.length === 0) {
+                resultsContainer.innerHTML = `
+                    <div class="bg-bgPanel border border-borderPanel rounded-xl p-8 text-center">
+                        <i class="fa-solid fa-circle-info text-textMuted text-3xl mb-3"></i>
+                        <p class="text-sm font-semibold text-textLight">Nenhum registro encontrado para "${queryRaw}"</p>
+                        <p class="text-xs text-textMuted mt-1">Busque por outros termos ou cheque a planilha.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            matches.forEach((m, mIdx) => {
+                const gid = GIDS_MAPPING[m.sheet] || '1002';
+                const linkSheets = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/edit?gid=${gid}#gid=${gid}`;
+                
+                const card = document.createElement('div');
+                card.className = "bg-bgPanel border border-borderPanel hover:border-brandGreen/45 rounded-xl p-5 shadow-sm transition-all";
+                
+                let badgeType = "";
+                let bodyContent = "";
+
+                if (m.type === 'acionamento') {
+                    badgeType = `<span class="bg-brandBlue/10 text-brandBlue border border-brandBlue/25 px-2.5 py-1 rounded text-xs font-bold uppercase"><i class="fa-solid fa-file-invoice-dollar mr-1"></i> Acionamento / Empenho</span>`;
+                    
+                    // Extrai campos padronizados usando o compêndio
+                    const std = getStandardFields(m.rowData);
+
+                    let statusColor = "text-textLight font-medium";
+                    if (std.status.toUpperCase().includes('PAGO')) statusColor = "text-brandGreen font-bold";
+                    if (std.status.toUpperCase().includes('CANCELADO')) statusColor = "text-brandRed font-bold";
+
+                    // Gera a lista de todas as outras colunas para o acordeão expandível
+                    let extraRowsHtml = "";
+                    Object.keys(m.rowData).forEach(colName => {
+                        const val = m.rowData[colName];
+                        if (val !== undefined && val !== null && val !== '') {
+                            extraRowsHtml += `
+                                <tr class="border-b border-borderPanel/40 hover:bg-black/10 transition-all">
+                                    <td class="p-2 font-semibold text-textMuted w-1/3 text-xs uppercase">${colName}</td>
+                                    <td class="p-2 text-textLight font-medium text-xs break-all">${highlightText(val, queryRaw)}</td>
+                                </tr>
+                            `;
+                        }
+                    });
+
+                    bodyContent = `
+                        <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-4 text-sm">
+                            <div>
+                                <span class="text-textMuted block font-semibold text-xs uppercase">Nº SEI do Acionamento</span>
+                                <span class="text-textLight font-bold break-all">${highlightText(std.sei, queryRaw)}</span>
+                            </div>
+                            <div>
+                                <span class="text-textMuted block font-semibold text-xs uppercase">Nota de Empenho (NC)</span>
+                                <span class="text-textLight font-medium">${highlightText(std.nc, queryRaw)}</span>
+                            </div>
+                            <div>
+                                <span class="text-textMuted block font-semibold text-xs uppercase">Status Fatura</span>
+                                <span class="${statusColor}">${highlightText(std.status, queryRaw)}</span>
+                            </div>
+                            <div>
+                                <span class="text-textMuted block font-semibold text-xs uppercase">Valor do Empenho</span>
+                                <span class="text-textLight font-bold">${highlightText(formatCurrency(std.valor), queryRaw)}</span>
+                            </div>
+                            <div class="sm:col-span-2">
+                                <span class="text-textMuted block font-semibold text-xs uppercase">OPM Beneficiada</span>
+                                <span class="text-textLight font-medium">${highlightText(std.opm, queryRaw)}</span>
+                            </div>
+                            <div>
+                                <span class="text-textMuted block font-semibold text-xs uppercase">Origem do Recurso</span>
+                                <span class="text-brandOrange font-bold">${highlightText(std.origem, queryRaw)}</span>
+                            </div>
+                            <div>
+                                <span class="text-textMuted block font-semibold text-xs uppercase">Nº NR / Lote Cota</span>
+                                <span class="text-textLight font-medium">${highlightText(std.nr, queryRaw)}</span>
+                            </div>
+                        </div>
+
+                        <!-- Accordion Gaveta de Detalhes -->
+                        <div class="mt-4 border-t border-borderPanel/40 pt-3">
+                            <button onclick="toggleDetails('details-${mIdx}')" class="text-xs font-bold text-brandBlue hover:text-white transition-all flex items-center gap-1.5 focus:outline-none">
+                                <i class="fa-solid fa-chevron-down transition-transform duration-200" id="icon-details-${mIdx}"></i> 
+                                <span id="text-details-${mIdx}">Ver Todos os Detalhes da Linha</span>
+                            </button>
+                            
+                            <div id="details-${mIdx}" class="hidden mt-3 bg-black/25 border border-borderPanel rounded-lg p-3 max-h-[300px] overflow-y-auto">
+                                <table class="w-full text-left text-xs border-collapse">
+                                    <tbody>
+                                        ${extraRowsHtml}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    badgeType = `<span class="bg-brandGreen/10 text-brandGreen border border-brandGreen/25 px-2.5 py-1 rounded text-xs font-bold uppercase"><i class="fa-solid fa-file-contract mr-1"></i> Dados Gerais ARP</span>`;
+                    
+                    const empresa = m.rowData['EMPRESA DETENTORA'] || m.rowData['EMPRESA'] || '---';
+                    const cnpj = m.rowData['CNPJ'] || '---';
+                    const numAta = m.rowData['NÚMERO DA ATA'] || m.rowData['Nº ATA'] || '---';
+                    const validade = m.rowData['DATA VALIDADE'] || m.rowData['VALIDADE'] || '---';
+                    const marca = m.rowData['MARCA/MODELO'] || '---';
+
+                    bodyContent = `
+                        <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-4 text-sm">
+                            <div class="sm:col-span-2">
+                                <span class="text-textMuted block font-semibold text-xs uppercase">Empresa Detentora</span>
+                                <span class="text-textLight font-medium">${highlightText(empresa, queryRaw)}</span>
+                            </div>
+                            <div>
+                                <span class="text-textMuted block font-semibold text-xs uppercase">CNPJ</span>
+                                <span class="text-textLight font-medium">${highlightText(cnpj, queryRaw)}</span>
+                            </div>
+                            <div>
+                                <span class="text-textMuted block font-semibold text-xs uppercase">Nº da Ata</span>
+                                <span class="text-textLight font-medium">${highlightText(numAta, queryRaw)}</span>
+                            </div>
+                            <div>
+                                <span class="text-textMuted block font-semibold text-xs uppercase">Marca / Modelo</span>
+                                <span class="text-textLight font-medium">${highlightText(marca, queryRaw)}</span>
+                            </div>
+                            <div>
+                                <span class="text-textMuted block font-semibold text-xs uppercase">Vigência até</span>
+                                <span class="text-brandOrange font-bold">${formatDate(validade)}</span>
+                            </div>
+                        </div>
+                    `;
+                }
+
+                card.innerHTML = `
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-borderPanel/60 pb-3">
+                        <div class="flex items-center gap-3">
+                            <span class="text-base font-bold text-textLight tracking-wide uppercase">${m.sheet}</span>
+                            ${badgeType}
+                        </div>
+                        <a href="${linkSheets}" target="_blank" class="bg-brandBlue/10 hover:bg-brandBlue/20 text-brandBlue hover:text-white text-xs md:text-sm font-bold px-3 py-2 rounded transition-all flex items-center gap-1.5 w-fit">
+                            <i class="fa-solid fa-up-right-from-square"></i> Ir para Linha no Sheets
+                        </a>
+                    </div>
+                    ${bodyContent}
+                `;
+                resultsContainer.appendChild(card);
+            });
+        }
+
+        // Lógica de Expansão de Detalhes
+        window.toggleDetails = function(id) {
+            const el = document.getElementById(id);
+            const icon = document.getElementById(`icon-${id}`);
+            const text = document.getElementById(`text-${id}`);
+            
+            if (el.classList.contains('hidden')) {
+                el.classList.remove('hidden');
+                icon.classList.add('rotate-180');
+                text.innerText = "Ocultar Detalhes";
+            } else {
+                el.classList.add('hidden');
+                icon.classList.remove('rotate-180');
+                text.innerText = "Ver Todos os Detalhes da Linha";
+            }
+        };
+
+        function clearSearch() {
+            document.getElementById('globalSearchInput').value = '';
+            document.getElementById('searchResultsSection').classList.add('hidden');
+            document.getElementById('clearSearchBtn').classList.add('hidden');
+        }
+
+        function normalizeString(str) {
+            return String(str || '')
+                .toUpperCase()
+                .normalize("NFD")
+                .replace(/[\u0300-\u036f]/g, "")
+                .trim();
+        }
+
+        function highlightText(text, search) {
+            if (!text || text === 'null') return '---';
+            const textStr = String(text);
+            if (!search) return textStr;
+            
+            const normText = normalizeString(textStr);
+            const normSearch = normalizeString(search);
+            
+            const index = normText.indexOf(normSearch);
+            if (index === -1) return textStr;
+            
+            const start = textStr.substring(0, index);
+            const middle = textStr.substring(index, index + search.length);
+            const end = textStr.substring(index + search.length);
+            
+            return `${start}<mark class="bg-brandGreen/40 text-white font-bold rounded px-0.5">${middle}</mark>${end}`;
+        }
+
+        // Auxiliares de Formatação
+        function formatCurrency(val) {
+            if (!val || val === '---') return '---';
+            
+            if (typeof val === 'string') {
+                if (val.includes('R$')) return val.trim();
+                const num = parseFloat(val.replace(/[^\d,-]/g, '').replace(',', '.'));
+                if (isNaN(num)) return val;
+                val = num;
+            }
+            
+            return new Intl.NumberFormat('pt-BR', {
+                style: 'currency',
+                currency: 'BRL'
+            }).format(val);
+        }
+
+        function formatDate(dateStr) {
+            if (!dateStr || dateStr === '---') return '---';
+            
+            if (typeof dateStr === 'string' && dateStr.startsWith('Date(')) {
+                const parts = dateStr.replace('Date(', '').replace(')', '').split(',');
+                if (parts.length >= 3) {
+                    const y = parseInt(parts[0]);
+                    const m = parseInt(parts[1]) + 1;
+                    const d = parseInt(parts[2]);
+                    return `${String(d).padStart(2, '0')}/${String(m).padStart(2, '0')}/${y}`;
+                }
+            }
+            
+            try {
+                const parts = String(dateStr).split('T')[0].split('-');
+                if (parts.length === 3) {
+                    return `${parts[2]}/${parts[1]}/${parts[0]}`;
+                }
+            } catch(e) {}
+            
+            return dateStr;
+        }
+    </script>
+</body>
+</html>
