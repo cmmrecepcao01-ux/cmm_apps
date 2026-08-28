@@ -376,10 +376,6 @@
             <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z M12 10h-2v2H9v-2H7V9h2V7h1v2h2v1z"/></svg>
             CADÊ O CARRO?
         </a>
-        <button onclick="abrirProvidenciasGeral()" class="nav-btn" style="background: rgba(255, 85, 0, 0.15); border-color: #ff5500; color: #ff5500; cursor: pointer;">
-            <svg viewBox="0 0 24 24" style="width: 16px; height: 16px; fill: currentColor;"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>
-            PROVIDÊNCIAS ADM
-        </button>
     </div>
 </header>
 
@@ -387,40 +383,6 @@
     <div id="loader">CARREGANDO SISTEMA CMM...</div>
 
     <div id="dashboard" style="display:none">
-        <!-- SEÇÃO DE RESUMO DE PROVIDÊNCIAS GERAIS (SEMPRE VISÍVEL) -->
-        <div id="providencias-gerais-section" style="background:#161616; border:1px solid #ff5500; border-radius:12px; padding:20px; margin-bottom:20px; box-shadow: 0 4px 15px rgba(0,0,0,0.5);">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; border-bottom:1px solid #333; padding-bottom:8px;">
-                <span class="card-title" style="margin-bottom:0; color:#ff5500; font-weight:bold; letter-spacing:1px;">📝 DOCUMENTOS ELABORADOS</span>
-            </div>
-            <div class="kpi-grid" style="grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px;">
-                <div class="kpi-card" style="--accent:#ff5500" onclick="abrirProvidenciasViewFromResumo('NOTIFIC')">
-                    <div class="kpi-label">NOTIFICAÇÕES</div>
-                    <div class="kpi-value" id="resumo-total-notificacoes">0</div>
-                    <div class="kpi-sub">Ver lista detalhada ➔</div>
-                </div>
-                <div class="kpi-card" style="--accent:#00aaff" onclick="abrirProvidenciasViewFromResumo('OFIC')">
-                    <div class="kpi-label">OFÍCIOS</div>
-                    <div class="kpi-value" id="resumo-total-oficios">0</div>
-                    <div class="kpi-sub">Ver lista detalhada ➔</div>
-                </div>
-                <div class="kpi-card" style="--accent:#00ff90" onclick="abrirProvidenciasViewFromResumo('MSG')">
-                    <div class="kpi-label">MENSAGENS NUMERADAS</div>
-                    <div class="kpi-value" id="resumo-total-mensagens">0</div>
-                    <div class="kpi-sub">Ver lista detalhada ➔</div>
-                </div>
-                <div class="kpi-card" style="--accent:#ffdd00" onclick="abrirProvidenciasViewFromResumo('RELATORIO')">
-                    <div class="kpi-label">RELATÓRIOS</div>
-                    <div class="kpi-value" id="resumo-total-relatorios">0</div>
-                    <div class="kpi-sub">Ver lista detalhada ➔</div>
-                </div>
-                <div class="kpi-card" style="--accent:#da70d6" onclick="abrirProvidenciasViewFromResumo('ATA')">
-                    <div class="kpi-label">ATAS DE REUNIÃO</div>
-                    <div class="kpi-value" id="resumo-total-atas">0</div>
-                    <div class="kpi-sub">Ver lista detalhada ➔</div>
-                </div>
-            </div>
-        </div>
-
         <div style="display: flex; justify-content: space-between; align-items: center; margin: 30px 0 15px;">
     <div class="section-label" style="margin: 0; border-left: 4px solid #00ff90; padding-left: 10px;">▸ INDICADORES GERAIS (Clique no card para abrir lista)</div>
     <a href="https://drive.google.com/drive/folders/1XCuR_KFL9xGySxF4pOxlGgVGeOwSwWaK?usp=sharing" target="_blank" class="nav-btn btn-notificacao" style="font-size: 0.75rem; padding: 6px 12px; text-decoration: none;">
@@ -519,10 +481,6 @@
                 <svg viewBox="0 0 24 24" style="width:16px;height:16px;fill:currentColor;"><path d="M19 8H5c-1.66 0-3 1.34-3 3v6h4v4h12v-4h4v-6c0-1.66-1.34-3-3-3zm-3 11H8v-5h8v5zm3-7c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1zm-1-9H6v4h12V3z"/></svg>
                 IMPRIMIR
             </button>
-            <button onclick="abrirProvidenciasMarca()" style="background:#222;color:#ff5500;border:1px solid #ff5500;padding:10px 20px;border-radius:8px;cursor:pointer;font-weight:bold;letter-spacing:1px;transition:0.3s;display:flex;align-items:center;gap:8px;">
-                <svg viewBox="0 0 24 24" style="width:16px;height:16px;fill:currentColor;"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>
-                PROVIDÊNCIAS ADM
-            </button>
         </div>
         
         <div id="brand-main-title" class="brand-title-huge">MARCA</div>
@@ -563,76 +521,6 @@
 
         <div id="brand-print-footer" class="print-only signature-block"></div>
     </div>
-
-    <!-- SUB-DASHBOARD DE PROVIDÊNCIAS ADMINISTRATIVAS DETALHADAS -->
-    <div id="providencias-dashboard" style="display:none">
-        <div style="display: flex; gap: 10px; margin-bottom: 20px;">
-            <button onclick="closeProvidenciasView()" style="background:#222;color:#fff;border:1px solid #ff5500;padding:10px 20px;border-radius:8px;cursor:pointer;font-weight:bold;letter-spacing:1px;transition:0.3s">
-                ← VOLTAR
-            </button>
-            <button onclick="gerarRelatorioPDF('providencias')" style="background:#222;color:#fff;border:1px solid #ff5500;padding:10px 20px;border-radius:8px;cursor:pointer;font-weight:bold;letter-spacing:1px;transition:0.3s;display:flex;align-items:center;gap:8px;">
-                <svg viewBox="0 0 24 24" style="width:16px;height:16px;fill:currentColor;"><path d="M19 8H5c-1.66 0-3 1.34-3 3v6h4v4h12v-4h4v-6c0-1.66-1.34-3-3-3zm-3 11H8v-5h8v5zm3-7c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1zm-1-9H6v4h12V3z"/></svg>
-                IMPRIMIR
-            </button>
-            <button id="btnRelatorioProvidencias" onclick="alert('Gerador de Relatórios em breve!')" style="background:#222;color:#ffdd00;border:1px solid #ffdd00;padding:10px 20px;border-radius:8px;cursor:pointer;font-weight:bold;letter-spacing:1px;transition:0.3s;display:flex;align-items:center;gap:8px;">
-                <svg viewBox="0 0 24 24" style="width:16px;height:16px;fill:currentColor;"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>
-                RELATÓRIOS
-            </button>
-        </div>
-        
-        <div id="providencias-main-title" class="brand-title-huge" style="-webkit-text-stroke: 1px rgba(255, 85, 0, 0.4);">DOCUMENTOS ELABORADOS</div>
-        
-        <div class="kpi-grid" id="providencias-sub-kpis" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
-            <!-- KPIs dinâmicos -->
-        </div>
-
-        <div class="table-card" id="providencias-filter-panel" style="margin-bottom: 20px;">
-            <span class="card-title" style="color:#ff5500;">Filtros de Visualização</span>
-            <div style="display: flex; gap: 12px; flex-direction: column; margin-top:10px;">
-                <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
-                    <span style="color:#aaa; font-size:0.85rem; min-width:90px; font-weight:bold;">Situação:</span>
-                    <button onclick="filterProvidenciasByStatus('TODOS')" class="history-btn active" id="btn-prov-status-todos">TODOS</button>
-                    <button onclick="filterProvidenciasByStatus('RESPONDIDO')" class="history-btn" id="btn-prov-status-resp" style="border-color:#00ff9050; color:#00ff90;">RESPONDIDOS</button>
-                    <button onclick="filterProvidenciasByStatus('PENDENTE')" class="history-btn" id="btn-prov-status-pend" style="border-color:#ff8c0050; color:#ff8c00;">PENDENTES</button>
-                </div>
-                <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
-                    <span style="color:#aaa; font-size:0.85rem; min-width:90px; font-weight:bold;">Documento:</span>
-                    <button onclick="filterProvidenciasByType('TODOS')" class="history-btn active" id="btn-prov-type-todos">TODOS</button>
-                    <button onclick="filterProvidenciasByType('NOTIFIC')" class="history-btn" id="btn-prov-type-notif" style="border-color:#ff550050; color:#ff5500;">NOTIFICAÇÕES</button>
-                    <button onclick="filterProvidenciasByType('OFIC')" class="history-btn" id="btn-prov-type-ofic" style="border-color:#00aaff50; color:#00aaff;">OFÍCIOS</button>
-                    <button onclick="filterProvidenciasByType('MSG')" class="history-btn" id="btn-prov-type-msg" style="border-color:#00ff9050; color:#00ff90;">MENSAGENS</button>
-                    <button onclick="filterProvidenciasByType('RELATORIO')" class="history-btn" id="btn-prov-type-rel" style="border-color:#ffdd0050; color:#ffdd00;">RELATÓRIOS</button>
-                    <button onclick="filterProvidenciasByType('ATA')" class="history-btn" id="btn-prov-type-ata" style="border-color:#da70d650; color:#da70d6;">ATAS DE REUNIÃO</button>
-                </div>
-                <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
-                    <span style="color:#aaa; font-size:0.85rem; min-width:90px; font-weight:bold;">Pesquisar:</span>
-                    <input type="text" id="provSearchInput" onkeyup="searchProvidencias()" placeholder="Pesquisar por assunto, número de documento, contratada..." style="flex:1; min-width:250px; padding:10px; background:#222; border:1px solid #444; color:#fff; border-radius:8px; outline:none;">
-                </div>
-            </div>
-        </div>
-
-        <div class="section-label" id="providencias-subtitle" style="color:#ff5500; border-left-color:#ff5500">▸ REGISTROS ENCONTRADOS</div>
-        
-        <div class="table-card">
-            <div class="table-wrapper" style="max-height: 75vh;"> 
-                <table>
-                    <thead>
-                        <tr>
-                            <th onclick="sortProvidenciasTable('data')" style="cursor:pointer">Data <span id="sort-prov-data"></span></th>
-                            <th onclick="sortProvidenciasTable('contratada')" style="cursor:pointer">Contratada <span id="sort-prov-contratada"></span></th>
-                            <th onclick="sortProvidenciasTable('providencia')" style="cursor:pointer">Providência (Nº Doc) <span id="sort-prov-providencia"></span></th>
-                            <th onclick="sortProvidenciasTable('assunto')" style="cursor:pointer">Assunto <span id="sort-prov-assunto"></span></th>
-                            <th onclick="sortProvidenciasTable('respondido')" style="cursor:pointer">Respondido? <span id="sort-prov-respondido"></span></th>
-                            <th>Observações</th>
-                        </tr>
-                    </thead>
-                    <tbody id="providencias-table-body"></tbody>
-                </table>
-            </div>
-            <div id="providencias-table-print-summary" class="print-only print-summary-box"></div>
-        </div>
-        <div id="providencias-print-footer" class="print-only signature-block"></div>
-    </div>
 </main>
 
 <div id="buscaModalOverlay" onclick="fecharBuscaDados()" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.85);z-index:2000;"></div>
@@ -663,16 +551,6 @@
     <div id="modalContent"></div>
 </div>
 
-<!-- OVERLAY E MODAL DE DETALHES DE PROVIDÊNCIAS -->
-<div id="provModalOverlay" onclick="closeProvidenciaModal()" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.85);z-index:3999;"></div>
-<div id="providenciaDetailsModal" style="display:none;position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);width:95%;max-width:550px;background:#1a1a1a;border:2px solid #ff5500;border-radius:16px;z-index:4000;padding:30px;box-shadow:0 0 60px rgba(0,0,0,0.9);max-height:90vh;overflow-y:auto">
-    <div class="modal-header" style="margin-bottom:15px; padding-bottom:10px;">
-        <h3 id="provModalTitle" style="color:#fff; letter-spacing:1px">DETALHES DA PROVIDÊNCIA</h3>
-        <span onclick="closeProvidenciaModal()" style="cursor:pointer;color:#ff5500; font-weight:bold">✕ FECHAR</span>
-    </div>
-    <div id="provModalContent"></div>
-</div>
-
 <script>
 Chart.defaults.color = '#ffffff';
 Chart.defaults.font.size = 13;
@@ -690,8 +568,6 @@ const COLORS = ["#00ff90", "#ff8c00", "#00aaff", "#ff4d6d", "#b44dff", "#ffdd00"
 let allData = [];
 let rawHistoryData = [];
 let charts = {};
-const API_URL = "https://script.google.com/macros/s/AKfycbxPloG_YjMC01xXQnTUsiTpBd7dcPxairGe9_i2DUzRiY59nuMl6eGsITtke5cjOAdb/exec";
-let providenciasData = [];
 const URL_BANCO_DADOS = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSwYd0zPPCAVAWrx2XMWfPNY1ko6UGt9--kHygtU-UpVGVRGQUyirFry2CSmU7MB6on-R0nwt3LStbl/pub?gid=1127142228&single=true&output=csv";
 let cacheBancoDados = null;
 const CONTATOS_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSwYd0zPPCAVAWrx2XMWfPNY1ko6UGt9--kHygtU-UpVGVRGQUyirFry2CSmU7MB6on-R0nwt3LStbl/pub?gid=743010356&single=true&output=csv";
@@ -1727,36 +1603,6 @@ function renderSubDashboardStatsAndGroupings(dados, prefix) {
 }
 
 function gerarRelatorioPDF(prefix) {
-    if (prefix === 'providencias') {
-        const dataHoje = new Date().toLocaleDateString('pt-BR');
-        const total = providenciasFiltradas.length;
-        const respondidas = providenciasFiltradas.filter(p => {
-            const resp = (p.respondido || "").toUpperCase().trim();
-            return resp === "SIM" || resp === "RESOLVIDO";
-        }).length;
-        const pendentes = total - respondidas;
-        
-        let summary = `<strong>Relatório Consolidado de Providências Administrativas:</strong><br>`;
-        summary += `Total de <b>${total}</b> documento(s) listado(s). `;
-        summary += `Destes, <b>${respondidas}</b> foram respondidos/resolvidos e <b>${pendentes}</b> continuam pendentes de providências pela contratada.`;
-        
-        document.getElementById(`providencias-table-print-summary`).className = "print-only print-summary-box";
-        document.getElementById(`providencias-table-print-summary`).innerHTML = summary;
-        
-        const footerHtml = `
-            <div style="display: flex; justify-content: flex-end; width: 100%; margin-top: 30px;">
-                <div class="signature-box">Espaço para Assinatura Digital GOV.BR</div>
-            </div>
-            <div style="clear: both;"></div>
-            <div style="margin-top: 15px; font-weight: bold; color: #fff; font-size: 0.95rem;">
-                ${dataHoje} &mdash; Assinatura &mdash; Gestor de Contrato CMM
-            </div>
-        `;
-        document.getElementById(`providencias-print-footer`).innerHTML = footerHtml;
-        window.print();
-        return;
-    }
-
     const dadosRelatorio = prefix === 'brand' ? dadosDaMarcaAtual : dadosCriticosAtuais;
     const nomePainel = prefix === 'brand' ? document.getElementById("brand-main-title").innerText : "CASOS CRÍTICOS";
     const dataHoje = new Date().toLocaleDateString('pt-BR');
@@ -1911,520 +1757,36 @@ function loadContatos(callback) {
     });
 }
 
-let providenciasFiltradas = [];
-let statusFiltroProvidencias = 'TODOS';
-let tipoDocumentoFiltro = '';
-let marcaFiltroProvidencias = '';
-let sortDirectionProvidencias = {};
-
-function loadProvidencias(callback) {
-    const url = API_URL + "?action=getProvidencias";
-    fetch(url)
-        .then(response => response.json())
-        .then(data => {
-            if (Array.isArray(data)) {
-                providenciasData = data;
-            } else {
-                console.error("Dados de providencias invalidos:", data);
-            }
-            if (callback) callback();
-        })
-        .catch(err => {
-            console.error("Erro ao carregar providencias:", err);
-            if (callback) callback();
-        });
-}
-
-function verificarTipoDocumento(prov, ass, tipo) {
-    function normalizar(str) {
-        if (!str) return "";
-        return str.toString()
-                  .toLowerCase()
-                  .normalize("NFD")
-                  .replace(/[\u0300-\u036f]/g, "") // remove acentos
-                  .trim();
-    }
-    
-    const provNorm = normalizar(prov);
-    const assNorm = normalizar(ass);
-    const tipoNorm = normalizar(tipo); // 'notific', 'ofic', 'msg', 'relatorio', 'ata'
-    
-    if (tipoNorm === 'notific') {
-        return provNorm.includes("notific") || assNorm.includes("notific");
-    }
-    if (tipoNorm === 'ofic') {
-        return provNorm.includes("ofic") || assNorm.includes("ofic");
-    }
-    if (tipoNorm === 'msg' || tipoNorm === 'mensagem') {
-        return provNorm.includes("msg") || provNorm.includes("mensagem") || 
-               assNorm.includes("msg") || assNorm.includes("mensagem");
-    }
-    if (tipoNorm === 'relatorio') {
-        return provNorm.includes("relator") || assNorm.includes("relator");
-    }
-    if (tipoNorm === 'ata' || tipoNorm === 'ata de reuniao') {
-        return provNorm.includes("ata") || assNorm.includes("ata");
-    }
-    return false;
-}
-
-function updateProvidenciasResumoContadores() {
-    let totalNotificacoes = 0;
-    let totalOficios = 0;
-    let totalMensagens = 0;
-    let totalRelatorios = 0;
-    let totalAtas = 0;
-    
-    providenciasData.forEach(p => {
-        const prov = p.providencia || "";
-        const ass = p.assunto || "";
-        if (verificarTipoDocumento(prov, ass, 'notific')) totalNotificacoes++;
-        if (verificarTipoDocumento(prov, ass, 'ofic')) totalOficios++;
-        if (verificarTipoDocumento(prov, ass, 'msg')) totalMensagens++;
-        if (verificarTipoDocumento(prov, ass, 'relatorio')) totalRelatorios++;
-        if (verificarTipoDocumento(prov, ass, 'ata')) totalAtas++;
-    });
-    
-    document.getElementById("resumo-total-notificacoes").innerText = totalNotificacoes;
-    document.getElementById("resumo-total-oficios").innerText = totalOficios;
-    document.getElementById("resumo-total-mensagens").innerText = totalMensagens;
-    document.getElementById("resumo-total-relatorios").innerText = totalRelatorios;
-    document.getElementById("resumo-total-atas").innerText = totalAtas;
-}
-
-// O botão do menu superior PROVIDENCIAS ADM rola a página suavemente até os Documentos Elaborados
-function abrirProvidenciasGeral() {
-    const sec = document.getElementById("providencias-gerais-section");
-    sec.scrollIntoView({ behavior: 'smooth' });
-}
-
-// Abre o subdashboard de providencias a partir da tela principal (resumo)
-function abrirProvidenciasViewFromResumo(tipo) {
-    tipoDocumentoFiltro = (tipo === 'TODOS') ? '' : tipo; // 'NOTIFIC', 'OFIC', 'MSG', 'RELATORIO', 'ATA' ou ''
-    marcaFiltroProvidencias = ''; // Sem filtro de marca
-    statusFiltroProvidencias = 'TODOS';
-    document.getElementById("provSearchInput").value = "";
-    
-    let subTitle = "Todos os Documentos";
-    if (tipo === 'NOTIFIC') subTitle = "Filtrado por Notificações";
-    if (tipo === 'OFIC') subTitle = "Filtrado por Ofícios";
-    if (tipo === 'MSG') subTitle = "Filtrado por Mensagens Numeradas";
-    if (tipo === 'RELATORIO') subTitle = "Filtrado por Relatórios";
-    if (tipo === 'ATA') subTitle = "Filtrado por Atas de Reunião";
-    
-    abrirProvidenciasDashboardCommon(subTitle);
-}
-
-// Abre o subdashboard de providencias a partir da subpagina de marcas
-function abrirProvidenciasMarca() {
-    const marca = document.getElementById("brand-main-title").innerText;
-    marcaFiltroProvidencias = marca;
-    tipoDocumentoFiltro = ''; // Sem filtro de tipo de documento
-    statusFiltroProvidencias = 'TODOS';
-    document.getElementById("provSearchInput").value = "";
-    
-    abrirProvidenciasDashboardCommon(`Marca: ${marca}`);
-}
-
-function abrirProvidenciasDashboardCommon(subtitulo) {
-    // Esconde os outros paineis
-    document.getElementById("dashboard").style.display = "none";
-    document.getElementById("brand-dashboard").style.display = "none";
-    document.getElementById("critico-dashboard").style.display = "none";
-    
-    // Exibe o de providencias
-    document.getElementById("providencias-dashboard").style.display = "block";
-    document.getElementById("providencias-main-title").innerText = "DOCUMENTOS ELABORADOS";
-    document.getElementById("providencias-subtitle").innerText = `▸ ${subtitulo.toUpperCase()}`;
-    
-    // Atualiza classes dos botoes de status e tipo
-    updateFiltroStatusButtonsUI();
-    updateFiltroTipoButtonsUI();
-    
-    // Aplica o filtro e renderiza
-    applyProvidenciasFiltersAndRender();
-    
-    window.scrollTo(0, 0);
-}
-
-function filterProvidenciasByType(tipo) {
-    tipoDocumentoFiltro = (tipo === 'TODOS') ? '' : tipo;
-    updateFiltroTipoButtonsUI();
-    
-    let subTitle = "Todos os Documentos";
-    if (tipo === 'NOTIFIC') subTitle = "Filtrado por Notificações";
-    if (tipo === 'OFIC') subTitle = "Filtrado por Ofícios";
-    if (tipo === 'MSG') subTitle = "Filtrado por Mensagens Numeradas";
-    if (tipo === 'RELATORIO') subTitle = "Filtrado por Relatórios";
-    if (tipo === 'ATA') subTitle = "Filtrado por Atas de Reunião";
-    
-    if (marcaFiltroProvidencias) {
-        subTitle = `Marca: ${marcaFiltroProvidencias} — ${subTitle}`;
-    }
-    document.getElementById("providencias-subtitle").innerText = `▸ ${subTitle.toUpperCase()}`;
-    
-    applyProvidenciasFiltersAndRender();
-}
-
-function updateFiltroTipoButtonsUI() {
-    document.getElementById("btn-prov-type-todos").classList.remove("active");
-    document.getElementById("btn-prov-type-notif").classList.remove("active");
-    document.getElementById("btn-prov-type-ofic").classList.remove("active");
-    document.getElementById("btn-prov-type-msg").classList.remove("active");
-    document.getElementById("btn-prov-type-rel").classList.remove("active");
-    if (document.getElementById("btn-prov-type-ata")) {
-        document.getElementById("btn-prov-type-ata").classList.remove("active");
-    }
-    
-    const activeType = tipoDocumentoFiltro || 'TODOS';
-    if (activeType === 'TODOS') document.getElementById("btn-prov-type-todos").classList.add("active");
-    if (activeType === 'NOTIFIC') document.getElementById("btn-prov-type-notif").classList.add("active");
-    if (activeType === 'OFIC') document.getElementById("btn-prov-type-ofic").classList.add("active");
-    if (activeType === 'MSG') document.getElementById("btn-prov-type-msg").classList.add("active");
-    if (activeType === 'RELATORIO') document.getElementById("btn-prov-type-rel").classList.add("active");
-    if (activeType === 'ATA' && document.getElementById("btn-prov-type-ata")) {
-        document.getElementById("btn-prov-type-ata").classList.add("active");
-    }
-}
-
-function closeProvidenciasView() {
-    document.getElementById("providencias-dashboard").style.display = "none";
-    
-    if (marcaFiltroProvidencias) {
-        // Se veio do subdashboard de marcas, volta para ele
-        document.getElementById("brand-dashboard").style.display = "block";
-    } else {
-        // Senão volta ao geral
-        document.getElementById("dashboard").style.display = "block";
-    }
-    window.scrollTo(0, 0);
-}
-
-function updateFiltroStatusButtonsUI() {
-    document.getElementById("btn-prov-status-todos").classList.remove("active");
-    document.getElementById("btn-prov-status-resp").classList.remove("active");
-    document.getElementById("btn-prov-status-pend").classList.remove("active");
-    
-    if (statusFiltroProvidencias === 'TODOS') {
-        document.getElementById("btn-prov-status-todos").classList.add("active");
-    } else if (statusFiltroProvidencias === 'RESPONDIDO') {
-        document.getElementById("btn-prov-status-resp").classList.add("active");
-    } else if (statusFiltroProvidencias === 'PENDENTE') {
-        document.getElementById("btn-prov-status-pend").classList.add("active");
-    }
-}
-
-function filterProvidenciasByStatus(status) {
-    statusFiltroProvidencias = status;
-    updateFiltroStatusButtonsUI();
-    applyProvidenciasFiltersAndRender();
-}
-
-function searchProvidencias() {
-    applyProvidenciasFiltersAndRender();
-}
-
-function applyProvidenciasFiltersAndRender() {
-    let dados = providenciasData;
-    
-    // 1. Filtro de marca
-    if (marcaFiltroProvidencias) {
-        dados = dados.filter(p => (p.contratada || "").toUpperCase().includes(marcaFiltroProvidencias.toUpperCase()));
-    }
-    
-    // 2. Filtro de tipo de documento
-    if (tipoDocumentoFiltro) {
-        dados = dados.filter(p => {
-            const prov = p.providencia || "";
-            const ass = p.assunto || "";
-            return verificarTipoDocumento(prov, ass, tipoDocumentoFiltro);
-        });
-    }
-    
-    // 3. Filtro de status (Respondido / Pendente)
-    if (statusFiltroProvidencias !== 'TODOS') {
-        dados = dados.filter(p => {
-            const resp = (p.respondido || "").toUpperCase().trim();
-            const isRespondido = (resp === "SIM" || resp === "RESOLVIDO");
-            if (statusFiltroProvidencias === 'RESPONDIDO') return isRespondido;
-            if (statusFiltroProvidencias === 'PENDENTE') return !isRespondido;
-            return true;
-        });
-    }
-    
-    // 4. Pesquisa de texto
-    const term = document.getElementById("provSearchInput").value.toLowerCase().trim();
-    if (term) {
-        dados = dados.filter(p => 
-            (p.data || "").toLowerCase().includes(term) ||
-            (p.contratada || "").toLowerCase().includes(term) ||
-            (p.providencia || "").toLowerCase().includes(term) ||
-            (p.assunto || "").toLowerCase().includes(term) ||
-            (p.observacoes || "").toLowerCase().includes(term)
-        );
-    }
-    
-    providenciasFiltradas = dados;
-    
-    // Renderiza KPIs do subdashboard
-    renderProvidenciasSubKpis(providenciasFiltradas);
-    
-    // Renderiza Tabela
-    renderProvidenciasTable(providenciasFiltradas);
-}
-
-function renderProvidenciasSubKpis(lista) {
-    const total = lista.length;
-    const respondidos = lista.filter(p => {
-        const resp = (p.respondido || "").toUpperCase().trim();
-        return resp === "SIM" || resp === "RESOLVIDO";
-    }).length;
-    const pendentes = total - respondidos;
-    
-    let totalNotificacoes = 0;
-    let totalOficios = 0;
-    let totalMensagens = 0;
-    let totalRelatorios = 0;
-    let totalAtas = 0;
-    
-    lista.forEach(p => {
-        const prov = p.providencia || "";
-        const ass = p.assunto || "";
-        if (verificarTipoDocumento(prov, ass, 'notific')) totalNotificacoes++;
-        if (verificarTipoDocumento(prov, ass, 'ofic')) totalOficios++;
-        if (verificarTipoDocumento(prov, ass, 'msg')) totalMensagens++;
-        if (verificarTipoDocumento(prov, ass, 'relatorio')) totalRelatorios++;
-        if (verificarTipoDocumento(prov, ass, 'ata')) totalAtas++;
-    });
-    
-    const kpiHtml = `
-        <div class="kpi-card" style="--accent:#e65c00">
-            <div class="kpi-label">TOTAL PENDÊNCIA/RESOLVIDO</div>
-            <div class="kpi-value">${total}</div>
-            <div class="kpi-sub" style="color:#e65c00; font-weight:bold">${pendentes} pendentes / ${respondidos} resolvidos</div>
-        </div>
-        <div class="kpi-card" style="--accent:#ff5500">
-            <div class="kpi-label">NOTIFICAÇÕES</div>
-            <div class="kpi-value">${totalNotificacoes}</div>
-            <div class="kpi-sub" style="color:#ff5500; font-weight:bold">Notificações enviadas</div>
-        </div>
-        <div class="kpi-card" style="--accent:#00aaff">
-            <div class="kpi-label">OFÍCIOS</div>
-            <div class="kpi-value">${totalOficios}</div>
-            <div class="kpi-sub" style="color:#00aaff; font-weight:bold">Ofícios emitidos</div>
-        </div>
-        <div class="kpi-card" style="--accent:#00ff90">
-            <div class="kpi-label">MENSAGENS NUMERADAS</div>
-            <div class="kpi-value">${totalMensagens}</div>
-            <div class="kpi-sub" style="color:#00ff90; font-weight:bold">Mensagens expedidas</div>
-        </div>
-        <div class="kpi-card" style="--accent:#ffdd00">
-            <div class="kpi-label">RELATÓRIOS</div>
-            <div class="kpi-value">${totalRelatorios}</div>
-            <div class="kpi-sub" style="color:#ffdd00; font-weight:bold">Relatórios elaborados</div>
-        </div>
-        <div class="kpi-card" style="--accent:#da70d6">
-            <div class="kpi-label">ATAS DE REUNIÃO</div>
-            <div class="kpi-value">${totalAtas}</div>
-            <div class="kpi-sub" style="color:#da70d6; font-weight:bold">Atas elaboradas</div>
-        </div>
-    `;
-    document.getElementById("providencias-sub-kpis").innerHTML = kpiHtml;
-}
-
-function renderProvidenciasTable(dados) {
-    if (dados.length === 0) {
-        document.getElementById("providencias-table-body").innerHTML = `
-            <tr>
-                <td colspan="6" style="text-align:center; color:#666; font-style:italic; padding: 20px;">
-                    Nenhum documento encontrado com os filtros atuais.
-                </td>
-            </tr>
-        `;
-        return;
-    }
-    
-    document.getElementById("providencias-table-body").innerHTML = dados.map((p, idx) => {
-        let respondidoBadge = "";
-        const resp = (p.respondido || "").toUpperCase().trim();
-        if (resp === "SIM" || resp === "RESOLVIDO") {
-            respondidoBadge = `<span class="badge badge-green">RESPONDIDO</span>`;
-        } else if (resp === "NÃO" || resp === "PENDENTE") {
-            respondidoBadge = `<span class="badge badge-orange">PENDENTE</span>`;
-        } else {
-            respondidoBadge = `<span class="badge" style="background:#444; color:#fff; border:1px solid #555;">${p.respondido || "-"}</span>`;
-        }
-        
-        let providenciaCel = p.providencia || "-";
-        Object.keys(MAPA_LINKS_SEI).forEach(seiNum => {
-            if (providenciaCel.includes(seiNum)) {
-                providenciaCel = providenciaCel.replace(seiNum, `<a href="${MAPA_LINKS_SEI[seiNum]}" target="_blank" style="color: #00aaff; font-weight: bold; text-decoration: underline;" onclick="event.stopPropagation();">${seiNum} 🔗</a>`);
-            }
-        });
-        
-        let assuntoCel = p.assunto || "-";
-        Object.keys(MAPA_LINKS_SEI).forEach(seiNum => {
-            if (assuntoCel.includes(seiNum)) {
-                assuntoCel = assuntoCel.replace(seiNum, `<a href="${MAPA_LINKS_SEI[seiNum]}" target="_blank" style="color: #00aaff; font-weight: bold; text-decoration: underline;" onclick="event.stopPropagation();">${seiNum} 🔗</a>`);
-            }
-        });
-        
-        let obsTabela = p.observacoes || "-";
-        if (obsTabela.length > 80) {
-            obsTabela = obsTabela.substring(0, 77) + "...";
-        }
-        
-        const originalIdx = providenciasData.indexOf(p);
-        
-        return `<tr onclick="showProvidenciaDetails(${originalIdx})">
-            <td>${p.data || "-"}</td>
-            <td style="color:#ff8c00; font-weight:bold">${p.contratada || "-"}</td>
-            <td style="color:#fff;">${providenciaCel}</td>
-            <td>${assuntoCel}</td>
-            <td style="text-align:center;">${respondidoBadge}</td>
-            <td style="color:#aaa; font-style:italic; max-width:300px;">${obsTabela}</td>
-        </tr>`;
-    }).join("");
-}
-
-function showProvidenciaDetails(index) {
-    const p = providenciasData[index];
-    document.getElementById("provModalTitle").innerText = `DETALHES DA PROVIDÊNCIA`;
-    
-    let providenciaCel = p.providencia || "-";
-    Object.keys(MAPA_LINKS_SEI).forEach(seiNum => {
-        if (providenciaCel.includes(seiNum)) {
-            providenciaCel = providenciaCel.replace(seiNum, `<a href="${MAPA_LINKS_SEI[seiNum]}" target="_blank" style="color: #00aaff; font-weight: bold; text-decoration: underline;">${seiNum} 🔗 (ABRIR NO SEI)</a>`);
-        }
-    });
-    
-    let assuntoCel = p.assunto || "-";
-    Object.keys(MAPA_LINKS_SEI).forEach(seiNum => {
-        if (assuntoCel.includes(seiNum)) {
-            assuntoCel = assuntoCel.replace(seiNum, `<a href="${MAPA_LINKS_SEI[seiNum]}" target="_blank" style="color: #00aaff; font-weight: bold; text-decoration: underline;">${seiNum} 🔗 (ABRIR NO SEI)</a>`);
-        }
-    });
-
-    let respondidoBadge = "";
-    const resp = (p.respondido || "").toUpperCase().trim();
-    if (resp === "SIM" || resp === "RESOLVIDO") {
-        respondidoBadge = `<span class="badge badge-green" style="font-size:0.8rem; padding:6px 12px;">RESPONDIDO</span>`;
-    } else {
-        respondidoBadge = `<span class="badge badge-orange" style="font-size:0.8rem; padding:6px 12px;">PENDENTE DE RESPOSTA</span>`;
-    }
-    
-    let html = `
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; background:#222; padding:15px; border-radius:8px; border-left:4px solid #ff5500;">
-            <div>
-                <span class="detail-label">Status do Documento</span>
-                ${respondidoBadge}
-            </div>
-            <div style="text-align:right;">
-                <span class="detail-label">Data de Registro</span>
-                <strong style="color:#fff; font-size:1rem;">${p.data || "-"}</strong>
-            </div>
-        </div>
-        
-        <div class="detail-item">
-            <span class="detail-label">Contratada / Empresa</span>
-            <strong style="color:#ff8c00; font-size:1.1rem;">${p.contratada || "-"}</strong>
-        </div>
-        
-        <div class="detail-item">
-            <span class="detail-label">Providência (Número do Documento)</span>
-            <span style="color:#fff; font-size:1rem;">${providenciaCel}</span>
-        </div>
-        
-        <div class="detail-item">
-            <span class="detail-label">Assunto</span>
-            <span style="color:#ccc; font-size:0.95rem;">${assuntoCel}</span>
-        </div>
-        
-        <div class="detail-item" style="border-bottom:none;">
-            <span class="detail-label">Observações / Histórico</span>
-            <div style="background:#222; padding:12px; border-radius:6px; font-style:italic; color:#eee; line-height:1.4; border:1px solid #333; margin-top:5px;">
-                ${p.observacoes || "Nenhuma observação específica cadastrada."}
-            </div>
-        </div>
-        
-        <div style="margin-top:25px; padding:15px; background:rgba(0, 170, 255, 0.1); border:1px solid rgba(0, 170, 255, 0.3); border-radius:8px; text-align:center;">
-            <strong style="color:#00aaff; font-size:0.85rem; text-transform:uppercase; display:block; margin-bottom:8px;">📁 Documentação Geral da Pasta CMM</strong>
-            <p style="font-size:0.75rem; color:#aaa; margin-bottom:12px;">Acesse todos os documentos, ofícios e comprovantes de notificações na nossa pasta compartilhada:</p>
-            <a href="https://drive.google.com/drive/u/2/folders/1XCuR_KFL9xGySxF4pOxlGgVGeOwSwWaK" target="_blank" class="nav-btn" style="background:#00aaff; color:#000; font-weight:bold; justify-content:center; text-decoration:none; padding:10px; border-radius:6px; display:flex; align-items:center; gap:8px;">
-                <svg viewBox="0 0 24 24" style="width:18px;height:18px;fill:currentColor;"><path d="M20 6h-8l-2-2H4c-1.1 0-1.99.9-1.99 2L4 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm-8 11H4v-2h8v2zm8-4H4v-2h16v2zm0-4H4V7h16v2z"/></svg>
-                ABRIR PASTA G-DRIVE
-            </a>
-        </div>
-    `;
-    
-    document.getElementById("provModalContent").innerHTML = html;
-    document.getElementById("provModalOverlay").style.display = "block";
-    document.getElementById("providenciaDetailsModal").style.display = "block";
-}
-
-function closeProvidenciaModal() {
-    document.getElementById("provModalOverlay").style.display = "none";
-    document.getElementById("providenciaDetailsModal").style.display = "none";
-}
-
-function sortProvidenciasTable(coluna) {
-    const key = 'prov-' + coluna;
-    if (sortDirectionProvidencias[key] === 'asc') sortDirectionProvidencias[key] = 'desc';
-    else sortDirectionProvidencias[key] = 'asc';
-    const direction = sortDirectionProvidencias[key];
-    
-    document.querySelectorAll(`th span[id^="sort-prov-"]`).forEach(span => span.innerHTML = '');
-    document.getElementById(`sort-prov-${coluna}`).innerHTML = direction === 'asc' ? ' ▲' : ' ▼';
-    
-    providenciasFiltradas.sort((a, b) => {
-        let valA = (a[coluna] || '').toString().toLowerCase();
-        let valB = (b[coluna] || '').toString().toLowerCase();
-        
-        if (coluna === 'data') {
-            const dA = (a.data || '').split('/');
-            const dB = (b.data || '').split('/');
-            valA = dA.length === 3 ? new Date(dA[2], dA[1] - 1, dA[0]).getTime() : 0;
-            valB = dB.length === 3 ? new Date(dB[2], dB[1] - 1, dB[0]).getTime() : 0;
-        }
-        
-        if (valA < valB) return direction === 'asc' ? -1 : 1;
-        if (valA > valB) return direction === 'asc' ? 1 : -1;
-        return 0;
-    });
-    
-    renderProvidenciasTable(providenciasFiltradas);
-}
-
 function init() {
     loadContatos(() => {
-        loadProvidencias(() => {
-            updateProvidenciasResumoContadores();
-            Papa.parse(CSV_URL, {
-                download: true, header: true, skipEmptyLines: true,
-                complete(results) {
-                try {
-                    rawHistoryData = results.data.filter(r => findVal(r, MAP.placa).length > 3);
-                    allData = rawHistoryData;
+        Papa.parse(CSV_URL, {
+            download: true, header: true, skipEmptyLines: true,
+            complete(results) {
+            try {
+                // Guarda TUDO no histórico
+                rawHistoryData = results.data.filter(r => findVal(r, MAP.placa).length > 3);
+                
+                // allData agora será a lista de todos os registros históricos (acionamentos)
+                allData = rawHistoryData;
 
-                    document.getElementById("loader").style.display = "none";
-                    document.getElementById("dashboard").style.display = "block";
-                    renderKPIs(allData);
-                    renderCharts(allData);
-                    renderTable(allData);
-                } catch (e) {
-                    console.error("Erro ao processar os dados:", e);
-                    document.getElementById("loader").innerHTML = `<div style="color:#ff4d6d; font-size:1.1rem; padding: 20px; text-align:center;">
-                        ❌ ERRO AO PROCESSAR DADOS:<br><span style="font-size:0.9rem; color:#aaa;">${e.message}</span>
-                    </div>`;
-                }
-            },
-            error(err) {
-                console.error("Erro ao baixar a planilha:", err);
+                document.getElementById("loader").style.display = "none";
+                document.getElementById("dashboard").style.display = "block";
+                renderKPIs(allData);
+                renderCharts(allData);
+                renderTable(allData);
+            } catch (e) {
+                console.error("Erro ao processar os dados:", e);
                 document.getElementById("loader").innerHTML = `<div style="color:#ff4d6d; font-size:1.1rem; padding: 20px; text-align:center;">
-                    ❌ ERRO DE CONEXÃO:<br><span style="font-size:0.9rem; color:#aaa;">Não foi possível baixar os dados da planilha. Verifique a sua conexão de rede.</span>
+                    ❌ ERRO AO PROCESSAR DADOS:<br><span style="font-size:0.9rem; color:#aaa;">${e.message}</span>
                 </div>`;
             }
-            });
+        },
+        error(err) {
+            console.error("Erro ao baixar a planilha:", err);
+            document.getElementById("loader").innerHTML = `<div style="color:#ff4d6d; font-size:1.1rem; padding: 20px; text-align:center;">
+                ❌ ERRO DE CONEXÃO:<br><span style="font-size:0.9rem; color:#aaa;">Não foi possível baixar os dados da planilha. Verifique a sua conexão de rede.</span>
+            </div>`;
+        }
         });
     });
 }

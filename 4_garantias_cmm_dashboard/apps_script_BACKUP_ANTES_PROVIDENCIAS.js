@@ -165,80 +165,8 @@ function doGet(e) {
     return handleGetTicketsAtivos(e.parameter.opm, e.parameter.placa);
   }
   
-  if (action === "getProvidencias") {
-    return handleGetProvidencias();
-  }
-  
   return ContentService.createTextOutput(JSON.stringify({ error: "Ação inválida ou não especificada." }))
                        .setMimeType(ContentService.MimeType.JSON);
-}
-
-// Retorna todas as providências administrativas da aba "providencias_adm"
-function handleGetProvidencias() {
-  const ss = SpreadsheetApp.getActiveSpreadsheet();
-  const sheet = ss.getSheetByName("providencias_adm");
-  if (!sheet) {
-    return jsonResponse({ error: "Aba 'providencias_adm' não encontrada." });
-  }
-  
-  const data = sheet.getDataRange().getValues();
-  if (data.length <= 1) {
-    return jsonResponse([]);
-  }
-  
-  function normalizeHeader(str) {
-    if (!str) return "";
-    return str.toString()
-              .toLowerCase()
-              .normalize("NFD")
-              .replace(/[\u0300-\u036f]/g, "") // remove acentos
-              .trim();
-  }
-  
-  const headers = data[0].map(normalizeHeader);
-  
-  const dataIdx = headers.indexOf("data");
-  const contratadaIdx = headers.indexOf("contratada");
-  
-  // Localizacao flexivel para providencia
-  let providenciaIdx = headers.indexOf("providencia (nº documento)");
-  if (providenciaIdx === -1) providenciaIdx = headers.indexOf("providencia");
-  if (providenciaIdx === -1) {
-    providenciaIdx = headers.findIndex(h => h.indexOf("providencia") !== -1 || h.indexOf("documento") !== -1);
-  }
-  
-  const assuntoIdx = headers.indexOf("assunto");
-  const respondidoIdx = headers.findIndex(h => h.indexOf("respondido") !== -1);
-  const observacoesIdx = headers.findIndex(h => h.indexOf("observaco") !== -1);
-  
-  const providencias = [];
-  for (let i = 1; i < data.length; i++) {
-    const row = data[i];
-    const contratadaVal = contratadaIdx !== -1 ? row[contratadaIdx] : "";
-    const providenciaVal = providenciaIdx !== -1 ? row[providenciaIdx] : "";
-    
-    if (!contratadaVal && !providenciaVal) continue;
-    
-    let dataFormatada = "";
-    if (dataIdx !== -1 && row[dataIdx]) {
-      if (row[dataIdx] instanceof Date) {
-        dataFormatada = Utilities.formatDate(row[dataIdx], Session.getScriptTimeZone(), "dd/MM/yyyy");
-      } else {
-        dataFormatada = row[dataIdx].toString().trim();
-      }
-    }
-    
-    providencias.push({
-      data: dataFormatada,
-      contratada: contratadaVal.toString().trim(),
-      providencia: providenciaVal.toString().trim(),
-      assunto: assuntoIdx !== -1 ? row[assuntoIdx].toString().trim() : "",
-      respondido: respondidoIdx !== -1 ? row[respondidoIdx].toString().trim() : "",
-      observacoes: observacoesIdx !== -1 ? row[observacoesIdx].toString().trim() : ""
-    });
-  }
-  
-  return jsonResponse(providencias);
 }
 
 /**
