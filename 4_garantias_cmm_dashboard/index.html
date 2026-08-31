@@ -574,6 +574,10 @@
                 <svg viewBox="0 0 24 24" style="width:16px;height:16px;fill:currentColor;"><path d="M19 8H5c-1.66 0-3 1.34-3 3v6h4v4h12v-4h4v-6c0-1.66-1.34-3-3-3zm-3 11H8v-5h8v5zm3-7c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1zm-1-9H6v4h12V3z"/></svg>
                 IMPRIMIR
             </button>
+            <button id="btnSincronizarDrive" onclick="sincronizarDriveManual()" style="background:#222;color:#da70d6;border:1px solid #da70d6;padding:10px 20px;border-radius:8px;cursor:pointer;font-weight:bold;letter-spacing:1px;transition:0.3s;display:flex;align-items:center;gap:8px;">
+                <svg viewBox="0 0 24 24" style="width:16px;height:16px;fill:currentColor;"><path d="M12 4V1L8 5l4 4V6c3.31 0 6 2.69 6 6 0 1.01-.25 1.97-.7 2.8l1.46 1.46C19.54 15.03 20 13.57 20 12c0-4.42-3.58-8-8-8zm0 14c-3.31 0-6-2.69-6-6 0-1.01.25-1.97.7-2.8L5.24 7.74C4.46 8.97 4 10.43 4 12c0 4.42 3.58 8 8 8v3l4-4-4-4v3z"/></svg>
+                SINCRONIZAR DRIVE
+            </button>
             <button id="btnRelatorioProvidencias" onclick="alert('Gerador de Relatórios em breve!')" style="background:#222;color:#ffdd00;border:1px solid #ffdd00;padding:10px 20px;border-radius:8px;cursor:pointer;font-weight:bold;letter-spacing:1px;transition:0.3s;display:flex;align-items:center;gap:8px;">
                 <svg viewBox="0 0 24 24" style="width:16px;height:16px;fill:currentColor;"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>
                 RELATÓRIOS
@@ -1734,11 +1738,14 @@ function gerarRelatorioPDF(prefix) {
             const resp = (p.respondido || "").toUpperCase().trim();
             return resp === "SIM" || resp === "RESOLVIDO";
         }).length;
-        const pendentes = total - respondidas;
+        const pendentes = providenciasFiltradas.filter(p => {
+            const resp = (p.respondido || "").toUpperCase().trim();
+            return resp === "NÃO" || resp === "NAO" || resp === "PENDENTE";
+        }).length;
         
         let summary = `<strong>Relatório Consolidado de Providências Administrativas:</strong><br>`;
         summary += `Total de <b>${total}</b> documento(s) listado(s). `;
-        summary += `Destes, <b>${respondidas}</b> foram respondidos/resolvidos e <b>${pendentes}</b> continuam pendentes de providências pela contratada.`;
+        summary += `Destes, <b>${respondidas}</b> foram respondidos/resolvidos, <b>${pendentes}</b> continuam pendentes de resposta pela contratada e os demais não se aplicam pendências.`;
         
         document.getElementById(`providencias-table-print-summary`).className = "print-only print-summary-box";
         document.getElementById(`providencias-table-print-summary`).innerHTML = summary;
@@ -1932,6 +1939,39 @@ function loadProvidencias(callback) {
         .catch(err => {
             console.error("Erro ao carregar providencias:", err);
             if (callback) callback();
+        });
+}
+
+function sincronizarDriveManual() {
+    const btn = document.getElementById("btnSincronizarDrive");
+    if (!btn) return;
+    
+    const originalText = btn.innerHTML;
+    btn.disabled = true;
+    btn.innerHTML = `<span style="display:flex;align-items:center;gap:8px;">🔄 Sincronizando...</span>`;
+    
+    const url = API_URL + "?action=sincronizarDrive";
+    fetch(url)
+        .then(response => response.json())
+        .then(res => {
+            if (res && res.success) {
+                alert(`Sincronização concluída com sucesso!\n\nNovos arquivos importados: ${res.novos}`);
+                loadProvidencias(() => {
+                    filterAndRenderProvidencias();
+                });
+            } else if (res && res.error) {
+                alert(`Erro ao sincronizar: ${res.error}`);
+            } else {
+                alert("Erro desconhecido ao tentar sincronizar.");
+            }
+        })
+        .catch(err => {
+            console.error("Erro na chamada de sincronização:", err);
+            alert("Falha na comunicação com o servidor do Google Sheets.");
+        })
+        .finally(() => {
+            btn.disabled = false;
+            btn.innerHTML = originalText;
         });
 }
 
@@ -2146,8 +2186,9 @@ function applyProvidenciasFiltersAndRender() {
         dados = dados.filter(p => {
             const resp = (p.respondido || "").toUpperCase().trim();
             const isRespondido = (resp === "SIM" || resp === "RESOLVIDO");
+            const isPendente = (resp === "NÃO" || resp === "NAO" || resp === "PENDENTE");
             if (statusFiltroProvidencias === 'RESPONDIDO') return isRespondido;
-            if (statusFiltroProvidencias === 'PENDENTE') return !isRespondido;
+            if (statusFiltroProvidencias === 'PENDENTE') return isPendente;
             return true;
         });
     }
@@ -2179,7 +2220,10 @@ function renderProvidenciasSubKpis(lista) {
         const resp = (p.respondido || "").toUpperCase().trim();
         return resp === "SIM" || resp === "RESOLVIDO";
     }).length;
-    const pendentes = total - respondidos;
+    const pendentes = lista.filter(p => {
+        const resp = (p.respondido || "").toUpperCase().trim();
+        return resp === "NÃO" || resp === "NAO" || resp === "PENDENTE";
+    }).length;
     
     let totalNotificacoes = 0;
     let totalOficios = 0;
@@ -2249,10 +2293,18 @@ function renderProvidenciasTable(dados) {
         const resp = (p.respondido || "").toUpperCase().trim();
         if (resp === "SIM" || resp === "RESOLVIDO") {
             respondidoBadge = `<span class="badge badge-green">RESPONDIDO</span>`;
-        } else if (resp === "NÃO" || resp === "PENDENTE") {
+        } else if (resp === "NÃO" || resp === "NAO" || resp === "PENDENTE") {
             respondidoBadge = `<span class="badge badge-orange">PENDENTE</span>`;
         } else {
-            respondidoBadge = `<span class="badge" style="background:#444; color:#fff; border:1px solid #555;">${p.respondido || "-"}</span>`;
+            respondidoBadge = `<span class="badge" style="background:rgba(255,255,255,0.06); color:#aaa; border:1px solid rgba(255,255,255,0.15);">NÃO SE APLICA</span>`;
+        }
+        
+        // Extrai link direto do Drive das observações, se houver
+        let linkDrive = "";
+        const obsStr = p.observacoes || "";
+        const matchLink = obsStr.match(/https:\/\/drive\.google\.com\/[^\s\]]+/);
+        if (matchLink) {
+            linkDrive = matchLink[0];
         }
         
         let providenciaCel = p.providencia || "-";
@@ -2262,6 +2314,11 @@ function renderProvidenciasTable(dados) {
             }
         });
         
+        // Adiciona o ícone do Drive se houver link
+        if (linkDrive) {
+            providenciaCel += ` <a href="${linkDrive}" target="_blank" style="color: #da70d6; font-size: 0.9rem; margin-left: 6px; font-weight: bold;" title="Abrir arquivo direto no Google Drive" onclick="event.stopPropagation();">📂</a>`;
+        }
+        
         let assuntoCel = p.assunto || "-";
         Object.keys(MAPA_LINKS_SEI).forEach(seiNum => {
             if (assuntoCel.includes(seiNum)) {
@@ -2270,6 +2327,11 @@ function renderProvidenciasTable(dados) {
         });
         
         let obsTabela = p.observacoes || "-";
+        // Limpa a tag de ID_DRIVE e link do Drive do resumo das observações na tabela
+        obsTabela = obsTabela.replace(/Link: https:\/\/drive\.google\.com\/[^\s]+/, "")
+                             .replace(/\[ID_DRIVE:[^\]]+\]/, "")
+                             .trim();
+        
         if (obsTabela.length > 80) {
             obsTabela = obsTabela.substring(0, 77) + "...";
         }
@@ -2291,6 +2353,14 @@ function showProvidenciaDetails(index) {
     const p = providenciasData[index];
     document.getElementById("provModalTitle").innerText = `DETALHES DA PROVIDÊNCIA`;
     
+    // Extrai o link do Drive se existir
+    let linkDrive = "";
+    const obsStr = p.observacoes || "";
+    const matchLink = obsStr.match(/https:\/\/drive\.google\.com\/[^\s\]]+/);
+    if (matchLink) {
+        linkDrive = matchLink[0];
+    }
+    
     let providenciaCel = p.providencia || "-";
     Object.keys(MAPA_LINKS_SEI).forEach(seiNum => {
         if (providenciaCel.includes(seiNum)) {
@@ -2309,8 +2379,32 @@ function showProvidenciaDetails(index) {
     const resp = (p.respondido || "").toUpperCase().trim();
     if (resp === "SIM" || resp === "RESOLVIDO") {
         respondidoBadge = `<span class="badge badge-green" style="font-size:0.8rem; padding:6px 12px;">RESPONDIDO</span>`;
-    } else {
+    } else if (resp === "NÃO" || resp === "PENDENTE") {
         respondidoBadge = `<span class="badge badge-orange" style="font-size:0.8rem; padding:6px 12px;">PENDENTE DE RESPOSTA</span>`;
+    } else {
+        respondidoBadge = `<span class="badge" style="background:#444; color:#fff; border:1px solid #555; font-size:0.8rem; padding:6px 12px;">${p.respondido || "-"}</span>`;
+    }
+    
+    // Limpa a tag do link e ID das observações exibidas no modal
+    let observacoesLimpa = obsStr.replace(/Link: https:\/\/drive\.google\.com\/[^\s]+/, "")
+                                 .replace(/\[ID_DRIVE:[^\]]+\]/, "")
+                                 .trim();
+    if (!observacoesLimpa) {
+        observacoesLimpa = "Nenhuma observação específica cadastrada.";
+    }
+    
+    let driveButtonHtml = "";
+    if (linkDrive) {
+        driveButtonHtml = `
+        <div style="margin-top:20px; padding:15px; background:rgba(218, 112, 214, 0.1); border:1px solid rgba(218, 112, 214, 0.3); border-radius:8px; text-align:center; margin-bottom:15px;">
+            <strong style="color:#da70d6; font-size:0.85rem; text-transform:uppercase; display:block; margin-bottom:8px;">📄 Documento Específico no Drive</strong>
+            <p style="font-size:0.75rem; color:#aaa; margin-bottom:12px;">Visualize ou faça o download deste arquivo diretamente no Google Drive:</p>
+            <a href="${linkDrive}" target="_blank" class="nav-btn" style="background:#da70d6; color:#000; font-weight:bold; justify-content:center; text-decoration:none; padding:10px; border-radius:6px; display:flex; align-items:center; gap:8px;">
+                <svg viewBox="0 0 24 24" style="width:18px;height:18px;fill:currentColor;"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>
+                ABRIR DOCUMENTO DIRETO
+            </a>
+        </div>
+        `;
     }
     
     let html = `
@@ -2343,11 +2437,13 @@ function showProvidenciaDetails(index) {
         <div class="detail-item" style="border-bottom:none;">
             <span class="detail-label">Observações / Histórico</span>
             <div style="background:#222; padding:12px; border-radius:6px; font-style:italic; color:#eee; line-height:1.4; border:1px solid #333; margin-top:5px;">
-                ${p.observacoes || "Nenhuma observação específica cadastrada."}
+                ${observacoesLimpa}
             </div>
         </div>
         
-        <div style="margin-top:25px; padding:15px; background:rgba(0, 170, 255, 0.1); border:1px solid rgba(0, 170, 255, 0.3); border-radius:8px; text-align:center;">
+        ${driveButtonHtml}
+        
+        <div style="margin-top:20px; padding:15px; background:rgba(0, 170, 255, 0.1); border:1px solid rgba(0, 170, 255, 0.3); border-radius:8px; text-align:center;">
             <strong style="color:#00aaff; font-size:0.85rem; text-transform:uppercase; display:block; margin-bottom:8px;">📁 Documentação Geral da Pasta CMM</strong>
             <p style="font-size:0.75rem; color:#aaa; margin-bottom:12px;">Acesse todos os documentos, ofícios e comprovantes de notificações na nossa pasta compartilhada:</p>
             <a href="https://drive.google.com/drive/u/2/folders/1XCuR_KFL9xGySxF4pOxlGgVGeOwSwWaK" target="_blank" class="nav-btn" style="background:#00aaff; color:#000; font-weight:bold; justify-content:center; text-decoration:none; padding:10px; border-radius:6px; display:flex; align-items:center; gap:8px;">
@@ -2396,12 +2492,23 @@ function sortProvidenciasTable(coluna) {
 }
 
 function init() {
-    loadContatos(() => {
+    // Carrega contatos e providências em paralelo (assíncrono)
+    try { loadContatos(() => {}); } catch(e) {}
+    
+    try {
         loadProvidencias(() => {
             updateProvidenciasResumoContadores();
-            Papa.parse(CSV_URL, {
-                download: true, header: true, skipEmptyLines: true,
-                complete(results) {
+            if (typeof filterAndRenderProvidencias === 'function') {
+                filterAndRenderProvidencias();
+            }
+        });
+    } catch(e) {}
+
+    // Função de carregamento com Fallback duplo
+    function carregarPlanilhaPrincipal(urlToUse, isFallback) {
+        Papa.parse(urlToUse, {
+            download: true, header: true, skipEmptyLines: true,
+            complete(results) {
                 try {
                     rawHistoryData = results.data.filter(r => findVal(r, MAP.placa).length > 3);
                     allData = rawHistoryData;
@@ -2413,20 +2520,29 @@ function init() {
                     renderTable(allData);
                 } catch (e) {
                     console.error("Erro ao processar os dados:", e);
-                    document.getElementById("loader").innerHTML = `<div style="color:#ff4d6d; font-size:1.1rem; padding: 20px; text-align:center;">
-                        ❌ ERRO AO PROCESSAR DADOS:<br><span style="font-size:0.9rem; color:#aaa;">${e.message}</span>
-                    </div>`;
+                    if (!isFallback) {
+                        carregarPlanilhaPrincipal("https://docs.google.com/spreadsheets/d/1r53K1aiaV1ShKcxatov1R3Mu_LfS1tWbtWvCS5NPCDY/export?format=csv&gid=268714295", true);
+                    } else {
+                        document.getElementById("loader").innerHTML = `<div style="color:#ff4d6d; font-size:1.1rem; padding: 20px; text-align:center;">
+                            ❌ ERRO AO PROCESSAR DADOS:<br><span style="font-size:0.9rem; color:#aaa;">${e.message}</span>
+                        </div>`;
+                    }
                 }
             },
             error(err) {
-                console.error("Erro ao baixar a planilha:", err);
-                document.getElementById("loader").innerHTML = `<div style="color:#ff4d6d; font-size:1.1rem; padding: 20px; text-align:center;">
-                    ❌ ERRO DE CONEXÃO:<br><span style="font-size:0.9rem; color:#aaa;">Não foi possível baixar os dados da planilha. Verifique a sua conexão de rede.</span>
-                </div>`;
+                console.error("Erro ao baixar planilha pela URL primária:", err);
+                if (!isFallback) {
+                    carregarPlanilhaPrincipal("https://docs.google.com/spreadsheets/d/1r53K1aiaV1ShKcxatov1R3Mu_LfS1tWbtWvCS5NPCDY/export?format=csv&gid=268714295", true);
+                } else {
+                    document.getElementById("loader").innerHTML = `<div style="color:#ff4d6d; font-size:1.1rem; padding: 20px; text-align:center;">
+                        ❌ ERRO DE CONEXÃO:<br><span style="font-size:0.9rem; color:#aaa;">Não foi possível carregar os dados. Verifique a conexão com a internet.</span>
+                    </div>`;
+                }
             }
-            });
         });
-    });
+    }
+
+    carregarPlanilhaPrincipal(CSV_URL, false);
 }
 init();
 

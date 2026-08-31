@@ -975,23 +975,123 @@
             baixarPlacas();
         }
 
-        // BAIXAR PLACAS DO BANCO DE DADOS
+        // BAIXAR PLACAS DO BANCO DE DADOS (ULTRA-RÁPIDO COM CACHE LOCAL)
+        const URL_BANCO_DADOS = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSwYd0zPPCAVAWrx2XMWfPNY1ko6UGt9--kHygtU-UpVGVRGQUyirFry2CSmU7MB6on-R0nwt3LStbl/pub?gid=971139551&single=true&output=csv";
+        
+        function liberarCampoPlaca() {
+            const input = document.getElementById("placaInput");
+            if (input) {
+                input.disabled = false;
+                input.placeholder = "Busque a placa digitando (ex: EBA1234)...";
+                input.focus();
+            }
+        }
+
+        function travarCampoPlaca() {
+            const input = document.getElementById("placaInput");
+            if (input) {
+                input.disabled = true;
+                input.placeholder = "⏳ Carregando frota de viaturas, aguarde um segundo...";
+            }
+        }
+
         function baixarPlacas() {
-            if (!API_URL) return;
+            // 1. Tenta carregar do Cache Local Instantâneo (0 ms)
+            try {
+                const cached = localStorage.getItem("cmm_placas_cache");
+                if (cached) {
+                    const parsed = JSON.parse(cached);
+                    if (Array.isArray(parsed) && parsed.length > 0) {
+                        placasBancoDados = parsed;
+                        dbPlacasCarregado = true;
+                        liberarCampoPlaca();
+                        console.log("✓ Placas carregadas instantaneamente do Cache Local:", placasBancoDados.length);
+                    }
+                }
+            } catch (e) {
+                console.warn("Erro ao ler cache local:", e);
+            }
+
+            if (!dbPlacasCarregado) {
+                travarCampoPlaca();
+            }
             
-            showLoading("CARREGANDO PLACAS...");
+            // 2. Baixa a versão mais recente em segundo plano via CSV
+            if (typeof Papa !== 'undefined') {
+                Papa.parse(URL_BANCO_DADOS, {
+                    download: true,
+                    header: true,
+                    skipEmptyLines: true,
+                    complete(results) {
+                        try {
+                            const data = results.data;
+                            placasBancoDados = data.map(r => {
+                                const placaKey = Object.keys(r).find(k => k.toLowerCase().includes("placa")) || "PLACA";
+                                const btlKey = Object.keys(r).find(k => k.toLowerCase().includes("btl")) || "BTL";
+                                const marcaModKey = Object.keys(r).find(k => k.toLowerCase().includes("marca")) || "MARCA/MODELO";
+                                const anoKey = Object.keys(r).find(k => k.toLowerCase().includes("ano")) || "ANO";
+                                
+                                const brandModelRaw = r[marcaModKey] ? r[marcaModKey].toString().trim() : "";
+                                let brand = "";
+                                let model = "";
+                                if (brandModelRaw.includes("/")) {
+                                    const parts = brandModelRaw.split("/");
+                                    brand = parts[0].trim();
+                                    model = parts[1].trim();
+                                } else {
+                                    brand = brandModelRaw;
+                                }
+                                
+                                return {
+                                    placa: (r[placaKey] || "").toString().toUpperCase().trim(),
+                                    opm: (r[btlKey] || "").toString().trim(),
+                                    marca: brand,
+                                    modelo: model,
+                                    ano: (r[anoKey] || "").toString().trim()
+                                };
+                            }).filter(p => p.placa.length > 3);
+                            
+                            dbPlacasCarregado = true;
+                            liberarCampoPlaca();
+                            try {
+                                localStorage.setItem("cmm_placas_cache", JSON.stringify(placasBancoDados));
+                            } catch(e) {}
+                            console.log("✓ Placas sincronizadas com sucesso:", placasBancoDados.length);
+                        } catch (e) {
+                            console.error("Erro ao processar CSV de placas:", e);
+                            liberarCampoPlaca();
+                        }
+                    },
+                    error(err) {
+                        console.error("Erro ao baixar CSV de placas, tentando API:", err);
+                        fetchPlacasApi();
+                    }
+                });
+            } else {
+                fetchPlacasApi();
+            }
+        }
+
+        function fetchPlacasApi() {
+            if (!API_URL) {
+                liberarCampoPlaca();
+                return;
+            }
             fetch(API_URL + "?action=getPlacas")
                 .then(res => res.json())
                 .then(data => {
-                    hideLoading();
                     if (Array.isArray(data)) {
                         placasBancoDados = data;
                         dbPlacasCarregado = true;
+                        liberarCampoPlaca();
+                        try {
+                            localStorage.setItem("cmm_placas_cache", JSON.stringify(placasBancoDados));
+                        } catch(e) {}
                     }
                 })
                 .catch(err => {
-                    hideLoading();
-                    console.error("Erro ao baixar placas:", err);
+                    console.error("Erro ao baixar placas da API:", err);
+                    liberarCampoPlaca();
                 });
         }
 
@@ -1001,12 +1101,13 @@
             const filter = input.value.toUpperCase().replace(/[^A-Z0-9]/g, "");
             input.value = filter;
             
-            if (!dbPlacasCarregado) {
-                selectedPlaca = filter;
-                document.getElementById("opmSelect").disabled = false;
-                document.getElementById("marcaSelect").disabled = false;
-                document.getElementById("modeloSelect").disabled = false;
-                document.getElementById("anoSelect").disabled = false;
+            selectedPlaca = filter;
+            document.getElementById("opmSelect").disabled = false;
+            document.getElementById("marcaSelect").disabled = false;
+            document.getElementById("modeloSelect").disabled = false;
+            document.getElementById("anoSelect").disabled = false;
+            
+            if (!dbPlacasCarregado || placasBancoDados.length === 0) {
                 return;
             }
             
