@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import { ServiceRecord, ServiceStatus, Mechanic, UserRole } from '../types';
-import { History, Clock, ClipboardList, CheckCircle2, ArrowLeft } from 'lucide-react';
+import { History, Clock, ClipboardList, CheckCircle2, ArrowLeft, BookOpen, ExternalLink } from 'lucide-react';
 import { formatMS } from './utils';
 import { MECHANICS as INITIAL_DATA } from '../constants';
 
@@ -75,6 +75,10 @@ export const ServiceDetailsView: React.FC<ServiceDetailsViewProps> = ({
       ? 'text-zinc-500'
       : 'text-zinc-400';
 
+  const rivVehicleUrl = service.plate 
+    ? `../20_riv_eletronico/index.html?placa=${encodeURIComponent(service.plate.trim().toUpperCase())}`
+    : `../20_riv_eletronico/index.html`;
+
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-10 animate-in fade-in slide-in-from-right duration-500">
       <div className="space-y-4">
@@ -126,6 +130,20 @@ export const ServiceDetailsView: React.FC<ServiceDetailsViewProps> = ({
           <span className="text-4xl font-mono font-bold text-amber-500 uppercase block">
             {service.plate}
           </span>
+          
+          {service.plate && (
+            <a
+              href={rivVehicleUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-full py-3 px-4 bg-[#009be3] hover:bg-[#007bb5] text-white font-mono font-black text-xs uppercase rounded-xl shadow-lg flex items-center justify-center gap-2 transition-all active:scale-95 cursor-pointer no-underline border border-cyan-300/40"
+              title={`Abrir RIV Eletrônico da viatura ${service.plate}`}
+            >
+              <BookOpen className="w-4 h-4" /> RIV Eletrônico da VTR
+              <ExternalLink className="w-3.5 h-3.5 opacity-80" />
+            </a>
+          )}
+
           {service.reportedDefect && (
             <div className="bg-rose-950/40 border border-rose-900/50 p-4 rounded-lg text-left">
               <span className="text-[9px] text-rose-400 uppercase block mb-2 font-black">
@@ -227,8 +245,23 @@ export const ServiceDetailsView: React.FC<ServiceDetailsViewProps> = ({
       </div>
       <div className="lg:col-span-2 space-y-6">
         <div className="bg-zinc-950 border border-zinc-900 p-10 rounded-2xl shadow-xl">
-          <h3 className="text-lg font-black border-b border-zinc-900 pb-6 uppercase italic text-white flex items-center justify-between">
-            <span>Prontuário Consolidado</span>
+          <h3 className="text-lg font-black border-b border-zinc-900 pb-6 uppercase italic text-white flex flex-wrap items-center justify-between gap-4">
+            <div className="flex items-center gap-3">
+              <span>Prontuário Consolidado</span>
+              {service.plate && (
+                <a
+                  href={rivVehicleUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1.5 px-3 py-1 bg-[#009be3] hover:bg-[#007bb5] text-white font-mono font-black text-[11px] uppercase rounded-lg shadow-md tracking-wider transition-all active:scale-95 cursor-pointer no-underline border border-cyan-300/40"
+                  title={`Abrir RIV Eletrônico da viatura ${service.plate}`}
+                >
+                  <BookOpen className="w-3.5 h-3.5" />
+                  RIV Eletrônico
+                  <ExternalLink className="w-3 h-3 opacity-80" />
+                </a>
+              )}
+            </div>
             {service.os && (
               <span className="text-sm font-mono text-amber-500">
                 OS: {service.os}
