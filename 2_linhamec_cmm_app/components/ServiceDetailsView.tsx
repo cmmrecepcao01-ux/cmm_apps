@@ -76,8 +76,8 @@ export const ServiceDetailsView: React.FC<ServiceDetailsViewProps> = ({
       : 'text-zinc-400';
 
   const rivVehicleUrl = service.plate 
-    ? `../20_riv_eletronico/index.html?placa=${encodeURIComponent(service.plate.trim().toUpperCase())}`
-    : `../20_riv_eletronico/index.html`;
+    ? `${window.location.origin}/20_riv_eletronico/?placa=${encodeURIComponent(service.plate.trim().toUpperCase())}`
+    : `${window.location.origin}/20_riv_eletronico/`;
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-10 animate-in fade-in slide-in-from-right duration-500">
