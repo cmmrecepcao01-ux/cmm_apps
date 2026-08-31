@@ -88,7 +88,8 @@ export const ServiceDetailsView: React.FC<ServiceDetailsViewProps> = ({
             </button>
           )}
         
-        {currentMechanic?.department === 'RECEPÇÃO' &&
+        {(currentMechanic?.department === 'RECEPÇÃO' ||
+          currentMechanic?.role === UserRole.CHIEF) &&
           (service.status === ServiceStatus.RESOLVED ||
             service.status === ServiceStatus.OUTSOURCED ||
             service.status === ServiceStatus.WARRANTY) && (

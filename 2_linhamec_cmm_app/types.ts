@@ -140,6 +140,7 @@ export type AppState =
   | 'IMPORT_VEHICLES'
   | 'PARTS_STATS'
   | 'READY_VEHICLES' 
+  | 'BULK_RELEASE_VEHICLES'
   | 'CLIENT_CONSULT';
 
   export interface PartCatalog {

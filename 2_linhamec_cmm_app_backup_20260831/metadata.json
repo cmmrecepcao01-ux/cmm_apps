@@ -1,0 +1,5 @@
+{
+  "name": "###TESTE - Gestão de Oficina - TESTE####",
+  "description": "Sistema de monitoramento de tempo e diagnóstico para oficinas mecânicas, permitindo o acompanhamento de reparos por múltiplos mecânicos e exportação de relatórios.",
+  "requestFramePermissions": []
+}

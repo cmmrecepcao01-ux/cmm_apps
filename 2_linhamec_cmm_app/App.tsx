@@ -41,6 +41,7 @@ import {
   Package,
   ArrowLeft,
   Lock,
+  CheckSquare,
 } from 'lucide-react';
 import * as XLSX from 'xlsx';
 import { createClient } from '@supabase/supabase-js';
@@ -57,6 +58,7 @@ import { ClientConsultView } from './components/ClientConsultView';
 import { ImportVehiclesView } from './components/ImportVehiclesView';
 import { SearchResultsView } from './components/SearchResultsView';
 import { ActiveMechanicsModal } from './components/ActiveMechanicsModal';
+import { BulkReleaseVehiclesView } from './components/BulkReleaseVehiclesView';
 import { formatMS } from './components/utils';
 
 // ========== CONFIGURAÇÕES ==========
@@ -772,10 +774,11 @@ const App: React.FC = () => {
   };
 
   // LIBERAÇÃO DIRETA DA VIATURA (Sem exigir token de 6 dígitos)
-  const handleReleaseVehicleDirect = async () => {
-    if (!selectedServiceId || !currentMechanic) return;
+  const handleReleaseVehicleDirect = async (targetId?: string) => {
+    const idToUse = targetId || selectedServiceId;
+    if (!idToUse || !currentMechanic) return;
     
-    const targetService = services.find((s) => s.id === selectedServiceId);
+    const targetService = services.find((s) => s.id === idToUse);
     if (!targetService) return;
 
     if (!confirm(`Deseja realmente liberar a saída da viatura ${targetService.plate}?`)) return;
@@ -834,7 +837,88 @@ const App: React.FC = () => {
 
     alert('✅ SAÍDA LIBERADA COM SUCESSO!');
     setSelectedServiceId(null);
-    setView('DASHBOARD');
+  };
+
+  // LIBERAÇÃO EM MASSA (BULK RELEASE)
+  const handleBulkRelease = async (serviceIds: string[]) => {
+    if (!currentMechanic || serviceIds.length === 0) return;
+
+    const exitTimestamp = Date.now();
+    const exitDateFormatted = new Date(exitTimestamp).toLocaleString('pt-BR', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+    });
+
+    const updatedList: ServiceRecord[] = [];
+
+    for (const id of serviceIds) {
+      const srv = services.find((s) => s.id === id);
+      if (!srv) continue;
+
+      const updatedLogs = [
+        ...srv.logs,
+        {
+          mechanicName: currentMechanic.name,
+          description: 'SAÍDA AUTORIZADA EM LOTE (BULK)',
+          remainingTasks: '',
+          timestamp: exitTimestamp,
+          durationInSession: 0,
+          destination: 'LIBERADO',
+        },
+      ];
+
+      const destHistoryText = getDestinationHistoryText(updatedLogs);
+
+      const updated: ServiceRecord = {
+        ...srv,
+        status: ServiceStatus.RESOLVED,
+        endTime: exitTimestamp,
+        exitDate: exitDateFormatted,
+        releaseToken: 'LIBERADO_DIRETO',
+        logs: updatedLogs,
+      };
+
+      updatedList.push(updated);
+
+      // Sincronizar planilha em background sem travar
+      sendToGoogleSheets({
+        os: srv.os || '',
+        plate: srv.plate,
+        prefix: srv.prefix,
+        year: srv.year,
+        brand: srv.brand,
+        model: srv.model,
+        opm: srv.opm,
+        entryDate: new Date(srv.globalStartTime || Date.now()).toLocaleDateString('pt-BR'),
+        exitDate: new Date().toLocaleDateString('pt-BR'),
+        destination: destHistoryText,
+        km: srv.km,
+        problem: srv.finalDiagnosis || srv.draftDiagnosis || '',
+      }).catch((err) => console.error('Erro Planilha Bulk:', err));
+    }
+
+    try {
+      const { error } = await supabase.from('services').upsert(updatedList);
+      if (error) {
+        console.error('Erro técnico no Supabase bulk:', error);
+        alert(`ERRO AO SALVAR NO BANCO: ${error.message}`);
+        return;
+      }
+
+      setServices((prev) => {
+        const mapUpdated = new Map(updatedList.map((item) => [item.id, item]));
+        return prev.map((item) => mapUpdated.get(item.id) || item);
+      });
+
+      alert(`✅ ${updatedList.length} VIATURAS LIBERADAS COM SUCESSO!`);
+      setView('DASHBOARD');
+    } catch (e) {
+      console.error(e);
+      alert('Erro crítico ao processar liberação em massa.');
+    }
   };
 
   const handleImportVehicles = async (newVehicles: Vehicle[]) => {
@@ -1568,7 +1652,7 @@ const App: React.FC = () => {
             )}
 
             {currentMechanic?.role === UserRole.CHIEF && (
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                 <button
                   onClick={() => setView('CHIEF_STATS')}
                   className="bg-zinc-950 border border-zinc-800 p-6 rounded-xl flex items-center justify-center gap-4 hover:border-white shadow-xl transition-all"
@@ -1594,6 +1678,15 @@ const App: React.FC = () => {
                   <Database className="w-6 h-6 text-amber-500" />
                   <span className="text-sm font-bold uppercase">
                     Importar Frota
+                  </span>
+                </button>
+                <button
+                  onClick={() => setView('BULK_RELEASE_VEHICLES')}
+                  className="bg-zinc-950 border border-emerald-500/50 p-6 rounded-xl flex items-center justify-center gap-4 hover:border-emerald-400 hover:bg-emerald-950/20 shadow-xl transition-all"
+                >
+                  <CheckSquare className="w-6 h-6 text-emerald-400" />
+                  <span className="text-sm font-bold uppercase text-emerald-300">
+                    Bulk Liberar VTR
                   </span>
                 </button>
               </div>
@@ -1868,16 +1961,27 @@ const App: React.FC = () => {
 
         {view === 'READY_VEHICLES' && (
           <div className="space-y-6">
-            <div className="flex items-center gap-4 mb-8">
-              <button
-                onClick={() => setView('DASHBOARD')}
-                className="p-4 bg-white text-black font-black uppercase text-xs rounded-sm flex items-center gap-2 shadow-lg"
-              >
-                <ArrowLeft className="w-4 h-4" /> Voltar
-              </button>
-              <h2 className="text-2xl font-black uppercase text-white italic">
-                Aguardando Liberação / Serviços Externos
-              </h2>
+            <div className="flex items-center justify-between flex-wrap gap-4 mb-8">
+              <div className="flex items-center gap-4">
+                <button
+                  onClick={() => setView('DASHBOARD')}
+                  className="p-4 bg-white text-black font-black uppercase text-xs rounded-sm flex items-center gap-2 shadow-lg hover:bg-zinc-200 transition-all"
+                >
+                  <ArrowLeft className="w-4 h-4" /> Voltar
+                </button>
+                <h2 className="text-2xl font-black uppercase text-white italic">
+                  Aguardando Liberação / Serviços Externos
+                </h2>
+              </div>
+
+              {currentMechanic?.role === UserRole.CHIEF && (
+                <button
+                  onClick={() => setView('BULK_RELEASE_VEHICLES')}
+                  className="px-6 py-4 bg-emerald-600 hover:bg-emerald-500 text-white font-black uppercase text-xs rounded-sm shadow-xl flex items-center gap-2 transition-all cursor-pointer"
+                >
+                  <CheckSquare className="w-4 h-4" /> Liberação em Massa (Bulk)
+                </button>
+              )}
             </div>
 
             <div className="grid gap-4">
@@ -1970,21 +2074,31 @@ const App: React.FC = () => {
                       )}
 
                       <button
-                        onClick={() => handleReopenService(s.id)}
-                        className="px-6 py-3 bg-amber-600 hover:bg-amber-500 text-white font-black text-xs uppercase rounded-sm shadow-lg"
-                      >
-                        Reabrir Serviço
-                      </button>
-
-                      <button
                         onClick={() => {
                           setSelectedServiceId(s.id);
                           setView('VIEW_DETAILS');
                         }}
-                        className="px-8 py-3 bg-emerald-600 text-white font-black text-xs uppercase rounded-sm hover:bg-emerald-500 shadow-lg"
+                        className="px-4 py-3 bg-zinc-800 hover:bg-zinc-700 text-white font-black text-xs uppercase rounded-sm border border-zinc-700 transition-all"
                       >
-                        Liberar Viatura
+                        Ver Ficha
                       </button>
+
+                      <button
+                        onClick={() => handleReopenService(s.id)}
+                        className="px-4 py-3 bg-amber-600 hover:bg-amber-500 text-white font-black text-xs uppercase rounded-sm shadow-lg transition-all"
+                      >
+                        Reabrir
+                      </button>
+
+                      {(currentMechanic?.department === 'RECEPÇÃO' ||
+                        currentMechanic?.role === UserRole.CHIEF) && (
+                        <button
+                          onClick={() => handleReleaseVehicleDirect(s.id)}
+                          className="px-6 py-3 bg-emerald-600 text-white font-black text-xs uppercase rounded-sm hover:bg-emerald-500 shadow-lg transition-all flex items-center gap-1.5 cursor-pointer"
+                        >
+                          <CheckCircle2 className="w-3.5 h-3.5" /> Liberar Viatura
+                        </button>
+                      )}
                     </div>
                   </div>
                 ))}
@@ -2004,6 +2118,15 @@ const App: React.FC = () => {
               )}
             </div>
           </div>
+        )}
+
+        {view === 'BULK_RELEASE_VEHICLES' && (
+          <BulkReleaseVehiclesView
+            services={services}
+            currentMechanic={currentMechanic}
+            onBack={() => setView('DASHBOARD')}
+            onBulkRelease={handleBulkRelease}
+          />
         )}
 
         {view === 'CLIENT_CONSULT' && (
