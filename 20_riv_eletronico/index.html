@@ -88,14 +88,14 @@
 <body class="font-sans antialiased min-h-screen flex flex-col bg-rivBg text-slate-100 selection:bg-rivSky selection:text-black">
 
   <!-- ========================================================================= -->
-  <!-- TELA 1: CAPA DO RIV ELETRÔNICO (PORTAL DO USUÁRIO - ESTILO FOTO 2)        -->
+  <!-- TELA 1: CAPA DO RIV ELETRÔNICO (PORTAL DO USUÁRIO)                       -->
   <!-- ========================================================================= -->
   <div id="view-cover" class="min-h-screen w-full bg-[#009be3] flex flex-col items-center justify-between p-6 sm:p-10 select-none animate-in fade-in duration-300 relative overflow-hidden">
     
-    <!-- FAIXA ORNAMENTAL SUPERIOR ÚNICA (COM BORDA AZUL ACIMA E ABAIXO) -->
+    <!-- FAIXA ORNAMENTAL SUPERIOR ÚNICA -->
     <div class="absolute top-4 sm:top-5 left-4 right-4 sm:left-8 sm:right-8 h-[2px] bg-white/95 rounded-full pointer-events-none z-10 shadow-sm"></div>
 
-    <!-- BRASÃO PMESP SUPERIOR (SIMÉTRICO ÀS BORDAS DOS BOTÕES) -->
+    <!-- BRASÃO PMESP SUPERIOR -->
     <div class="w-full max-w-md flex flex-col items-center justify-center pt-4 sm:pt-6 animate-in zoom-in-95 duration-500">
       <div class="w-full max-w-[320px] sm:max-w-[390px] flex items-center justify-center filter drop-shadow-2xl px-2">
         <img
@@ -139,7 +139,7 @@
 
     </div>
 
-    <!-- RODAPÉ: BOTÃO DISCRETO AJUDA (PORTAL DEV & GESTÃO) -->
+    <!-- RODAPÉ: BOTÃO DISCRETO AJUDA -->
     <div class="w-full flex justify-center pb-2">
       <button
         onclick="openDevModal()"
@@ -149,13 +149,13 @@
       </button>
     </div>
 
-    <!-- FAIXA ORNAMENTAL INFERIOR ÚNICA (COM BORDA AZUL ACIMA E ABAIXO) -->
+    <!-- FAIXA ORNAMENTAL INFERIOR ÚNICA -->
     <div class="absolute bottom-4 sm:bottom-5 left-4 right-4 sm:left-8 sm:right-8 h-[2px] bg-white/95 rounded-full pointer-events-none z-10 shadow-sm"></div>
 
   </div>
 
   <!-- ========================================================================= -->
-  <!-- TELA 2: FORMULÁRIO DE LANÇAMENTO EM RIV (ESTILO FOTOS 3 E 4)              -->
+  <!-- TELA 2: FORMULÁRIO DE LANÇAMENTO EM RIV                                  -->
   <!-- ========================================================================= -->
   <div id="view-form" class="hidden min-h-screen w-full bg-rivBg flex-col p-4 sm:p-6 lg:p-8 animate-in fade-in duration-300">
     <div class="max-w-4xl w-full mx-auto space-y-6">
@@ -260,7 +260,7 @@
 
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             
-            <!-- DATA DO SERVIÇO (COM TRAVA DE ANO 2015 A 2099) -->
+            <!-- DATA DO SERVIÇO (ANO 2015 A 2099) -->
             <div>
               <label class="block text-[11px] font-tactical font-bold uppercase text-slate-300 mb-1">
                 DATA DO SERVIÇO * <span class="text-[9px] text-slate-500 font-mono">(ANO 2015-2099)</span>
@@ -428,7 +428,7 @@
           </button>
         </div>
 
-        <!-- SEÇÃO 4: CUSTOS E VALORES FINANCEIROS (PEÇAS E MÃO DE OBRA) -->
+        <!-- SEÇÃO 4: CUSTOS E VALORES FINANCEIROS -->
         <div class="space-y-4">
           <div class="flex items-center gap-2 text-xs font-tactical font-bold text-amber-400 uppercase tracking-wider border-b border-rivBorder/60 pb-2">
             <i data-lucide="circle-dollar-sign" class="w-4 h-4"></i> 4. CUSTOS E VALORES DA MANUTENÇÃO (R$)
@@ -517,21 +517,21 @@
   </div>
 
   <!-- ========================================================================= -->
-  <!-- TELA 3: CONSULTAR RIV (PORTAL DO USUÁRIO - PRONTUÁRIO COMPLETO)          -->
+  <!-- TELA 3: CONSULTAR RIV (PORTAL DO USUÁRIO - PRONTUÁRIO INDIVIDUAL)        -->
   <!-- ========================================================================= -->
   <div id="view-consult" class="hidden min-h-screen w-full bg-rivBg flex-col p-4 sm:p-6 lg:p-8 space-y-6 animate-in fade-in duration-300">
     <div class="max-w-5xl w-full mx-auto space-y-6">
       
-      <!-- BARRA DE BUSCA E NAVEGAÇÃO -->
-      <div class="flex flex-wrap items-center justify-between gap-4 no-print border-b border-rivBorder pb-4">
+      <!-- BARRA DE BUSCA E NAVEGAÇÃO SUPERIOR -->
+      <div class="flex flex-wrap items-center justify-between gap-3 no-print border-b border-rivBorder pb-4">
         <button
           onclick="navigateTo('COVER')"
-          class="px-5 py-3 bg-white hover:bg-slate-200 text-slate-950 font-tactical font-black text-xs uppercase rounded-lg flex items-center gap-2 shadow-lg transition-all active:scale-95 cursor-pointer"
+          class="px-4 py-3 bg-white hover:bg-slate-200 text-slate-950 font-tactical font-black text-xs uppercase rounded-lg flex items-center gap-2 shadow-lg transition-all active:scale-95 cursor-pointer"
         >
           <i data-lucide="arrow-left" class="w-4 h-4"></i> VOLTAR
         </button>
 
-        <div class="relative flex-1 min-w-[280px]">
+        <div class="relative flex-1 min-w-[260px]">
           <i data-lucide="search" class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400"></i>
           <input
             id="consultSearchInput"
@@ -548,23 +548,25 @@
           </button>
         </div>
 
-        <div class="flex items-center gap-2">
+        <div class="flex flex-wrap items-center gap-2">
           <button
             onclick="openNewRecordForCurrentVehicle()"
-            class="px-4 py-3 bg-emerald-600 hover:bg-emerald-500 text-white font-tactical font-bold text-xs uppercase rounded-lg shadow-lg flex items-center gap-2 transition-all cursor-pointer"
+            class="px-4 py-3 bg-emerald-600 hover:bg-emerald-500 text-white font-tactical font-bold text-xs uppercase rounded-lg shadow-lg flex items-center gap-1.5 transition-all cursor-pointer"
           >
             <i data-lucide="plus-circle" class="w-4 h-4"></i> LANÇAR NO RIV
           </button>
+
           <button
             onclick="generateQrCodeModal()"
-            class="px-4 py-3 bg-rivPanel hover:bg-rivBorder border border-rivBorder text-rivSky font-tactical font-bold text-xs uppercase rounded-lg flex items-center gap-2 transition-all cursor-pointer"
+            class="px-3.5 py-3 bg-slate-900 hover:bg-slate-800 border border-rivBorder text-slate-300 font-tactical font-bold text-xs uppercase rounded-lg flex items-center gap-1.5 transition-all cursor-pointer"
             title="Gerar QR Code"
           >
             <i data-lucide="qr-code" class="w-4 h-4"></i> QR CODE
           </button>
+
           <button
             onclick="window.print()"
-            class="px-4 py-3 bg-slate-800 hover:bg-slate-700 text-slate-200 font-tactical font-bold text-xs uppercase rounded-lg flex items-center gap-2 transition-all cursor-pointer"
+            class="px-3.5 py-3 bg-slate-800 hover:bg-slate-700 text-slate-200 font-tactical font-bold text-xs uppercase rounded-lg flex items-center gap-1.5 transition-all cursor-pointer"
             title="Imprimir RIV"
           >
             <i data-lucide="printer" class="w-4 h-4"></i> IMPRIMIR
@@ -581,7 +583,7 @@
   </div>
 
   <!-- ========================================================================= -->
-  <!-- TELA 4: PAINEL DE GESTÃO DO RIV ELETRÔNICO (ACESSO DESENVOLVEDOR / AUDIT) -->
+  <!-- TELA 4: PAINEL DE GESTÃO E AUDITORIA (COM BULK DELETE & EDIÇÃO)           -->
   <!-- ========================================================================= -->
   <div id="view-management" class="hidden min-h-screen w-full bg-rivBg flex-col p-4 sm:p-6 lg:p-8 space-y-6 animate-in fade-in duration-300">
     <div class="max-w-7xl w-full mx-auto space-y-6">
@@ -601,41 +603,54 @@
               PAINEL DE GESTÃO DO RIV ELETRÔNICO
             </h2>
             <p class="text-[11px] text-slate-400 font-mono">
-              Controle Geral da Frota, Auditoria, Custos Acumulados e Histórico de Intervenções
+              Controle Geral da Frota, Auditoria, Custos Acumulados e Exclusão Segura
             </p>
           </div>
         </div>
 
         <div class="flex flex-wrap items-center gap-2">
+          <!-- BOTÃO DE EXCLUSÃO EM MASSA (BULK DELETE) -->
+          <button
+            id="btnBulkDelete"
+            onclick="openBulkDeleteModal()"
+            disabled
+            class="px-4 py-2.5 bg-rose-950/40 border border-rose-500/30 text-rose-300/40 font-tactical font-bold text-xs uppercase rounded-lg flex items-center gap-1.5 transition-all cursor-not-allowed"
+          >
+            <i data-lucide="trash-2" class="w-4 h-4"></i> EXCLUIR SELECIONADOS (<span id="bulkSelectedCount">0</span>)
+          </button>
+
           <button
             onclick="openNewRecordModal()"
             class="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-tactical font-bold text-xs uppercase rounded-lg shadow-lg flex items-center gap-1.5 cursor-pointer"
           >
             <i data-lucide="plus-circle" class="w-4 h-4"></i> NOVO LANÇAMENTO
           </button>
+
           <button
             onclick="reloadAllFromSupabase()"
             class="px-4 py-2.5 bg-rivPanel hover:bg-rivBorder border border-rivBorder text-rivSky font-tactical font-bold text-xs uppercase rounded-lg flex items-center gap-1.5 cursor-pointer"
-            title="Sincronizar dados do Supabase"
+            title="Sincronizar dados do Supabase e Linha Mecânica"
           >
             <i data-lucide="refresh-cw" class="w-4 h-4"></i> SINCRONIZAR
           </button>
+
           <button
             onclick="exportRIVRecordsToCSV()"
             class="px-4 py-2.5 bg-slate-800 hover:bg-slate-700 text-emerald-300 font-tactical font-bold text-xs uppercase rounded-lg border border-emerald-500/30 flex items-center gap-1.5 cursor-pointer"
           >
             <i data-lucide="file-spreadsheet" class="w-4 h-4"></i> EXCEL / CSV
           </button>
+
           <button
             onclick="printManagementReport()"
             class="px-4 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-200 font-tactical font-bold text-xs uppercase rounded-lg flex items-center gap-1.5 cursor-pointer"
           >
-            <i data-lucide="printer" class="w-4 h-4"></i> IMPRIMIR RELATÓRIO
+            <i data-lucide="printer" class="w-4 h-4"></i> IMPRIMIR
           </button>
         </div>
       </div>
 
-      <!-- CARDS DE INDICADORES / METRICAS (KPIs) -->
+      <!-- CARDS DE INDICADORES (KPIS) -->
       <div class="grid grid-cols-2 sm:grid-cols-5 gap-3 sm:gap-4">
         <div class="bg-rivCard border border-rivBorder p-4 rounded-xl shadow-lg">
           <span class="text-[10px] font-tactical font-bold text-slate-400 uppercase block">ATENDIMENTOS</span>
@@ -668,7 +683,7 @@
         </div>
       </div>
 
-      <!-- BARRA DE FILTROS MULTI-CRITÉRIO (ESTILO EXCEL) -->
+      <!-- BARRA DE FILTROS MULTI-CRITÉRIO -->
       <div class="bg-rivCard border border-rivBorder rounded-2xl p-5 space-y-4 shadow-xl no-print">
         <div class="flex items-center justify-between border-b border-rivBorder/60 pb-2">
           <span class="text-xs font-tactical font-bold uppercase text-slate-300 flex items-center gap-1.5">
@@ -693,7 +708,7 @@
             />
           </div>
 
-          <!-- FILTRO POR ORIGEM (RIV vs LINHA MECÂNICA) -->
+          <!-- FILTRO POR ORIGEM -->
           <div class="sm:col-span-3">
             <label class="block text-[10px] font-tactical font-bold uppercase text-slate-400 mb-1">ORIGEM DO REGISTRO</label>
             <select
@@ -719,7 +734,7 @@
             </select>
           </div>
 
-          <!-- FILTRO POR CATEGORIA DE SERVIÇO -->
+          <!-- FILTRO POR CATEGORIA -->
           <div class="sm:col-span-2">
             <label class="block text-[10px] font-tactical font-bold uppercase text-slate-400 mb-1">CATEGORIA</label>
             <select
@@ -794,24 +809,33 @@
         </div>
       </div>
 
-      <!-- TABELA DINÂMICA DE ATENDIMENTOS (ESTILO PLANILHA EXCEL) -->
+      <!-- TABELA DINÂMICA DE ATENDIMENTOS (COM CHECKBOX PARA BULK DELETE) -->
       <div class="bg-rivCard border border-rivBorder rounded-2xl overflow-hidden shadow-2xl">
         <div class="overflow-x-auto custom-scroll">
-          <table class="w-full text-left border-collapse min-w-[1100px]">
+          <table class="w-full text-left border-collapse min-w-[1150px]">
             <thead>
               <tr class="bg-slate-950 text-slate-400 text-[10px] font-tactical font-black uppercase tracking-wider border-b border-rivBorder select-none">
+                <th class="py-3.5 px-3 text-center w-10 no-print">
+                  <input
+                    type="checkbox"
+                    id="selectAllCheckbox"
+                    onchange="toggleSelectAllRows(this.checked)"
+                    class="w-4 h-4 rounded bg-slate-900 border-slate-700 text-rose-500 focus:ring-rose-500 cursor-pointer"
+                    title="Selecionar Todos"
+                  />
+                </th>
                 <th class="py-3.5 px-3">DATA</th>
                 <th class="py-3.5 px-3">PLACA / PREF.</th>
                 <th class="py-3.5 px-3">OPM</th>
                 <th class="py-3.5 px-3">MODELO / ANO</th>
                 <th class="py-3.5 px-3">KM</th>
-                <th class="py-3.5 px-4 min-w-[320px]">SERVIÇOS EXECUTADOS & PEÇAS</th>
+                <th class="py-3.5 px-4 min-w-[280px]">SERVIÇOS EXECUTADOS & PEÇAS</th>
                 <th class="py-3.5 px-3">LOCAL / OFICINA</th>
                 <th class="py-3.5 px-3">RESPONSÁVEL / MOTORISTA</th>
                 <th class="py-3.5 px-3 text-right">CUSTO PEÇAS</th>
                 <th class="py-3.5 px-3 text-right">CUSTO M.O.</th>
                 <th class="py-3.5 px-3 text-right text-emerald-400">TOTAL GERAL</th>
-                <th class="py-3.5 px-3 text-center no-print">AÇÕES</th>
+                <th class="py-3.5 px-3 text-center min-w-[140px] no-print">AÇÕES (AUDITORIA)</th>
               </tr>
             </thead>
             <tbody id="managementTableBody" class="divide-y divide-slate-800 text-xs font-mono">
@@ -958,7 +982,7 @@
           <textarea id="editServicos" rows="4" required class="w-full bg-slate-950 border border-rivBorder text-white px-3 py-2.5 rounded-lg font-mono text-xs uppercase"></textarea>
         </div>
 
-        <!-- TRAVA DE SEGURANÇA E AUDITORIA OBRIGATÓRIA -->
+        <!-- TRAVA DE AUDITORIA OBRIGATÓRIA -->
         <div class="bg-amber-950/20 border border-amber-500/40 p-4 rounded-xl space-y-4">
           <div class="flex items-center gap-2 text-xs font-tactical font-bold text-amber-400 uppercase">
             <i data-lucide="lock" class="w-4 h-4"></i> TRAVA DE AUDITORIA OBRIGATÓRIA
@@ -1002,10 +1026,10 @@
         </div>
 
         <div class="flex justify-end gap-3 pt-2">
-          <button type="button" onclick="closeEditModal()" class="px-5 py-3 bg-slate-800 hover:bg-slate-700 text-slate-300 font-tactical font-bold text-xs uppercase rounded-lg">
+          <button type="button" onclick="closeEditModal()" class="px-5 py-3 bg-slate-800 hover:bg-slate-700 text-slate-300 font-tactical font-bold text-xs uppercase rounded-lg cursor-pointer">
             CANCELAR
           </button>
-          <button type="submit" class="px-6 py-3 bg-amber-600 hover:bg-amber-500 text-slate-950 font-tactical font-black text-xs uppercase rounded-lg shadow-lg">
+          <button type="submit" class="px-6 py-3 bg-amber-600 hover:bg-amber-500 text-slate-950 font-tactical font-black text-xs uppercase rounded-lg shadow-lg cursor-pointer">
             SALVAR ALTERAÇÕES COM AUDITORIA
           </button>
         </div>
@@ -1014,14 +1038,14 @@
   </div>
 
   <!-- ========================================================================= -->
-  <!-- MODAL: EXCLUSÃO DE REGISTRO COM TRAVA DE AUDITORIA                        -->
+  <!-- MODAL: EXCLUSÃO DE REGISTRO (INDIVIDUAL OU BULK) COM AUDITORIA            -->
   <!-- ========================================================================= -->
   <div id="modalDeleteRecord" class="fixed inset-0 bg-black/90 backdrop-blur-md z-50 hidden items-center justify-center p-4">
     <div class="bg-rivCard border-2 border-rose-500 rounded-2xl max-w-lg w-full p-6 space-y-5 shadow-2xl animate-in zoom-in-95 duration-200">
       
       <div class="flex items-center justify-between border-b border-rivBorder pb-3">
         <h3 class="font-tactical font-black text-rose-400 text-base uppercase flex items-center gap-2">
-          <i data-lucide="trash-2" class="w-5 h-5 text-rose-400"></i> EXCLUIR REGISTRO DO RIV (AUDITORIA)
+          <i data-lucide="trash-2" class="w-5 h-5 text-rose-400"></i> EXCLUIR REGISTRO(S) DO RIV (AUDITORIA)
         </h3>
         <button onclick="closeDeleteModal()" class="p-1 text-slate-400 hover:text-white">
           <i data-lucide="x" class="w-5 h-5"></i>
@@ -1029,15 +1053,15 @@
       </div>
 
       <p class="text-xs text-slate-300">
-        Atenção: A exclusão de um registro do RIV é uma ação sensível e será registrada em log auditado.
+        Atenção: Esta ação é sensível e removerá permanentemente o(s) registro(s) do banco de dados e da memória local, registrando a autoria.
       </p>
 
-      <div class="bg-slate-950 p-3 rounded-lg border border-slate-800 text-xs font-mono">
-        <div><strong>VIATURA:</strong> <span id="deletePlateDisplay" class="text-white"></span></div>
-        <div><strong>DATA:</strong> <span id="deleteDataDisplay" class="text-slate-300"></span> • <strong>KM:</strong> <span id="deleteKmDisplay" class="text-emerald-400"></span></div>
+      <div id="deleteItemsListDisplay" class="bg-slate-950 p-3 rounded-lg border border-slate-800 text-xs font-mono max-h-40 overflow-y-auto custom-scroll space-y-1">
+        <!-- Detalhes dos itens -->
       </div>
 
       <form id="deleteRecordForm" onsubmit="handleConfirmDeleteRecord(event)" class="space-y-4">
+        <input type="hidden" id="deleteTargetMode" value="SINGLE" />
         <input type="hidden" id="deleteRecordId" />
 
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -1054,6 +1078,10 @@
               <option value="CEL PM">CEL PM</option>
               <option value="1º TEN PM">1º TEN PM</option>
               <option value="2º TEN PM">2º TEN PM</option>
+              <option value="SUBTEN PM">SUBTEN PM</option>
+              <option value="1º SGT PM">1º SGT PM</option>
+              <option value="2º SGT PM">2º SGT PM</option>
+              <option value="3º SGT PM">3º SGT PM</option>
               <option value="CB PM">CB PM</option>
             </select>
           </div>
@@ -1071,16 +1099,16 @@
         </div>
 
         <div>
-          <label class="block text-[9px] font-tactical font-bold uppercase text-slate-400 mb-1">JUSTIFICATIVA DA EXCLUSÃO *</label>
+          <label class="block text-[9px] font-tactical font-bold uppercase text-slate-400 mb-1">JUSTIFICATIVA DA EXCLUSÃO (OBRIGATÓRIO) *</label>
           <input id="deleteAuthJustificativa" type="text" required placeholder="EX: LANÇAMENTO EM DUPLICIDADE / ERRO DE VIATURA..." class="w-full bg-slate-950 border border-rose-500/50 text-white px-3 py-2 rounded text-xs uppercase font-bold" />
         </div>
 
         <div class="flex justify-end gap-3 pt-2">
-          <button type="button" onclick="closeDeleteModal()" class="px-4 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 font-tactical font-bold text-xs uppercase rounded-lg">
+          <button type="button" onclick="closeDeleteModal()" class="px-4 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 font-tactical font-bold text-xs uppercase rounded-lg cursor-pointer">
             CANCELAR
           </button>
-          <button type="submit" class="px-5 py-2.5 bg-rose-600 hover:bg-rose-500 text-white font-tactical font-black text-xs uppercase rounded-lg shadow-lg">
-            CONFIRMAR EXCLUSÃO
+          <button type="submit" class="px-5 py-2.5 bg-rose-600 hover:bg-rose-500 text-white font-tactical font-black text-xs uppercase rounded-lg shadow-lg cursor-pointer">
+            CONFIRMAR EXCLUSÃO PERMANENTE
           </button>
         </div>
       </form>
@@ -1140,7 +1168,8 @@
     let currentSelectedVehicle = null;
     let allRIVRecords = [];
     let filteredManagementRecords = [];
-    let siplIndex = new Map(); // Mapa de busca rápida
+    let selectedRecordIds = new Set();
+    let siplIndex = new Map();
 
     // INICIALIZAÇÃO
     window.addEventListener('DOMContentLoaded', async () => {
@@ -1151,10 +1180,9 @@
       fetchLinhaMecanicaRecords();
       checkUrlParameters();
       setDefaultFormDate();
-      addServiceLine(); // Linha inicial vazia
+      addServiceLine();
     });
 
-    // 1. INDEXAÇÃO DA BASE SIPL
     function initSIPLDatabase() {
       const data = window.SIPL_FROTA_DATA || [];
       siplIndex.clear();
@@ -1165,7 +1193,6 @@
       });
     }
 
-    // 2. PARÂMETROS DA URL
     function checkUrlParameters() {
       const params = new URLSearchParams(window.location.search);
       const placa = params.get('placa') || params.get('p') || params.get('vtr');
@@ -1182,7 +1209,6 @@
       }
     }
 
-    // VALIDAÇÃO DE DATA (ANO ENTRE 2015 E 2099)
     function validateServiceDate(input) {
       if (!input.value) return;
       const parts = input.value.split('-');
@@ -1195,7 +1221,6 @@
       }
     }
 
-    // CÁLCULO DE CUSTOS EM TEMPO REAL NO FORMULÁRIO
     function calculateTotalCost() {
       const pecas = parseFloat(document.getElementById('formValorPecas').value) || 0;
       const mo = parseFloat(document.getElementById('formValorMO').value) || 0;
@@ -1210,7 +1235,7 @@
       document.getElementById('editValorTotal').value = total > 0 ? `R$ ${total.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` : 'R$ 0,00';
     }
 
-    // 3. NAVEGAÇÃO ENTRE TELAS
+    // NAVEGAÇÃO ENTRE TELAS
     function navigateTo(view) {
       currentView = view;
       document.getElementById('view-cover').classList.add('hidden');
@@ -1229,6 +1254,8 @@
         window.scrollTo({ top: 0, behavior: 'smooth' });
       } else if (view === 'MANAGEMENT') {
         document.getElementById('view-management').classList.remove('hidden');
+        selectedRecordIds.clear();
+        updateBulkDeleteButton();
         populateOpmFilterOptions();
         applyManagementFilters();
         window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -1261,7 +1288,6 @@
       }
     }
 
-    // 4. BUSCA DE VIATURA NO SIPL
     function findVehicleInSIPL(query) {
       if (!query) return null;
       const clean = query.trim().toUpperCase();
@@ -1350,7 +1376,7 @@
       navigateTo('CONSULT');
     }
 
-    // 5. RENDERIZAÇÃO DA PÁGINA RIV (CONSULTA INDIVIDUAL)
+    // RENDERIZAÇÃO DA PÁGINA RIV INDIVIDUAL
     function renderVehicleRIVPage(v) {
       const container = document.getElementById('vehicleDetailsContainer');
       if (!container) return;
@@ -1387,7 +1413,7 @@
             </div>
           </div>
 
-          <!-- GRID DE DADOS CADASTRAIS (FL. CAPA E CADASTRO) -->
+          <!-- GRID DE DADOS CADASTRAIS -->
           <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 pt-6 text-xs font-mono font-bold">
             <div class="bg-white/70 p-3 rounded-lg border border-slate-900/10 shadow-sm">
               <span class="text-[9px] uppercase text-slate-700 block font-tactical">MARCA / MODELO</span>
@@ -1424,7 +1450,7 @@
           </div>
         </div>
 
-        <!-- LIVRO DE REVISÕES & MANUTENÇÕES (FOLHA FL14) -->
+        <!-- HISTÓRICO DE SERVIÇOS EXECUTADOS E PEÇAS -->
         <div class="bg-rivCard border border-rivBorder rounded-2xl p-6 space-y-4 shadow-2xl print-card">
           <div class="flex items-center justify-between border-b border-rivBorder/60 pb-3">
             <h3 class="font-tactical font-black text-lg text-white uppercase tracking-wider flex items-center gap-2">
@@ -1453,7 +1479,7 @@
                     <span class="text-emerald-400 font-mono font-bold text-sm">
                       ${Number(rec.km || 0).toLocaleString('pt-BR')} KM
                     </span>
-                    ${rec.os ? `<span class="text-slate-300 font-mono text-xs">OS: ${rec.os}</span>` : ''}
+                    ${rec.os ? `<span class="text-slate-300 font-mono text-xs font-bold">OS: ${rec.os}</span>` : ''}
                     <span class="px-2 py-0.5 rounded bg-slate-900 text-slate-200 border border-slate-700 text-[10px] font-tactical uppercase">
                       ${rec.tipo || 'MANUTENÇÃO'}
                     </span>
@@ -1493,7 +1519,7 @@
       lucide.createIcons();
     }
 
-    // 6. LINHAS DINÂMICAS DE SERVIÇOS (TIPO POR LINHA + TRAVA 50 CARACTERES)
+    // LINHAS DINÂMICAS DE SERVIÇOS
     function addServiceLine(initialType = 'OUTROS REPAROS DIVERSOS', initialValue = '') {
       const container = document.getElementById('serviceLinesContainer');
       if (!container) return;
@@ -1505,7 +1531,6 @@
       div.className = 'grid grid-cols-1 sm:grid-cols-12 gap-2 bg-slate-950/90 border border-rivBorder p-2.5 rounded-xl shadow-md items-center';
 
       div.innerHTML = `
-        <!-- SELETOR TIPO DE MANUTENÇÃO POR LINHA -->
         <div class="sm:col-span-4">
           <select
             class="service-line-tipo w-full bg-[#0b1424] border border-rivBorder text-rivGold px-3 py-2.5 rounded-lg font-sans text-xs font-bold uppercase focus:border-rivGold focus:outline-none"
@@ -1523,7 +1548,6 @@
           </select>
         </div>
 
-        <!-- TEXTBOX DE SERVIÇO/PEÇA -->
         <div class="sm:col-span-7 relative flex items-center bg-[#070d18] border border-slate-800 rounded-lg px-3 py-1">
           <i data-lucide="wrench" class="w-4 h-4 text-emerald-400 shrink-0 mr-2"></i>
           <input
@@ -1540,7 +1564,6 @@
           </span>
         </div>
 
-        <!-- BOTAO EXCLUIR LINHA -->
         <div class="sm:col-span-1 flex justify-center">
           <button
             type="button"
@@ -1623,7 +1646,7 @@
       }
     }
 
-    // 7. GRAVAÇÃO NO SUPABASE & GOOGLE SHEETS (COM CUSTOS FINANCEIROS)
+    // GRAVAÇÃO NO SUPABASE & GOOGLE SHEETS
     async function handleSaveRIVRecord(event) {
       event.preventDefault();
 
@@ -1633,7 +1656,6 @@
         btnSubmit.innerHTML = `<span class="animate-spin mr-2">⚙️</span> GRAVANDO NO RIV...`;
       }
 
-      // Valida e extrai linhas de serviço com seus respectivos tipos
       const lineRows = document.querySelectorAll('#serviceLinesContainer > div');
       const servicesList = [];
       const tiposSet = new Set();
@@ -1685,16 +1707,15 @@
       const tipoGeral = tiposSet.size > 0 ? Array.from(tiposSet).join(' / ') : 'MANUTENÇÃO';
       const obs = document.getElementById('formObs').value.trim().toUpperCase();
 
-      // Formata data brasileira dd/mm/aaaa
       const dataParts = dataSrv.split('-');
       const dataBR = (dataParts.length === 3) ? `${dataParts[2]}/${dataParts[1]}/${dataParts[0]}` : dataSrv;
 
       const recordId = crypto.randomUUID();
       const timestampNow = Date.now();
 
-      // Objeto compatível com a tabela SQL do Supabase e com o estado local
       const record = {
         id: recordId,
+        origem: 'RIV_LANCAMENTO',
         plate: plate,
         prefix: prefix,
         opm: opm,
@@ -1716,24 +1737,20 @@
         created_at: timestampNow
       };
 
-      // 1. Salva localmente
       allRIVRecords.push(record);
       saveLocalRecords();
 
-      // 2. Salva no Supabase (com tratamento de erro explícito)
       if (supabaseClient) {
         try {
           const { error } = await supabaseClient.from('riv_records').insert([record]);
           if (error) {
             console.error('Erro ao inserir no Supabase riv_records:', error);
-            alert(`Aviso Supabase: ${error.message}\nO registro foi salvo localmente.`);
           }
         } catch (err) {
-          console.error('Falha de conexão Supabase:', err);
+          console.error('Falha Supabase:', err);
         }
       }
 
-      // 3. Sincroniza em segundo plano com Google Sheets Webhook (Data BR + Quebra de linha por serviço + Coluna N Custo Total)
       try {
         fetch(GOOGLE_SHEETS_RIV_URL, {
           method: 'POST',
@@ -1756,14 +1773,13 @@
               custo_total: valorTotal > 0 ? `R$ ${valorTotal.toFixed(2).replace('.', ',')}` : ''
             }
           })
-        }).catch(err => console.warn('Sheets sync error:', err));
+        }).catch(err => console.warn('Sheets sync notice:', err));
       } catch (e) {
-        console.warn('Sheets trigger error:', e);
+        console.warn('Sheets trigger notice:', e);
       }
 
-      alert(`✅ REGISTRO DO RIV GRAVADO COM SUCESSO!\nViatura: ${plate} | KM: ${km} | Custo: R$ ${valorTotal.toFixed(2)}`);
+      alert(`✅ REGISTRO DO RIV GRAVADO COM SUCESSO!\nViatura: ${plate} | KM: ${km}`);
 
-      // Reseta e abre a consulta da viatura
       document.getElementById('rivEntryForm').reset();
       setDefaultFormDate();
       calculateTotalCost();
@@ -1771,7 +1787,6 @@
       consultVehicle(plate);
     }
 
-    // 8. CARREGAMENTO E SINCRONIZAÇÃO DE DADOS
     function loadLocalRecords() {
       try {
         const stored = localStorage.getItem('CMM_RIV_RECORDS');
@@ -1794,7 +1809,6 @@
       try {
         const { data, error } = await supabaseClient.from('riv_records').select('*');
         if (!error && data && data.length > 0) {
-          // Mescla com dados locais sem duplicatas por ID
           const existingIds = new Set(allRIVRecords.map(r => r.id));
           data.forEach(item => {
             if (!existingIds.has(item.id)) {
@@ -1827,7 +1841,7 @@
           }
         }
       } catch(err) {
-        console.warn('Notice: Linha Mecanica background sync:', err);
+        console.warn('Linha Mecanica fetch notice:', err);
       }
     }
 
@@ -1845,7 +1859,7 @@
       return dateStr;
     }
 
-    // 9. PAINEL DE GESTÃO: AUTENTICAÇÃO E FILTROS
+    // PAINEL DE GESTÃO & AUTENTICAÇÃO
     function openDevModal() {
       const modal = document.getElementById('modalDevAuth');
       const input = document.getElementById('devPasswordInput');
@@ -1931,6 +1945,7 @@
 
     function clearManagementFilters() {
       document.getElementById('filterSearch').value = '';
+      document.getElementById('filterOrigem').value = '';
       document.getElementById('filterOpm').value = '';
       document.getElementById('filterTipo').value = '';
       document.getElementById('filterModel').value = '';
@@ -1950,13 +1965,11 @@
       const dateEnd = document.getElementById('filterDateEnd')?.value || '';
 
       filteredManagementRecords = allRIVRecords.filter(r => {
-        // Filtro Origem
         if (origem) {
           if (origem === 'CMM_LINHA_MECANICA' && r.origem !== 'CMM_LINHA_MECANICA') return false;
           if (origem === 'RIV_LANCAMENTO' && r.origem === 'CMM_LINHA_MECANICA') return false;
         }
 
-        // Busca geral
         if (search) {
           const matchPlate = (r.plate || '').toUpperCase().includes(search);
           const matchPrefix = (r.prefix || '').toUpperCase().includes(search);
@@ -1966,23 +1979,17 @@
           if (!matchPlate && !matchPrefix && !matchOs && !matchResp && !matchServ) return false;
         }
 
-        // Filtro OPM
         if (opm && (r.opm || '').toUpperCase() !== opm) return false;
 
-        // Filtro Tipo
         if (tipo) {
           const hasTipoInRecord = (r.tipo || '').toUpperCase().includes(tipo);
           const hasTipoInLines = (r.servicos || []).some(s => s.toUpperCase().includes(tipo));
           if (!hasTipoInRecord && !hasTipoInLines) return false;
         }
 
-        // Filtro Modelo
         if (model && !(r.model || '').toUpperCase().includes(model)) return false;
 
-        // Filtro Data Inicial
         if (dateStart && (r.data || '') < dateStart) return false;
-
-        // Filtro Data Final
         if (dateEnd && (r.data || '') > dateEnd) return false;
 
         return true;
@@ -2028,7 +2035,7 @@
       if (filteredManagementRecords.length === 0) {
         tbody.innerHTML = `
           <tr>
-            <td colspan="12" class="p-8 text-center text-slate-500 font-tactical uppercase tracking-wider">
+            <td colspan="13" class="p-8 text-center text-slate-500 font-tactical uppercase tracking-wider">
               Nenhum registro encontrado para os filtros selecionados.
             </td>
           </tr>
@@ -2036,13 +2043,22 @@
         return;
       }
 
-      tbody.innerHTML = filteredManagementRecords.map((r, idx) => {
+      tbody.innerHTML = filteredManagementRecords.map((r) => {
+        const isChecked = selectedRecordIds.has(r.id);
         const valorPecas = parseFloat(r.valor_pecas) || 0;
         const valorMO = parseFloat(r.valor_mo) || 0;
         const valorTotal = parseFloat(r.valor_total) || (valorPecas + valorMO);
 
         return `
-          <tr class="hover:bg-slate-900/60 transition-colors border-b border-slate-800/80">
+          <tr class="hover:bg-slate-900/60 transition-colors border-b border-slate-800/80 ${isChecked ? 'bg-rose-950/20' : ''}">
+            <td class="py-3 px-3 text-center no-print">
+              <input
+                type="checkbox"
+                ${isChecked ? 'checked' : ''}
+                onchange="toggleSelectRecordRow('${r.id}', this.checked)"
+                class="w-4 h-4 rounded bg-slate-900 border-slate-700 text-rose-500 focus:ring-rose-500 cursor-pointer"
+              />
+            </td>
             <td class="py-3 px-3 whitespace-nowrap font-bold text-rivSky">
               ${formatDateBR(r.data)}
             </td>
@@ -2092,22 +2108,22 @@
               <div class="flex items-center justify-center gap-1.5">
                 <button
                   onclick="openEditRecordModal('${r.id}')"
-                  class="p-1.5 bg-amber-500/20 hover:bg-amber-500/40 text-amber-300 border border-amber-500/40 rounded transition-colors cursor-pointer"
+                  class="px-2 py-1 bg-amber-500/20 hover:bg-amber-500/40 text-amber-300 border border-amber-500/40 rounded text-[10px] font-tactical font-bold uppercase flex items-center gap-1 cursor-pointer"
                   title="Editar com Auditoria"
                 >
-                  <i data-lucide="edit-3" class="w-3.5 h-3.5"></i>
+                  <i data-lucide="edit-3" class="w-3.5 h-3.5"></i> EDITAR
                 </button>
                 <button
                   onclick="openDeleteRecordModal('${r.id}')"
-                  class="p-1.5 bg-rose-500/20 hover:bg-rose-500/40 text-rose-300 border border-rose-500/40 rounded transition-colors cursor-pointer"
+                  class="px-2 py-1 bg-rose-500/20 hover:bg-rose-500/40 text-rose-300 border border-rose-500/40 rounded text-[10px] font-tactical font-bold uppercase flex items-center gap-1 cursor-pointer"
                   title="Excluir com Auditoria"
                 >
-                  <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                  <i data-lucide="trash-2" class="w-3.5 h-3.5"></i> EXCLUIR
                 </button>
                 <button
                   onclick="consultVehicle('${r.plate}')"
-                  class="p-1.5 bg-rivSky/20 hover:bg-rivSky/40 text-rivSky border border-rivSky/40 rounded transition-colors cursor-pointer"
-                  title="Ver Ficha RIV da Viatura"
+                  class="p-1.5 bg-rivSky/20 hover:bg-rivSky/40 text-rivSky border border-rivSky/40 rounded cursor-pointer"
+                  title="Ver Ficha da Viatura"
                 >
                   <i data-lucide="eye" class="w-3.5 h-3.5"></i>
                 </button>
@@ -2120,14 +2136,78 @@
       lucide.createIcons();
     }
 
+    // SELEÇÃO MÚLTIPLA E BULK DELETE
+    function toggleSelectRecordRow(id, isChecked) {
+      if (isChecked) {
+        selectedRecordIds.add(id);
+      } else {
+        selectedRecordIds.delete(id);
+      }
+      updateBulkDeleteButton();
+    }
+
+    function toggleSelectAllRows(isChecked) {
+      if (isChecked) {
+        filteredManagementRecords.forEach(r => selectedRecordIds.add(r.id));
+      } else {
+        selectedRecordIds.clear();
+      }
+      renderManagementTable();
+      updateBulkDeleteButton();
+    }
+
+    function updateBulkDeleteButton() {
+      const btn = document.getElementById('btnBulkDelete');
+      const counter = document.getElementById('bulkSelectedCount');
+      const count = selectedRecordIds.size;
+
+      if (counter) counter.textContent = count;
+
+      if (!btn) return;
+      if (count > 0) {
+        btn.disabled = false;
+        btn.className = 'px-4 py-2.5 bg-rose-600 hover:bg-rose-500 text-white font-tactical font-black text-xs uppercase rounded-lg shadow-lg flex items-center gap-1.5 transition-all cursor-pointer animate-pulse';
+      } else {
+        btn.disabled = true;
+        btn.className = 'px-4 py-2.5 bg-rose-950/40 border border-rose-500/30 text-rose-300/40 font-tactical font-bold text-xs uppercase rounded-lg flex items-center gap-1.5 transition-all cursor-not-allowed';
+      }
+    }
+
+    function openBulkDeleteModal() {
+      if (selectedRecordIds.size === 0) return alert('Selecione ao menos um registro para excluir.');
+
+      document.getElementById('deleteTargetMode').value = 'BULK';
+      document.getElementById('deleteRecordId').value = Array.from(selectedRecordIds).join(',');
+
+      const listDiv = document.getElementById('deleteItemsListDisplay');
+      if (listDiv) {
+        const selectedRecs = allRIVRecords.filter(r => selectedRecordIds.has(r.id));
+        listDiv.innerHTML = `
+          <div class="text-amber-400 font-bold mb-1 uppercase">EXCLUSÃO EM MASSA: ${selectedRecs.length} REGISTROS SELECIONADOS</div>
+          ${selectedRecs.map(r => `
+            <div class="border-b border-slate-800 pb-1">
+              • <strong>${r.plate}</strong> (${r.prefix || '-'}) - Data: ${formatDateBR(r.data)} | KM: ${r.km}
+            </div>
+          `).join('')}
+        `;
+      }
+
+      resetDeleteAuthForm();
+
+      const modal = document.getElementById('modalDeleteRecord');
+      if (modal) {
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+      }
+      lucide.createIcons();
+    }
+
     async function reloadAllFromSupabase() {
       try {
-        let count = 0;
         if (supabaseClient) {
           const { data, error } = await supabaseClient.from('riv_records').select('*');
           if (!error && data) {
             allRIVRecords = data;
-            count += data.length;
           }
         }
         await fetchLinhaMecanicaRecords();
@@ -2139,7 +2219,7 @@
       }
     }
 
-    // 10. AUDITORIA: EDIÇÃO DE REGISTRO
+    // AUDITORIA: EDIÇÃO DE REGISTRO
     function openEditRecordModal(recordId) {
       const rec = allRIVRecords.find(r => r.id === recordId);
       if (!rec) return alert('Registro não localizado.');
@@ -2161,7 +2241,6 @@
 
       document.getElementById('editServicos').value = (rec.servicos || []).join('\n');
 
-      // Limpa campos de auditoria
       document.getElementById('editAuthPassword').value = '';
       document.getElementById('editAuthNome').value = '';
       document.getElementById('editAuthRe').value = '';
@@ -2190,7 +2269,7 @@
       if (pass !== DEV_PASSWORD) return alert('SENHA MESTRE INCORRETA. Ação não autorizada.');
 
       const justificativa = document.getElementById('editAuthJustificativa').value.trim();
-      if (justificativa.length < 10) return alert('A justificativa da alteração é obrigatória (mínimo 10 caracteres).');
+      if (justificativa.length < 5) return alert('A justificativa da alteração é obrigatória.');
 
       const recordId = document.getElementById('editRecordId').value;
       const rec = allRIVRecords.find(r => r.id === recordId);
@@ -2212,19 +2291,6 @@
       const auditorNome = document.getElementById('editAuthNome').value.trim().toUpperCase();
       const auditorRe = document.getElementById('editAuthRe').value.trim().toUpperCase();
 
-      const auditLog = {
-        timestamp: new Date().toISOString(),
-        auditor: `${auditorPosto} ${auditorNome} (RE: ${auditorRe})`,
-        justificativa: justificativa,
-        dados_anteriores: {
-          data: rec.data,
-          km: rec.km,
-          servicos: rec.servicos,
-          valor_total: rec.valor_total
-        }
-      };
-
-      // Atualiza registro
       rec.data = dataSrv;
       rec.km = km;
       rec.os = os;
@@ -2234,15 +2300,12 @@
       rec.valor_pecas = valorPecas;
       rec.valor_mo = valorMO;
       rec.valor_total = valorTotal;
-      rec.historico_auditoria = rec.historico_auditoria || [];
-      rec.historico_auditoria.push(auditLog);
 
       saveLocalRecords();
 
-      // Atualiza no Supabase
       if (supabaseClient) {
         try {
-          const { error } = await supabaseClient.from('riv_records').update({
+          await supabaseClient.from('riv_records').update({
             data: dataSrv,
             km: km,
             os: os,
@@ -2253,34 +2316,38 @@
             valor_mo: valorMO,
             valor_total: valorTotal
           }).eq('id', recordId);
-
-          if (error) {
-            console.error('Erro update Supabase:', error);
-          }
         } catch (e) {
           console.error(e);
         }
       }
 
-      alert('✅ REGISTRO ATUALIZADO COM SUCESSO E LOG DE AUDITORIA GRAVADO!');
+      alert('✅ REGISTRO ATUALIZADO COM SUCESSO!');
       closeEditModal();
-      applyManagementFilters();
+      if (currentView === 'MANAGEMENT') {
+        applyManagementFilters();
+      } else if (currentView === 'CONSULT' && currentSelectedVehicle) {
+        renderVehicleRIVPage(currentSelectedVehicle);
+      }
     }
 
-    // 11. AUDITORIA: EXCLUSÃO DE REGISTRO
+    // AUDITORIA: EXCLUSÃO INDIVIDUAL
     function openDeleteRecordModal(recordId) {
       const rec = allRIVRecords.find(r => r.id === recordId);
       if (!rec) return alert('Registro não localizado.');
 
+      document.getElementById('deleteTargetMode').value = 'SINGLE';
       document.getElementById('deleteRecordId').value = rec.id;
-      document.getElementById('deletePlateDisplay').textContent = `${rec.plate} (${rec.prefix || 'SEM PREF'})`;
-      document.getElementById('deleteDataDisplay').textContent = formatDateBR(rec.data);
-      document.getElementById('deleteKmDisplay').textContent = `${rec.km} KM`;
 
-      document.getElementById('deleteAuthPassword').value = '';
-      document.getElementById('deleteAuthNome').value = '';
-      document.getElementById('deleteAuthRe').value = '';
-      document.getElementById('deleteAuthJustificativa').value = '';
+      const listDiv = document.getElementById('deleteItemsListDisplay');
+      if (listDiv) {
+        listDiv.innerHTML = `
+          <div><strong>VIATURA:</strong> <span class="text-white">${rec.plate} (${rec.prefix || 'SEM PREF'})</span></div>
+          <div><strong>DATA:</strong> <span class="text-slate-300">${formatDateBR(rec.data)}</span> • <strong>KM:</strong> <span class="text-emerald-400">${rec.km} KM</span></div>
+          <div class="text-slate-400 mt-1"><strong>SERVIÇOS:</strong> ${(rec.servicos || []).join(' | ')}</div>
+        `;
+      }
+
+      resetDeleteAuthForm();
 
       const modal = document.getElementById('modalDeleteRecord');
       if (modal) {
@@ -2288,6 +2355,13 @@
         modal.classList.add('flex');
       }
       lucide.createIcons();
+    }
+
+    function resetDeleteAuthForm() {
+      document.getElementById('deleteAuthPassword').value = '';
+      document.getElementById('deleteAuthNome').value = '';
+      document.getElementById('deleteAuthRe').value = '';
+      document.getElementById('deleteAuthJustificativa').value = '';
     }
 
     function closeDeleteModal() {
@@ -2299,42 +2373,155 @@
     }
 
     async function handleConfirmDeleteRecord(event) {
-      event.preventDefault();
+      if (event) event.preventDefault();
 
-      const pass = document.getElementById('deleteAuthPassword').value;
-      if (pass !== DEV_PASSWORD) return alert('SENHA MESTRE INCORRETA. Ação cancelada.');
+      const btnSubmit = document.querySelector('#deleteRecordForm button[type="submit"]');
+      const originalBtnText = btnSubmit ? btnSubmit.innerHTML : 'CONFIRMAR EXCLUSÃO PERMANENTE';
 
-      const justificativa = document.getElementById('deleteAuthJustificativa').value.trim();
-      if (justificativa.length < 5) return alert('A justificativa da exclusão é obrigatória.');
+      try {
+        const passInput = document.getElementById('deleteAuthPassword');
+        const pass = passInput ? passInput.value.trim() : '';
+        if (pass !== DEV_PASSWORD) {
+          alert('SENHA MESTRE INCORRETA. Ação cancelada.');
+          if (passInput) passInput.focus();
+          return;
+        }
 
-      const recordId = document.getElementById('deleteRecordId').value;
-      
-      // Remove do array local
-      allRIVRecords = allRIVRecords.filter(r => r.id !== recordId);
-      saveLocalRecords();
+        const justificativaInput = document.getElementById('deleteAuthJustificativa');
+        const justificativa = justificativaInput ? justificativaInput.value.trim() : '';
+        if (justificativa.length < 3) {
+          alert('A justificativa da exclusão é obrigatória.');
+          if (justificativaInput) justificativaInput.focus();
+          return;
+        }
 
-      // Remove do Supabase
-      if (supabaseClient) {
-        try {
-          const { error } = await supabaseClient.from('riv_records').delete().eq('id', recordId);
-          if (error) {
-            console.error('Erro ao deletar no Supabase:', error);
+        const targetIdsStr = document.getElementById('deleteRecordId')?.value || '';
+        const targetIds = targetIdsStr.split(',').map(s => s.trim()).filter(Boolean);
+
+        if (targetIds.length === 0) {
+          alert('Nenhum registro selecionado para exclusão.');
+          closeDeleteModal();
+          return;
+        }
+
+        const targetSet = new Set(targetIds);
+
+        const auditorPosto = document.getElementById('deleteAuthPosto')?.value || 'CAP PM';
+        const auditorNome = (document.getElementById('deleteAuthNome')?.value || 'ADMIN').trim().toUpperCase();
+        const auditorRe = (document.getElementById('deleteAuthRe')?.value || '').trim().toUpperCase();
+        const auditorCompleto = `${auditorPosto} ${auditorNome} (RE: ${auditorRe || 'CMM'})`;
+
+        if (btnSubmit) {
+          btnSubmit.disabled = true;
+          btnSubmit.innerHTML = `<span class="animate-spin mr-1.5">⚙️</span> EXCLUINDO E ENVIANDO ALERTA...`;
+        }
+
+        const deletedItems = allRIVRecords.filter(r => targetSet.has(r.id));
+        const auditLogs = JSON.parse(localStorage.getItem('CMM_RIV_AUDIT_LOGS') || '[]');
+        const supabaseAuditEntries = [];
+
+        // Prepara os logs e envia webhook / e-mail para cada item
+        for (const item of deletedItems) {
+          const logEntry = {
+            timestamp: new Date().toISOString(),
+            tipo_acao: 'EXCLUSÃO',
+            auditor: auditorCompleto,
+            auditor_posto: auditorPosto,
+            auditor_nome: auditorNome,
+            auditor_re: auditorRe,
+            justificativa: justificativa,
+            id_registro: item.id,
+            placa: item.plate || '',
+            prefixo: item.prefix || '',
+            data_servico: item.data || '',
+            km: item.km || '',
+            servicos: (item.servicos || []).join(' | '),
+            valor_total: item.valor_total ? `R$ ${parseFloat(item.valor_total).toFixed(2)}` : 'R$ 0,00'
+          };
+          auditLogs.push(logEntry);
+
+          supabaseAuditEntries.push({
+            record_id: item.id,
+            plate: item.plate || '',
+            prefix: item.prefix || '',
+            opm: item.opm || 'CMM',
+            data_servico: item.data || '',
+            km: String(item.km || ''),
+            servicos: item.servicos || [],
+            valor_total: Number(item.valor_total || 0),
+            auditor_posto: auditorPosto,
+            auditor_nome: auditorNome,
+            auditor_re: auditorRe,
+            justificativa: justificativa,
+            deleted_at: new Date().toISOString(),
+            raw_payload: item
+          });
+
+          // Envia disparo de E-MAIL e gravação no Google Sheets (LOG_AUDITORIA)
+          try {
+            fetch(GOOGLE_SHEETS_RIV_URL, {
+              method: 'POST',
+              mode: 'no-cors',
+              headers: { 'Content-Type': 'text/plain' },
+              body: JSON.stringify({ data: { action: 'RIV_EXCLUSAO', ...logEntry } })
+            }).catch(err => console.warn('Email/Sheets sync warning:', err));
+          } catch(e) {
+            console.warn('Webhook error:', e);
           }
-        } catch(e) {
-          console.error(e);
+        }
+
+        localStorage.setItem('CMM_RIV_AUDIT_LOGS', JSON.stringify(auditLogs));
+
+        // Grava no Supabase (riv_deleted_records)
+        if (supabaseClient && supabaseAuditEntries.length > 0) {
+          try {
+            const { error: insErr } = await supabaseClient.from('riv_deleted_records').insert(supabaseAuditEntries);
+            if (insErr) console.warn('Supabase riv_deleted_records insert warning:', insErr);
+          } catch(sbErr) {
+            console.warn('Supabase insert exception:', sbErr);
+          }
+        }
+
+        // Remove do array local
+        allRIVRecords = allRIVRecords.filter(r => !targetSet.has(r.id));
+        targetIds.forEach(id => selectedRecordIds.delete(id));
+        saveLocalRecords();
+
+        // Remove do Supabase ativo (riv_records)
+        if (supabaseClient) {
+          try {
+            const { error: delErr } = await supabaseClient.from('riv_records').delete().in('id', targetIds);
+            if (delErr) console.warn('Supabase riv_records delete warning:', delErr);
+          } catch(delEx) {
+            console.warn('Supabase delete exception:', delEx);
+          }
+        }
+
+        alert(`✅ ${targetIds.length} REGISTRO(S) EXCLUÍDO(S) COM SUCESSO!\n- Log gravado no Supabase (riv_deleted_records)\n- E-mail enviado para cmmmanutfrota@policiamilitar.sp.gov.br`);
+        closeDeleteModal();
+        updateBulkDeleteButton();
+
+        if (currentView === 'MANAGEMENT') {
+          applyManagementFilters();
+        } else if (currentView === 'CONSULT' && currentSelectedVehicle) {
+          renderVehicleRIVPage(currentSelectedVehicle);
+        }
+      } catch(err) {
+        console.error('Erro na exclusão:', err);
+        alert('ERRO AO PROCESSAR EXCLUSÃO: ' + err.message);
+      } finally {
+        if (btnSubmit) {
+          btnSubmit.disabled = false;
+          btnSubmit.innerHTML = originalBtnText;
         }
       }
-
-      alert('✅ REGISTRO EXCLUÍDO COM SUCESSO!');
-      closeDeleteModal();
-      applyManagementFilters();
     }
 
-    // 12. EXPORTAÇÃO CSV / EXCEL
+    // EXPORTAÇÃO CSV / EXCEL
     function exportRIVRecordsToCSV() {
       if (filteredManagementRecords.length === 0) return alert('Nenhum registro para exportar.');
 
-      let csv = '\uFEFF'; // BOM para suporte acentuação no Excel
+      let csv = '\uFEFF';
       csv += 'ID;DATA;PLACA;PREFIXO;OPM;MODELO;ANO;KM;SERVIÇOS EXECUTADOS;LOCAL;RESPONSÁVEL;OS;VALOR PEÇAS (R$);VALOR MO (R$);CUSTO TOTAL (R$)\n';
 
       filteredManagementRecords.forEach(r => {
@@ -2360,7 +2547,7 @@
       window.print();
     }
 
-    // 13. QR CODE MODAL
+    // QR CODE MODAL
     function generateQrCodeModal() {
       if (!currentSelectedVehicle) return alert('NENHUMA VIATURA SELECIONADA.');
 

@@ -50,7 +50,76 @@ function doPost(e) {
       })).setMimeType(ContentService.MimeType.JSON);
     }
 
-    // AÇÃO 2: GRAVAR NOVO REGISTRO DO RIV (ABA 1)
+    // AÇÃO 2: REGISTRO DE LOG DE AUDITORIA (EXCLUSÕES E ALTERAÇÕES)
+    if (d.action === "RIV_AUDITORIA" || d.action === "RIV_EXCLUSAO") {
+      var sheetAudit = ss.getSheetByName("LOG_AUDITORIA");
+      if (!sheetAudit) {
+        sheetAudit = ss.insertSheet("LOG_AUDITORIA");
+        sheetAudit.appendRow([
+          "TIMESTAMP", "AÇÃO", "AUDITOR", "JUSTIFICATIVA", "PLACA", 
+          "PREFIXO", "DATA SERVIÇO", "KM", "SERVIÇOS", "VALOR TOTAL", "ID REGISTRO"
+        ]);
+      }
+      sheetAudit.appendRow([
+        new Date(),
+        d.tipo_acao || 'EXCLUSÃO',
+        d.auditor || '',
+        d.justificativa || '',
+        (d.placa || '').toUpperCase(),
+        (d.prefixo || '').toUpperCase(),
+        d.data_servico || '',
+        d.km || '',
+        d.servicos || '',
+        d.valor_total || '',
+        d.id_registro || ''
+      ]);
+      var lastAuditRow = sheetAudit.getLastRow();
+      sheetAudit.getRange(lastAuditRow, 9).setWrap(true);
+
+      // ENVIO AUTOMÁTICO DE E-MAIL DE ALERTA DE EXCLUSÃO
+      if (d.action === "RIV_EXCLUSAO" || d.tipo_acao === "EXCLUSÃO") {
+        try {
+          var recipientEmail = "cmmmanutfrota@policiamilitar.sp.gov.br";
+          var subject = "[ALERTA RIV PMESP] Exclusão de Registro - Vtr " + (d.placa || 'N/A') + " - " + (d.auditor || 'Auditor');
+          var htmlBody = '<div style="font-family: Arial, sans-serif; background-color: #f4f6f9; padding: 20px; color: #1e293b;">' +
+            '<div style="max-width: 600px; margin: 0 auto; background: #ffffff; border-radius: 8px; overflow: hidden; border: 1px solid #e2e8f0; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">' +
+              '<div style="background-color: #b91c1c; color: #ffffff; padding: 16px 20px;">' +
+                '<h2 style="margin: 0; font-size: 18px; text-transform: uppercase;">⚠️ ALERTA DE EXCLUSÃO DE REGISTRO - RIV ELETRÔNICO</h2>' +
+                '<p style="margin: 4px 0 0 0; font-size: 12px; opacity: 0.9;">CENTRO DE MOTOMECANIZAÇÃO - POLÍCIA MILITAR DO ESTADO DE SÃO PAULO</p>' +
+              '</div>' +
+              '<div style="padding: 20px;">' +
+                '<p style="font-size: 14px; margin-top: 0;">Foi confirmada uma <strong>exclusão de registro</strong> no RIV Eletrônico com os seguintes dados de auditoria:</p>' +
+                '<table style="width: 100%; border-collapse: collapse; font-size: 13px; margin: 15px 0;">' +
+                  '<tr style="background-color: #f8fafc;"><td style="padding: 8px; border: 1px solid #e2e8f0; font-weight: bold; width: 35%;">DATA / HORA:</td><td style="padding: 8px; border: 1px solid #e2e8f0;">' + Utilities.formatDate(new Date(), "America/Sao_Paulo", "dd/MM/yyyy HH:mm:ss") + '</td></tr>' +
+                  '<tr><td style="padding: 8px; border: 1px solid #e2e8f0; font-weight: bold;">AUDITOR RESPONSÁVEL:</td><td style="padding: 8px; border: 1px solid #e2e8f0; color: #b91c1c; font-weight: bold;">' + (d.auditor || '-') + '</td></tr>' +
+                  '<tr style="background-color: #f8fafc;"><td style="padding: 8px; border: 1px solid #e2e8f0; font-weight: bold;">JUSTIFICATIVA:</td><td style="padding: 8px; border: 1px solid #e2e8f0; font-style: italic;">' + (d.justificativa || '-') + '</td></tr>' +
+                  '<tr><td style="padding: 8px; border: 1px solid #e2e8f0; font-weight: bold;">VIATURA (PLACA):</td><td style="padding: 8px; border: 1px solid #e2e8f0; font-weight: bold;">' + (d.placa || '-') + (d.prefixo ? ' (' + d.prefixo + ')' : '') + '</td></tr>' +
+                  '<tr style="background-color: #f8fafc;"><td style="padding: 8px; border: 1px solid #e2e8f0; font-weight: bold;">DATA DO SERVIÇO:</td><td style="padding: 8px; border: 1px solid #e2e8f0;">' + (d.data_servico || '-') + '</td></tr>' +
+                  '<tr><td style="padding: 8px; border: 1px solid #e2e8f0; font-weight: bold;">KM REGISTRADO:</td><td style="padding: 8px; border: 1px solid #e2e8f0;">' + (d.km || '-') + ' KM</td></tr>' +
+                  '<tr style="background-color: #f8fafc;"><td style="padding: 8px; border: 1px solid #e2e8f0; font-weight: bold;">SERVIÇOS EXCLUÍDOS:</td><td style="padding: 8px; border: 1px solid #e2e8f0;">' + (d.servicos || '-') + '</td></tr>' +
+                  '<tr><td style="padding: 8px; border: 1px solid #e2e8f0; font-weight: bold;">VALOR TOTAL:</td><td style="padding: 8px; border: 1px solid #e2e8f0; font-weight: bold;">' + (d.valor_total || 'R$ 0,00') + '</td></tr>' +
+                  '<tr style="background-color: #f8fafc;"><td style="padding: 8px; border: 1px solid #e2e8f0; font-weight: bold;">ID DO REGISTRO:</td><td style="padding: 8px; border: 1px solid #e2e8f0; font-family: monospace; font-size: 11px;">' + (d.id_registro || '-') + '</td></tr>' +
+                '</table>' +
+                '<p style="font-size: 11px; color: #64748b; margin-bottom: 0;">Este é um e-mail automático gerado pelo Sistema RIV Eletrônico do CMM / PMESP para fins de controle e auditoria.</p>' +
+              '</div>' +
+            '</div>' +
+          '</div>';
+
+          MailApp.sendEmail({
+            to: recipientEmail,
+            subject: subject,
+            htmlBody: htmlBody
+          });
+        } catch (mailErr) {
+          Logger.log("Erro ao enviar e-mail de auditoria: " + mailErr.toString());
+        }
+      }
+
+      return ContentService.createTextOutput(JSON.stringify({ status: "SUCCESS" }))
+        .setMimeType(ContentService.MimeType.JSON);
+    }
+
+    // AÇÃO 3: GRAVAR NOVO REGISTRO DO RIV (ABA 1)
     var sheet = ss.getSheetByName("RIV_LANCAMENTOS") || ss.getSheets()[0];
     
     // Se a aba estiver sem cabeçalho, cria
