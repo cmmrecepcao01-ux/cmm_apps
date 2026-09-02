@@ -8,10 +8,13 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
     <!-- FontAwesome -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <!-- SheetJS para exportação e importação Excel -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-    <!-- Dados iniciais -->
+    <!-- ExcelJS para exportação fiel ao template original -->
+    <script src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js"></script>
+    <!-- Supabase JS CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <!-- Dados iniciais e Template Excel Oficial em Base64 -->
     <script src="escala_data.js"></script>
+    <script src="excel_template_b64.js"></script>
     <style>
         :root {
             --bg-base: #0a0c10;
@@ -25,7 +28,7 @@
             --text-muted: #94a3b8;
             --text-dim: #64748b;
             
-            /* Status Colors */
+            /* Status Colors Principais */
             --status-s-bg: #064e3b;
             --status-s-text: #34d399;
             --status-s-border: #059669;
@@ -50,19 +53,25 @@
             --status-ds-text: #c084fc;
             --status-ds-border: #9333ea;
 
-            --status-agr-bg: #3f3f46;
-            --status-agr-text: #e4e4e7;
-            --status-agr-border: #71717a;
+            --status-ag-bg: #3f3f46;
+            --status-ag-text: #e4e4e7;
+            --status-ag-border: #71717a;
 
             --status-lp-bg: #042f2e;
             --status-lp-text: #2dd4bf;
             --status-lp-border: #0d9488;
+
+            /* Outras Siglas Especiais */
+            --status-special-bg: #1f2937;
+            --status-special-text: #e5e7eb;
+            --status-special-border: #4b5563;
             
             --accent-blue: #3b82f6;
             --accent-green: #10b981;
             --accent-amber: #f59e0b;
             --accent-rose: #f43f5e;
             --accent-indigo: #6366f1;
+            --accent-cyan: #06b6d4;
         }
 
         * {
@@ -142,7 +151,22 @@
             letter-spacing: 0.8px;
             margin-top: 2px;
             font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
+
+        .cloud-badge {
+            font-size: 0.65rem;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: 800;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .cloud-online { background: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid #059669; }
+        .cloud-offline { background: rgba(245, 158, 11, 0.2); color: #fbbf24; border: 1px solid #d97706; }
 
         .header-actions {
             display: flex;
@@ -155,6 +179,7 @@
         .btn {
             display: inline-flex;
             align-items: center;
+            justify-content: center;
             gap: 7px;
             padding: 8px 14px;
             border-radius: 7px;
@@ -264,7 +289,7 @@
             padding: 20px 24px;
         }
 
-        /* KPI & PERIOD BAR */
+        /* TOP TOOLBAR: KPIS EM LINHA ÚNICA E BOTÕES EMPILHADOS */
         .top-toolbar {
             display: grid;
             grid-template-columns: auto 1fr auto;
@@ -273,7 +298,7 @@
             background: var(--bg-card);
             border: 1px solid var(--border);
             border-radius: 12px;
-            padding: 14px 20px;
+            padding: 12px 18px;
             margin-bottom: 20px;
         }
 
@@ -312,51 +337,72 @@
             border-color: var(--accent-blue);
         }
 
+        /* KPIS EM LINHA ÚNICA */
         .kpi-row {
             display: flex;
-            gap: 12px;
-            justify-content: center;
-            flex-wrap: wrap;
+            gap: 8px;
+            align-items: center;
+            justify-content: flex-start;
+            flex-wrap: nowrap;
+            overflow-x: auto;
+            padding: 2px 0;
         }
 
         .kpi-badge {
             background: rgba(255, 255, 255, 0.03);
             border: 1px solid var(--border);
             border-radius: 8px;
-            padding: 8px 14px;
+            padding: 6px 12px;
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 8px;
+            flex-shrink: 0;
         }
 
         .kpi-badge i {
-            font-size: 1.1rem;
+            font-size: 1rem;
         }
 
         .kpi-badge .kpi-num {
-            font-size: 1.1rem;
+            font-size: 1.05rem;
             font-weight: 800;
             font-family: 'JetBrains Mono', monospace;
         }
 
         .kpi-badge .kpi-desc {
-            font-size: 0.68rem;
+            font-size: 0.64rem;
             color: var(--text-muted);
             font-weight: 600;
+            white-space: nowrap;
         }
 
-        /* LEGEND & QUICK STAMPER */
+        /* COLUNA VERTICAL DE BOTÕES À DIREITA */
+        .action-buttons-column {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            min-width: 155px;
+        }
+
+        .action-buttons-column .btn {
+            padding: 6px 12px;
+            font-size: 0.72rem;
+            width: 100%;
+        }
+
+        /* LEGENDA & CARIMBO RÁPIDO DE SIGLAS */
         .legend-bar {
             background: var(--bg-card);
             border: 1px solid var(--border);
             border-radius: 10px;
-            padding: 10px 16px;
+            padding: 8px 16px;
             margin-bottom: 20px;
             display: flex;
             align-items: center;
             justify-content: space-between;
             flex-wrap: wrap;
-            gap: 12px;
+            gap: 10px;
+            position: relative;
         }
 
         .legend-title {
@@ -371,12 +417,12 @@
         .legend-items {
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 6px;
             flex-wrap: wrap;
         }
 
         .sigla-chip {
-            padding: 4px 10px;
+            padding: 4px 9px;
             border-radius: 5px;
             font-size: 0.72rem;
             font-weight: 800;
@@ -386,6 +432,7 @@
             display: inline-flex;
             align-items: center;
             gap: 5px;
+            white-space: nowrap;
         }
 
         .sigla-chip:hover {
@@ -403,8 +450,64 @@
         .chip-fm  { background: var(--status-fm-bg);  color: var(--status-fm-text);  border-color: var(--status-fm-border); }
         .chip-lts { background: var(--status-lts-bg); color: var(--status-lts-text); border-color: var(--status-lts-border); }
         .chip-ds  { background: var(--status-ds-bg);  color: var(--status-ds-text);  border-color: var(--status-ds-border); }
-        .chip-agr { background: var(--status-agr-bg); color: var(--status-agr-text); border-color: var(--status-agr-border); }
+        .chip-ag  { background: var(--status-ag-bg);   color: var(--status-ag-text);   border-color: var(--status-ag-border); }
         .chip-lp  { background: var(--status-lp-bg);  color: var(--status-lp-text);  border-color: var(--status-lp-border); }
+        .chip-more{ background: #1e293b; color: #38bdf8; border-color: #3b82f6; }
+
+        /* MENU SUSPENSO DE TODAS AS SIGLAS PMESP */
+        .siglas-dropdown-menu {
+            position: absolute;
+            top: calc(100% + 5px);
+            right: 16px;
+            background: #111827;
+            border: 1px solid var(--accent-blue);
+            border-radius: 10px;
+            padding: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+            z-index: 1000;
+            display: none;
+            width: 480px;
+            max-height: 380px;
+            overflow-y: auto;
+        }
+
+        .siglas-dropdown-menu.show {
+            display: block;
+        }
+
+        .siglas-grid-dropdown {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 6px;
+        }
+
+        .sigla-drop-item {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 6px 8px;
+            font-size: 0.7rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+
+        .sigla-drop-item:hover {
+            background: rgba(59, 130, 246, 0.15);
+            border-color: var(--accent-blue);
+        }
+
+        .sigla-tag-sm {
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: 900;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.72rem;
+            min-width: 34px;
+            text-align: center;
+        }
 
         /* SEARCH & FILTER BAR */
         .filter-row {
@@ -479,7 +582,6 @@
             text-align: center;
         }
 
-        /* Header oficial PMESP */
         .escala-table thead tr.main-head th {
             background: #1e293b;
             color: #e2e8f0;
@@ -519,7 +621,6 @@
             background: #25121b;
         }
 
-        /* Grupo / Seção Banner Row */
         .group-header-row td {
             background: #1e293b;
             color: #38bdf8;
@@ -532,7 +633,6 @@
             border-left: 5px solid #38bdf8;
         }
 
-        /* Body Rows */
         .escala-table tbody tr {
             border-bottom: 1px solid #1f293d;
             transition: background-color 0.15s;
@@ -598,7 +698,6 @@
             white-space: nowrap;
         }
 
-        /* DAY CELL (Interactive matrix cell) */
         .td-day-cell {
             padding: 3px !important;
             width: 58px;
@@ -635,8 +734,9 @@
         .status-badge.status-FM  { background: var(--status-fm-bg);  color: var(--status-fm-text);  border-color: var(--status-fm-border); }
         .status-badge.status-LTS { background: var(--status-lts-bg); color: var(--status-lts-text); border-color: var(--status-lts-border); }
         .status-badge.status-DS  { background: var(--status-ds-bg);  color: var(--status-ds-text);  border-color: var(--status-ds-border); }
-        .status-badge.status-AGR { background: var(--status-agr-bg); color: var(--status-agr-text); border-color: var(--status-agr-border); }
+        .status-badge.status-AG  { background: var(--status-ag-bg);  color: var(--status-ag-text);  border-color: var(--status-ag-border); }
         .status-badge.status-LP  { background: var(--status-lp-bg);  color: var(--status-lp-text);  border-color: var(--status-lp-border); }
+        .status-badge.status-OTHER { background: var(--status-special-bg); color: var(--status-special-text); border-color: var(--status-special-border); }
         .status-badge.status-EMPTY { background: #161b26; color: #475569; border: 1px dashed #334155; }
 
         .td-actions {
@@ -740,7 +840,7 @@
             display: flex;
             flex-direction: column;
             gap: 8px;
-            max-height: 320px;
+            max-height: 380px;
             overflow-y: auto;
             padding-right: 6px;
         }
@@ -764,6 +864,11 @@
             background: rgba(59, 130, 246, 0.04);
         }
 
+        .obs-item.padrao-institucional {
+            border-left: 3px solid #10b981;
+            background: rgba(16, 185, 129, 0.03);
+        }
+
         .obs-item:hover {
             border-color: #3b82f6;
         }
@@ -781,7 +886,7 @@
             display: flex;
             flex-direction: column;
             gap: 6px;
-            max-height: 320px;
+            max-height: 380px;
             overflow-y: auto;
             padding-right: 6px;
         }
@@ -827,6 +932,34 @@
             box-shadow: 0 0 8px rgba(239, 68, 68, 0.3);
         }
 
+        /* EQUIPE SELECTOR CHIPS NO MODAL */
+        .equipe-selector-row {
+            display: flex;
+            gap: 8px;
+            margin-top: 6px;
+        }
+
+        .equipe-btn-chip {
+            flex: 1;
+            padding: 8px 12px;
+            background: #1e293b;
+            border: 1px solid #334155;
+            color: #94a3b8;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 800;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.2s;
+        }
+
+        .equipe-btn-chip.active {
+            background: var(--accent-blue);
+            color: #fff;
+            border-color: var(--accent-blue);
+            box-shadow: 0 0 10px rgba(59, 130, 246, 0.3);
+        }
+
         /* FOOTER INFO & ASSINATURAS */
         .footer-info-grid {
             display: grid;
@@ -844,6 +977,25 @@
             border-radius: 8px;
             padding: 12px;
             text-align: center;
+            position: relative;
+            cursor: pointer;
+            transition: border-color 0.2s;
+        }
+
+        .sign-box:hover {
+            border-color: var(--accent-blue);
+            background: rgba(59, 130, 246, 0.03);
+        }
+
+        .sign-edit-btn {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            opacity: 0.6;
+        }
+
+        .sign-box:hover .sign-edit-btn {
+            opacity: 1;
         }
 
         .sign-role {
@@ -886,7 +1038,7 @@
             background: #131926;
             border: 1px solid var(--border-highlight);
             border-radius: 14px;
-            max-width: 620px;
+            max-width: 650px;
             width: 100%;
             box-shadow: 0 10px 40px rgba(0,0,0,0.8);
             overflow: hidden;
@@ -996,38 +1148,341 @@
             transform: translateY(0);
         }
 
-        /* PRINT / PDF STYLES */
+        /* ========================================================================= */
+        /* ÁREA DE IMPRESSÃO OFICIAL PMESP - IDÊNTICA AO FÍSICO (FRENTE E VERSO)     */
+        /* ========================================================================= */
+        #officialPrintArea {
+            display: none;
+        }
+
         @media print {
-            body {
-                background: #fff !important;
-                color: #000 !important;
-                font-size: 9pt !important;
-                padding: 0 !important;
+            @page {
+                size: A4 portrait;
+                margin: 4mm 4mm 4mm 4mm;
             }
-            header, .top-toolbar, .legend-bar, .filter-row, .td-actions, .btn, .role-selector {
+
+            html, body {
+                background: #ffffff !important;
+                color: #000000 !important;
+                font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif !important;
+                font-size: 6.8pt !important;
+                padding: 0 !important;
+                margin: 0 !important;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+
+            header, .top-toolbar, .legend-bar, .filter-row, .table-wrapper, .bottom-grid, .footer-info-grid, .modal-overlay, .toast, .role-selector, .header-actions {
                 display: none !important;
             }
-            .table-wrapper, .panel-card, .footer-info-grid {
-                background: #fff !important;
-                border: 1px solid #000 !important;
-                box-shadow: none !important;
-                color: #000 !important;
+
+            #officialPrintArea {
+                display: block !important;
+                width: 100% !important;
             }
-            .escala-table th, .escala-table td {
-                border: 1px solid #000 !important;
-                color: #000 !important;
+
+            /* PÁGINA 1: FRENTE DA ESCALA */
+            .p-page-1 {
+                page-break-after: always !important;
+                break-after: page !important;
+                width: 100% !important;
             }
-            .status-badge {
-                border: 1px solid #334155 !important;
+
+            /* CABEÇALHO DO DOCUMENTO */
+            .p-header-table {
+                width: 100% !important;
+                border-collapse: collapse !important;
+                border: 1.5px solid #000 !important;
+                margin-bottom: 1.5px !important;
+            }
+
+            .p-header-table td {
+                padding: 1px 2px !important;
+                vertical-align: middle !important;
+                border: none !important;
+            }
+
+            .p-crest-img {
+                width: 44px !important;
+                height: 44px !important;
+                object-fit: contain !important;
+                display: block !important;
+                margin: 0 auto !important;
+            }
+
+            .p-header-titles {
+                text-align: center !important;
+                line-height: 1.1 !important;
+            }
+
+            .p-header-titles h2 {
+                font-size: 7.8pt !important;
+                font-weight: 800 !important;
+                margin: 0 !important;
+            }
+
+            .p-header-titles h3 {
+                font-size: 7.2pt !important;
+                font-weight: 800 !important;
+                margin: 0 !important;
+            }
+
+            .p-period-bar {
+                background: #b8b8b8 !important;
+                border: 1px solid #000 !important;
+                font-size: 7.2pt !important;
+                font-weight: 800 !important;
+                padding: 1px 5px !important;
+                margin-top: 1px !important;
+                display: inline-block !important;
+            }
+
+            .p-secao-bar {
+                text-align: center !important;
+                font-size: 7.4pt !important;
+                font-weight: 800 !important;
+                margin-top: 1px !important;
+            }
+
+            /* TABELA PRINCIPAL DE ESCALA */
+            .p-main-table {
+                width: 100% !important;
+                border-collapse: collapse !important;
+                border: 1.5px solid #000 !important;
+                font-size: 6.4pt !important;
+            }
+
+            .p-main-table th, .p-main-table td {
+                border: 1px solid #000 !important;
+                padding: 0.8px 1.2px !important;
+                text-align: center !important;
+                vertical-align: middle !important;
                 color: #000 !important;
-                background: transparent !important;
+                line-height: 1.05 !important;
+            }
+
+            .p-bg-gray {
+                background: #b8b8b8 !important;
+                font-weight: 800 !important;
+            }
+
+            .p-group-row td {
+                background: #b8b8b8 !important;
+                font-weight: 800 !important;
+                font-size: 6.8pt !important;
+                text-align: center !important;
+                padding: 1px 0 !important;
+                letter-spacing: 0.4px !important;
+                border-top: 1.5px solid #000 !important;
+                border-bottom: 1.5px solid #000 !important;
+            }
+
+            .p-secao-cell {
+                font-weight: 800 !important;
+                font-style: italic !important;
+                font-size: 6.2pt !important;
+                text-align: center !important;
+                line-height: 1.1 !important;
+                padding: 1px !important;
+            }
+
+            .p-text-red {
+                color: #c00000 !important;
+                font-weight: 800 !important;
+            }
+
+            .p-text-bold {
+                font-weight: 800 !important;
+            }
+
+            /* TABELA DE AFASTAMENTOS */
+            .p-afast-box {
+                width: 100% !important;
+                border-collapse: collapse !important;
+                border: 1.5px solid #000 !important;
+                border-top: none !important;
+                font-size: 6.4pt !important;
+            }
+
+            .p-afast-box th, .p-afast-box td {
+                border: 1px solid #000 !important;
+                padding: 0.8px 2px !important;
+            }
+
+            /* PAINEL DE OBSERVAÇÕES */
+            .p-obs-box {
+                width: 100% !important;
+                border: 1.5px solid #000 !important;
+                border-top: none !important;
+                padding: 0 !important;
+            }
+
+            .p-obs-header {
+                background: #b8b8b8 !important;
+                text-align: center !important;
+                font-weight: 800 !important;
+                font-size: 6.8pt !important;
+                border-bottom: 1px solid #000 !important;
+                padding: 0.8px 0 !important;
+            }
+
+            .p-obs-content {
+                padding: 1px 2.5px !important;
+                font-size: 5.6pt !important;
+                line-height: 1.1 !important;
+            }
+
+            .p-obs-row {
+                margin-bottom: 0.6px !important;
+                text-align: justify !important;
+            }
+
+            /* RODAPÉ OFICIAL: AUX DE SEMANA, DATA, QPO E ASSINATURAS (FOTO 3) */
+            .p-footer-table {
+                width: 100% !important;
+                border-collapse: collapse !important;
+                border: 1.5px solid #000 !important;
+                border-top: none !important;
+                font-size: 6.4pt !important;
+            }
+
+            .p-footer-table td {
+                border: 1px solid #000 !important;
+                padding: 0.8px 2.5px !important;
+            }
+
+            .p-aux-row td {
+                background: #b8b8b8 !important;
+                font-weight: 800 !important;
+            }
+
+            .p-date-row td {
+                text-align: center !important;
+                font-weight: 800 !important;
+                padding: 1px 0 !important;
+            }
+
+            /* QUADRO DE QPO (FOTO 3) */
+            .p-qpo-table {
+                border-collapse: collapse !important;
+                border: 1px solid #000 !important;
+                font-size: 6pt !important;
+                text-align: center !important;
+                width: 100% !important;
+            }
+
+            .p-qpo-table th, .p-qpo-table td {
+                border: 1px solid #000 !important;
+                padding: 0.8px 2px !important;
+            }
+
+            /* CAIXAS DE ASSINATURA DA PÁGINA 1 */
+            .p-sign-zone {
+                display: flex !important;
+                flex-direction: column !important;
+                justify-content: space-between !important;
+                min-height: 38px !important;
+                text-align: center !important;
+                padding: 1.5px !important;
+            }
+
+            .p-sign-role-title {
+                text-align: left !important;
+                font-weight: 800 !important;
+                font-size: 6.2pt !important;
+            }
+
+            .p-sign-stamp-area {
+                height: 20px !important;
+            }
+
+            .p-sign-name-tag {
+                font-weight: 800 !important;
+                font-size: 6.5pt !important;
+            }
+
+            .p-sign-post-tag {
+                font-size: 5.8pt !important;
+            }
+
+            /* ========================================================================= */
+            /* PÁGINA 2: VERSO DA ESCALA (ALTERAÇÕES DA ESCALA - FOTOS 2, 3 E 4)         */
+            /* ========================================================================= */
+            .p-page-2 {
+                page-break-before: always !important;
+                break-before: page !important;
+                width: 100% !important;
+                display: flex !important;
+                flex-direction: column !important;
+                min-height: 98vh !important;
+                justify-content: space-between !important;
+            }
+
+            .p-alter-header {
+                background: #b8b8b8 !important;
+                border: 1.5px solid #000 !important;
+                text-align: center !important;
+                font-size: 8.5pt !important;
+                font-weight: 900 !important;
+                padding: 2.5px 0 !important;
+                letter-spacing: 0.8px !important;
+                margin-bottom: 0 !important;
+            }
+
+            .p-alter-table {
+                width: 100% !important;
+                border-collapse: collapse !important;
+                border: 1.5px solid #000 !important;
+                border-top: none !important;
+                font-size: 6.5pt !important;
+                flex-grow: 1 !important;
+            }
+
+            .p-alter-table th {
+                border: 1px solid #000 !important;
+                background: #b8b8b8 !important;
+                padding: 2px 3px !important;
+                font-weight: 800 !important;
+                text-align: center !important;
+            }
+
+            .p-alter-table td {
+                border: 1px solid #000 !important;
+                padding: 1.8px 3px !important;
+                height: 14.5px !important;
+                vertical-align: middle !important;
+            }
+
+            /* RODAPÉ DA PÁGINA 2: ASSINATURAS MANUAIS (FOTO 4) */
+            .p-alter-footer {
+                display: flex !important;
+                justify-content: space-around !important;
+                align-items: flex-end !important;
+                padding: 14px 10px 4px 10px !important;
+                margin-top: 10px !important;
+            }
+
+            .p-alter-sign-col {
+                text-align: center !important;
+                width: 28% !important;
+            }
+
+            .p-alter-sign-line {
+                border-top: 1.2px solid #000 !important;
+                margin-bottom: 3px !important;
+                width: 100% !important;
+            }
+
+            .p-alter-sign-label {
+                font-size: 7pt !important;
+                font-weight: 800 !important;
             }
         }
     </style>
 </head>
 <body>
 
-    <!-- HEADER -->
+    <!-- HEADER DA APLICAÇÃO WEB -->
     <header>
         <div class="header-container">
             <div class="header-brand">
@@ -1036,7 +1491,10 @@
                 </div>
                 <div class="header-titles">
                     <h1>CENTRO DE MOTOMECANIZAÇÃO &bull; <span>SEÇÃO DE MANUTENÇÃO</span></h1>
-                    <p id="subHeaderTitle">SISTEMA DE GESTÃO DE ESCALA DE SERVIÇO & EFETIVO (WEB APP MANUT_ESCALA)</p>
+                    <p id="subHeaderTitle">
+                        <span>SISTEMA DE GESTÃO DE ESCALA DE SERVIÇO & EFETIVO</span>
+                        <span id="cloudStatusBadge" class="cloud-badge cloud-offline"><i class="fa-solid fa-database"></i> LOCAL / SUPABASE PRONTO</span>
+                    </p>
                 </div>
             </div>
 
@@ -1050,15 +1508,15 @@
             <div class="header-actions">
                 <button class="btn btn-back" onclick="history.back()"><i class="fa-solid fa-arrow-left"></i> VOLTAR</button>
                 <button class="btn btn-secondary" onclick="openSupabaseModal()"><i class="fa-solid fa-database"></i> SUPABASE / BD</button>
-                <button class="btn btn-outline" onclick="window.print()"><i class="fa-solid fa-print"></i> IMPRIMIR PDF</button>
+                <button class="btn btn-outline" onclick="triggerOfficialPrint()"><i class="fa-solid fa-print"></i> IMPRIMIR PDF</button>
                 <button class="btn btn-success" onclick="exportToExcel()"><i class="fa-solid fa-file-excel"></i> EXPORTAR EXCEL</button>
-                <button class="btn btn-primary" onclick="saveAllData()"><i class="fa-solid fa-floppy-disk"></i> SALVAR ESCALA</button>
+                <button class="btn btn-primary" onclick="saveAllData(true)"><i class="fa-solid fa-floppy-disk"></i> SALVAR ESCALA</button>
             </div>
         </div>
     </header>
 
     <main>
-        <!-- TOP TOOLBAR (SELETOR DE PERÍODO & KPIS) -->
+        <!-- TOP TOOLBAR: KPIS EM LINHA ÚNICA E BOTÕES EMPILHADOS -->
         <div class="top-toolbar">
             <div class="period-selector">
                 <div class="selector-group">
@@ -1096,7 +1554,7 @@
                 </div>
             </div>
 
-            <!-- KPIS RÁPIDOS -->
+            <!-- KPIS RÁPIDOS EM LINHA ÚNICA -->
             <div class="kpi-row">
                 <div class="kpi-badge">
                     <i class="fa-solid fa-users" style="color: var(--accent-blue);"></i>
@@ -1126,7 +1584,7 @@
                     <i class="fa-solid fa-plane-departure" style="color: var(--accent-rose);"></i>
                     <div>
                         <div class="kpi-num" id="kpiAfastados">0</div>
-                        <div class="kpi-desc">FÉRIAS / LTS / DS / LP</div>
+                        <div class="kpi-desc">FÉRIAS / LTS / DS / LP / AG</div>
                     </div>
                 </div>
 
@@ -1139,13 +1597,15 @@
                 </div>
             </div>
 
-            <div style="display: flex; gap: 8px;">
-                <button class="btn btn-danger-outline" onclick="resetCurrentWeekToDefaults()" title="Redefine todos os militares para S nos dias úteis e F no final de semana"><i class="fa-solid fa-rotate-left"></i> ZERAR PADRÃO</button>
+            <!-- BOTÕES EMPILHADOS VERTICALMENTE -->
+            <div class="action-buttons-column">
                 <button class="btn btn-primary" onclick="openAddMilitarModal()"><i class="fa-solid fa-user-plus"></i> NOVO MILITAR</button>
+                <button class="btn btn-secondary" style="font-size: 0.68rem;" onclick="copyFromPreviousWeek()" title="Copia e propaga a escala da semana anterior para a semana atual"><i class="fa-solid fa-clone"></i> REPLICAR SEM. ANTERIOR</button>
+                <button class="btn btn-danger-outline" onclick="resetCurrentWeekToDefaults()" title="Redefine todos os militares para S nos dias úteis e F no final de semana"><i class="fa-solid fa-rotate-left"></i> ZERAR PADRÃO</button>
             </div>
         </div>
 
-        <!-- LEGENDA & CARIMBO RÁPIDO DE SIGLAS -->
+        <!-- LEGENDA & CARIMBO RÁPIDO DE SIGLAS (COM SIGLA AG - AGREGADO) -->
         <div class="legend-bar">
             <div class="legend-title">
                 <i class="fa-solid fa-stamp"></i> CARIMBO RÁPIDO (CLIQUE PARA SELECIONAR E APLICAR NAS CÉLULAS):
@@ -1157,9 +1617,21 @@
                 <span class="sigla-chip chip-fm" onclick="selectStamp('FM', this)"><strong>FM</strong> - FOLGA MENSAL</span>
                 <span class="sigla-chip chip-lts" onclick="selectStamp('LTS', this)"><strong>LTS</strong> - LIC. SAÚDE</span>
                 <span class="sigla-chip chip-ds" onclick="selectStamp('DS', this)"><strong>DS</strong> - DISPENSA</span>
-                <span class="sigla-chip chip-agr" onclick="selectStamp('AGR', this)"><strong>AGR</strong> - AGREGADO</span>
+                <span class="sigla-chip chip-ag" onclick="selectStamp('AG', this)"><strong>AG</strong> - AGREGADO</span>
                 <span class="sigla-chip chip-lp" onclick="selectStamp('LP', this)"><strong>LP</strong> - LIC. PRÊMIO</span>
+                <button class="sigla-chip chip-more" onclick="toggleMoreSiglasMenu(event)"><i class="fa-solid fa-list-check"></i> + MAIS SIGLAS <i class="fa-solid fa-caret-down"></i></button>
                 <span class="sigla-chip chip-f" onclick="selectStamp('', this)"><i class="fa-solid fa-eraser"></i> LIMPAR</span>
+            </div>
+
+            <!-- MENU SUSPENSO DE SIGLAS ADICIONAIS PMESP -->
+            <div class="siglas-dropdown-menu" id="siglasDropdownMenu">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; border-bottom: 1px solid var(--border); padding-bottom: 6px;">
+                    <span style="font-size: 0.72rem; font-weight: 800; color: #38bdf8;"><i class="fa-solid fa-list-ul"></i> TODAS AS SIGLAS DE SITUAÇÃO DA PMESP</span>
+                    <button class="btn-icon-sm" onclick="toggleMoreSiglasMenu(event)"><i class="fa-solid fa-xmark"></i></button>
+                </div>
+                <div class="siglas-grid-dropdown" id="siglasGridDropdown">
+                    <!-- Gerado dinamicamente -->
+                </div>
             </div>
         </div>
 
@@ -1250,36 +1722,8 @@
             </div>
 
             <!-- QUADRO DE EFETIVO (QPO) & ASSINATURAS -->
-            <div class="footer-info-grid">
-                <div class="sign-box">
-                    <div class="sign-role">AUXILIAR OFICIAL DE SEMANA</div>
-                    <div class="sign-name" id="signAuxOficialTitular">3º SGT PM 191299-2 NATHALIA</div>
-                    <div class="sign-post">SUBSTITUTO: <span id="signAuxOficialSubstituto">3º SGT PM 105043-5 SERAPIÃO</span></div>
-                </div>
-
-                <div class="sign-box">
-                    <div class="sign-role">ELABORADOR DA ESCALA</div>
-                    <div class="sign-name" id="signElaboradorNome">LUCIANO PEREIRA DE SOUZA</div>
-                    <div class="sign-post" id="signElaboradorCargo">2º SGT PM AUX SEÇ MANUT FROTA</div>
-                </div>
-
-                <div class="sign-box">
-                    <div class="sign-role">CONFERENTE DA ESCALA</div>
-                    <div class="sign-name" id="signConferenteNome">JULIANA MARINO</div>
-                    <div class="sign-post" id="signConferenteCargo">CB PM ESCAL SEÇ MANUT FROTA</div>
-                </div>
-
-                <div class="sign-box">
-                    <div class="sign-role">CHEFE DA SEÇÃO DE MANUTENÇÃO</div>
-                    <div class="sign-name" id="signChefeSecaoNome">REBECA COSTA ANDRADE MELO</div>
-                    <div class="sign-post" id="signChefeSecaoCargo">1º TEN PM CH SEÇ MANUT FROTA</div>
-                </div>
-
-                <div class="sign-box">
-                    <div class="sign-role">CHEFE DA DIVISÃO DE MANUTENÇÃO</div>
-                    <div class="sign-name" id="signChefeDivisaoNome">SAMUEL DE ANDRADE</div>
-                    <div class="sign-post" id="signChefeDivisaoCargo">MAJ PM CH DIV MANUT TRANSP</div>
-                </div>
+            <div class="footer-info-grid" id="signBoxesContainer">
+                <!-- Renderizado dinamicamente via JS -->
             </div>
         </div>
 
@@ -1342,7 +1786,211 @@
         </div>
     </main>
 
-    <!-- MODAL: ADICIONAR / EDITAR MILITAR (COM RESTRIÇÕES MÉDICAS INTEGRADAS) -->
+    <!-- ========================================================================= -->
+    <!-- ÁREA DE IMPRESSÃO OFICIAL PMESP - IDÊNTICA AO FÍSICO (FRENTE E VERSO)     -->
+    <!-- ========================================================================= -->
+    <div id="officialPrintArea">
+        
+        <!-- PÁGINA 1: FRENTE DA ESCALA (MODELO FOTO 1 E 3) -->
+        <div class="p-page-1">
+            <!-- CABEÇALHO COM BRASÕES -->
+            <table class="p-header-table">
+                <tr>
+                    <td style="width: 55px; text-align: center;">
+                        <img src="assets/brasao_sp.png" class="p-crest-img" alt="SP" onerror="this.style.display='none'">
+                    </td>
+                    <td class="p-header-titles">
+                        <h2>SECRETARIA DA SEGURANÇA PUBLICA</h2>
+                        <h3>POLÍCIA MILITAR DO ESTADO DE SÃO PAULO</h3>
+                        <h3>CENTRO DE MOTOMECANIZAÇÃO</h3>
+                        <div class="p-period-bar" id="pHeaderPeriod">ESCALA DE SERVIÇO - PERÍODO DE 06SET26 a 12SET26</div>
+                        <div class="p-secao-bar">SEÇÃO DE MANUTENÇÃO DE FROTA</div>
+                    </td>
+                    <td style="width: 55px; text-align: center;">
+                        <img src="assets/brasao_cmm.png" class="p-crest-img" alt="CMM" onerror="this.style.display='none'">
+                    </td>
+                </tr>
+            </table>
+
+            <!-- TABELA OFICIAL DE ESCALA COM SEÇÕES MESCLADAS -->
+            <table class="p-main-table" id="pMainTable">
+                <thead>
+                    <tr class="p-bg-gray">
+                        <th rowspan="2" style="width: 18px;">Nº</th>
+                        <th rowspan="2" style="width: 82px;">SEÇÃO</th>
+                        <th rowspan="2" style="width: 108px;">FUNÇÃO</th>
+                        <th rowspan="2" style="width: 46px;">GRAD</th>
+                        <th rowspan="2" style="width: 50px;">RE</th>
+                        <th rowspan="2" style="width: 88px; text-align: left; padding-left: 3px;">NOME DE GUERRA</th>
+                        <th class="p-text-red" style="width: 18px;" id="pth_dom_name">DOM</th>
+                        <th style="width: 18px;" id="pth_seg_name">SEG</th>
+                        <th style="width: 18px;" id="pth_ter_name">TER</th>
+                        <th style="width: 18px;" id="pth_qua_name">QUA</th>
+                        <th style="width: 18px;" id="pth_qui_name">QUI</th>
+                        <th style="width: 18px;" id="pth_sex_name">SEX</th>
+                        <th class="p-text-red" style="width: 18px;" id="pth_sab_name">SAB</th>
+                    </tr>
+                    <tr class="p-bg-gray">
+                        <th class="p-text-red" id="pth_dom_date">6</th>
+                        <th id="pth_seg_date">7</th>
+                        <th id="pth_ter_date">8</th>
+                        <th id="pth_qua_date">9</th>
+                        <th id="pth_qui_date">10</th>
+                        <th id="pth_sex_date">11</th>
+                        <th class="p-text-red" id="pth_sab_date">12</th>
+                    </tr>
+                </thead>
+                <tbody id="pTableBody">
+                    <!-- Preenchido dinamicamente via JS com formatação idêntica à Foto 1 -->
+                </tbody>
+            </table>
+
+            <!-- TABELA DE AFASTAMENTOS (FOTO 1) -->
+            <table class="p-afast-box" id="pAfastTable" style="display: none;">
+                <thead>
+                    <tr class="p-bg-gray">
+                        <th style="width: 22px;">Nº</th>
+                        <th style="width: 160px;">SITUAÇÃO</th>
+                        <th style="width: 220px;">NOME</th>
+                        <th>PERÍODO</th>
+                    </tr>
+                </thead>
+                <tbody id="pAfastTbody">
+                    <!-- Preenchido dinamicamente -->
+                </tbody>
+            </table>
+
+            <!-- PAINEL DE OBSERVAÇÕES (FOTO 1) -->
+            <div class="p-obs-box">
+                <div class="p-obs-header">OBSERVAÇÕES</div>
+                <div class="p-obs-content" id="pObsContent">
+                    <!-- Preenchido dinamicamente -->
+                </div>
+            </div>
+
+            <!-- RODAPÉ OFICIAL: AUX DE SEMANA, DATA, QPO E ASSINATURAS (FOTO 3) -->
+            <table class="p-footer-table">
+                <tr class="p-aux-row">
+                    <td style="width: 230px;">AUX OFICIAL DE SEMANA</td>
+                    <td colspan="3" id="pAuxTitularText">2º Sgt PM 107774-A Luciano</td>
+                </tr>
+                <tr class="p-aux-row">
+                    <td>AUX OFICIAL DE SEMANA - SUBSTITUTO</td>
+                    <td colspan="3" id="pAuxSubstitutoText">3º Sgt PM 191651-3 Ricardo Borges</td>
+                </tr>
+                <tr class="p-date-row">
+                    <td colspan="4" id="pCurrentDateFullText">São Paulo, 02 de setembro de 2026.</td>
+                </tr>
+                <tr>
+                    <!-- ELABORADOR E CONFERENTE (LADO ESQUERDO) -->
+                    <td colspan="2" style="vertical-align: top; width: 62%; padding: 2px;">
+                        <div class="p-sign-zone">
+                            <div class="p-sign-role-title">ELABORADOR:</div>
+                            <div class="p-sign-stamp-area"></div>
+                            <div class="p-sign-name-tag" id="pElaboradorNome">VALDERLEY BRITO MOURA</div>
+                            <div class="p-sign-post-tag" id="pElaboradorCargo">2º SGT PM AUX SEÇ MANUT FROTA</div>
+                        </div>
+                    </td>
+                    <!-- QUADRO DE QPO (LADO DIREITO - FOTO 3) -->
+                    <td colspan="2" style="vertical-align: top; width: 38%; padding: 1.5px;">
+                        <table class="p-qpo-table">
+                            <tr class="p-bg-gray">
+                                <th>QPO - SEÇ MANUT FROT</th>
+                                <th style="width: 40px;">FIXADO</th>
+                                <th style="width: 50px;">EXISTENTE</th>
+                            </tr>
+                            <tr>
+                                <td style="text-align: left; font-weight: bold; padding-left: 3px;">SUBTEN PM/SGT PM</td>
+                                <td>6</td>
+                                <td id="pQpoSgtExistente">4</td>
+                            </tr>
+                            <tr>
+                                <td style="text-align: left; font-weight: bold; padding-left: 3px;">CB PM/SD PM</td>
+                                <td>21</td>
+                                <td id="pQpoCbSdExistente">24</td>
+                            </tr>
+                            <tr class="p-bg-gray">
+                                <td style="text-align: left; font-weight: bold; padding-left: 3px;">TOTAL</td>
+                                <td>27</td>
+                                <td id="pQpoTotalExistente">28</td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+                <!-- LINHA DE ASSINATURAS INFERIORES: CONFERENTE, CH SEÇÃO, CH DIVISÃO -->
+                <tr>
+                    <td style="width: 33%; vertical-align: top; padding: 1.5px;">
+                        <div class="p-sign-zone">
+                            <div class="p-sign-role-title">CONFERENTE:</div>
+                            <div class="p-sign-stamp-area"></div>
+                            <div class="p-sign-name-tag" id="pConferenteNome">FÁBIO DOS REIS PINHEIRO</div>
+                            <div class="p-sign-post-tag" id="pConferenteCargo">2º SGT PM ESCAL SEÇ MANUT FROTA</div>
+                        </div>
+                    </td>
+                    <td colspan="2" style="width: 34%; vertical-align: top; padding: 1.5px;">
+                        <div class="p-sign-zone">
+                            <div class="p-sign-role-title" style="text-align: center;">CHEFE DA SEÇÃO DE MANUTENÇÃO</div>
+                            <div class="p-sign-stamp-area"></div>
+                            <div class="p-sign-name-tag" id="pChefeSecaoNome">JOSÉ MAYCON DE PAIVA HONORATO</div>
+                            <div class="p-sign-post-tag" id="pChefeSecaoCargo">CAP PM CH SEÇ MANUT FROTA</div>
+                        </div>
+                    </td>
+                    <td style="width: 33%; vertical-align: top; padding: 1.5px;">
+                        <div class="p-sign-zone">
+                            <div class="p-sign-role-title" style="text-align: center;">CHEFE DA DIVISÃO DE MANUTENÇÃO</div>
+                            <div class="p-sign-stamp-area"></div>
+                            <div class="p-sign-name-tag" id="pChefeDivisaoNome">SAMUEL DE ANDRADE</div>
+                            <div class="p-sign-post-tag" id="pChefeDivisaoCargo">MAJ PM CH DIV MANUT TRANSP</div>
+                        </div>
+                    </td>
+                </tr>
+            </table>
+        </div>
+
+        <!-- PÁGINA 2: VERSO DA ESCALA - ALTERAÇÕES DA ESCALA (FOTOS 2, 3 E 4) -->
+        <div class="p-page-2">
+            <div>
+                <!-- CABEÇALHO DO VERSO DA ESCALA -->
+                <div class="p-alter-header" id="pAlterHeaderPeriod">
+                    ALTERAÇÕES DA ESCALA DE 06SET26 A 12SET26
+                </div>
+
+                <!-- TABELA PAUTADA DE ALTERAÇÕES (FOTOS 2 E 3) -->
+                <table class="p-alter-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 22%;">Posto/ Grad Nome</th>
+                            <th style="width: 50%;">Alterações (Descrever a alteração e o motivo)</th>
+                            <th style="width: 16%;">PM que transcreveu</th>
+                            <th style="width: 12%;">Rubrica do Oficial</th>
+                        </tr>
+                    </thead>
+                    <tbody id="pAlterTableBody">
+                        <!-- 36 Linhas pautadas renderizadas via JS -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- RODAPÉ DE ASSINATURAS DO VERSO DA ESCALA (FOTO 4) -->
+            <div class="p-alter-footer">
+                <div class="p-alter-sign-col">
+                    <div class="p-alter-sign-line"></div>
+                    <div class="p-alter-sign-label">Conferente</div>
+                </div>
+                <div class="p-alter-sign-col">
+                    <div class="p-alter-sign-line"></div>
+                    <div class="p-alter-sign-label">Chefe de Seção</div>
+                </div>
+                <div class="p-alter-sign-col">
+                    <div class="p-alter-sign-line"></div>
+                    <div class="p-alter-sign-label">Chefe da Divisão</div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- MODAL: ADICIONAR / EDITAR MILITAR -->
     <div class="modal-overlay" id="militarModal">
         <div class="modal-card">
             <div class="modal-header">
@@ -1352,6 +2000,7 @@
             <div class="modal-body">
                 <form id="militarForm" onsubmit="saveMilitarForm(event)">
                     <input type="hidden" id="editMilitarIndex" value="-1">
+                    <input type="hidden" id="selectedEquipeOption" value="SEM_EQUIPE">
                     <div class="form-grid">
                         <div class="form-group full-width">
                             <label>GRUPO / EXPEDIENTE DE HORÁRIO *</label>
@@ -1363,8 +2012,15 @@
                         </div>
 
                         <div class="form-group full-width">
-                            <label>SEÇÃO / EQUIPE *</label>
-                            <input type="text" id="militarSecao" class="form-input" placeholder="EX: MANUTENÇÃO DE FROTA Equipe A" required>
+                            <label>SEÇÃO DE LOTAÇÃO *</label>
+                            <input type="text" id="militarSecaoBase" class="form-input" value="MANUTENÇÃO DE FROTA" placeholder="EX: MANUTENÇÃO DE FROTA" required>
+                            
+                            <label style="margin-top: 8px;">EQUIPE / ESCALONAMENTO:</label>
+                            <div class="equipe-selector-row">
+                                <div class="equipe-btn-chip" id="eqBtnA" onclick="selectEquipeChoice('A')">EQUIPE "A"</div>
+                                <div class="equipe-btn-chip" id="eqBtnB" onclick="selectEquipeChoice('B')">EQUIPE "B"</div>
+                                <div class="equipe-btn-chip active" id="eqBtnNone" onclick="selectEquipeChoice('SEM_EQUIPE')">SEM EQUIPE DEFINIDA</div>
+                            </div>
                         </div>
 
                         <div class="form-group">
@@ -1426,7 +2082,48 @@
         </div>
     </div>
 
-    <!-- MODAL: EDITAR OBSERVAÇÃO (AUTO OU MANUAL) -->
+    <!-- MODAL: EDITAR ASSINANTE -->
+    <div class="modal-overlay" id="signModal">
+        <div class="modal-card">
+            <div class="modal-header">
+                <div class="modal-title"><i class="fa-solid fa-signature"></i> CONFIGURAR ASSINANTE DA ESCALA</div>
+                <button class="btn-icon-sm" onclick="closeModal('signModal')"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="editSignKey" value="">
+                <div class="form-grid">
+                    <div class="form-group full-width">
+                        <label>FUNÇÃO DO ASSINANTE NO SISTEMA *</label>
+                        <select id="signRoleSelect" class="form-select">
+                            <option value="ELABORADOR DA ESCALA">ELABORADOR DA ESCALA</option>
+                            <option value="CONFERENTE DA ESCALA">CONFERENTE DA ESCALA</option>
+                            <option value="CHEFE DA SEÇÃO DE MANUTENÇÃO">CHEFE DA SEÇÃO DE MANUTENÇÃO</option>
+                            <option value="CHEFE DA DIVISÃO DE MANUTENÇÃO">CHEFE DA DIVISÃO DE MANUTENÇÃO</option>
+                            <option value="AUXILIAR OFICIAL DE SEMANA">AUXILIAR OFICIAL DE SEMANA</option>
+                            <option value="AUXILIAR OFICIAL DE SEMANA - SUBSTITUTO">AUXILIAR OFICIAL DE SEMANA - SUBSTITUTO</option>
+                            <option value="OFICIAL DE DIA">OFICIAL DE DIA</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group full-width">
+                        <label>NOME COMPLETO DO MILITAR *</label>
+                        <input type="text" id="signNomeInput" class="form-input" placeholder="EX: LUCIANO PEREIRA DE SOUZA" required>
+                    </div>
+
+                    <div class="form-group full-width">
+                        <label>POSTO / GRADUAÇÃO E FUNÇÃO / SEÇÃO *</label>
+                        <input type="text" id="signCargoInput" class="form-input" placeholder="EX: 2º SGT PM AUX SEÇ MANUT FROTA" required>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal('signModal')">CANCELAR</button>
+                <button class="btn btn-primary" onclick="saveSignData()">SALVAR ASSINANTE</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: EDITAR OBSERVAÇÃO -->
     <div class="modal-overlay" id="editObsModal">
         <div class="modal-card">
             <div class="modal-header">
@@ -1437,7 +2134,7 @@
                 <input type="hidden" id="editObsIndex" value="-1">
                 <div class="form-group">
                     <label>TEXTO DA OBSERVAÇÃO *</label>
-                    <textarea id="editObsTextInput" class="form-input" rows="4" placeholder="DIGITE A OBSERVAÇÃO..."></textarea>
+                    <textarea id="editObsTextInput" class="form-input" rows="5" placeholder="DIGITE A OBSERVAÇÃO..."></textarea>
                 </div>
             </div>
             <div class="modal-footer">
@@ -1521,6 +2218,7 @@
                             <option value="DISPENSA REGULAMENTAR">DISPENSA REGULAMENTAR</option>
                             <option value="FOLGA MENSAL">FOLGA MENSAL</option>
                             <option value="LICENÇA PRÊMIO">LICENÇA PRÊMIO</option>
+                            <option value="AGREGADO">AGREGADO</option>
                             <option value="LICENÇA SEM VENCIMENTOS">LICENÇA SEM VENCIMENTOS</option>
                         </select>
                     </div>
@@ -1587,34 +2285,60 @@
         </div>
     </div>
 
-    <!-- MODAL: SUPABASE & CONFIGURAÇÕES -->
+    <!-- MODAL: SUPABASE & SQL PERMANENTE -->
     <div class="modal-overlay" id="supabaseModal">
-        <div class="modal-card">
+        <div class="modal-card" style="max-width: 720px;">
             <div class="modal-header">
-                <div class="modal-title"><i class="fa-solid fa-database"></i> CONFIGURAÇÃO SUPABASE / BD EM NUVEM</div>
+                <div class="modal-title"><i class="fa-solid fa-database"></i> CONEXÃO SUPABASE (CLOUD SYNC EM TEMPO REAL)</div>
                 <button class="btn-icon-sm" onclick="closeModal('supabaseModal')"><i class="fa-solid fa-xmark"></i></button>
             </div>
             <div class="modal-body">
                 <div class="form-group" style="margin-bottom: 12px;">
-                    <label>SUPABASE PROJECT URL</label>
+                    <label>SUPABASE PROJECT URL (ARMAZENADO PERMANENTEMENTE)</label>
                     <input type="text" id="supabaseUrl" class="form-input" placeholder="https://xyzcompany.supabase.co">
                 </div>
                 <div class="form-group" style="margin-bottom: 12px;">
                     <label>SUPABASE ANON / SERVICE KEY</label>
                     <input type="password" id="supabaseKey" class="form-input" placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...">
                 </div>
-                <div class="form-group" style="margin-bottom: 16px;">
-                    <label>TABELA DE DESTINO</label>
-                    <input type="text" id="supabaseTable" class="form-input" value="escalas_manutencao">
+
+                <div style="background: rgba(16, 185, 129, 0.1); border: 1px solid #10b981; padding: 10px 14px; border-radius: 8px; font-size: 0.72rem; color: #a7f3d0; margin-bottom: 14px;">
+                    <strong><i class="fa-solid fa-cloud-arrow-up"></i> AUTO-SAVE ATIVO:</strong> Qualquer alteração na grade, carimbos rápidos, assinantes ou afastamentos é sincronizada instantaneamente na nuvem do Supabase!
                 </div>
 
-                <div style="background: rgba(59, 130, 246, 0.1); border: 1px solid var(--accent-blue); padding: 12px; border-radius: 8px; font-size: 0.75rem; color: #93c5fd;">
-                    <strong><i class="fa-solid fa-circle-info"></i> MODO HÍBRIDO ATIVO:</strong> Todos os dados são salvos localmente de forma ultra-rápida (offline first) e replicados instantaneamente para o Supabase quando as credenciais estiverem preenchidas.
+                <div style="display: flex; justify-content: space-between; align-items: center; margin: 12px 0 6px 0;">
+                    <label style="color: #38bdf8; font-weight: 800;"><i class="fa-solid fa-code"></i> SCRIPT SQL DAS TABELAS NO SUPABASE:</label>
+                    <button class="btn btn-secondary" style="padding: 4px 10px; font-size: 0.7rem;" onclick="copySupabaseSql()"><i class="fa-solid fa-copy"></i> COPIAR SQL</button>
                 </div>
+                <textarea id="supabaseSqlText" class="form-input" style="height: 110px; font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; background: #0b0f17;" readonly>
+CREATE TABLE IF NOT EXISTS public.escalas_manutencao (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    ano INTEGER NOT NULL,
+    mes INTEGER NOT NULL,
+    semana INTEGER NOT NULL,
+    periodo TEXT NOT NULL,
+    dias_datas JSONB NOT NULL DEFAULT '{}'::jsonb,
+    grid JSONB NOT NULL DEFAULT '[]'::jsonb,
+    afastamentos JSONB NOT NULL DEFAULT '[]'::jsonb,
+    observacoes JSONB NOT NULL DEFAULT '[]'::jsonb,
+    observacoes_padrao JSONB NOT NULL DEFAULT '[]'::jsonb,
+    observacoes_manuais JSONB NOT NULL DEFAULT '[]'::jsonb,
+    observacoes_editadas JSONB NOT NULL DEFAULT '{}'::jsonb,
+    restricoes JSONB NOT NULL DEFAULT '[]'::jsonb,
+    assinaturas JSONB NOT NULL DEFAULT '[]'::jsonb,
+    alteracoes JSONB NOT NULL DEFAULT '[]'::jsonb,
+    status TEXT NOT NULL DEFAULT 'EM_ELABORACAO',
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    UNIQUE(ano, mes, semana)
+);
+ALTER TABLE public.escalas_manutencao ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Permissao Total Escalas" ON public.escalas_manutencao FOR ALL USING (true) WITH CHECK (true);
+                </textarea>
             </div>
             <div class="modal-footer">
                 <button class="btn btn-secondary" onclick="closeModal('supabaseModal')">FECHAR</button>
-                <button class="btn btn-primary" onclick="saveSupabaseConfig()">SALVAR CONEXÃO</button>
+                <button class="btn btn-primary" onclick="saveSupabaseConfig()">SALVAR E TESTAR CONEXÃO</button>
             </div>
         </div>
     </div>
@@ -1629,12 +2353,80 @@
     <script>
         // CONSTANTES E SIGLAS DO CALENDÁRIO MILITAR
         const MONTHS_SIGLAS = ['JAN', 'FEV', 'MAR', 'ABR', 'MAI', 'JUN', 'JUL', 'AGO', 'SET', 'OUT', 'NOV', 'DEZ'];
+        const MONTHS_EXTENSO = ['janeiro', 'fevereiro', 'março', 'abril', 'maio', 'junho', 'julho', 'agosto', 'setembro', 'outubro', 'novembro', 'dezembro'];
         const DIAS_KEYS = ['dom', 'seg', 'ter', 'qua', 'qui', 'sex', 'sab'];
         const DIAS_LABELS = { dom: 'DOMINGO', seg: 'SEGUNDA-FEIRA', ter: 'TERÇA-FEIRA', qua: 'QUARTA-FEIRA', qui: 'QUINTA-FEIRA', sex: 'SEXTA-FEIRA', sab: 'SÁBADO' };
-        const SIGLAS_VALIDAS = ['S', 'F', 'FE', 'FM', 'LTS', 'DS', 'AGR', 'LP'];
+
+        // TABELA COMPLETA DE TODAS AS SIGLAS DA PMESP (COM SIGLA AG OFICIAL)
+        const TODAS_SIGLAS_PMESP = [
+            { sigla: 'S', desc: 'SERVIÇO', bg: 'var(--status-s-bg)', color: 'var(--status-s-text)' },
+            { sigla: 'F', desc: 'FOLGA', bg: 'var(--status-f-bg)', color: 'var(--status-f-text)' },
+            { sigla: 'FE', desc: 'FÉRIAS', bg: 'var(--status-fe-bg)', color: 'var(--status-fe-text)' },
+            { sigla: 'FM', desc: 'FOLGA MENSAL', bg: 'var(--status-fm-bg)', color: 'var(--status-fm-text)' },
+            { sigla: 'LTS', desc: 'LICENÇA TRATAMENTO DE SAÚDE', bg: 'var(--status-lts-bg)', color: 'var(--status-lts-text)' },
+            { sigla: 'DS', desc: 'DISPENSA DO SERVIÇO', bg: 'var(--status-ds-bg)', color: 'var(--status-ds-text)' },
+            { sigla: 'AG', desc: 'AGREGADO', bg: 'var(--status-ag-bg)', color: 'var(--status-ag-text)' },
+            { sigla: 'LP', desc: 'LICENÇA PRÊMIO', bg: 'var(--status-lp-bg)', color: 'var(--status-lp-text)' },
+            { sigla: 'CV', desc: 'CONVALESCENÇA', bg: '#431407', color: '#fdba74' },
+            { sigla: 'EAP', desc: 'ESTÁGIO ATUALIZAÇÃO PROFISSIONAL', bg: '#172554', color: '#93c5fd' },
+            { sigla: 'M', desc: 'MEIO EXPEDIENTE MANHÃ', bg: '#064e3b', color: '#a7f3d0' },
+            { sigla: 'T', desc: 'MEIO EXPEDIENTE TARDE', bg: '#064e3b', color: '#a7f3d0' },
+            { sigla: 'CS', desc: 'CURSO', bg: '#312e81', color: '#c7d2fe' },
+            { sigla: 'FR', desc: 'FERIADO', bg: '#1f2937', color: '#e5e7eb' },
+            { sigla: 'LG', desc: 'LICENÇA GESTANTE', bg: '#701a75', color: '#f5d0fe' },
+            { sigla: 'L', desc: 'LUTO', bg: '#111827', color: '#9ca3af' },
+            { sigla: 'N', desc: 'NÚPCIAS', bg: '#831843', color: '#fbcfe8' },
+            { sigla: 'LPA', desc: 'LICENÇA PATERNIDADE', bg: '#164e63', color: '#a5f3fc' },
+            { sigla: 'DO', desc: 'DOAR SANGUE', bg: '#881337', color: '#fecdd3' },
+            { sigla: 'OV', desc: 'OPERAÇÃO VERÃO', bg: '#713f12', color: '#fde047' },
+            { sigla: 'EF', desc: 'EXPEDIENTE FACULTATIVO', bg: '#374151', color: '#d1d5db' },
+            { sigla: 'LSV', desc: 'LICENÇA SEM VENCIMENTOS', bg: '#581c87', color: '#e9d5ff' },
+            { sigla: 'OP', desc: 'OPERAÇÃO', bg: '#854d0e', color: '#fef08a' },
+            { sigla: 'PF', desc: 'PONTO FACULTATIVO', bg: '#374151', color: '#d1d5db' },
+            { sigla: 'AD', desc: 'A DISPOSIÇÃO', bg: '#334155', color: '#cbd5e1' },
+            { sigla: 'CEP', desc: 'CURSO ESPECIALIZAÇÃO PROFISSIONAL', bg: '#1e1b4b', color: '#ddd6fe' },
+            { sigla: 'EEP', desc: 'ESTÁGIO ESPECIALIZAÇÃO PROFISSIONAL', bg: '#1e1b4b', color: '#ddd6fe' }
+        ];
+
+        const SIGLAS_VALIDAS = TODAS_SIGLAS_PMESP.map(s => s.sigla);
 
         // LISTA OFICIAL DE SIGLAS DE RESTRIÇÃO MÉDICA PMESP
         const SIGLAS_RESTRICAO = ['EF', 'FO', 'LP', 'LS', 'OU', 'PO', 'PT', 'SE', 'SG', 'SP', 'UA', 'UB', 'US', 'UU'];
+
+        // HIERARQUIA PMESP PARA ORDENAÇÃO AUTOMÁTICA
+        const HIERARQUIA_PESOS = {
+            'CEL PM': 1,
+            'TEN CEL PM': 2,
+            'MAJ PM': 3,
+            'CAP PM': 4,
+            '1º TEN PM': 5,
+            '2º TEN PM': 6,
+            'ASP OF PM': 7,
+            'SUBTEN PM': 8,
+            '1º SGT PM': 9,
+            '2º SGT PM': 10,
+            '3º SGT PM': 11,
+            'CB PM': 12,
+            'SD PM': 13
+        };
+
+        const GRUPOS_PESOS = {
+            'EXPEDIENTE ADMINISTRATIVO DAS 08H ÀS 18H': 1,
+            'EXPEDIENTE ADM. HORÁRIO 12 X 36 - DAS 07H ÀS 19H': 2,
+            'HORÁRIO 12 X 36 - DAS 06H ÀS 18H': 3
+        };
+
+        // OBSERVAÇÕES PADRÃO INSTITUCIONAIS
+        const OBSERVACOES_PADRAO_INSTITUCIONAIS = [
+            '1) Regime de Trabalho - Horário de Expediente Administrativo - PORTARIA PM1-7/02/23 . O horário de expediente será das 08:00 às 18:00 h, de 2ª às 6ª feiras, em dois dias da semana o horário de expediente será desdobrado em dois turnos, das 08:00 às 13:00 e das 13:00 às 18:00 (os desdobramentos de turnos de serviço semanais poderão ser aglutinados em um único dia da respectiva semana), ou das 09:00 às 18:00 h, de 2ª às 6ª feiras (em um dia da semana, o horário de expediente administrativo a ser cumprido será desdobrado em um turno de serviço).',
+            '02) O Auxiliar do Oficial de Semana deverá: 2.1) Conferir o efetivo em forma; 2.2) Prestar demais apoio, ordenados pelo Oficial de Semana; 2.3) Na ausência deste, deverá o graduado subsequente escalado assumir a função e realizar as atribuições designadas.',
+            '03) Cb PM Gaspar está autorizado a fazer o horário das 07h15min `as 19:15 conforme documentação via SEI nº 057.00035103/2025-83.',
+            '04) Cb PM Soares a contar de 28AGO24 passou à condição de Agregado, conforme DOE SP 169, de 03SET24.',
+            '05) Cb PM Maciel de 04NOV24 a 03NOV25 passou a usufruir 365 dias de Licença sem Vencimentos - DOE SP Nº 203, de 21OUT24.',
+            '06) Cb PM Bazoni está autorizado a fazer o horário das 06h00min às 18h00 conforme documentação via SEI nº 057.00020488/2026-65.',
+            '07) Cb PM Barone está autorizado a fazer o horário das 06h45min às 18h45 conforme documentação via SEI nº 057.00072719/2026-16.',
+            '08) 2º Sgt PM Brito está autorizado a fazer o horário das 06h00min às 18h00 nos dias que se desloca para Marilia - SP, conforme documentação via SEI nº 057.00072572/2026-64.'
+        ];
 
         // ESTADO GLOBAL
         let currentScaleData = null;
@@ -1643,16 +2435,77 @@
         let selectedStamp = 'S';
         let currentRole = 'AUXILIAR';
         let currentTab = 'grid';
+        let supabaseClient = null;
+        let autoSaveTimeout = null;
 
         // INICIALIZAÇÃO
         window.addEventListener('DOMContentLoaded', () => {
+            initSupabaseClient();
             initApp();
             applyUpperCasing();
             renderRestricaoChips('restrChipsContainer');
             renderRestricaoChips('restrDirectChipsContainer');
+            populateSiglasDropdown();
+            
+            document.addEventListener('click', (e) => {
+                const drop = document.getElementById('siglasDropdownMenu');
+                if (drop && !e.target.closest('.legend-bar')) {
+                    drop.classList.remove('show');
+                }
+            });
         });
 
-        // RENDERIZA CHECKBOXES DE SIGLAS DE RESTRIÇÃO
+        // INICIALIZA CLIENTE SUPABASE
+        function initSupabaseClient() {
+            const url = localStorage.getItem('CMM_SUPABASE_URL');
+            const key = localStorage.getItem('CMM_SUPABASE_KEY');
+            const badge = document.getElementById('cloudStatusBadge');
+
+            if (url && key && window.supabase) {
+                try {
+                    supabaseClient = window.supabase.createClient(url, key);
+                    if (badge) {
+                        badge.className = 'cloud-badge cloud-online';
+                        badge.innerHTML = '<i class="fa-solid fa-cloud-check"></i> SUPABASE CONECTADO (NUVEM ATIVA)';
+                    }
+                } catch(e) {
+                    supabaseClient = null;
+                }
+            } else {
+                supabaseClient = null;
+                if (badge) {
+                    badge.className = 'cloud-badge cloud-offline';
+                    badge.innerHTML = '<i class="fa-solid fa-database"></i> MODO LOCAL (OFFLINE)';
+                }
+            }
+        }
+
+        // POPULA DROPDOWN DE TODAS AS SIGLAS
+        function populateSiglasDropdown() {
+            const container = document.getElementById('siglasGridDropdown');
+            if (!container) return;
+            container.innerHTML = '';
+            TODAS_SIGLAS_PMESP.forEach(item => {
+                const el = document.createElement('div');
+                el.className = 'sigla-drop-item';
+                el.onclick = () => {
+                    selectStamp(item.sigla, null);
+                    document.getElementById('siglasDropdownMenu').classList.remove('show');
+                };
+                el.innerHTML = `
+                    <span class="sigla-tag-sm" style="background: ${item.bg}; color: ${item.color};">${item.sigla}</span>
+                    <span style="font-weight: 700;">${item.desc}</span>
+                `;
+                container.appendChild(el);
+            });
+        }
+
+        function toggleMoreSiglasMenu(event) {
+            if (event) event.stopPropagation();
+            const drop = document.getElementById('siglasDropdownMenu');
+            if (drop) drop.classList.toggle('show');
+        }
+
         function renderRestricaoChips(containerId) {
             const container = document.getElementById(containerId);
             if (!container) return;
@@ -1669,7 +2522,6 @@
             });
         }
 
-        // FORÇA AUTO-UPPERCASE EM TODOS OS INPUTS
         function applyUpperCasing() {
             document.querySelectorAll('input[type="text"], textarea').forEach(el => {
                 el.addEventListener('input', (e) => {
@@ -1681,7 +2533,6 @@
             });
         }
 
-        // MOTOR DE CALENDÁRIO INTELIGENTE MILITAR PMESP (DOMINGO A SÁBADO)
         function calculateMonthWeeks(year, monthNum) {
             const monthIdx = monthNum - 1;
             const weeks = [];
@@ -1723,10 +2574,10 @@
                     daysMap[dayKey] = dayObj;
                 }
 
-                const periodStr = `${daysList[0].formatted} A ${daysList[6].formatted}`;
+                const periodStr = `${daysList[0].formatted} a ${daysList[6].formatted}`;
                 weeks.push({
                     weekNum: weekNum,
-                    label: `SEM ${String(weekNum).padStart(2, '0')}: ${periodStr}`,
+                    label: `SEM ${String(weekNum).padStart(2, '0')}: ${periodStr.toUpperCase()}`,
                     period: periodStr,
                     daysList: daysList,
                     daysMap: daysMap
@@ -1739,15 +2590,13 @@
             return weeks;
         }
 
-        // INICIALIZA A APLICAÇÃO
-        function initApp() {
+        async function initApp() {
             const ano = parseInt(document.getElementById('selAno').value);
             const mes = parseInt(document.getElementById('selMes').value);
             updateWeeksDropdown(ano, mes, 0);
-            loadScaleForCurrentPeriod();
+            await loadScaleForCurrentPeriod();
         }
 
-        // ATUALIZA DROPDOWN DE SEMANAS
         function updateWeeksDropdown(ano, mes, selectIndex = 0) {
             currentMonthWeeks = calculateMonthWeeks(ano, mes);
             const selSemana = document.getElementById('selSemana');
@@ -1764,21 +2613,18 @@
             selSemana.value = selectedWeekIndex;
         }
 
-        // EVENTOS DE TROCA DE ANO OU MÊS
-        function onYearOrMonthChange() {
+        async function onYearOrMonthChange() {
             const ano = parseInt(document.getElementById('selAno').value);
             const mes = parseInt(document.getElementById('selMes').value);
             updateWeeksDropdown(ano, mes, 0);
-            loadScaleForCurrentPeriod();
+            await loadScaleForCurrentPeriod();
         }
 
-        // EVENTO DE TROCA DE SEMANA
-        function onWeekChange() {
+        async function onWeekChange() {
             selectedWeekIndex = parseInt(document.getElementById('selSemana').value);
-            loadScaleForCurrentPeriod();
+            await loadScaleForCurrentPeriod();
         }
 
-        // RECUPERA CADASTRO GLOBAL DE RESTRIÇÕES (PERSISTENTE ENTRE TODAS AS SEMANAS)
         function getGlobalRestricoesMap() {
             try {
                 const saved = localStorage.getItem('CMM_RESTRICOES_GLOBAIS');
@@ -1798,27 +2644,127 @@
             localStorage.setItem('CMM_RESTRICOES_GLOBAIS', JSON.stringify(map));
         }
 
-        // CARREGA DADOS DA SEMANA SELECIONADA
-        function loadScaleForCurrentPeriod() {
+        // CADASTRO GLOBAL DE ASSINANTES E AUXILIARES (FOTO 3)
+        function getGlobalAssinaturas() {
+            try {
+                const saved = localStorage.getItem('CMM_ASSINATURAS_GLOBAIS');
+                if (saved) return JSON.parse(saved);
+            } catch(e){}
+            
+            return [
+                { id: 'aux_titular', role: 'AUX OFICIAL DE SEMANA', nome: '2º SGT PM 107774-A LUCIANO', cargo: 'AUXILIAR DE SEMANA' },
+                { id: 'aux_substituto', role: 'AUX OFICIAL DE SEMANA - SUBSTITUTO', nome: '3º SGT PM 191651-3 RICARDO BORGES', cargo: 'SUBSTITUTO' },
+                { id: 'elaborador', role: 'ELABORADOR DA ESCALA', nome: 'VALDERLEY BRITO MOURA', cargo: '2º SGT PM AUX SEÇ MANUT FROTA' },
+                { id: 'conferente', role: 'CONFERENTE DA ESCALA', nome: 'FÁBIO DOS REIS PINHEIRO', cargo: '2º SGT PM ESCAL SEÇ MANUT FROTA' },
+                { id: 'chefe_secao', role: 'CHEFE DA SEÇÃO DE MANUTENÇÃO', nome: 'JOSÉ MAYCON DE PAIVA HONORATO', cargo: 'CAP PM CH SEÇ MANUT FROTA' },
+                { id: 'chefe_divisao', role: 'CHEFE DA DIVISÃO DE MANUTENÇÃO', nome: 'SAMUEL DE ANDRADE', cargo: 'MAJ PM CH DIV MANUT TRANSP' }
+            ];
+        }
+
+        function saveGlobalAssinaturas(assinaturas) {
+            localStorage.setItem('CMM_ASSINATURAS_GLOBAIS', JSON.stringify(assinaturas));
+        }
+
+        function sortMilitaresGrid(grid) {
+            grid.sort((a, b) => {
+                const gA = GRUPOS_PESOS[a.grupo.toUpperCase()] || 99;
+                const gB = GRUPOS_PESOS[b.grupo.toUpperCase()] || 99;
+                if (gA !== gB) return gA - gB;
+
+                const getEquipeScore = (sec) => {
+                    const s = (sec || '').toUpperCase();
+                    if (s.includes('EQUIPE "A"') || s.includes('EQUIPE A')) return 1;
+                    if (s.includes('EQUIPE "B"') || s.includes('EQUIPE B')) return 2;
+                    return 3;
+                };
+                const eqA = getEquipeScore(a.secao);
+                const eqB = getEquipeScore(b.secao);
+                if (eqA !== eqB) return eqA - eqB;
+
+                const hA = HIERARQUIA_PESOS[a.grad.toUpperCase().trim()] || 99;
+                const hB = HIERARQUIA_PESOS[b.grad.toUpperCase().trim()] || 99;
+                if (hA !== hB) return hA - hB;
+
+                return (a.re || '').localeCompare(b.re || '');
+            });
+
+            grid.forEach((m, idx) => {
+                m.num = idx + 1;
+            });
+
+            return grid;
+        }
+
+        async function loadScaleForCurrentPeriod() {
             const ano = document.getElementById('selAno').value;
             const mes = String(document.getElementById('selMes').value).padStart(2, '0');
             const semObj = currentMonthWeeks[selectedWeekIndex];
             if (!semObj) return;
 
             const storageKey = `CMM_ESCALA_${ano}_M${mes}_W${semObj.weekNum}`;
-            const saved = localStorage.getItem(storageKey);
+            let loadedData = null;
 
-            if (saved) {
+            if (supabaseClient) {
                 try {
-                    currentScaleData = JSON.parse(saved);
-                } catch (e) {
-                    createNewWeekData(ano, mes, semObj);
+                    const { data, error } = await supabaseClient
+                        .from('escalas_manutencao')
+                        .select('*')
+                        .eq('ano', parseInt(ano))
+                        .eq('mes', parseInt(mes))
+                        .eq('semana', semObj.weekNum)
+                        .maybeSingle();
+
+                    if (data && !error) {
+                        loadedData = {
+                            ano: data.ano,
+                            mes: data.mes,
+                            semana: data.semana,
+                            periodo: data.periodo,
+                            dias_datas: data.dias_datas,
+                            grid: data.grid,
+                            afastamentos: data.afastamentos || [],
+                            observacoes: data.observacoes || [],
+                            observacoes_padrao: data.observacoes_padrao || JSON.parse(JSON.stringify(OBSERVACOES_PADRAO_INSTITUCIONAIS)),
+                            observacoes_manuais: data.observacoes_manuais || [],
+                            observacoes_editadas: data.observacoes_editadas || {},
+                            restricoes: data.restricoes || [],
+                            assinaturas: data.assinaturas || getGlobalAssinaturas(),
+                            alteracoes: data.alteracoes || []
+                        };
+                    }
+                } catch(e) {
+                    console.warn('Busca no Supabase falhou, utilizando cache local:', e);
                 }
-            } else {
-                createNewWeekData(ano, mes, semObj);
             }
 
-            // Atualiza metadados da semana corrente
+            if (!loadedData) {
+                const saved = localStorage.getItem(storageKey);
+                if (saved) {
+                    try {
+                        loadedData = JSON.parse(saved);
+                    } catch (e) {}
+                }
+            }
+
+            if (!loadedData) {
+                if (selectedWeekIndex > 0) {
+                    const prevSemObj = currentMonthWeeks[selectedWeekIndex - 1];
+                    const prevKey = `CMM_ESCALA_${ano}_M${mes}_W${prevSemObj.weekNum}`;
+                    const prevSaved = localStorage.getItem(prevKey);
+                    if (prevSaved) {
+                        try {
+                            const prevData = JSON.parse(prevSaved);
+                            loadedData = cloneDataForNewWeek(prevData, ano, mes, semObj);
+                        } catch(e){}
+                    }
+                }
+
+                if (!loadedData) {
+                    loadedData = createNewWeekData(ano, mes, semObj);
+                }
+            }
+
+            currentScaleData = loadedData;
             currentScaleData.ano = parseInt(ano);
             currentScaleData.mes = parseInt(mes);
             currentScaleData.semana = semObj.weekNum;
@@ -1833,7 +2779,6 @@
                 sab: String(semObj.daysMap.sab.dayNum)
             };
 
-            // Aplica cadastro global persistente de restrições médicas aos militares
             const restricoesMap = getGlobalRestricoesMap();
             currentScaleData.grid.forEach(m => {
                 if (restricoesMap[m.re]) {
@@ -1841,12 +2786,82 @@
                 }
             });
 
-            // Sincroniza observações automáticas
+            currentScaleData.assinaturas = getGlobalAssinaturas();
+            sortMilitaresGrid(currentScaleData.grid);
             syncAutomaticObservacoes();
             renderAll();
         }
 
-        // CRIA NOVO ESTADO COM EFETIVO PADRÃO E DIAS ZERADOS (S em dias úteis, F em fim de semana)
+        function cloneDataForNewWeek(sourceData, ano, mes, semObj) {
+            const newGrid = JSON.parse(JSON.stringify(sourceData.grid || []));
+            
+            newGrid.forEach(m => {
+                if (!m.dias) {
+                    m.dias = { dom: 'F', seg: 'S', ter: 'S', qua: 'S', qui: 'S', sex: 'S', sab: 'F' };
+                } else {
+                    DIAS_KEYS.forEach(k => {
+                        const v = m.dias[k];
+                        if (v === 'FM' || v === 'DS') {
+                            m.dias[k] = (k === 'dom' || k === 'sab') ? 'F' : 'S';
+                        }
+                    });
+                }
+            });
+
+            return {
+                ano: parseInt(ano),
+                mes: parseInt(mes),
+                semana: semObj.weekNum,
+                periodo: semObj.period,
+                dias_datas: {
+                    dom: String(semObj.daysMap.dom.dayNum),
+                    seg: String(semObj.daysMap.seg.dayNum),
+                    ter: String(semObj.daysMap.ter.dayNum),
+                    qua: String(semObj.daysMap.qua.dayNum),
+                    qui: String(semObj.daysMap.qui.dayNum),
+                    sex: String(semObj.daysMap.sex.dayNum),
+                    sab: String(semObj.daysMap.sab.dayNum)
+                },
+                grid: newGrid,
+                afastamentos: [],
+                observacoes_padrao: JSON.parse(JSON.stringify(OBSERVACOES_PADRAO_INSTITUCIONAIS)),
+                observacoes_manuais: JSON.parse(JSON.stringify(sourceData.observacoes_manuais || [])),
+                observacoes_editadas: {},
+                observacoes: [],
+                restricoes: [],
+                alteracoes: [],
+                assinaturas: getGlobalAssinaturas()
+            };
+        }
+
+        function copyFromPreviousWeek() {
+            if (selectedWeekIndex === 0) {
+                alert('Você já está na primeira semana do mês!');
+                return;
+            }
+
+            const ano = document.getElementById('selAno').value;
+            const mes = String(document.getElementById('selMes').value).padStart(2, '0');
+            const prevSemObj = currentMonthWeeks[selectedWeekIndex - 1];
+            const prevKey = `CMM_ESCALA_${ano}_M${mes}_W${prevSemObj.weekNum}`;
+            const prevSaved = localStorage.getItem(prevKey);
+
+            if (!prevSaved) {
+                alert('Não há dados gravados na semana anterior para replicar.');
+                return;
+            }
+
+            if (confirm(`Deseja replicar todos os dados e afastamentos da SEMANA ${prevSemObj.weekNum} para a semana atual?`)) {
+                const prevData = JSON.parse(prevSaved);
+                const semObj = currentMonthWeeks[selectedWeekIndex];
+                currentScaleData = cloneDataForNewWeek(prevData, ano, mes, semObj);
+                syncAutomaticObservacoes();
+                renderAll();
+                scheduleAutoSave();
+                showToast(`Dados da SEM ${prevSemObj.weekNum} replicados com sucesso!`);
+            }
+        }
+
         function createNewWeekData(ano, mes, semObj) {
             let baseMilitares = [];
             if (typeof INITIAL_ESCALA_DATA !== 'undefined' && INITIAL_ESCALA_DATA.grid) {
@@ -1865,7 +2880,7 @@
                 };
             });
 
-            currentScaleData = {
+            return {
                 ano: parseInt(ano),
                 mes: parseInt(mes),
                 semana: semObj.weekNum,
@@ -1881,15 +2896,16 @@
                 },
                 grid: baseMilitares,
                 afastamentos: [],
+                observacoes_padrao: JSON.parse(JSON.stringify(OBSERVACOES_PADRAO_INSTITUCIONAIS)),
                 observacoes_manuais: [],
                 observacoes_editadas: {},
                 observacoes: [],
                 restricoes: [],
-                alteracoes: []
+                alteracoes: [],
+                assinaturas: getGlobalAssinaturas()
             };
         }
 
-        // REDEFINE A SEMANA ATUAL PARA O PADRÃO (S dias úteis, F fim de semana)
         function resetCurrentWeekToDefaults() {
             if (!currentScaleData || !currentScaleData.grid) return;
             if (confirm('Deseja zerar a escala desta semana para o padrão inicial (S nos dias úteis e F no final de semana)?')) {
@@ -1905,15 +2921,16 @@
                     };
                 });
                 currentScaleData.afastamentos = [];
+                currentScaleData.observacoes_padrao = JSON.parse(JSON.stringify(OBSERVACOES_PADRAO_INSTITUCIONAIS));
                 currentScaleData.observacoes_manuais = [];
                 currentScaleData.observacoes_editadas = {};
                 syncAutomaticObservacoes();
                 renderAll();
+                scheduleAutoSave();
                 showToast('Escala redefinida para o padrão inicial!');
             }
         }
 
-        // MOTOR DE SINCRONIZAÇÃO AUTOMÁTICA DE CONDIÇÕES ESPECIAIS COM OBSERVAÇÕES & AFASTAMENTOS
         function syncAutomaticObservacoes() {
             if (!currentScaleData || !currentScaleData.grid) return;
             const semObj = currentMonthWeeks[selectedWeekIndex];
@@ -1927,8 +2944,11 @@
                 currentScaleData.observacoes_editadas = {};
             }
 
+            if (!currentScaleData.observacoes_padrao) {
+                currentScaleData.observacoes_padrao = JSON.parse(JSON.stringify(OBSERVACOES_PADRAO_INSTITUCIONAIS));
+            }
+
             currentScaleData.grid.forEach(m => {
-                // Restrições médicas ativas do militar
                 if (m.restricao && m.restricao.ativa && m.restricao.codigos && m.restricao.codigos.length > 0) {
                     const cods = m.restricao.codigos.join('/');
                     const per = m.restricao.periodo ? ` ${m.restricao.periodo}` : '';
@@ -1941,34 +2961,24 @@
 
                 if (!m.dias) return;
 
-                // Agrupa dias por condição especial
-                const specialDays = {
-                    FE: [],
-                    FM: [],
-                    LTS: [],
-                    DS: [],
-                    AGR: [],
-                    LP: []
-                };
-
+                const specialDays = {};
                 DIAS_KEYS.forEach(dayKey => {
                     const status = m.dias[dayKey];
-                    if (specialDays[status]) {
+                    if (status && status !== 'S' && status !== 'F') {
+                        if (!specialDays[status]) specialDays[status] = [];
                         specialDays[status].push(dayKey);
                     }
                 });
 
                 const milDesc = `${m.grad} ${m.re} ${m.nome}`;
 
-                // FÉRIAS (FE)
-                if (specialDays.FE.length > 0) {
+                if (specialDays.FE && specialDays.FE.length > 0) {
                     const firstDayKey = specialDays.FE[0];
                     const lastDayKey = specialDays.FE[specialDays.FE.length - 1];
                     const dataIni = semObj.daysMap[firstDayKey].formatted;
                     const dataFim = semObj.daysMap[lastDayKey].formatted;
-                    const textoPeriodo = (firstDayKey === lastDayKey) ? `EM ${dataIni}` : `NO PERÍODO DE ${dataIni} A ${dataFim}`;
+                    const textoPeriodo = (firstDayKey === lastDayKey) ? `em ${dataIni}` : `no período de ${dataIni} a ${dataFim}`;
                     const key = `FE_${m.re}`;
-                    
                     const defaultText = `${milDesc} FÉRIAS ${textoPeriodo}.`;
                     const finalText = currentScaleData.observacoes_editadas[key] || defaultText;
 
@@ -1977,16 +2987,15 @@
                         num: m.num,
                         situacao: 'FÉRIAS',
                         nome: `${m.grad} ${m.re} ${m.nome}`,
-                        periodo: `${specialDays.FE.length} DIAS (${dataIni} A ${dataFim})`
+                        periodo: `${specialDays.FE.length} dias (${dataIni} a ${dataFim})`
                     });
                 }
 
-                // FOLGA MENSAL (FM)
-                if (specialDays.FM.length > 0) {
+                if (specialDays.FM && specialDays.FM.length > 0) {
                     specialDays.FM.forEach(dayKey => {
                         const dataFmt = semObj.daysMap[dayKey].formatted;
                         const key = `FM_${m.re}_${dayKey}`;
-                        const defaultText = `${milDesc} FOLGA MENSAL EM ${dataFmt} REFERENTE AO PERÍODO AQUISITIVO.`;
+                        const defaultText = `${milDesc} FOLGA MENSAL em ${dataFmt} referente ao período de aquisição.`;
                         const finalText = currentScaleData.observacoes_editadas[key] || defaultText;
 
                         autoObs.push({ key: key, text: finalText });
@@ -1994,18 +3003,17 @@
                             num: m.num,
                             situacao: 'FOLGA MENSAL',
                             nome: `${m.grad} ${m.re} ${m.nome}`,
-                            periodo: `EM ${dataFmt}`
+                            periodo: `em ${dataFmt}`
                         });
                     });
                 }
 
-                // LICENÇA TRATAMENTO DE SAÚDE (LTS)
-                if (specialDays.LTS.length > 0) {
+                if (specialDays.LTS && specialDays.LTS.length > 0) {
                     const firstDayKey = specialDays.LTS[0];
                     const lastDayKey = specialDays.LTS[specialDays.LTS.length - 1];
                     const dataIni = semObj.daysMap[firstDayKey].formatted;
                     const dataFim = semObj.daysMap[lastDayKey].formatted;
-                    const textoPeriodo = (firstDayKey === lastDayKey) ? `EM ${dataIni}` : `NO PERÍODO DE ${dataIni} A ${dataFim}`;
+                    const textoPeriodo = (firstDayKey === lastDayKey) ? `em ${dataIni}` : `no período de ${dataIni} a ${dataFim}`;
                     const key = `LTS_${m.re}`;
                     const defaultText = `${milDesc} LICENÇA TRATAMENTO DE SAÚDE ${textoPeriodo}.`;
                     const finalText = currentScaleData.observacoes_editadas[key] || defaultText;
@@ -2015,32 +3023,30 @@
                         num: m.num,
                         situacao: 'LICENÇA TRAT. DE SAÚDE',
                         nome: `${m.grad} ${m.re} ${m.nome}`,
-                        periodo: `${dataIni} A ${dataFim}`
+                        periodo: `${dataIni} a ${dataFim}`
                     });
                 }
 
-                // DISPENSA REGULAMENTAR (DS)
-                if (specialDays.DS.length > 0) {
+                if (specialDays.DS && specialDays.DS.length > 0) {
                     specialDays.DS.forEach(dayKey => {
                         const dataFmt = semObj.daysMap[dayKey].formatted;
                         const key = `DS_${m.re}_${dayKey}`;
-                        const defaultText = `${milDesc} DISPENSA REGULAMENTAR EM ${dataFmt}.`;
+                        const defaultText = `${milDesc} DISPENSA DO SERVIÇO em ${dataFmt}.`;
                         const finalText = currentScaleData.observacoes_editadas[key] || defaultText;
 
                         autoObs.push({ key: key, text: finalText });
                         autoAfast.push({
                             num: m.num,
-                            situacao: 'DISPENSA REGULAMENTAR',
+                            situacao: 'DISPENSA DO SERVIÇO',
                             nome: `${m.grad} ${m.re} ${m.nome}`,
-                            periodo: `EM ${dataFmt}`
+                            periodo: `em ${dataFmt}`
                         });
                     });
                 }
 
-                // AGREGADO (AGR)
-                if (specialDays.AGR.length > 0) {
-                    const key = `AGR_${m.re}`;
-                    const defaultText = `${milDesc} NA CONDIÇÃO DE AGREGADO CONFORME PUBLICADO EM DOE.`;
+                if (specialDays.AG && specialDays.AG.length > 0) {
+                    const key = `AG_${m.re}`;
+                    const defaultText = `${milDesc} na condição de AGREGADO conforme publicado em DOE.`;
                     const finalText = currentScaleData.observacoes_editadas[key] || defaultText;
 
                     autoObs.push({ key: key, text: finalText });
@@ -2048,18 +3054,17 @@
                         num: m.num,
                         situacao: 'AGREGADO',
                         nome: `${m.grad} ${m.re} ${m.nome}`,
-                        periodo: `CONFORME DOE`
+                        periodo: `A CONTAR DE DOE`
                     });
                 }
 
-                // LICENÇA PRÊMIO (LP)
-                if (specialDays.LP.length > 0) {
+                if (specialDays.LP && specialDays.LP.length > 0) {
                     const firstDayKey = specialDays.LP[0];
                     const lastDayKey = specialDays.LP[specialDays.LP.length - 1];
                     const dataIni = semObj.daysMap[firstDayKey].formatted;
                     const dataFim = semObj.daysMap[lastDayKey].formatted;
                     const key = `LP_${m.re}`;
-                    const defaultText = `${milDesc} LICENÇA PRÊMIO NO PERÍODO DE ${dataIni} A ${dataFim}.`;
+                    const defaultText = `${milDesc} LICENÇA PRÊMIO no período de ${dataIni} a ${dataFim}.`;
                     const finalText = currentScaleData.observacoes_editadas[key] || defaultText;
 
                     autoObs.push({ key: key, text: finalText });
@@ -2067,18 +3072,59 @@
                         num: m.num,
                         situacao: 'LICENÇA PRÊMIO',
                         nome: `${m.grad} ${m.re} ${m.nome}`,
-                        periodo: `${dataIni} A ${dataFim}`
+                        periodo: `${dataIni} a ${dataFim}`
                     });
                 }
+
+                Object.keys(specialDays).forEach(sig => {
+                    if (!['FE', 'FM', 'LTS', 'DS', 'AG', 'LP'].includes(sig)) {
+                        const sigObj = TODAS_SIGLAS_PMESP.find(s => s.sigla === sig);
+                        const desc = sigObj ? sigObj.desc : sig;
+                        const dayKey = specialDays[sig][0];
+                        const dataFmt = semObj.daysMap[dayKey].formatted;
+                        const key = `${sig}_${m.re}_${dayKey}`;
+                        const defaultText = `${milDesc} ${desc} (${sig}) em ${dataFmt}.`;
+                        const finalText = currentScaleData.observacoes_editadas[key] || defaultText;
+                        autoObs.push({ key: key, text: finalText });
+                    }
+                });
             });
 
-            // Consolida lista de observações (Automáticas + Manuais)
             const finais = [];
             let count = 1;
+
+            currentScaleData.observacoes_padrao.forEach((obsTxt, idx) => {
+                const cleanTxt = obsTxt.replace(/^\d+\)\s*/, '');
+                finais.push({
+                    id: count,
+                    tipo: 'padrao',
+                    padraoIndex: idx,
+                    rawText: cleanTxt,
+                    text: `${String(count).padStart(2, '0')}) ${cleanTxt}`,
+                    isAuto: false
+                });
+                count++;
+            });
+
+            if (currentScaleData.observacoes_manuais) {
+                currentScaleData.observacoes_manuais.forEach((obsTxt, idx) => {
+                    const cleanTxt = obsTxt.replace(/^\d+\)\s*/, '');
+                    finais.push({
+                        id: count,
+                        tipo: 'manual',
+                        manualIndex: idx,
+                        rawText: cleanTxt,
+                        text: `${String(count).padStart(2, '0')}) ${cleanTxt}`,
+                        isAuto: false
+                    });
+                    count++;
+                });
+            }
 
             autoObs.forEach(obsItem => {
                 finais.push({
                     id: count,
+                    tipo: 'auto',
                     key: obsItem.key,
                     rawText: obsItem.text,
                     text: `${String(count).padStart(2, '0')}) ${obsItem.text}`,
@@ -2087,26 +3133,12 @@
                 count++;
             });
 
-            if (currentScaleData.observacoes_manuais) {
-                currentScaleData.observacoes_manuais.forEach((obsTxt, idx) => {
-                    finais.push({
-                        id: count,
-                        manualIndex: idx,
-                        rawText: obsTxt,
-                        text: `${String(count).padStart(2, '0')}) ${obsTxt}`,
-                        isAuto: false
-                    });
-                    count++;
-                });
-            }
-
             currentScaleData.observacoes_estruturadas = finais;
             currentScaleData.observacoes = finais.map(f => f.text);
             currentScaleData.afastamentos = autoAfast;
             currentScaleData.restricoes = restricoesList;
         }
 
-        // RENDERIZAÇÃO COMPLETA DA TELA
         function renderAll() {
             renderHeaderDates();
             renderTableGrid();
@@ -2115,10 +3147,11 @@
             renderRestricoes();
             renderAfastamentos();
             renderAlteracoes();
+            renderAssinantes();
             populateMilitarSelects();
+            renderOfficialPrintArea();
         }
 
-        // RENDERIZA DATAS NO CABEÇALHO DA TABELA
         function renderHeaderDates() {
             if (!currentScaleData || !currentScaleData.dias_datas) return;
             const dd = currentScaleData.dias_datas;
@@ -2132,11 +3165,10 @@
 
             const sub = document.getElementById('subHeaderTitle');
             if (sub && currentScaleData.periodo) {
-                sub.textContent = `ESCALA DE SERVIÇO • PERÍODO DE ${currentScaleData.periodo} • MANUTENÇÃO DE FROTA`;
+                sub.querySelector('span').textContent = `ESCALA DE SERVIÇO • PERÍODO DE ${currentScaleData.periodo} • MANUTENÇÃO DE FROTA`;
             }
         }
 
-        // RENDERIZA A GRADE DE ESCALA
         function renderTableGrid(filterText = '') {
             const tbody = document.getElementById('escalaTableBody');
             tbody.innerHTML = '';
@@ -2169,7 +3201,14 @@
                 let daysHtml = '';
                 DIAS_KEYS.forEach(day => {
                     const val = (militar.dias && militar.dias[day]) ? militar.dias[day].toUpperCase() : '';
-                    const badgeClass = val ? `status-${val}` : 'status-EMPTY';
+                    let badgeClass = 'status-EMPTY';
+                    if (val) {
+                        if (['S', 'F', 'FE', 'FM', 'LTS', 'DS', 'AG', 'LP'].includes(val)) {
+                            badgeClass = `status-${val}`;
+                        } else {
+                            badgeClass = 'status-OTHER';
+                        }
+                    }
                     daysHtml += `
                         <td class="td-day-cell" onclick="handleCellClick(${index}, '${day}')" title="Clique para aplicar carimbo ou alternar">
                             <div class="status-badge ${badgeClass}">${val || '-'}</div>
@@ -2199,7 +3238,6 @@
             });
         }
 
-        // CARIMBO RÁPIDO AO CLICAR NA CÉLULA
         function handleCellClick(militarIndex, dayKey) {
             if (!currentScaleData || !currentScaleData.grid[militarIndex]) return;
 
@@ -2215,9 +3253,9 @@
 
             syncAutomaticObservacoes();
             renderAll();
+            scheduleAutoSave();
         }
 
-        // SELECIONA CARIMBO RÁPIDO
         function selectStamp(sigla, chipElement) {
             selectedStamp = sigla;
             document.querySelectorAll('.sigla-chip').forEach(c => c.classList.remove('active-stamp'));
@@ -2225,7 +3263,6 @@
             showToast(`Carimbo ativo: ${sigla || 'LIMPAR'}`);
         }
 
-        // ALTERA PERFIL DE ACESSO
         function setAppRole(role) {
             currentRole = role;
             document.getElementById('roleChefeBtn').classList.toggle('active', role === 'CHEFE');
@@ -2241,13 +3278,11 @@
             }
         }
 
-        // FILTRO DE BUSCA DINÂMICO
         function filterTable() {
             const query = document.getElementById('searchInput').value;
             renderTableGrid(query);
         }
 
-        // RENDERIZAÇÃO DE KPIS
         function renderKPIS() {
             if (!currentScaleData || !currentScaleData.grid) return;
             const total = currentScaleData.grid.length;
@@ -2265,7 +3300,7 @@
                     const s = m.dias[k];
                     if (s === 'S') emServicoTotal++;
                     else if (s === 'F' || s === 'FM') folgasTotal++;
-                    else if (['FE', 'LTS', 'DS', 'AGR', 'LP'].includes(s)) afastadosTotal++;
+                    else if (['FE', 'LTS', 'DS', 'AG', 'LP'].includes(s)) afastadosTotal++;
                 });
             });
 
@@ -2276,25 +3311,25 @@
             document.getElementById('kpiRestricoes').textContent = restricoesCount;
         }
 
-        // RENDERIZAÇÃO DE OBSERVAÇÕES
         function renderObservacoes() {
             const container = document.getElementById('obsListContainer');
             container.innerHTML = '';
             
             if (!currentScaleData || !currentScaleData.observacoes_estruturadas || currentScaleData.observacoes_estruturadas.length === 0) {
-                container.innerHTML = '<div class="empty-placeholder">Nenhuma condição especial ou observação registrada nesta semana. Ao marcar FE, FM, LTS, DS ou LP na grade, os registros aparecerão aqui automaticamente.</div>';
+                container.innerHTML = '<div class="empty-placeholder">Nenhuma observação cadastrada.</div>';
                 return;
             }
 
             currentScaleData.observacoes_estruturadas.forEach((obsObj, idx) => {
                 const item = document.createElement('div');
-                item.className = `obs-item ${obsObj.isAuto ? 'auto-generated' : ''}`;
+                const extraClass = obsObj.tipo === 'padrao' ? 'padrao-institucional' : (obsObj.isAuto ? 'auto-generated' : '');
+                item.className = `obs-item ${extraClass}`;
                 
                 const editBtnHtml = `<button class="btn-icon-sm" onclick="openEditObsModal(${idx})" title="Editar texto desta observação"><i class="fa-solid fa-pen-to-square"></i></button>`;
                 
                 const deleteBtnHtml = obsObj.isAuto 
                     ? `<span title="Gerado automaticamente pela grade" style="color: var(--accent-blue); font-size: 0.7rem; margin-left: 6px;"><i class="fa-solid fa-bolt"></i> AUTO</span>` 
-                    : `<button class="btn-icon-sm delete" onclick="deleteManualObs(${idx})" title="Excluir observação manual"><i class="fa-solid fa-trash-can"></i></button>`;
+                    : `<button class="btn-icon-sm delete" onclick="deleteObsItem(${idx})" title="Excluir observação"><i class="fa-solid fa-trash-can"></i></button>`;
 
                 item.innerHTML = `
                     <div style="flex: 1;">${obsObj.text}</div>
@@ -2307,7 +3342,6 @@
             });
         }
 
-        // EDITAR QUALQUER OBSERVAÇÃO (AUTO OU MANUAL)
         function openEditObsModal(index) {
             const obsObj = currentScaleData.observacoes_estruturadas[index];
             if (!obsObj) return;
@@ -2319,26 +3353,45 @@
 
         function saveEditedObs() {
             const index = parseInt(document.getElementById('editObsIndex').value);
-            const newText = document.getElementById('editObsTextInput').value.trim().toUpperCase();
+            const newText = document.getElementById('editObsTextInput').value.trim();
             if (!newText) return;
 
             const obsObj = currentScaleData.observacoes_estruturadas[index];
             if (!obsObj) return;
 
-            if (obsObj.isAuto && obsObj.key) {
+            if (obsObj.tipo === 'padrao' && typeof obsObj.padraoIndex === 'number') {
+                currentScaleData.observacoes_padrao[obsObj.padraoIndex] = newText;
+            } else if (obsObj.tipo === 'manual' && typeof obsObj.manualIndex === 'number') {
+                currentScaleData.observacoes_manuais[obsObj.manualIndex] = newText;
+            } else if (obsObj.isAuto && obsObj.key) {
                 if (!currentScaleData.observacoes_editadas) currentScaleData.observacoes_editadas = {};
                 currentScaleData.observacoes_editadas[obsObj.key] = newText;
-            } else if (!obsObj.isAuto && typeof obsObj.manualIndex === 'number') {
-                currentScaleData.observacoes_manuais[obsObj.manualIndex] = newText;
             }
 
             closeModal('editObsModal');
             syncAutomaticObservacoes();
             renderObservacoes();
+            scheduleAutoSave();
             showToast('Observação atualizada com sucesso!');
         }
 
-        // RENDERIZAÇÃO DE RESTRIÇÕES MÉDICAS
+        function deleteObsItem(index) {
+            const obsObj = currentScaleData.observacoes_estruturadas[index];
+            if (!obsObj) return;
+
+            if (confirm('Deseja excluir esta observação?')) {
+                if (obsObj.tipo === 'padrao' && typeof obsObj.padraoIndex === 'number') {
+                    currentScaleData.observacoes_padrao.splice(obsObj.padraoIndex, 1);
+                } else if (obsObj.tipo === 'manual' && typeof obsObj.manualIndex === 'number') {
+                    currentScaleData.observacoes_manuais.splice(obsObj.manualIndex, 1);
+                }
+                syncAutomaticObservacoes();
+                renderObservacoes();
+                scheduleAutoSave();
+                showToast('Observação excluída com sucesso!');
+            }
+        }
+
         function renderRestricoes() {
             const container = document.getElementById('restrListContainer');
             container.innerHTML = '';
@@ -2359,12 +3412,69 @@
             });
         }
 
-        // TOGGLE CAMPOS DE RESTRIÇÃO NO MODAL DO MILITAR
+        function renderAssinantes() {
+            const container = document.getElementById('signBoxesContainer');
+            if (!container) return;
+            container.innerHTML = '';
+
+            const assinantes = currentScaleData.assinaturas || getGlobalAssinaturas();
+
+            assinantes.forEach((s, idx) => {
+                const box = document.createElement('div');
+                box.className = 'sign-box';
+                box.onclick = () => openEditSignModal(idx);
+                box.innerHTML = `
+                    <button class="btn-icon-sm sign-edit-btn" title="Configurar Assinante"><i class="fa-solid fa-pen"></i></button>
+                    <div class="sign-role">${s.role}</div>
+                    <div class="sign-name">${s.nome}</div>
+                    <div class="sign-post">${s.cargo}</div>
+                `;
+                container.appendChild(box);
+            });
+        }
+
+        function openEditSignModal(idx) {
+            const assinantes = currentScaleData.assinaturas || getGlobalAssinaturas();
+            const s = assinantes[idx];
+            if (!s) return;
+
+            document.getElementById('editSignKey').value = idx;
+            document.getElementById('signRoleSelect').value = s.role;
+            document.getElementById('signNomeInput').value = s.nome;
+            document.getElementById('signCargoInput').value = s.cargo;
+
+            openModal('signModal');
+        }
+
+        function saveSignData() {
+            const idx = parseInt(document.getElementById('editSignKey').value);
+            const assinantes = currentScaleData.assinaturas || getGlobalAssinaturas();
+            
+            if (assinantes[idx]) {
+                assinantes[idx].role = document.getElementById('signRoleSelect').value;
+                assinantes[idx].nome = document.getElementById('signNomeInput').value.trim().toUpperCase();
+                assinantes[idx].cargo = document.getElementById('signCargoInput').value.trim().toUpperCase();
+                
+                currentScaleData.assinaturas = assinantes;
+                saveGlobalAssinaturas(assinantes);
+                renderAssinantes();
+                closeModal('signModal');
+                scheduleAutoSave();
+                showToast('Assinante atualizado com sucesso!');
+            }
+        }
+
+        function selectEquipeChoice(eq) {
+            document.getElementById('selectedEquipeOption').value = eq;
+            document.getElementById('eqBtnA').classList.toggle('active', eq === 'A');
+            document.getElementById('eqBtnB').classList.toggle('active', eq === 'B');
+            document.getElementById('eqBtnNone').classList.toggle('active', eq === 'SEM_EQUIPE');
+        }
+
         function toggleRestricaoFields(isShown) {
             document.getElementById('militarRestricaoFields').style.display = isShown ? 'block' : 'none';
         }
 
-        // RENDERIZAÇÃO DE AFASTAMENTOS
         function renderAfastamentos() {
             const tbody = document.getElementById('afastTableBody');
             tbody.innerHTML = '';
@@ -2388,7 +3498,6 @@
             });
         }
 
-        // RENDERIZAÇÃO DE ALTERAÇÕES DIÁRIAS
         function renderAlteracoes() {
             const tbody = document.getElementById('alterTableBody');
             tbody.innerHTML = '';
@@ -2411,7 +3520,6 @@
             });
         }
 
-        // PREENCHE SELECTS DE MILITARES NOS MODAIS
         function populateMilitarSelects() {
             const afastSelect = document.getElementById('afastMilitarSelect');
             const alterSelect = document.getElementById('alterMilitarSelect');
@@ -2431,7 +3539,6 @@
             if (restrDirectSelect) restrDirectSelect.innerHTML = restrOptionsHtml;
         }
 
-        // CONTROLE DE ABAS
         function switchViewTab(tab) {
             currentTab = tab;
             document.getElementById('tabGridBtn').classList.toggle('active', tab === 'grid');
@@ -2443,7 +3550,6 @@
             document.getElementById('viewAlterContainer').style.display = (tab === 'alteracoes') ? 'block' : 'none';
         }
 
-        // MODAIS
         function openModal(id) {
             document.getElementById(id).style.display = 'flex';
         }
@@ -2456,6 +3562,8 @@
             document.getElementById('editMilitarIndex').value = '-1';
             document.getElementById('militarModalTitle').innerHTML = '<i class="fa-solid fa-user-plus"></i> ADICIONAR MILITAR NA ESCALA';
             document.getElementById('militarForm').reset();
+            document.getElementById('militarSecaoBase').value = 'MANUTENÇÃO DE FROTA';
+            selectEquipeChoice('SEM_EQUIPE');
             document.getElementById('militarHasRestricao').checked = false;
             toggleRestricaoFields(false);
             document.querySelectorAll('#restrChipsContainer .restr-toggle-chip').forEach(c => c.classList.remove('active'));
@@ -2468,13 +3576,24 @@
             document.getElementById('editMilitarIndex').value = index;
             document.getElementById('militarModalTitle').innerHTML = '<i class="fa-solid fa-user-pen"></i> EDITAR DADOS DO MILITAR';
             document.getElementById('militarGrupo').value = m.grupo || 'EXPEDIENTE ADMINISTRATIVO DAS 08h às 18h';
-            document.getElementById('militarSecao').value = m.secao || '';
+            
+            let secaoBase = m.secao || 'MANUTENÇÃO DE FROTA';
+            if (secaoBase.includes('Equipe "A"') || secaoBase.includes('Equipe A')) {
+                selectEquipeChoice('A');
+                secaoBase = secaoBase.replace(/Equipe\s*["']?A["']?/i, '').trim();
+            } else if (secaoBase.includes('Equipe "B"') || secaoBase.includes('Equipe B')) {
+                selectEquipeChoice('B');
+                secaoBase = secaoBase.replace(/Equipe\s*["']?B["']?/i, '').trim();
+            } else {
+                selectEquipeChoice('SEM_EQUIPE');
+            }
+            document.getElementById('militarSecaoBase').value = secaoBase || 'MANUTENÇÃO DE FROTA';
+
             document.getElementById('militarFuncao').value = m.funcao || '';
             document.getElementById('militarGrad').value = m.grad || 'Cb PM';
             document.getElementById('militarRE').value = m.re || '';
             document.getElementById('militarNome').value = m.nome || '';
 
-            // Restrições
             const hasRestr = !!(m.restricao && m.restricao.ativa);
             document.getElementById('militarHasRestricao').checked = hasRestr;
             toggleRestricaoFields(hasRestr);
@@ -2507,9 +3626,17 @@
                 codigos: activeCods
             };
 
+            const eqChoice = document.getElementById('selectedEquipeOption').value;
+            let secaoFinal = document.getElementById('militarSecaoBase').value.trim().toUpperCase();
+            if (eqChoice === 'A') {
+                secaoFinal += '           Equipe "A"';
+            } else if (eqChoice === 'B') {
+                secaoFinal += '           Equipe "B"';
+            }
+
             const militarData = {
                 grupo: document.getElementById('militarGrupo').value,
-                secao: document.getElementById('militarSecao').value.toUpperCase(),
+                secao: secaoFinal,
                 funcao: document.getElementById('militarFuncao').value.toUpperCase(),
                 grad: document.getElementById('militarGrad').value,
                 re: re,
@@ -2518,7 +3645,6 @@
                 restricao: restricaoObj
             };
 
-            // Salva no cadastro persistente global
             saveGlobalRestricao(re, restricaoObj);
 
             if (editIdx >= 0) {
@@ -2527,27 +3653,28 @@
                 currentScaleData.grid[editIdx] = militarData;
                 showToast('Militar atualizado com sucesso!');
             } else {
-                militarData.num = currentScaleData.grid.length + 1;
                 currentScaleData.grid.push(militarData);
                 showToast('Novo militar incluído na escala!');
             }
 
+            sortMilitaresGrid(currentScaleData.grid);
             closeModal('militarModal');
             syncAutomaticObservacoes();
             renderAll();
+            scheduleAutoSave();
         }
 
         function deleteMilitar(index) {
             if (confirm('Deseja realmente remover este militar da escala?')) {
                 currentScaleData.grid.splice(index, 1);
-                currentScaleData.grid.forEach((m, idx) => m.num = idx + 1);
+                sortMilitaresGrid(currentScaleData.grid);
                 syncAutomaticObservacoes();
                 renderAll();
+                scheduleAutoSave();
                 showToast('Militar removido da escala.');
             }
         }
 
-        // MODAL DE RESTRIÇÃO DIRETA AO MILITAR (A PARTIR DA SEÇÃO DE RESTRIÇÕES)
         function openAddRestrMilitarModal() {
             document.getElementById('restrDirectMilitarSelect').value = '';
             document.getElementById('restrDirectPeriodo').value = '';
@@ -2597,7 +3724,6 @@
                 codigos: activeCods
             };
 
-            // Aplica no militar local e no banco global
             const m = currentScaleData.grid.find(item => item.re === re);
             if (m) m.restricao = restricaoObj;
             saveGlobalRestricao(re, restricaoObj);
@@ -2605,6 +3731,7 @@
             closeModal('restrDirectModal');
             syncAutomaticObservacoes();
             renderAll();
+            scheduleAutoSave();
             showToast('Restrição médica vinculada com sucesso!');
         }
 
@@ -2619,37 +3746,27 @@
             closeModal('restrDirectModal');
             syncAutomaticObservacoes();
             renderAll();
+            scheduleAutoSave();
             showToast('Restrição médica removida!');
         }
 
-        // OBSERVAÇÕES MANUAIS
         function openAddObsModal() {
             document.getElementById('obsTextInput').value = '';
             openModal('obsModal');
         }
 
         function saveManualObs() {
-            const txt = document.getElementById('obsTextInput').value.trim().toUpperCase();
+            const txt = document.getElementById('obsTextInput').value.trim();
             if (!txt) return;
             if (!currentScaleData.observacoes_manuais) currentScaleData.observacoes_manuais = [];
             currentScaleData.observacoes_manuais.push(txt);
             closeModal('obsModal');
             syncAutomaticObservacoes();
             renderObservacoes();
+            scheduleAutoSave();
             showToast('Observação manual adicionada!');
         }
 
-        function deleteManualObs(index) {
-            const obsObj = currentScaleData.observacoes_estruturadas[index];
-            if (obsObj && !obsObj.isAuto && typeof obsObj.manualIndex === 'number') {
-                currentScaleData.observacoes_manuais.splice(obsObj.manualIndex, 1);
-            }
-            syncAutomaticObservacoes();
-            renderObservacoes();
-            showToast('Observação removida.');
-        }
-
-        // AFASTAMENTOS MANUAIS
         function openAddAfastModal() {
             document.getElementById('afastPeriodo').value = '';
             openModal('afastModal');
@@ -2658,7 +3775,7 @@
         function saveManualAfastamento() {
             const sit = document.getElementById('afastSituacao').value;
             const nome = document.getElementById('afastMilitarSelect').value;
-            const periodo = document.getElementById('afastPeriodo').value.trim().toUpperCase();
+            const periodo = document.getElementById('afastPeriodo').value.trim();
             if (!periodo) return;
 
             if (!currentScaleData.afastamentos) currentScaleData.afastamentos = [];
@@ -2671,10 +3788,10 @@
 
             closeModal('afastModal');
             renderAfastamentos();
+            scheduleAutoSave();
             showToast('Afastamento registrado!');
         }
 
-        // ALTERAÇÕES DIÁRIAS
         function openAddAlterModal() {
             document.getElementById('alterDesc').value = '';
             document.getElementById('alterTranscreveu').value = '';
@@ -2702,14 +3819,21 @@
 
             closeModal('alterModal');
             renderAlteracoes();
+            scheduleAutoSave();
             showToast('Alteração de escala registrada com sucesso!');
         }
 
-        // CONFIGURAÇÕES SUPABASE
         function openSupabaseModal() {
             document.getElementById('supabaseUrl').value = localStorage.getItem('CMM_SUPABASE_URL') || '';
             document.getElementById('supabaseKey').value = localStorage.getItem('CMM_SUPABASE_KEY') || '';
             openModal('supabaseModal');
+        }
+
+        function copySupabaseSql() {
+            const sql = document.getElementById('supabaseSqlText').value;
+            navigator.clipboard.writeText(sql).then(() => {
+                showToast('Script SQL copiado para a área de transferência!');
+            });
         }
 
         function saveSupabaseConfig() {
@@ -2717,12 +3841,21 @@
             const key = document.getElementById('supabaseKey').value.trim();
             localStorage.setItem('CMM_SUPABASE_URL', url);
             localStorage.setItem('CMM_SUPABASE_KEY', key);
+            initSupabaseClient();
             closeModal('supabaseModal');
-            showToast('Configurações de banco de dados salvas!');
+            showToast('Configurações do Supabase salvas permanentemente!');
+            saveAllData(true);
         }
 
-        // SALVAR ESCALA ATUAL
-        function saveAllData() {
+        function scheduleAutoSave() {
+            if (autoSaveTimeout) clearTimeout(autoSaveTimeout);
+            autoSaveTimeout = setTimeout(() => {
+                saveAllData(false);
+            }, 800);
+        }
+
+        async function saveAllData(notifyUser = true) {
+            if (!currentScaleData) return;
             const ano = document.getElementById('selAno').value;
             const mes = String(document.getElementById('selMes').value).padStart(2, '0');
             const semObj = currentMonthWeeks[selectedWeekIndex];
@@ -2730,97 +3863,478 @@
 
             const storageKey = `CMM_ESCALA_${ano}_M${mes}_W${semObj.weekNum}`;
             localStorage.setItem(storageKey, JSON.stringify(currentScaleData));
-            showToast(`Escala da Semana ${semObj.weekNum} (${semObj.period}) salva com sucesso!`);
+
+            if (supabaseClient) {
+                try {
+                    const payload = {
+                        ano: parseInt(ano),
+                        mes: parseInt(mes),
+                        semana: semObj.weekNum,
+                        periodo: semObj.period,
+                        dias_datas: currentScaleData.dias_datas,
+                        grid: currentScaleData.grid,
+                        afastamentos: currentScaleData.afastamentos,
+                        observacoes: currentScaleData.observacoes,
+                        observacoes_padrao: currentScaleData.observacoes_padrao,
+                        observacoes_manuais: currentScaleData.observacoes_manuais,
+                        observacoes_editadas: currentScaleData.observacoes_editadas,
+                        restricoes: currentScaleData.restricoes,
+                        assinaturas: currentScaleData.assinaturas,
+                        alteracoes: currentScaleData.alteracoes,
+                        updated_at: new Date().toISOString()
+                    };
+
+                    const { error } = await supabaseClient
+                        .from('escalas_manutencao')
+                        .upsert(payload, { onConflict: 'ano,mes,semana' });
+
+                    if (error) throw error;
+                    if (notifyUser) showToast(`Escala salva com sucesso no Supabase (Nuvem) e localmente!`);
+                    return;
+                } catch(err) {
+                    console.warn('Erro ao sincronizar com Supabase:', err);
+                }
+            }
+
+            if (notifyUser) showToast(`Escala da Semana ${semObj.weekNum} (${semObj.period}) salva com sucesso!`);
         }
 
-        // EXPORTAÇÃO EXCEL (.XLSX)
-        function exportToExcel() {
-            try {
-                const wb = XLSX.utils.book_new();
+        // =========================================================================
+        // MOTOR DE RENDERIZAÇÃO OFICIAL PMESP PARA IMPRESSÃO / PDF (FRENTE E VERSO)
+        // =========================================================================
+        function renderOfficialPrintArea() {
+            if (!currentScaleData || !currentScaleData.grid) return;
+            const semObj = currentMonthWeeks[selectedWeekIndex];
+            if (!semObj) return;
+
+            // -------------------------------------------------------------
+            // PÁGINA 1: FRENTE DA ESCALA
+            // -------------------------------------------------------------
+            document.getElementById('pHeaderPeriod').textContent = `ESCALA DE SERVIÇO - PERÍODO DE ${currentScaleData.periodo || '06SET26 a 12SET26'}`;
+            
+            const dd = currentScaleData.dias_datas;
+            document.getElementById('pth_dom_date').textContent = dd.dom || '6';
+            document.getElementById('pth_seg_date').textContent = dd.seg || '7';
+            document.getElementById('pth_ter_date').textContent = dd.ter || '8';
+            document.getElementById('pth_qua_date').textContent = dd.qua || '9';
+            document.getElementById('pth_qui_date').textContent = dd.qui || '10';
+            document.getElementById('pth_sex_date').textContent = dd.sex || '11';
+            document.getElementById('pth_sab_date').textContent = dd.sab || '12';
+
+            // Grade de Militares com Seções Mescladas por Equipe (Foto 1)
+            const tbody = document.getElementById('pTableBody');
+            tbody.innerHTML = '';
+
+            let currentGroup = '';
+            const grid = currentScaleData.grid;
+
+            let i = 0;
+            while (i < grid.length) {
+                const m = grid[i];
+
+                if (m.grupo && m.grupo !== currentGroup) {
+                    currentGroup = m.grupo;
+                    const gTr = document.createElement('tr');
+                    gTr.className = 'p-group-row';
+                    gTr.innerHTML = `<td colspan="13">${currentGroup}</td>`;
+                    tbody.appendChild(gTr);
+                }
+
+                const currentSecaoStr = m.secao || 'MANUTENÇÃO DE FROTA';
+                const isEquipeA = currentSecaoStr.includes('Equipe "A"') || currentSecaoStr.includes('Equipe A');
+                const isEquipeB = currentSecaoStr.includes('Equipe "B"') || currentSecaoStr.includes('Equipe B');
                 
-                const wsData = [
-                    ["SECRETARIA DA SEGURANÇA PÚBLICA"],
-                    ["POLÍCIA MILITAR DO ESTADO DE SÃO PAULO"],
-                    ["CENTRO DE MOTOMECANIZAÇÃO"],
-                    [],
-                    [`ESCALA DE SERVIÇO - PERÍODO DE ${currentScaleData.periodo || 'SEMANAL'}`],
-                    [],
-                    ["SEÇÃO DE MANUTENÇÃO DE FROTA"],
-                    []
-                ];
+                let secaoLabelHtml = 'MANUTENÇÃO<br>DE FROTA';
+                if (isEquipeA) secaoLabelHtml = 'MANUTENÇÃO<br>DE FROTA<br><i>Equipe "A"</i>';
+                else if (isEquipeB) secaoLabelHtml = 'MANUTENÇÃO<br>DE FROTA<br><i>Equipe "B"</i>';
 
-                wsData.push([
-                    "Nº", "SEÇÃO", "FUNÇÃO", "GRAD", "RE", "NOME DE GUERRA",
-                    `DOM (${currentScaleData.dias_datas.dom})`,
-                    `SEG (${currentScaleData.dias_datas.seg})`,
-                    `TER (${currentScaleData.dias_datas.ter})`,
-                    `QUA (${currentScaleData.dias_datas.qua})`,
-                    `QUI (${currentScaleData.dias_datas.qui})`,
-                    `SEX (${currentScaleData.dias_datas.sex})`,
-                    `SAB (${currentScaleData.dias_datas.sab})`
-                ]);
-
-                let currentGroup = '';
-                currentScaleData.grid.forEach(m => {
-                    if (m.grupo && m.grupo !== currentGroup) {
-                        currentGroup = m.grupo;
-                        wsData.push([`--- ${currentGroup} ---`]);
+                let spanCount = 1;
+                for (let j = i + 1; j < grid.length; j++) {
+                    const nextM = grid[j];
+                    if (nextM.grupo === currentGroup) {
+                        const nextSec = nextM.secao || '';
+                        const nextIsA = nextSec.includes('Equipe "A"') || nextSec.includes('Equipe A');
+                        const nextIsB = nextSec.includes('Equipe "B"') || nextSec.includes('Equipe B');
+                        if (isEquipeA && nextIsA) spanCount++;
+                        else if (isEquipeB && nextIsB) spanCount++;
+                        else if (!isEquipeA && !isEquipeB && !nextIsA && !nextIsB) spanCount++;
+                        else break;
+                    } else {
+                        break;
                     }
-                    wsData.push([
-                        m.num,
-                        m.secao,
-                        m.funcao,
-                        m.grad,
-                        m.re,
-                        m.nome,
-                        m.dias.dom || '',
-                        m.dias.seg || '',
-                        m.dias.ter || '',
-                        m.dias.qua || '',
-                        m.dias.qui || '',
-                        m.dias.sex || '',
-                        m.dias.sab || ''
-                    ]);
+                }
+
+                for (let k = 0; k < spanCount; k++) {
+                    const mil = grid[i + k];
+                    const tr = document.createElement('tr');
+
+                    let daysHtml = '';
+                    DIAS_KEYS.forEach(day => {
+                        const val = (mil.dias && mil.dias[day]) ? mil.dias[day].toUpperCase() : '';
+                        let valClass = '';
+                        if (['FE', 'FR', 'LTS', 'AG'].includes(val)) {
+                            valClass = 'p-text-red';
+                        } else if (['FM', 'DS', 'LP', 'S'].includes(val)) {
+                            valClass = 'p-text-bold';
+                        }
+                        daysHtml += `<td class="${valClass}">${val || ''}</td>`;
+                    });
+
+                    let secaoTd = '';
+                    if (k === 0) {
+                        secaoTd = `<td rowspan="${spanCount}" class="p-secao-cell">${secaoLabelHtml}</td>`;
+                    }
+
+                    tr.innerHTML = `
+                        <td style="font-weight: bold;">${mil.num}</td>
+                        ${secaoTd}
+                        <td style="text-align: left; font-size: 6.2pt; padding-left: 2px;">${mil.funcao}</td>
+                        <td style="font-weight: bold;">${mil.grad}</td>
+                        <td style="font-family: 'JetBrains Mono', monospace; font-size: 6.2pt;">${mil.re}</td>
+                        <td style="text-align: left; font-weight: bold; padding-left: 2px;">${mil.nome}</td>
+                        ${daysHtml}
+                    `;
+                    tbody.appendChild(tr);
+                }
+
+                i += spanCount;
+            }
+
+            // Afastamentos
+            const afastTable = document.getElementById('pAfastTable');
+            const afastTbody = document.getElementById('pAfastTbody');
+            if (currentScaleData.afastamentos && currentScaleData.afastamentos.length > 0) {
+                afastTable.style.display = 'table';
+                afastTbody.innerHTML = '';
+                currentScaleData.afastamentos.forEach(a => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td style="text-align: center; font-weight: bold;">${a.num}</td>
+                        <td style="text-align: center; font-weight: bold;">${a.situacao}</td>
+                        <td style="text-align: left; font-weight: bold; padding-left: 4px;">${a.nome}</td>
+                        <td style="text-align: left; padding-left: 4px;">${a.periodo}</td>
+                    `;
+                    afastTbody.appendChild(tr);
                 });
+            } else {
+                afastTable.style.display = 'none';
+            }
 
-                if (currentScaleData.afastamentos && currentScaleData.afastamentos.length > 0) {
-                    wsData.push([]);
-                    wsData.push(["--- AFASTAMENTOS E SITUAÇÕES ESPECIAIS ---"]);
-                    wsData.push(["Nº", "SITUAÇÃO", "NOME", "PERÍODO"]);
-                    currentScaleData.afastamentos.forEach(a => {
-                        wsData.push([a.num, a.situacao, a.nome, a.periodo]);
-                    });
+            // Observações
+            const obsContainer = document.getElementById('pObsContent');
+            obsContainer.innerHTML = '';
+            if (currentScaleData.observacoes && currentScaleData.observacoes.length > 0) {
+                currentScaleData.observacoes.forEach(obs => {
+                    const div = document.createElement('div');
+                    div.className = 'p-obs-row';
+                    div.innerHTML = `<i>${obs}</i>`;
+                    obsContainer.appendChild(div);
+                });
+            }
+
+            // Rodapé Oficial: Auxiliar de Semana, Data, QPO e Assinaturas (Foto 3)
+            const assinantes = currentScaleData.assinaturas || getGlobalAssinaturas();
+            
+            const auxTitular = assinantes.find(s => s.id === 'aux_titular' || s.role.includes('SUBSTITUTO') === false && s.role.includes('AUXILIAR')) || { nome: '2º Sgt PM 107774-A Luciano' };
+            const auxSubstituto = assinantes.find(s => s.id === 'aux_substituto' || s.role.includes('SUBSTITUTO')) || { nome: '3º Sgt PM 191651-3 Ricardo Borges' };
+            const elaborador = assinantes.find(s => s.id === 'elaborador' || s.role.includes('ELABORADOR')) || { nome: 'VALDERLEY BRITO MOURA', cargo: '2º SGT PM AUX SEÇ MANUT FROTA' };
+            const conferente = assinantes.find(s => s.id === 'conferente' || s.role.includes('CONFERENTE')) || { nome: 'FÁBIO DOS REIS PINHEIRO', cargo: '2º SGT PM ESCAL SEÇ MANUT FROTA' };
+            const chefeSecao = assinantes.find(s => s.id === 'chefe_secao' || s.role.includes('SEÇÃO')) || { nome: 'JOSÉ MAYCON DE PAIVA HONORATO', cargo: 'CAP PM CH SEÇ MANUT FROTA' };
+            const chefeDivisao = assinantes.find(s => s.id === 'chefe_divisao' || s.role.includes('DIVISÃO')) || { nome: 'SAMUEL DE ANDRADE', cargo: 'MAJ PM CH DIV MANUT TRANSP' };
+
+            document.getElementById('pAuxTitularText').textContent = auxTitular.nome;
+            document.getElementById('pAuxSubstitutoText').textContent = auxSubstituto.nome;
+
+            // Data formatada em português por extenso
+            const now = new Date();
+            const diaHoje = String(now.getDate()).padStart(2, '0');
+            const mesHoje = MONTHS_EXTENSO[now.getMonth()];
+            const anoHoje = now.getFullYear();
+            document.getElementById('pCurrentDateFullText').textContent = `São Paulo, ${diaHoje} de ${mesHoje} de ${anoHoje}.`;
+
+            // Cálculo dinâmico do QPO Existente
+            const sgtCount = grid.filter(m => /Subten|Sgt/i.test(m.grad)).length;
+            const cbSdCount = grid.filter(m => /Cb|Sd/i.test(m.grad)).length;
+            const totalCount = grid.length;
+
+            document.getElementById('pQpoSgtExistente').textContent = sgtCount;
+            document.getElementById('pQpoCbSdExistente').textContent = cbSdCount;
+            document.getElementById('pQpoTotalExistente').textContent = totalCount;
+
+            // Assinaturas
+            document.getElementById('pElaboradorNome').textContent = elaborador.nome;
+            document.getElementById('pElaboradorCargo').textContent = elaborador.cargo;
+
+            document.getElementById('pConferenteNome').textContent = conferente.nome;
+            document.getElementById('pConferenteCargo').textContent = conferente.cargo;
+
+            document.getElementById('pChefeSecaoNome').textContent = chefeSecao.nome;
+            document.getElementById('pChefeSecaoCargo').textContent = chefeSecao.cargo;
+
+            document.getElementById('pChefeDivisaoNome').textContent = chefeDivisao.nome;
+            document.getElementById('pChefeDivisaoCargo').textContent = chefeDivisao.cargo;
+
+            // -------------------------------------------------------------
+            // PÁGINA 2: VERSO DA ESCALA (ALTERAÇÕES DA ESCALA - FOTOS 2, 3 E 4)
+            // -------------------------------------------------------------
+            document.getElementById('pAlterHeaderPeriod').textContent = `ALTERAÇÕES DA ESCALA  DE ${(currentScaleData.periodo || '06SET26 A 12SET26').toUpperCase()}`;
+            
+            const alterTbody = document.getElementById('pAlterTableBody');
+            alterTbody.innerHTML = '';
+
+            const registeredAlts = currentScaleData.alteracoes || [];
+            const totalPage2Rows = 36;
+
+            for (let idx = 0; idx < totalPage2Rows; idx++) {
+                const tr = document.createElement('tr');
+                if (idx < registeredAlts.length) {
+                    const alt = registeredAlts[idx];
+                    tr.innerHTML = `
+                        <td style="font-weight: bold; text-align: left; padding-left: 4px;">${alt.militar || ''}</td>
+                        <td style="text-align: left; padding-left: 4px;">${alt.desc || ''}</td>
+                        <td style="text-align: center;">${alt.transcreveu || ''}</td>
+                        <td style="text-align: center;">${alt.status === 'AUTORIZADO' ? 'RUBRICADO' : ''}</td>
+                    `;
+                } else {
+                    tr.innerHTML = `
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    `;
                 }
-
-                if (currentScaleData.observacoes && currentScaleData.observacoes.length > 0) {
-                    wsData.push([]);
-                    wsData.push(["--- OBSERVAÇÕES ---"]);
-                    currentScaleData.observacoes.forEach(obs => {
-                        wsData.push([obs]);
-                    });
-                }
-
-                if (currentScaleData.restricoes && currentScaleData.restricoes.length > 0) {
-                    wsData.push([]);
-                    wsData.push(["--- RESTRIÇÕES OPERACIONAIS ---"]);
-                    currentScaleData.restricoes.forEach(r => {
-                        wsData.push([r.texto]);
-                    });
-                }
-
-                const ws = XLSX.utils.aoa_to_sheet(wsData);
-                XLSX.utils.book_append_sheet(wb, ws, "ESCALA_MANUTENCAO");
-                
-                const fileName = `ESCALA_MANUT_FROTA_${currentScaleData.periodo || 'SEMANAL'}.xlsx`;
-                XLSX.writeFile(wb, fileName);
-                showToast(`Planilha ${fileName} exportada com sucesso!`);
-            } catch (err) {
-                console.error(err);
-                showToast('Erro ao gerar arquivo Excel.');
+                alterTbody.appendChild(tr);
             }
         }
 
-        // TOAST
+        function triggerOfficialPrint() {
+            renderOfficialPrintArea();
+            window.print();
+        }
+
+        // =========================================================================
+        // EXPORTAÇÃO EXCEL FIEL AO TEMPLATE ORIGINAL PMESP (VIA EXCELJS)
+        // =========================================================================
+        async function exportToExcel() {
+            try {
+                if (!window.ExcelJS || typeof EXCEL_TEMPLATE_BASE64 === 'undefined') {
+                    showToast('Template Excel não carregado.');
+                    return;
+                }
+
+                showToast('Gerando arquivo Excel oficial idêntico ao modelo...');
+
+                const workbook = new ExcelJS.Workbook();
+                
+                // Converte base64 para Uint8Array
+                const binaryString = window.atob(EXCEL_TEMPLATE_BASE64);
+                const len = binaryString.length;
+                const bytes = new Uint8Array(len);
+                for (let i = 0; i < len; i++) {
+                    bytes[i] = binaryString.charCodeAt(i);
+                }
+
+                await workbook.xlsx.load(bytes.buffer);
+                const ws = workbook.getWorksheet('Plan1') || workbook.worksheets[0];
+
+                // 1. Cabeçalho e Período
+                const periodoStr = currentScaleData.periodo || '06SET26 a 12SET26';
+                ws.getCell('H5').value = `ESCALA DE SERVIÇO - PERÍODO DE ${periodoStr}`;
+
+                // 2. Datas do Calendário
+                const dd = currentScaleData.dias_datas || { dom: '6', seg: '7', ter: '8', qua: '9', qui: '10', sex: '11', sab: '12' };
+                const dayCols = [
+                    { colNum: 25, key: 'dom' }, // Y
+                    { colNum: 27, key: 'seg' }, // AA
+                    { colNum: 29, key: 'ter' }, // AC
+                    { colNum: 31, key: 'qua' }, // AE
+                    { colNum: 33, key: 'qui' }, // AG
+                    { colNum: 35, key: 'sex' }, // AI
+                    { colNum: 37, key: 'sab' }  // AK
+                ];
+
+                // Linhas de data 12 e 21
+                [12, 21].forEach(rowNum => {
+                    dayCols.forEach(d => {
+                        const c = ws.getRow(rowNum).getCell(d.colNum);
+                        c.value = parseInt(dd[d.key]) || dd[d.key];
+                    });
+                });
+
+                // 3. Militares na Grade
+                const grid = currentScaleData.grid || [];
+
+                // Mapeamento das linhas físicas da planilha modelo:
+                // Grupo 1: 13, 14, 15, 16 (4 linhas)
+                // Grupo 2 Equipe A: 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32 (11 linhas)
+                // Grupo 2 Equipe B: 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43 (11 linhas)
+                // Grupo 3: 45, 46 (2 linhas)
+                const templateRows = [
+                    13, 14, 15, 16,
+                    22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32,
+                    33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43,
+                    45, 46
+                ];
+
+                grid.forEach((m, idx) => {
+                    if (idx < templateRows.length) {
+                        const rNum = templateRows[idx];
+                        const row = ws.getRow(rNum);
+
+                        row.getCell(1).value = m.num || (idx + 1);      // Col A (Nº)
+                        row.getCell(7).value = m.funcao || '';          // Col G (Função)
+                        row.getCell(13).value = m.grad || '';           // Col M (Grad)
+                        row.getCell(17).value = m.re || '';             // Col Q (RE)
+                        row.getCell(20).value = m.nome || '';           // Col T (Nome)
+
+                        // Preenchimento dos dias e formatação de cores (Vermelho para FE, FR, LTS, AG)
+                        dayCols.forEach(d => {
+                            const cell = row.getCell(d.colNum);
+                            const val = (m.dias && m.dias[d.key]) ? m.dias[d.key].toUpperCase() : '';
+                            cell.value = val;
+
+                            if (['FE', 'FR', 'LTS', 'AG'].includes(val)) {
+                                cell.font = { name: 'Arial', size: 8, bold: true, color: { argb: 'FFFF0000' } };
+                            } else if (['FM', 'DS', 'LP', 'S'].includes(val)) {
+                                cell.font = { name: 'Arial', size: 8, bold: true, color: { argb: 'FF000000' } };
+                            } else {
+                                cell.font = { name: 'Arial', size: 8, bold: false, color: { argb: 'FF000000' } };
+                            }
+                        });
+                    }
+                });
+
+                // 4. Afastamentos (Linhas 48 a 52)
+                const afastamentos = currentScaleData.afastamentos || [];
+                for (let i = 0; i < 5; i++) {
+                    const rNum = 48 + i;
+                    const row = ws.getRow(rNum);
+                    if (i < afastamentos.length) {
+                        const af = afastamentos[i];
+                        row.getCell(1).value = af.num || (i + 1);
+                        row.getCell(2).value = af.situacao || '';
+                        row.getCell(13).value = af.nome || '';
+                        row.getCell(25).value = af.periodo || '';
+                    } else {
+                        row.getCell(1).value = '';
+                        row.getCell(2).value = '';
+                        row.getCell(13).value = '';
+                        row.getCell(25).value = '';
+                    }
+                }
+
+                // 5. Observações (Linhas 54 a 69)
+                const observacoes = currentScaleData.observacoes || [];
+                for (let i = 0; i < 16; i++) {
+                    const rNum = 54 + i;
+                    const row = ws.getRow(rNum);
+                    if (i < observacoes.length) {
+                        row.getCell(1).value = observacoes[i];
+                    } else {
+                        row.getCell(1).value = '';
+                    }
+                }
+
+                // 6. Restrições (Linhas 71 a 78)
+                const restricoes = currentScaleData.restricoes || [];
+                for (let i = 0; i < 8; i++) {
+                    const rNum = 71 + i;
+                    const row = ws.getRow(rNum);
+                    if (i < restricoes.length) {
+                        row.getCell(1).value = restricoes[i].texto;
+                    } else {
+                        row.getCell(1).value = '';
+                    }
+                }
+
+                // 7. Auxiliares de Semana
+                const assinantes = currentScaleData.assinaturas || getGlobalAssinaturas();
+                const auxTitular = assinantes.find(s => s.id === 'aux_titular' || (s.role.includes('AUXILIAR') && !s.role.includes('SUBSTITUTO'))) || { nome: '2º Sgt PM 107774-A Luciano' };
+                const auxSubstituto = assinantes.find(s => s.id === 'aux_substituto' || s.role.includes('SUBSTITUTO')) || { nome: '3º Sgt PM 191651-3 Ricardo Borges' };
+
+                ws.getCell('M79').value = auxTitular.nome;
+                ws.getCell('M80').value = auxSubstituto.nome;
+
+                // 8. Data
+                const now = new Date();
+                const diaHoje = String(now.getDate()).padStart(2, '0');
+                const mesHoje = MONTHS_EXTENSO[now.getMonth()];
+                const anoHoje = now.getFullYear();
+                ws.getCell('A81').value = `São Paulo, ${diaHoje} de ${mesHoje} de ${anoHoje}.`;
+
+                // 9. QPO Existente
+                const sgtCount = grid.filter(m => /Subten|Sgt/i.test(m.grad)).length;
+                const cbSdCount = grid.filter(m => /Cb|Sd/i.test(m.grad)).length;
+                const totalCount = grid.length;
+
+                ws.getCell('AJ83').value = sgtCount;
+                ws.getCell('AJ84').value = cbSdCount;
+                ws.getCell('AJ85').value = totalCount;
+
+                // 10. Assinaturas
+                const elaborador = assinantes.find(s => s.id === 'elaborador' || s.role.includes('ELABORADOR')) || { nome: 'VALDERLEY BRITO MOURA', cargo: '2º SGT PM AUX SEÇ MANUT FROTA' };
+                const conferente = assinantes.find(s => s.id === 'conferente' || s.role.includes('CONFERENTE')) || { nome: 'FÁBIO DOS REIS PINHEIRO', cargo: '2º SGT PM ESCAL SEÇ MANUT FROTA' };
+                const chefeSecao = assinantes.find(s => s.id === 'chefe_secao' || s.role.includes('SEÇÃO')) || { nome: 'JOSÉ MAYCON DE PAIVA HONORATO', cargo: 'CAP PM CH SEÇ MANUT FROTA' };
+                const chefeDivisao = assinantes.find(s => s.id === 'chefe_divisao' || s.role.includes('DIVISÃO')) || { nome: 'SAMUEL DE ANDRADE', cargo: 'MAJ PM CH DIV MANUT TRANSP' };
+
+                ws.getCell('A85').value = elaborador.nome;
+                ws.getCell('A86').value = elaborador.cargo;
+
+                ws.getCell('A90').value = conferente.nome;
+                ws.getCell('A91').value = conferente.cargo;
+
+                ws.getCell('J90').value = `                   ${chefeSecao.nome}`;
+                ws.getCell('J91').value = `                  ${chefeSecao.cargo}`;
+
+                ws.getCell('X90').value = chefeDivisao.nome;
+                ws.getCell('X91').value = chefeDivisao.cargo;
+
+                // 11. Verso (Plan1 linhas 93 a 138)
+                ws.getCell('A93').value = `  ALTERAÇÕES DA ESCALA  DE ${periodoStr.toUpperCase()}`;
+                const alteracoes = currentScaleData.alteracoes || [];
+                for (let i = 0; i < 44; i++) {
+                    const rNum = 95 + i;
+                    const row = ws.getRow(rNum);
+                    if (i < alteracoes.length) {
+                        const alt = alteracoes[i];
+                        row.getCell(1).value = alt.militar || '';
+                        row.getCell(8).value = alt.desc || '';
+                        row.getCell(28).value = alt.transcreveu || '';
+                        row.getCell(35).value = alt.status === 'AUTORIZADO' ? 'RUBRICADO' : '';
+                    } else {
+                        row.getCell(1).value = '';
+                        row.getCell(8).value = '';
+                        row.getCell(28).value = '';
+                        row.getCell(35).value = '';
+                    }
+                }
+
+                // 12. Atualiza Plan2 (Registro Diário de Alterações) se existir
+                const ws2 = workbook.getWorksheet('Plan2');
+                if (ws2) {
+                    ws2.getCell('A5').value = `ALTERAÇÕES DE ESCALA DE SERVIÇO DE PRAÇAS DO PERÍODO ${periodoStr}`;
+                }
+
+                // 13. Download do arquivo modificado
+                const outBuffer = await workbook.xlsx.writeBuffer();
+                const blob = new Blob([outBuffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                const fileName = `ESCALA_SEMANAL_${periodoStr.replace(/\s+/g, '_')}.xlsx`;
+                a.download = fileName;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                window.URL.revokeObjectURL(url);
+
+                showToast(`Planilha oficial ${fileName} exportada com layout idêntico!`);
+            } catch(err) {
+                console.error('Erro na exportação ExcelJS:', err);
+                showToast('Erro ao exportar planilha Excel.');
+            }
+        }
+
         function showToast(msg) {
             const toast = document.getElementById('toastNotification');
             document.getElementById('toastMessage').textContent = msg;
