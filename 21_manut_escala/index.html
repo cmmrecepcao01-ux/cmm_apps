@@ -2455,10 +2455,13 @@ CREATE POLICY "Permissao Total Escalas" ON public.escalas_manutencao FOR ALL USI
             });
         });
 
+        const DEFAULT_SUPABASE_URL = 'https://rrqxcehfsbfoblqmxxkh.supabase.co';
+        const DEFAULT_SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJycXhjZWhmc2Jmb2JscW14eGtoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjkwNzEzNDMsImV4cCI6MjA4NDY0NzM0M30.0sy9oWpr1xYCa0wiDzva9EfwDlVZYRBA6IpyHUdOPek';
+
         // INICIALIZA CLIENTE SUPABASE
         function initSupabaseClient() {
-            const url = localStorage.getItem('CMM_SUPABASE_URL');
-            const key = localStorage.getItem('CMM_SUPABASE_KEY');
+            const url = localStorage.getItem('CMM_SUPABASE_URL') || DEFAULT_SUPABASE_URL;
+            const key = localStorage.getItem('CMM_SUPABASE_KEY') || DEFAULT_SUPABASE_KEY;
             const badge = document.getElementById('cloudStatusBadge');
 
             if (url && key && window.supabase) {
@@ -2469,7 +2472,12 @@ CREATE POLICY "Permissao Total Escalas" ON public.escalas_manutencao FOR ALL USI
                         badge.innerHTML = '<i class="fa-solid fa-cloud-check"></i> SUPABASE CONECTADO (NUVEM ATIVA)';
                     }
                 } catch(e) {
+                    console.error('Erro ao conectar Supabase:', e);
                     supabaseClient = null;
+                    if (badge) {
+                        badge.className = 'cloud-badge cloud-offline';
+                        badge.innerHTML = '<i class="fa-solid fa-database"></i> MODO LOCAL (OFFLINE)';
+                    }
                 }
             } else {
                 supabaseClient = null;
@@ -4137,11 +4145,13 @@ CREATE POLICY "Permissao Total Escalas" ON public.escalas_manutencao FOR ALL USI
                 await workbook.xlsx.load(bytes.buffer);
                 const ws = workbook.getWorksheet('Plan1') || workbook.worksheets[0];
 
-                // 1. Cabeçalho e Período
+                // 1. Cabeçalho e Período (Fonte 22, Bold)
                 const periodoStr = currentScaleData.periodo || '06SET26 a 12SET26';
-                ws.getCell('H5').value = `ESCALA DE SERVIÇO - PERÍODO DE ${periodoStr}`;
+                const cellH5 = ws.getCell('H5');
+                cellH5.value = `ESCALA DE SERVIÇO - PERÍODO DE ${periodoStr}`;
+                cellH5.font = { name: 'Arial', size: 22, bold: true };
 
-                // 2. Datas do Calendário
+                // 2. Datas do Calendário (Fonte 20, Bold)
                 const dd = currentScaleData.dias_datas || { dom: '6', seg: '7', ter: '8', qua: '9', qui: '10', sex: '11', sab: '12' };
                 const dayCols = [
                     { colNum: 25, key: 'dom' }, // Y
@@ -4158,10 +4168,12 @@ CREATE POLICY "Permissao Total Escalas" ON public.escalas_manutencao FOR ALL USI
                     dayCols.forEach(d => {
                         const c = ws.getRow(rowNum).getCell(d.colNum);
                         c.value = parseInt(dd[d.key]) || dd[d.key];
+                        const isRed = (d.key === 'dom' || d.key === 'sab');
+                        c.font = { name: 'Arial', size: 20, bold: true, color: isRed ? { argb: 'FFFF0000' } : undefined };
                     });
                 });
 
-                // 3. Militares na Grade
+                // 3. Militares na Grade (Fonte 18.0 Padrão PMESP)
                 const grid = currentScaleData.grid || [];
 
                 // Mapeamento das linhas físicas da planilha modelo:
@@ -4181,30 +4193,45 @@ CREATE POLICY "Permissao Total Escalas" ON public.escalas_manutencao FOR ALL USI
                         const rNum = templateRows[idx];
                         const row = ws.getRow(rNum);
 
-                        row.getCell(1).value = m.num || (idx + 1);      // Col A (Nº)
-                        row.getCell(7).value = m.funcao || '';          // Col G (Função)
-                        row.getCell(13).value = m.grad || '';           // Col M (Grad)
-                        row.getCell(17).value = m.re || '';             // Col Q (RE)
-                        row.getCell(20).value = m.nome || '';           // Col T (Nome)
+                        // Identificação do Militar (Fonte 18, Bold)
+                        const cNum = row.getCell(1);
+                        cNum.value = m.num || (idx + 1);
+                        cNum.font = { name: 'Arial', size: 18, bold: true };
 
-                        // Preenchimento dos dias e formatação de cores (Vermelho para FE, FR, LTS, AG)
+                        const cFunc = row.getCell(7);
+                        cFunc.value = m.funcao || '';
+                        cFunc.font = { name: 'Arial', size: 18, bold: true };
+
+                        const cGrad = row.getCell(13);
+                        cGrad.value = m.grad || '';
+                        cGrad.font = { name: 'Arial', size: 18, bold: true };
+
+                        const cRe = row.getCell(17);
+                        cRe.value = m.re || '';
+                        cRe.font = { name: 'Arial', size: 18, bold: true };
+
+                        const cNome = row.getCell(20);
+                        cNome.value = m.nome || '';
+                        cNome.font = { name: 'Arial', size: 18, bold: true };
+
+                        // Dias da Semana (Fonte 18.0, Vermelho para FE, FR, LTS, AG)
                         dayCols.forEach(d => {
                             const cell = row.getCell(d.colNum);
                             const val = (m.dias && m.dias[d.key]) ? m.dias[d.key].toUpperCase() : '';
                             cell.value = val;
 
                             if (['FE', 'FR', 'LTS', 'AG'].includes(val)) {
-                                cell.font = { name: 'Arial', size: 8, bold: true, color: { argb: 'FFFF0000' } };
+                                cell.font = { name: 'Arial', size: 18, bold: true, color: { argb: 'FFFF0000' } };
                             } else if (['FM', 'DS', 'LP', 'S'].includes(val)) {
-                                cell.font = { name: 'Arial', size: 8, bold: true, color: { argb: 'FF000000' } };
+                                cell.font = { name: 'Arial', size: 18, bold: true, color: { argb: 'FF000000' } };
                             } else {
-                                cell.font = { name: 'Arial', size: 8, bold: false, color: { argb: 'FF000000' } };
+                                cell.font = { name: 'Arial', size: 18, bold: false, color: { argb: 'FF000000' } };
                             }
                         });
                     }
                 });
 
-                // 4. Afastamentos (Linhas 48 a 52)
+                // 4. Afastamentos (Linhas 48 a 52 - Fonte 18, Bold)
                 const afastamentos = currentScaleData.afastamentos || [];
                 for (let i = 0; i < 5; i++) {
                     const rNum = 48 + i;
@@ -4215,6 +4242,10 @@ CREATE POLICY "Permissao Total Escalas" ON public.escalas_manutencao FOR ALL USI
                         row.getCell(2).value = af.situacao || '';
                         row.getCell(13).value = af.nome || '';
                         row.getCell(25).value = af.periodo || '';
+
+                        [1, 2, 13, 25].forEach(col => {
+                            row.getCell(col).font = { name: 'Arial', size: 18, bold: true };
+                        });
                     } else {
                         row.getCell(1).value = '';
                         row.getCell(2).value = '';
@@ -4223,74 +4254,99 @@ CREATE POLICY "Permissao Total Escalas" ON public.escalas_manutencao FOR ALL USI
                     }
                 }
 
-                // 5. Observações (Linhas 54 a 69)
+                // 5. Observações com Mapeamento Físico Exato das Células Mescladas
+                // Obs 1: Linha 54 (Mesclada 54 a 56)
+                // Obs 2: Linha 57 (Mesclada 57 a 58)
+                // Obs 3 a 13: Linhas 59 a 69
+                const obsRowIndices = [54, 57, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69];
                 const observacoes = currentScaleData.observacoes || [];
-                for (let i = 0; i < 16; i++) {
-                    const rNum = 54 + i;
-                    const row = ws.getRow(rNum);
-                    if (i < observacoes.length) {
-                        row.getCell(1).value = observacoes[i];
+                obsRowIndices.forEach((rNum, idx) => {
+                    const cell = ws.getCell(`A${rNum}`);
+                    if (idx < observacoes.length) {
+                        cell.value = observacoes[idx];
+                        cell.font = { name: 'Arial', size: 16, bold: false };
                     } else {
-                        row.getCell(1).value = '';
+                        cell.value = '';
                     }
-                }
+                });
 
-                // 6. Restrições (Linhas 71 a 78)
+                // 6. Restrições (Linhas 71 a 78 - Fonte 18)
                 const restricoes = currentScaleData.restricoes || [];
                 for (let i = 0; i < 8; i++) {
                     const rNum = 71 + i;
-                    const row = ws.getRow(rNum);
+                    const cell = ws.getCell(`A${rNum}`);
                     if (i < restricoes.length) {
-                        row.getCell(1).value = restricoes[i].texto;
+                        cell.value = restricoes[i].texto;
+                        cell.font = { name: 'Arial', size: 18, bold: false };
                     } else {
-                        row.getCell(1).value = '';
+                        cell.value = '';
                     }
                 }
 
-                // 7. Auxiliares de Semana
+                // 7. Auxiliares de Semana (Fonte 18)
                 const assinantes = currentScaleData.assinaturas || getGlobalAssinaturas();
                 const auxTitular = assinantes.find(s => s.id === 'aux_titular' || (s.role.includes('AUXILIAR') && !s.role.includes('SUBSTITUTO'))) || { nome: '2º Sgt PM 107774-A Luciano' };
                 const auxSubstituto = assinantes.find(s => s.id === 'aux_substituto' || s.role.includes('SUBSTITUTO')) || { nome: '3º Sgt PM 191651-3 Ricardo Borges' };
 
-                ws.getCell('M79').value = auxTitular.nome;
-                ws.getCell('M80').value = auxSubstituto.nome;
+                const cellM79 = ws.getCell('M79');
+                cellM79.value = auxTitular.nome;
+                cellM79.font = { name: 'Arial', size: 18, bold: false };
 
-                // 8. Data
+                const cellM80 = ws.getCell('M80');
+                cellM80.value = auxSubstituto.nome;
+                cellM80.font = { name: 'Arial', size: 18, bold: false };
+
+                // 8. Data (Fonte 18, Bold)
                 const now = new Date();
                 const diaHoje = String(now.getDate()).padStart(2, '0');
                 const mesHoje = MONTHS_EXTENSO[now.getMonth()];
                 const anoHoje = now.getFullYear();
-                ws.getCell('A81').value = `São Paulo, ${diaHoje} de ${mesHoje} de ${anoHoje}.`;
+                const cellA81 = ws.getCell('A81');
+                cellA81.value = `São Paulo, ${diaHoje} de ${mesHoje} de ${anoHoje}.`;
+                cellA81.font = { name: 'Arial', size: 18, bold: true };
 
-                // 9. QPO Existente
+                // 9. QPO Existente (Fonte 16)
                 const sgtCount = grid.filter(m => /Subten|Sgt/i.test(m.grad)).length;
                 const cbSdCount = grid.filter(m => /Cb|Sd/i.test(m.grad)).length;
                 const totalCount = grid.length;
 
                 ws.getCell('AJ83').value = sgtCount;
+                ws.getCell('AJ83').font = { name: 'Arial', size: 16, bold: false };
                 ws.getCell('AJ84').value = cbSdCount;
+                ws.getCell('AJ84').font = { name: 'Arial', size: 16, bold: false };
                 ws.getCell('AJ85').value = totalCount;
+                ws.getCell('AJ85').font = { name: 'Arial', size: 16, bold: false };
 
-                // 10. Assinaturas
+                // 10. Assinaturas (Fonte 16, Bold)
                 const elaborador = assinantes.find(s => s.id === 'elaborador' || s.role.includes('ELABORADOR')) || { nome: 'VALDERLEY BRITO MOURA', cargo: '2º SGT PM AUX SEÇ MANUT FROTA' };
                 const conferente = assinantes.find(s => s.id === 'conferente' || s.role.includes('CONFERENTE')) || { nome: 'FÁBIO DOS REIS PINHEIRO', cargo: '2º SGT PM ESCAL SEÇ MANUT FROTA' };
                 const chefeSecao = assinantes.find(s => s.id === 'chefe_secao' || s.role.includes('SEÇÃO')) || { nome: 'JOSÉ MAYCON DE PAIVA HONORATO', cargo: 'CAP PM CH SEÇ MANUT FROTA' };
                 const chefeDivisao = assinantes.find(s => s.id === 'chefe_divisao' || s.role.includes('DIVISÃO')) || { nome: 'SAMUEL DE ANDRADE', cargo: 'MAJ PM CH DIV MANUT TRANSP' };
 
                 ws.getCell('A85').value = elaborador.nome;
+                ws.getCell('A85').font = { name: 'Arial', size: 16, bold: true };
                 ws.getCell('A86').value = elaborador.cargo;
+                ws.getCell('A86').font = { name: 'Arial', size: 16, bold: false };
 
                 ws.getCell('A90').value = conferente.nome;
+                ws.getCell('A90').font = { name: 'Arial', size: 16, bold: true };
                 ws.getCell('A91').value = conferente.cargo;
+                ws.getCell('A91').font = { name: 'Arial', size: 16, bold: false };
 
                 ws.getCell('J90').value = `                   ${chefeSecao.nome}`;
+                ws.getCell('J90').font = { name: 'Arial', size: 16, bold: true };
                 ws.getCell('J91').value = `                  ${chefeSecao.cargo}`;
+                ws.getCell('J91').font = { name: 'Arial', size: 16, bold: false };
 
                 ws.getCell('X90').value = chefeDivisao.nome;
+                ws.getCell('X90').font = { name: 'Arial', size: 16, bold: true };
                 ws.getCell('X91').value = chefeDivisao.cargo;
+                ws.getCell('X91').font = { name: 'Arial', size: 16, bold: false };
 
                 // 11. Verso (Plan1 linhas 93 a 138)
                 ws.getCell('A93').value = `  ALTERAÇÕES DA ESCALA  DE ${periodoStr.toUpperCase()}`;
+                ws.getCell('A93').font = { name: 'Arial', size: 20, bold: true };
+
                 const alteracoes = currentScaleData.alteracoes || [];
                 for (let i = 0; i < 44; i++) {
                     const rNum = 95 + i;
@@ -4328,7 +4384,7 @@ CREATE POLICY "Permissao Total Escalas" ON public.escalas_manutencao FOR ALL USI
                 document.body.removeChild(a);
                 window.URL.revokeObjectURL(url);
 
-                showToast(`Planilha oficial ${fileName} exportada com layout idêntico!`);
+                showToast(`Planilha oficial ${fileName} exportada com fonte 18 e layout idêntico!`);
             } catch(err) {
                 console.error('Erro na exportação ExcelJS:', err);
                 showToast('Erro ao exportar planilha Excel.');
