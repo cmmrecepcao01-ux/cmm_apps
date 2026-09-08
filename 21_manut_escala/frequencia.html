@@ -1203,6 +1203,74 @@
         }
 
         // CARREGA EFETIVO PURGADO PADRÃO (28 MILITARES)
+
+        // HIERARQUIA OFICIAL PMESP PARA ORDENAÇÃO ESTATUTÁRIA
+        const HIERARQUIA_PESOS = {
+            'CEL PM': 1, 'CORONEL PM': 1,
+            'TEN CEL PM': 2, 'TENENTE CORONEL PM': 2,
+            'MAJ PM': 3, 'MAJOR PM': 3,
+            'CAP PM': 4, 'CAPITÃO PM': 4, 'CAPITAO PM': 4,
+            '1º TEN PM': 5, '1º TENENTE PM': 5, '1° TEN PM': 5,
+            '2º TEN PM': 6, '2º TENENTE PM': 6, '2° TEN PM': 6,
+            'ASP OF PM': 7, 'ASPIRANTE PM': 7,
+            'SUBTEN PM': 8, 'SUB TEN PM': 8, 'SUBTENENTE PM': 8,
+            '1º SGT PM': 9, '1° SGT PM': 9, '1º SARGENTO PM': 9,
+            '2º SGT PM': 10, '2° SGT PM': 10, '2º SARGENTO PM': 10,
+            '3º SGT PM': 11, '3° SGT PM': 11, '3º SARGENTO PM': 11,
+            'CB PM': 12, 'CABO PM': 12,
+            'SD PM': 13, 'SD 1C PM': 13, 'SD 2C PM': 13, 'SOLDADO PM': 13
+        };
+
+        function getGradWeight(grad) {
+            if (!grad) return 99;
+            const g = grad.trim().toUpperCase().replace(/\s+/g, ' ');
+            return HIERARQUIA_PESOS[g] || 99;
+        }
+
+        function sortMilitaresByHierarquiaAndRe(militares) {
+            return militares.sort((a, b) => {
+                const wA = getGradWeight(a.grad);
+                const wB = getGradWeight(b.grad);
+                if (wA !== wB) return wA - wB;
+                const reA = parseInt((a.re || '').replace(/\D/g, ''), 10) || 0;
+                const reB = parseInt((b.re || '').replace(/\D/g, ''), 10) || 0;
+                return reA - reB;
+            });
+        }
+
+        function getGlobalAlteracoesList() {
+            try {
+                const list = localStorage.getItem('CMM_ALTERACOES_GLOBAIS');
+                return list ? JSON.parse(list) : [];
+            } catch(e) {
+                return [];
+            }
+        }
+
+        function findAlteracaoForDateAndMilitar(re, dateObj) {
+            const y = dateObj.getFullYear();
+            const m = String(dateObj.getMonth() + 1).padStart(2, '0');
+            const d = String(dateObj.getDate()).padStart(2, '0');
+            const isoDate = `${y}-${m}-${d}`;
+            const mSig = MONTHS_SIGLAS[dateObj.getMonth()] || '';
+            const yShort = String(y).slice(-2);
+            const pmespDate = `${d}${mSig}${yShort}`.toUpperCase();
+
+            const alts = getGlobalAlteracoesList();
+            const cleanRe = (re || '').replace(/\D/g, '');
+
+            for (let alt of alts) {
+                const altCleanRe = (alt.re || '').replace(/\D/g, '');
+                if (altCleanRe === cleanRe || (alt.militar && alt.militar.includes(cleanRe))) {
+                    if (alt.dateIso === isoDate || alt.data === pmespDate || (alt.data && alt.data.startsWith(d + mSig))) {
+                        return alt;
+                    }
+                }
+            }
+            return null;
+        }
+
+        // CARREGA EFETIVO PADRÃO ORDENADO RIGOROSAMENTE POR HIERARQUIA E RE
         function getStandardEfetivo() {
             let baseList = [];
             try {
@@ -1225,6 +1293,9 @@
                 const r = (m.re || '');
                 return !n.includes('CARLOS') && !n.includes('MACIEL') && !r.includes('106571') && !r.includes('186571') && !r.includes('143641');
             });
+
+            // Ordena estritamente por Hierarquia e RE
+            baseList = sortMilitaresByHierarquiaAndRe(baseList);
 
             baseList.forEach((m, idx) => {
                 m.num = idx + 1;
@@ -1276,6 +1347,31 @@
         }
 
         // REGRAS DE ESCALA PADRÃO PARA CALCULAR O VALOR DE DIÁRIA DO DIA
+        
+        const scaleCache = {};
+
+        function getScaleSavedForDate(year, month, dateObj) {
+            const d = dateObj.getDate();
+            const mesStr = String(month).padStart(2, '0');
+            for (let w = 1; w <= 6; w++) {
+                const key = `CMM_ESCALA_${year}_M${mesStr}_W${w}`;
+                if (!scaleCache[key]) {
+                    const raw = localStorage.getItem(key);
+                    if (raw) {
+                        try { scaleCache[key] = JSON.parse(raw); } catch(e) {}
+                    }
+                }
+                const scale = scaleCache[key];
+                if (scale && scale.dias_datas) {
+                    const dayKey = DIAS_KEYS[dateObj.getDay()];
+                    if (scale.dias_datas[dayKey] && parseInt(scale.dias_datas[dayKey], 10) === d) {
+                        return { scale, dayKey };
+                    }
+                }
+            }
+            return null;
+        }
+
         function calculateDayValueFromScale(militar, dateObj) {
             const dayOfWeek = dateObj.getDay(); // 0: Dom, 1: Seg, 2: Ter, 3: Qua, 4: Qui, 5: Sex, 6: Sab
             const weekOfYear = getWeekOfYear(dateObj);
@@ -1285,8 +1381,47 @@
             const secao = (militar.secao || '').toUpperCase();
             const nome = (militar.nome || '').toUpperCase();
             const reCode = (militar.re || '');
+            const cleanRe = reCode.replace(/\D/g, '');
 
-            // 1. Verifica Situação Especial / Afastamento Programado (FÉRIAS, LP, AGREGADO, ETC)
+            // 1. PRIORIDADE 1: ALTERAÇÕES DIÁRIAS REGISTRADAS (SOBRESCREVEM A ESCALA)
+            const alt = findAlteracaoForDateAndMilitar(reCode, dateObj);
+            if (alt && alt.sigla) {
+                const s = alt.sigla.toUpperCase();
+                if (s === 'EAP') return '1';
+                if (s === 'S') {
+                    if (grupo.includes('08H ÀS 18H') || grupo.includes('08H AS 18H')) return '1';
+                    return '2';
+                }
+                if (s === 'FE' || s === 'FÉRIAS' || s === 'FERIAS') return 'FE';
+                if (s === 'LP') return 'LP';
+                if (s === 'FS') return 'FS';
+                if (s === 'F' || s === 'FOLGA') return 'A';
+                if (s === 'FM' || s === 'FOLGA MENSAL') return 'A';
+                if (s === 'LTS' || s === 'DS' || s === 'CV' || s === 'AG' || s === 'FR') return 'A';
+                if (s === 'M' || s === 'T') return '1';
+                return 'A';
+            }
+
+            // 2. PRIORIDADE 2: ESCALA SEMANAL GRAVADA PELO OPERADOR
+            const scaleObj = getScaleSavedForDate(currentYear, currentMonth, dateObj);
+            if (scaleObj && scaleObj.scale && scaleObj.scale.grid) {
+                const milInScale = scaleObj.scale.grid.find(m => m.re === reCode || (m.re && m.re.replace(/\D/g, '') === cleanRe));
+                if (milInScale && milInScale.dias && milInScale.dias[scaleObj.dayKey]) {
+                    const siglaScale = milInScale.dias[scaleObj.dayKey].toUpperCase();
+                    if (siglaScale === 'EAP') return '1';
+                    if (siglaScale === 'S') {
+                        if (grupo.includes('08H ÀS 18H') || grupo.includes('08H AS 18H')) return '1';
+                        return '2';
+                    }
+                    if (siglaScale === 'FE' || siglaScale === 'FÉRIAS') return 'FE';
+                    if (siglaScale === 'LP') return 'LP';
+                    if (siglaScale === 'FS') return 'FS';
+                    if (siglaScale === 'M' || siglaScale === 'T') return '1';
+                    if (['F', 'FM', 'LTS', 'DS', 'CV', 'AG', 'FR'].includes(siglaScale)) return 'A';
+                }
+            }
+
+            // 2. PRIORIDADE 2: SITUAÇÃO ESPECIAL / AFASTAMENTO PROGRAMADO (FÉRIAS, LP, AGREGADO, ETC)
             let sit = militar.situacao_especial;
             if (!sit || !sit.ativa) {
                 try {
@@ -1302,16 +1437,17 @@
                 if (s === 'FE' || s === 'F') return 'FE';
                 if (s === 'LP') return 'LP';
                 if (s === 'FS') return 'FS';
+                if (s === 'EAP') return '1';
                 if (s === 'AG') return 'A';
                 return 'A';
             }
 
-            // 2. Cb PM Soares sempre Agregado
+            // 3. Cb PM Soares sempre Agregado
             if (nome.includes('SOARES') || reCode.includes('122372')) {
                 return 'A';
             }
 
-            // 3. Expediente Administrativo 08h às 18h (8h a 12h = 1 ponto)
+            // 4. Expediente Administrativo 08h às 18h (8h a 12h = 1 ponto)
             if (grupo.includes('08H ÀS 18H') || grupo.includes('08H AS 18H')) {
                 if (dayOfWeek === 0 || dayOfWeek === 6) return 'A'; // Fim de semana = Folga (A)
                 if (nome.includes('AUGUSTO') && dayOfWeek === 1) return 'A'; // Augusto folga na 2ª
@@ -1319,7 +1455,7 @@
                 return '1'; // Trabalha = 1 ponto de diária
             }
 
-            // 4. Expediente 12x36 - 07h às 19h (12h de trabalho = 2 pontos)
+            // 5. Expediente 12x36 - 07h às 19h (12h de trabalho = 2 pontos)
             if (grupo.includes('07H ÀS 19H') || grupo.includes('07H AS 19H')) {
                 const isTeamA = secao.includes('EQUIPE "A"') || secao.includes('EQUIPE A');
                 const isTeamB = secao.includes('EQUIPE "B"') || secao.includes('EQUIPE B');
@@ -1334,7 +1470,7 @@
                 return works ? '2' : 'A';
             }
 
-            // 5. Horário 12x36 - 06h às 18h
+            // 6. Horário 12x36 - 06h às 18h
             if (grupo.includes('06H ÀS 18H') || grupo.includes('06H AS 18H')) {
                 if (nome.includes('GARCIA')) {
                     const is4Services = isEquipeA4Services;
@@ -1355,27 +1491,47 @@
         }
 
         // CARREGA OU GERA OS DADOS DE FREQUÊNCIA PARA O MÊS/ANO
+                // CARREGA E SINCRONIZA A FREQUÊNCIA PARA O MÊS/ANO
         function loadFrequenciaForPeriod(year, month) {
             const storageKey = `CMM_FREQ_${year}_${month}`;
             const saved = localStorage.getItem(storageKey);
             const globalObsMap = getGlobalObsGeralMap();
+            let savedFreq = null;
 
             if (saved) {
-                try {
-                    freqData = JSON.parse(saved);
-                    // Garante que observações persistentes gerais sejam mantidas
-                    freqData.militares.forEach(m => {
-                        if (globalObsMap[m.re] && (!m.obs || m.obs.trim() === '')) {
-                            m.obs = globalObsMap[m.re];
-                        }
-                    });
-                    renderFreqTable();
-                    return;
-                } catch(e) {}
+                try { savedFreq = JSON.parse(saved); } catch(e) {}
             }
 
-            // Gera nova frequência automática a partir da escala
+            // Gera nova frequência automática a partir da escala atualizada + alterações
             generateFrequencyData(year, month);
+
+            // Mescla dados manuais salvos anteriormente (assinaturas, observações gerais, edições manuais)
+            if (savedFreq) {
+                if (savedFreq.assinaturas) {
+                    freqData.assinaturas = Object.assign(freqData.assinaturas, savedFreq.assinaturas);
+                }
+                if (savedFreq.observacoes) {
+                    Object.keys(savedFreq.observacoes).forEach(re => {
+                        if (savedFreq.observacoes[re] && !freqData.observacoes[re]) {
+                            freqData.observacoes[re] = savedFreq.observacoes[re];
+                        }
+                    });
+                }
+                // Mescla edições manuais que o operador possa ter feito na frequência
+                if (savedFreq.edicoes_manuais) {
+                    freqData.edicoes_manuais = savedFreq.edicoes_manuais;
+                    freqData.militares.forEach(m => {
+                        const cleanRe = (m.re || '').replace(/\D/g, '');
+                        for (let d = 1; d <= 31; d++) {
+                            const key = `${cleanRe}_${d}`;
+                            if (savedFreq.edicoes_manuais[key] !== undefined) {
+                                m.days[d] = savedFreq.edicoes_manuais[key];
+                            }
+                        }
+                    });
+                }
+            }
+
             renderFreqTable();
         }
 
@@ -1383,19 +1539,21 @@
             const daysInMonth = new Date(year, month, 0).getDate();
             const baseEfetivo = getStandardEfetivo();
             const globalObsMap = getGlobalObsGeralMap();
+            const altsGlobais = getGlobalAlteracoesList();
 
             freqData = {
                 ano: year,
                 mes: month,
                 militares: [],
                 observacoes: {},
+                edicoes_manuais: (freqData && freqData.edicoes_manuais) ? freqData.edicoes_manuais : {},
                 assinaturas: {
-                    elaborador_nome: 'VALDERLEY BRITO MOURA',
-                    elaborador_cargo: '2º Sgt PM Aux Seç Manut Frota',
-                    conferente_nome: 'FÁBIO DOS REIS PINHEIRO',
-                    conferente_cargo: '2º Sgt PM Escalante Seç Manut Frota',
-                    chefe_nome: 'JOSÉ MAYCON DE PAIVA HONORATO',
-                    chefe_cargo: 'CAP PM Ch Seç Manut Frota'
+                    elaborador_nome: (freqData && freqData.assinaturas && freqData.assinaturas.elaborador_nome) || 'VALDERLEY BRITO MOURA',
+                    elaborador_cargo: (freqData && freqData.assinaturas && freqData.assinaturas.elaborador_cargo) || '2º Sgt PM Aux Seç Manut Frota',
+                    conferente_nome: (freqData && freqData.assinaturas && freqData.assinaturas.conferente_nome) || 'FÁBIO DOS REIS PINHEIRO',
+                    conferente_cargo: (freqData && freqData.assinaturas && freqData.assinaturas.conferente_cargo) || '2º Sgt PM Escalante Seç Manut Frota',
+                    chefe_nome: (freqData && freqData.assinaturas && freqData.assinaturas.chefe_nome) || 'JOSÉ MAYCON DE PAIVA HONORATO',
+                    chefe_cargo: (freqData && freqData.assinaturas && freqData.assinaturas.chefe_cargo) || 'CAP PM Ch Seç Manut Frota'
                 }
             };
 
@@ -1418,8 +1576,8 @@
                     saveGlobalObsGeral(m.re, obsGeral);
                 }
 
-                // Observações detalhadas de férias ou licença para o Verso
-                let obsVerso = '';
+                // Observações detalhadas de afastamentos / alterações para o Verso
+                const obsVersoParts = [];
                 let sit = m.situacao_especial;
                 if (!sit || !sit.ativa) {
                     try {
@@ -1431,13 +1589,25 @@
                 if (sit && sit.ativa && sit.data_inicio) {
                     const sigla = (sit.sigla || '').toUpperCase();
                     if (sigla === 'FE' || sigla === 'F') {
-                        obsVerso = `FÉRIAS DE ${formatDateBr(sit.data_inicio)} A ${formatDateBr(sit.data_fim)}`;
+                        obsVersoParts.push(`FÉRIAS DE ${formatDateBr(sit.data_inicio)} A ${formatDateBr(sit.data_fim)}`);
                     } else if (sigla === 'LP') {
-                        obsVerso = `LICENÇA PRÊMIO DE ${formatDateBr(sit.data_inicio)} A ${formatDateBr(sit.data_fim)}`;
-                    } else {
-                        obsVerso = `${sigla} DE ${formatDateBr(sit.data_inicio)} A ${formatDateBr(sit.data_fim)}`;
+                        obsVersoParts.push(`LICENÇA PRÊMIO DE ${formatDateBr(sit.data_inicio)} A ${formatDateBr(sit.data_fim)}`);
+                    } else if (sigla !== 'EAP') {
+                        obsVersoParts.push(`${sigla} DE ${formatDateBr(sit.data_inicio)} A ${formatDateBr(sit.data_fim)}`);
                     }
                 }
+
+                // Anexa alterações do militar no mês (ex: FM, LTS, DS)
+                const cleanRe = (m.re || '').replace(/\D/g, '');
+                altsGlobais.forEach(alt => {
+                    const altCleanRe = (alt.re || '').replace(/\D/g, '');
+                    if (altCleanRe === cleanRe) {
+                        const altSig = (alt.sigla || '').toUpperCase();
+                        if (['FM', 'LTS', 'DS', 'CV', 'FS'].includes(altSig)) {
+                            obsVersoParts.push(`${alt.desc || altSig} EM ${alt.data}`);
+                        }
+                    }
+                });
 
                 freqData.militares.push({
                     num: m.num,
@@ -1450,7 +1620,7 @@
                     obs: obsGeral
                 });
 
-                freqData.observacoes[m.re] = obsVerso;
+                freqData.observacoes[m.re] = obsVersoParts.join('; ');
             });
         }
 
@@ -1689,6 +1859,7 @@
         }
 
         // CLIQUE INTERATIVO EM UMA CÉLULA DE DIA
+                // CLIQUE INTERATIVO EM UMA CÉLULA DE DIA
         function handleCellClick(militarIdx, dayNum, cellEl) {
             const currentVal = freqData.militares[militarIdx].days[dayNum] || '';
             let newVal = selectedStampValue;
@@ -1698,13 +1869,19 @@
                 newVal = (selectedStampValue === 'A') ? '2' : 'A';
             }
 
-            freqData.militares[militarIdx].days[dayNum] = newVal;
+            const mil = freqData.militares[militarIdx];
+            mil.days[dayNum] = newVal;
             cellEl.textContent = newVal;
             cellEl.className = 'td-day ' + getStampStyleClass(newVal);
 
+            // Registra edição manual para persistência
+            if (!freqData.edicoes_manuais) freqData.edicoes_manuais = {};
+            const cleanRe = (mil.re || '').replace(/\D/g, '');
+            freqData.edicoes_manuais[`${cleanRe}_${dayNum}`] = newVal;
+
             // Recalcula totais da linha
             const daysInMonth = new Date(currentYear, currentMonth, 0).getDate();
-            const { totalDA, totalAA } = calculateRowTotals(freqData.militares[militarIdx].days, daysInMonth);
+            const { totalDA, totalAA } = calculateRowTotals(mil.days, daysInMonth);
 
             const daEl = document.getElementById(`da_cell_${militarIdx}`);
             const aaEl = document.getElementById(`aa_cell_${militarIdx}`);

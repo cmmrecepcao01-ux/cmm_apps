@@ -1871,9 +1871,10 @@
                                 <th style="width: 130px;">DATA / DIA</th>
                                 <th style="width: 60px;">Nº ORD</th>
                                 <th style="width: 220px;">GRAD / RE / NOME</th>
+                                <th style="width: 90px; text-align: center;">CARIMBO</th>
                                 <th>ALTERAÇÃO / MOTIVO DETALHADO</th>
-                                <th style="width: 160px;">TRANSCREVEU</th>
-                                <th style="width: 140px;">STATUS / RUBRICA</th>
+                                <th style="width: 130px; text-align: center;">STATUS / RUBRICA</th>
+                                <th style="width: 100px; text-align: center;">AÇÕES</th>
                             </tr>
                         </thead>
                         <tbody id="alterTableBody">
@@ -2403,18 +2404,19 @@
         </div>
     </div>
 
-    <!-- MODAL: REGISTRAR ALTERAÇÃO DIÁRIA -->
+    <!-- MODAL: REGISTRAR / EDITAR ALTERAÇÃO DIÁRIA -->
     <div class="modal-overlay" id="alterModal">
         <div class="modal-card">
             <div class="modal-header">
-                <div class="modal-title"><i class="fa-solid fa-clock-rotate-left"></i> REGISTRAR ALTERAÇÃO DIÁRIA</div>
+                <div class="modal-title" id="alterModalTitle"><i class="fa-solid fa-clock-rotate-left"></i> REGISTRAR ALTERAÇÃO DIÁRIA</div>
                 <button class="btn-icon-sm" onclick="closeModal('alterModal')"><i class="fa-solid fa-xmark"></i></button>
             </div>
             <div class="modal-body">
+                <input type="hidden" id="alterEditIndex" value="-1">
                 <div class="form-grid">
                     <div class="form-group">
                         <label>DATA / DIA *</label>
-                        <input type="text" id="alterData" class="form-input" placeholder="EX: 08JAN26 - QUINTA-FEIRA">
+                        <input type="date" id="alterData" class="form-input" style="text-transform: none;" required>
                     </div>
                     <div class="form-group">
                         <label>MILITAR *</label>
@@ -2422,13 +2424,24 @@
                             <!-- Preenchido dinamicamente -->
                         </select>
                     </div>
-                    <div class="form-group full-width">
-                        <label>ALTERAÇÃO E MOTIVO *</label>
-                        <input type="text" id="alterDesc" class="form-input" placeholder="EX: DO SERVIÇO PARA FOLGA MENSAL CONFORME SOLICITAÇÃO">
-                    </div>
                     <div class="form-group">
-                        <label>PM QUE TRANSCREVEU *</label>
-                        <input type="text" id="alterTranscreveu" class="form-input" placeholder="EX: 2º SGT PM REIS">
+                        <label>SITUAÇÃO / CARIMBO DESTINO *</label>
+                        <select id="alterSigla" class="form-select">
+                            <option value="S">S - SERVIÇO</option>
+                            <option value="F">F - FOLGA</option>
+                            <option value="FM">FM - FOLGA MENSAL</option>
+                            <option value="FE">FE - FÉRIAS</option>
+                            <option value="LP">LP - LICENÇA PRÊMIO</option>
+                            <option value="FS">FS - FOLGA SUPLEMENTAR</option>
+                            <option value="LTS">LTS - LICENÇA TRATAMENTO SAÚDE</option>
+                            <option value="DS">DS - DISPENSA DO SERVIÇO</option>
+                            <option value="AG">AG - AGREGADO</option>
+                            <option value="EAP">EAP - ESTÁGIO APERFEIÇOAMENTO</option>
+                            <option value="CV">CV - CONVOCAÇÃO</option>
+                            <option value="FR">FR - FOLGA RECOMPENSA</option>
+                            <option value="M">M - MANHÃ (08H ÀS 12H)</option>
+                            <option value="T">T - TARDE (13H ÀS 17H)</option>
+                        </select>
                     </div>
                     <div class="form-group">
                         <label>STATUS / DESPACHO</label>
@@ -2437,6 +2450,10 @@
                             <option value="AGUARDANDO RUBRICA">AGUARDANDO RUBRICA</option>
                             <option value="INDEFERIDO">INDEFERIDO</option>
                         </select>
+                    </div>
+                    <div class="form-group full-width">
+                        <label>ALTERAÇÃO E MOTIVO DETALHADO *</label>
+                        <input type="text" id="alterDesc" class="form-input" placeholder="EX: DA FOLGA PARA O SERVIÇO CONFORME ESCALA OU SOLICITAÇÃO">
                     </div>
                 </div>
             </div>
@@ -2505,8 +2522,6 @@ CREATE POLICY "Permissao Total Escalas" ON public.escalas_manutencao FOR ALL USI
         </div>
     </div>
 
-    <!-- TOAST NOTIFICATION -->
-    <div 
     <!-- MODAL: GESTÃO DA INSPEÇÃO ANUAL DE SAÚDE (IAS) -->
     <div class="modal-overlay" id="iasModal">
         <div class="modal-card" style="max-width: 480px;">
@@ -3422,8 +3437,45 @@ CREATE POLICY "Permissao Total Escalas" ON public.escalas_manutencao FOR ALL USI
 
                 const milDesc = `${m.grad} ${m.re} ${m.nome}`;
 
-                // --- 1. SITUAÇÃO (AFASTAMENTOS): APENAS FÉRIAS, AGREGADO E LICENÇA PRÊMIO ---
-                // (Estes NÃO entram em OBSERVAÇÕES pois já constam no quadro SITUAÇÃO)
+                                // --- 1. SITUAÇÃO (AFASTAMENTOS): PERÍODO TOTAL DE AFASTAMENTO DO MILITAR ---
+                let sitGlobal = m.situacao_especial;
+                if (!sitGlobal || !sitGlobal.ativa) {
+                    try {
+                        const sMap = getGlobalSituacoesMap();
+                        if (sMap[m.re] && sMap[m.re].ativa) sitGlobal = sMap[m.re];
+                    } catch(e) {}
+                }
+
+                function formatToPmespDate(str) {
+                    if (!str) return '';
+                    if (/^\d{4}-\d{2}-\d{2}$/.test(str)) {
+                        const [y, mm, dd] = str.split('-');
+                        const mIndex = parseInt(mm, 10) - 1;
+                        return `${dd}${MONTHS_SIGLAS[mIndex] || ''}${String(y).slice(-2)}`.toUpperCase();
+                    }
+                    return str.toUpperCase();
+                }
+
+                function getPeriodoCompleto(sitObj, fallbackCount, fallbackIni, fallbackFim) {
+                    if (sitObj && sitObj.ativa) {
+                        if (sitObj.sigla === 'AG') {
+                            return sitObj.detalhes || 'A CONTAR DE DOE';
+                        }
+                        if (sitObj.data_inicio && sitObj.data_fim) {
+                            const d1 = new Date(sitObj.data_inicio + 'T00:00:00');
+                            const d2 = new Date(sitObj.data_fim + 'T00:00:00');
+                            if (!isNaN(d1.getTime()) && !isNaN(d2.getTime())) {
+                                const diffTime = Math.abs(d2.getTime() - d1.getTime());
+                                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
+                                const f1 = formatToPmespDate(sitObj.data_inicio);
+                                const f2 = formatToPmespDate(sitObj.data_fim);
+                                return `${diffDays} DIAS (${f1} A ${f2})`;
+                            }
+                        }
+                        if (sitObj.detalhes) return sitObj.detalhes;
+                    }
+                    return `${fallbackCount} DIAS (${fallbackIni} A ${fallbackFim})`;
+                }
 
                 if (specialDays.FE && specialDays.FE.length > 0) {
                     const firstDayKey = specialDays.FE[0];
@@ -3434,7 +3486,7 @@ CREATE POLICY "Permissao Total Escalas" ON public.escalas_manutencao FOR ALL USI
                         num: m.num,
                         situacao: 'FÉRIAS',
                         nome: `${m.grad} ${m.re} ${m.nome}`,
-                        periodo: `${specialDays.FE.length} DIAS (${dataIni} A ${dataFim})`
+                        periodo: getPeriodoCompleto(sitGlobal, specialDays.FE.length, dataIni, dataFim)
                     });
                 }
 
@@ -3443,7 +3495,7 @@ CREATE POLICY "Permissao Total Escalas" ON public.escalas_manutencao FOR ALL USI
                         num: m.num,
                         situacao: 'AGREGADO',
                         nome: `${m.grad} ${m.re} ${m.nome}`,
-                        periodo: `A CONTAR DE DOE`
+                        periodo: (sitGlobal && sitGlobal.detalhes) ? sitGlobal.detalhes : 'A CONTAR DE DOE'
                     });
                 }
 
@@ -3456,7 +3508,7 @@ CREATE POLICY "Permissao Total Escalas" ON public.escalas_manutencao FOR ALL USI
                         num: m.num,
                         situacao: 'LP - LICENÇA PRÊMIO',
                         nome: `${m.grad} ${m.re} ${m.nome}`,
-                        periodo: `${specialDays.LP.length} DIAS (${dataIni} A ${dataFim})`
+                        periodo: getPeriodoCompleto(sitGlobal, specialDays.LP.length, dataIni, dataFim)
                     });
                 }
 
@@ -3496,7 +3548,7 @@ CREATE POLICY "Permissao Total Escalas" ON public.escalas_manutencao FOR ALL USI
                 }
 
                 Object.keys(specialDays).forEach(sig => {
-                    if (!['FE', 'AG', 'LP', 'FM', 'LTS', 'DS'].includes(sig)) {
+                    if (!['FE', 'AG', 'LP', 'FM', 'LTS', 'DS', 'EAP'].includes(sig)) {
                         const sigObj = TODAS_SIGLAS_PMESP.find(s => s.sigla === sig);
                         const desc = sigObj ? sigObj.desc : sig;
                         specialDays[sig].forEach(dayKey => {
@@ -4086,40 +4138,45 @@ CREATE POLICY "Permissao Total Escalas" ON public.escalas_manutencao FOR ALL USI
             const tbody = document.getElementById('alterTableBody');
             tbody.innerHTML = '';
             if (!currentScaleData || !currentScaleData.alteracoes || currentScaleData.alteracoes.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="6" class="empty-placeholder">Nenhuma alteração diária registrada para esta semana.</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="7" class="empty-placeholder">Nenhuma alteração diária registrada para esta semana.</td></tr>';
                 return;
             }
 
             currentScaleData.alteracoes.forEach((alt, idx) => {
                 const tr = document.createElement('tr');
+                const siglaVal = alt.sigla || 'S';
                 tr.innerHTML = `
                     <td style="font-family: 'JetBrains Mono'; font-weight: 700; color: #38bdf8;">${alt.data}</td>
                     <td style="font-family: 'JetBrains Mono'; color: var(--text-dim);">${alt.num || '-'}</td>
                     <td><strong>${alt.militar}</strong></td>
+                    <td style="text-align: center;"><span class="status-badge status-${siglaVal}" style="height: 22px; font-size: 0.72rem; font-weight: 700; display: inline-flex; padding: 0 8px;">${siglaVal}</span></td>
                     <td>${alt.desc}</td>
-                    <td style="color: #cbd5e1;">${alt.transcreveu}</td>
-                    <td><span class="status-badge status-S" style="height: 22px; font-size: 0.68rem; display: inline-flex; padding: 0 8px;">${alt.status}</span></td>
+                    <td style="text-align: center;"><span class="status-badge status-${alt.status === 'AUTORIZADO' ? 'S' : 'F'}" style="height: 22px; font-size: 0.68rem; display: inline-flex; padding: 0 8px;">${alt.status}</span></td>
+                    <td style="text-align: center; white-space: nowrap;">
+                        <button class="btn-icon-sm" onclick="editAlteracao(${idx})" title="Editar Alteração" style="color: var(--accent-blue); margin-right: 4px;"><i class="fa-solid fa-pen-to-square"></i></button>
+                        <button class="btn-icon-sm" onclick="deleteAlteracao(${idx})" title="Excluir Alteração" style="color: var(--accent-red);"><i class="fa-solid fa-trash-can"></i></button>
+                    </td>
                 `;
                 tbody.appendChild(tr);
             });
         }
 
-        function populateMilitarSelects() {
+                function populateMilitarSelects() {
             const afastSelect = document.getElementById('afastMilitarSelect');
             const alterSelect = document.getElementById('alterMilitarSelect');
             const restrDirectSelect = document.getElementById('restrDirectMilitarSelect');
-            if (!afastSelect || !alterSelect || !currentScaleData || !currentScaleData.grid) return;
+            if (!currentScaleData || !currentScaleData.grid) return;
 
-            let optionsHtml = '';
+            let optionsHtml = '<option value="">-- SELECIONE O MILITAR --</option>';
             let restrOptionsHtml = '<option value="">-- SELECIONE O MILITAR --</option>';
 
             currentScaleData.grid.forEach(m => {
-                optionsHtml += `<option value="${m.grad} ${m.re} ${m.nome}">${m.num} - ${m.grad} ${m.re} ${m.nome}</option>`;
+                optionsHtml += `<option value="${m.re}">${m.num} - ${m.grad} ${m.re} ${m.nome}</option>`;
                 restrOptionsHtml += `<option value="${m.re}">${m.num} - ${m.grad} ${m.re} ${m.nome}</option>`;
             });
 
-            afastSelect.innerHTML = optionsHtml;
-            alterSelect.innerHTML = optionsHtml;
+            if (afastSelect) afastSelect.innerHTML = optionsHtml;
+            if (alterSelect) alterSelect.innerHTML = optionsHtml;
             if (restrDirectSelect) restrDirectSelect.innerHTML = restrOptionsHtml;
         }
 
@@ -4453,35 +4510,216 @@ CREATE POLICY "Permissao Total Escalas" ON public.escalas_manutencao FOR ALL USI
             showToast('Afastamento registrado!');
         }
 
-        function openAddAlterModal() {
+                function openAddAlterModal() {
+            populateMilitarSelects();
+            document.getElementById('alterEditIndex').value = '-1';
+            document.getElementById('alterModalTitle').innerHTML = '<i class="fa-solid fa-plus"></i> REGISTRAR ALTERAÇÃO DIÁRIA';
+            const semObj = currentMonthWeeks[selectedWeekIndex];
+            if (semObj && semObj.daysList && semObj.daysList.length > 0) {
+                const firstDate = semObj.daysList[0].dateObj;
+                document.getElementById('alterData').value = getLocalDateIso(firstDate);
+            } else {
+                document.getElementById('alterData').value = getLocalDateIso(new Date());
+            }
+            document.getElementById('alterMilitarSelect').value = '';
+            document.getElementById('alterSigla').value = 'S';
             document.getElementById('alterDesc').value = '';
-            document.getElementById('alterTranscreveu').value = '';
+            document.getElementById('alterStatus').value = 'AUTORIZADO';
             openModal('alterModal');
         }
 
+        function editAlteracao(index) {
+            populateMilitarSelects();
+            if (!currentScaleData || !currentScaleData.alteracoes || !currentScaleData.alteracoes[index]) return;
+            const alt = currentScaleData.alteracoes[index];
+            document.getElementById('alterEditIndex').value = index;
+            document.getElementById('alterModalTitle').innerHTML = '<i class="fa-solid fa-pen-to-square"></i> EDITAR ALTERAÇÃO DIÁRIA';
+
+            if (alt.dateIso) {
+                document.getElementById('alterData').value = alt.dateIso;
+            } else if (alt.data) {
+                const mSig = alt.data.substring(2, 5);
+                const mIdx = MONTHS_SIGLAS.indexOf(mSig);
+                const dStr = alt.data.substring(0, 2);
+                if (mIdx !== -1) {
+                    const mNum = String(mIdx + 1).padStart(2, '0');
+                    document.getElementById('alterData').value = `${currentYear}-${mNum}-${dStr}`;
+                }
+            }
+
+            const cleanAltRe = (alt.re || '').replace(/\D/g, '');
+            const sel = document.getElementById('alterMilitarSelect');
+            for (let opt of sel.options) {
+                const optClean = opt.value.replace(/\D/g, '');
+                if (opt.value === alt.re || optClean === cleanAltRe || opt.textContent.includes(alt.re)) {
+                    sel.value = opt.value;
+                    break;
+                }
+            }
+
+            document.getElementById('alterSigla').value = alt.sigla || 'S';
+            document.getElementById('alterDesc').value = alt.desc || '';
+            document.getElementById('alterStatus').value = alt.status || 'AUTORIZADO';
+
+            openModal('alterModal');
+        }
+
+        function deleteAlteracao(index) {
+            if (!currentScaleData || !currentScaleData.alteracoes || !currentScaleData.alteracoes[index]) return;
+            const alt = currentScaleData.alteracoes[index];
+            if (window.confirm && !window.confirm(`Deseja realmente excluir a alteração de ${alt.militar} em ${alt.data}?`)) return;
+
+            // Remove de CMM_ALTERACOES_GLOBAIS
+            try {
+                let globais = JSON.parse(localStorage.getItem('CMM_ALTERACOES_GLOBAIS') || '[]');
+                const cleanAltRe = (alt.re || '').replace(/\D/g, '');
+                globais = globais.filter(a => {
+                    const aCleanRe = (a.re || '').replace(/\D/g, '');
+                    const sameDate = (a.dateIso === alt.dateIso || a.data === alt.data);
+                    const sameRe = (aCleanRe === cleanAltRe || (a.militar && a.militar.includes(cleanAltRe)));
+                    return !(sameDate && sameRe);
+                });
+                localStorage.setItem('CMM_ALTERACOES_GLOBAIS', JSON.stringify(globais));
+            } catch(e) {}
+
+            // Se pertencer à semana visível, restaura o padrão original da escala
+            const semObj = currentMonthWeeks[selectedWeekIndex];
+            if (semObj && currentScaleData.grid) {
+                const cleanAltRe = (alt.re || '').replace(/\D/g, '');
+                const milTarget = currentScaleData.grid.find(m => {
+                    const mCleanRe = (m.re || '').replace(/\D/g, '');
+                    return mCleanRe === cleanAltRe || `${m.grad} ${m.re} ${m.nome}` === alt.militar;
+                });
+
+                if (milTarget) {
+                    const defaultDays = getDefaultDaysForMilitar(milTarget, semObj.weekOfYear, semObj);
+                    DIAS_KEYS.forEach(dayKey => {
+                        const dObj = semObj.daysMap[dayKey];
+                        if (dObj) {
+                            const curIso = getLocalDateIso(dObj.dateObj);
+                            if (curIso === alt.dateIso || dObj.formatted === alt.data) {
+                                milTarget.dias[dayKey] = defaultDays[dayKey] || 'F';
+                            }
+                        }
+                    });
+                }
+            }
+
+            // Remove da lista
+            currentScaleData.alteracoes.splice(index, 1);
+
+            renderAll();
+            syncAutomaticObservacoes();
+            renderAlteracoes();
+            saveAllData(false);
+            showToast('Alteração excluída com sucesso!');
+        }
+
+        function formatIsoToPmesp(isoDateStr) {
+            if (!isoDateStr) return '';
+            const parts = isoDateStr.split('-');
+            if (parts.length === 3) {
+                const y = parts[0];
+                const mIdx = parseInt(parts[1], 10) - 1;
+                const d = parts[2].padStart(2, '0');
+                const mSig = MONTHS_SIGLAS[mIdx] || '';
+                const yShort = String(y).slice(-2);
+                return `${d}${mSig}${yShort}`.toUpperCase();
+            }
+            return isoDateStr.toUpperCase();
+        }
+
+        function getLocalDateIso(d) {
+            if (!d) return '';
+            const y = d.getFullYear();
+            const m = String(d.getMonth() + 1).padStart(2, '0');
+            const day = String(d.getDate()).padStart(2, '0');
+            return `${y}-${m}-${day}`;
+        }
+
         function saveAlteracao() {
-            const data = document.getElementById('alterData').value.trim().toUpperCase();
-            const militar = document.getElementById('alterMilitarSelect').value;
+            const editIdx = parseInt(document.getElementById('alterEditIndex').value, 10);
+            const dataIso = document.getElementById('alterData').value;
+            const reSelectVal = document.getElementById('alterMilitarSelect').value;
+            const sigla = document.getElementById('alterSigla').value;
             const desc = document.getElementById('alterDesc').value.trim().toUpperCase();
-            const transcreveu = document.getElementById('alterTranscreveu').value.trim().toUpperCase();
             const status = document.getElementById('alterStatus').value;
 
-            if (!data || !desc) return;
+            if (!dataIso || !reSelectVal) {
+                showToast('Preencha a data e selecione o militar!');
+                return;
+            }
+
+            const dataFmt = formatIsoToPmesp(dataIso);
+            const cleanRe = reSelectVal.replace(/\D/g, '');
+
+            // Localiza o militar pelo RE selecionado
+            let milTarget = null;
+            if (currentScaleData && currentScaleData.grid) {
+                milTarget = currentScaleData.grid.find(m => {
+                    const mClean = (m.re || '').replace(/\D/g, '');
+                    return mClean === cleanRe || m.re === reSelectVal || `${m.grad} ${m.re} ${m.nome}` === reSelectVal;
+                });
+            }
+
+            const reMilitar = milTarget ? milTarget.re : reSelectVal;
+            const numMilitar = milTarget ? milTarget.num : '-';
+            const nomeCompleto = milTarget ? `${milTarget.grad} ${milTarget.re} ${milTarget.nome}` : reSelectVal;
+
+            const altObj = {
+                id: (editIdx >= 0 && currentScaleData.alteracoes && currentScaleData.alteracoes[editIdx]) ? currentScaleData.alteracoes[editIdx].id : Date.now(),
+                data: dataFmt,
+                dateIso: dataIso,
+                re: reMilitar,
+                num: numMilitar,
+                militar: nomeCompleto,
+                sigla: sigla,
+                desc: desc || `ALTERAÇÃO PARA ${sigla}`,
+                transcreveu: 'AUXILIAR DE ESCALA',
+                status: status
+            };
 
             if (!currentScaleData.alteracoes) currentScaleData.alteracoes = [];
-            currentScaleData.alteracoes.push({
-                data,
-                num: '-',
-                militar,
-                desc,
-                transcreveu: transcreveu || 'AUXILIAR DE ESCALA',
-                status
-            });
+
+            if (editIdx >= 0 && editIdx < currentScaleData.alteracoes.length) {
+                currentScaleData.alteracoes[editIdx] = altObj;
+            } else {
+                currentScaleData.alteracoes.push(altObj);
+            }
+
+            // Persiste globalmente para integração com a Frequência
+            try {
+                let globais = JSON.parse(localStorage.getItem('CMM_ALTERACOES_GLOBAIS') || '[]');
+                globais = globais.filter(a => {
+                    const aClean = (a.re || '').replace(/\D/g, '');
+                    const sameDate = (a.dateIso === dataIso || a.data === dataFmt);
+                    const sameRe = (aClean === cleanRe);
+                    return !(sameDate && sameRe);
+                });
+                globais.push(altObj);
+                localStorage.setItem('CMM_ALTERACOES_GLOBAIS', JSON.stringify(globais));
+            } catch(e) {}
+
+            // Aplica na semana atual se a data estiver visível na escala
+            const semObj = currentMonthWeeks[selectedWeekIndex];
+            if (semObj && milTarget) {
+                DIAS_KEYS.forEach(dayKey => {
+                    const dObj = semObj.daysMap[dayKey];
+                    if (dObj) {
+                        const curIso = getLocalDateIso(dObj.dateObj);
+                        if (curIso === dataIso || dObj.formatted === dataFmt) {
+                            milTarget.dias[dayKey] = sigla;
+                        }
+                    }
+                });
+            }
 
             closeModal('alterModal');
+            renderAll();
+            syncAutomaticObservacoes();
             renderAlteracoes();
-            scheduleAutoSave();
-            showToast('Alteração de escala registrada com sucesso!');
+            saveAllData(false);
+            showToast(editIdx >= 0 ? 'Alteração editada com sucesso!' : 'Alteração registrada e sincronizada com sucesso!');
         }
 
         function openSupabaseModal() {
