@@ -1,0 +1,2120 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CMM - Controle de Frequência de Diárias | Seção de Manutenção de Frota</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <!-- ExcelJS para exportação fiel ao template original -->
+    <script src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js"></script>
+    <!-- Supabase JS CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <!-- Dados iniciais da Escala -->
+    <script src="escala_data.js"></script>
+    <style>
+        :root {
+            --bg-base: #0a0c10;
+            --bg-card: #12161f;
+            --bg-card-hover: #181e2b;
+            --bg-input: #1a202c;
+            --border: #232d3f;
+            --border-highlight: #dc2626;
+            
+            --text-main: #f3f4f6;
+            --text-muted: #94a3b8;
+            --text-dim: #64748b;
+            
+            --accent-red: #dc2626;
+            --accent-red-hover: #ef4444;
+            --accent-blue: #3b82f6;
+            --accent-green: #10b981;
+            --accent-amber: #f59e0b;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            text-transform: uppercase;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-base);
+            color: var(--text-main);
+            min-height: 100vh;
+            padding-bottom: 60px;
+            font-size: 13px;
+        }
+
+        /* HEADER */
+        header {
+            background: linear-gradient(180deg, #181116 0%, #0c0a0e 100%);
+            border-bottom: 1px solid rgba(220, 38, 38, 0.3);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.6);
+        }
+
+        .header-container {
+            max-width: 1750px;
+            margin: 0 auto;
+            padding: 12px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        .header-brand {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .header-badge {
+            width: 44px;
+            height: 44px;
+            background: radial-gradient(circle, #dc2626 0%, #7f1d1d 100%);
+            border: 2px solid #ef4444;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: 1.4rem;
+            box-shadow: 0 0 15px rgba(220, 38, 38, 0.4);
+        }
+
+        .header-titles h1 {
+            font-size: 1.1rem;
+            font-weight: 900;
+            letter-spacing: 1.5px;
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .header-titles h1 span {
+            color: var(--accent-red-hover);
+        }
+
+        .header-titles p {
+            font-size: 0.72rem;
+            color: var(--text-muted);
+            letter-spacing: 0.8px;
+            margin-top: 2px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        /* BUTTONS */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 7px;
+            padding: 8px 14px;
+            border-radius: 7px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: 1px solid transparent;
+            text-decoration: none;
+            color: #fff;
+            white-space: nowrap;
+        }
+
+        .btn-back {
+            background: rgba(255, 255, 255, 0.06);
+            border-color: var(--border);
+            color: var(--text-main);
+        }
+        .btn-back:hover {
+            background: rgba(255, 255, 255, 0.12);
+            color: #fff;
+            border-color: var(--accent-blue);
+        }
+
+        .btn-freq {
+            background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
+            border-color: #ef4444;
+            color: #fff;
+        }
+        .btn-freq:hover {
+            background: #ef4444;
+            box-shadow: 0 0 14px rgba(239, 68, 68, 0.5);
+        }
+
+        .btn-success {
+            background: #059669;
+            border-color: #10b981;
+        }
+        .btn-success:hover {
+            background: #10b981;
+            box-shadow: 0 0 12px rgba(16, 185, 129, 0.4);
+        }
+
+        .btn-primary {
+            background: #2563eb;
+            border-color: #3b82f6;
+        }
+        .btn-primary:hover {
+            background: #3b82f6;
+            box-shadow: 0 0 12px rgba(59, 130, 246, 0.4);
+        }
+
+        .btn-outline {
+            background: rgba(255, 255, 255, 0.04);
+            border-color: var(--border);
+            color: var(--text-main);
+        }
+        .btn-outline:hover {
+            border-color: var(--text-muted);
+            background: rgba(255, 255, 255, 0.08);
+            color: #fff;
+        }
+
+        /* MAIN CONTAINER */
+        .app-container {
+            max-width: 1750px;
+            margin: 20px auto;
+            padding: 0 24px;
+        }
+
+        /* CONTROLS CARD */
+        .control-panel {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 16px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 16px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+        }
+
+        .control-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .control-label {
+            font-size: 0.72rem;
+            color: var(--text-muted);
+            font-weight: 700;
+            letter-spacing: 0.8px;
+        }
+
+        .form-select, .form-input {
+            background: var(--bg-input);
+            border: 1px solid var(--border);
+            color: var(--text-main);
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-family: inherit;
+            font-size: 0.75rem;
+            font-weight: 600;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .form-select:focus, .form-input:focus {
+            border-color: var(--accent-red);
+        }
+
+        /* LEGEND BAR FOR STAMP SELECTOR */
+        .legend-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 12px 20px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 14px;
+            flex-wrap: wrap;
+        }
+
+        .legend-items {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .legend-chip {
+            padding: 5px 10px;
+            border-radius: 6px;
+            font-size: 0.7rem;
+            font-weight: 800;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+            border: 1px solid transparent;
+            transition: all 0.15s ease;
+            user-select: none;
+        }
+
+        .legend-chip:hover {
+            transform: translateY(-1px);
+        }
+
+        .legend-chip.active {
+            border-color: #ffffff;
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.4);
+            transform: scale(1.04);
+        }
+
+        .chip-0 { background: #1e293b; color: #94a3b8; border-color: #334155; }
+        .chip-1 { background: #064e3b; color: #34d399; border-color: #059669; }
+        .chip-2 { background: #1e3a8a; color: #60a5fa; border-color: #2563eb; }
+        .chip-3 { background: #3b0764; color: #c084fc; border-color: #9333ea; }
+        .chip-a { background: #3f3f46; color: #e4e4e7; border-color: #71717a; }
+        .chip-f { background: #4c0519; color: #fb7185; border-color: #e11d48; }
+        .chip-lp { background: #042f2e; color: #2dd4bf; border-color: #0d9488; }
+        .chip-fs { background: #7f1d1d; color: #fca5a5; border-color: #dc2626; }
+
+        /* TABS */
+        .tabs-nav {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+
+        .tab-btn {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            color: var(--text-muted);
+            padding: 8px 18px;
+            border-radius: 8px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 7px;
+        }
+
+        .tab-btn.active {
+            background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
+            color: #ffffff;
+            border-color: #ef4444;
+            box-shadow: 0 0 12px rgba(220, 38, 38, 0.35);
+        }
+
+        /* TABLE STYLING */
+        .table-wrapper {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            overflow-x: auto;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.4);
+            margin-bottom: 24px;
+        }
+
+        .freq-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-family: 'JetBrains Mono', 'Inter', monospace;
+            font-size: 0.72rem;
+            min-width: 1400px;
+        }
+
+        .freq-table th, .freq-table td {
+            border: 1px solid var(--border);
+            text-align: center;
+            padding: 4px 3px;
+        }
+
+        .freq-table thead tr.head-top th {
+            background: #151a24;
+            color: #94a3b8;
+            font-size: 0.68rem;
+            font-weight: 800;
+            letter-spacing: 0.8px;
+            padding: 6px 4px;
+        }
+
+        .freq-table thead tr.head-days th {
+            background: #111620;
+            color: #cbd5e1;
+            font-size: 0.65rem;
+            font-weight: 700;
+            padding: 4px 2px;
+        }
+
+        .freq-table thead tr.head-num th {
+            background: #0e121a;
+            color: #ffffff;
+            font-size: 0.72rem;
+            font-weight: 800;
+            padding: 5px 2px;
+        }
+
+        .freq-table thead th.th-weekend {
+            background: rgba(37, 99, 235, 0.2) !important;
+            color: #93c5fd !important;
+        }
+
+        .freq-table tbody tr:hover {
+            background: rgba(255, 255, 255, 0.03);
+        }
+
+        .freq-table tbody td.td-left {
+            text-align: left;
+            padding-left: 8px;
+            font-family: 'Inter', sans-serif;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+
+        .freq-table tbody td.td-grad {
+            color: #38bdf8;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+
+        .freq-table tbody td.td-re {
+            color: #94a3b8;
+            font-size: 0.68rem;
+            white-space: nowrap;
+        }
+
+        .freq-table tbody td.td-nome {
+            color: #f3f4f6;
+            font-weight: 800;
+            white-space: nowrap;
+        }
+
+        .freq-table tbody td.td-day {
+            cursor: pointer;
+            font-weight: 800;
+            font-size: 0.75rem;
+            transition: all 0.1s;
+            user-select: none;
+            min-width: 24px;
+            max-width: 32px;
+        }
+
+        .freq-table tbody td.td-day:hover {
+            outline: 2px solid #ef4444;
+            z-index: 10;
+        }
+
+        .freq-table tbody td.td-da {
+            font-weight: 900;
+            color: #34d399;
+            background: rgba(16, 185, 129, 0.1);
+            font-size: 0.8rem;
+            min-width: 45px;
+        }
+
+        .freq-table tbody td.td-aa {
+            font-weight: 900;
+            color: #60a5fa;
+            background: rgba(59, 130, 246, 0.1);
+            font-size: 0.8rem;
+            min-width: 45px;
+        }
+
+        .freq-table tbody td.td-obs {
+            text-align: left;
+            padding-left: 6px;
+            font-size: 0.68rem;
+            color: var(--text-main);
+            min-width: 160px;
+        }
+
+        /* CELL STAMP COLORS */
+        .cell-s0 { color: #64748b; }
+        .cell-s1 { color: #34d399; font-weight: 900; }
+        .cell-s2 { color: #60a5fa; font-weight: 900; }
+        .cell-s3 { color: #c084fc; font-weight: 900; }
+        .cell-sA { color: #94a3b8; }
+        .cell-sFE, .cell-sF { color: #ef4444; font-weight: 900; }
+        .cell-sLP { color: #2dd4bf; font-weight: 900; }
+        .cell-sFS { color: #f87171; font-weight: 900; }
+        .cell-weekend-bg { background: rgba(59, 130, 246, 0.08); }
+
+        /* VERSO & OBSERVAÇÕES */
+        .verso-container {
+            display: none;
+        }
+
+        .verso-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+        }
+
+        .verso-title {
+            font-size: 0.95rem;
+            font-weight: 800;
+            color: #ffffff;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 10px;
+        }
+
+        .obs-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(480px, 1fr));
+            gap: 12px;
+        }
+
+        .obs-item {
+            background: var(--bg-input);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 10px 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .obs-item-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.75rem;
+            font-weight: 800;
+            color: #38bdf8;
+        }
+
+        .obs-item textarea {
+            width: 100%;
+            background: #0e121a;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 6px 10px;
+            color: #ffffff;
+            font-family: inherit;
+            font-size: 0.72rem;
+            resize: vertical;
+            min-height: 44px;
+            outline: none;
+        }
+
+        .obs-item textarea:focus {
+            border-color: var(--accent-red);
+        }
+
+        /* SIGNATURES CARD */
+        .signatures-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+            margin-top: 20px;
+        }
+
+        .sign-box {
+            background: var(--bg-input);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .sign-box-role {
+            font-size: 0.72rem;
+            font-weight: 800;
+            color: var(--accent-red-hover);
+        }
+
+        /* OCULTA O CONTAINER DE IMPRESSÃO NA TELA */
+        #printContainer {
+            display: none;
+        }
+
+        /* PRINT STYLES - LAYOUT OFICIAL IDÊNTICO AO EXCEL PMESP (FOTO 2) */
+        @media print {
+            @page {
+                size: A4 landscape;
+                margin: 4mm 5mm 4mm 5mm;
+            }
+
+            html, body {
+                background: #ffffff !important;
+                color: #000000 !important;
+                font-family: Arial, Helvetica, sans-serif !important;
+                font-size: 8pt !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                width: 100% !important;
+            }
+
+            /* Oculta tudo que não faz parte da impressão */
+            body > *:not(#printContainer) {
+                display: none !important;
+            }
+
+            #printContainer {
+                display: block !important;
+                visibility: visible !important;
+                position: relative !important;
+                width: 100% !important;
+                margin: 0 !important;
+                padding: 0 !important;
+            }
+
+            /* PÁGINA 1: FRENTE */
+            .print-frequencia-frente {
+                display: block !important;
+                page-break-after: always !important;
+                break-after: page !important;
+                width: 100% !important;
+                margin: 0 !important;
+                padding: 0 !important;
+            }
+
+            /* CABEÇALHO OFICIAL COM BRASÃO */
+            .p-head-table {
+                width: 100%;
+                border-collapse: collapse;
+                border: 1.5px solid #000000;
+                margin-bottom: 2px;
+            }
+
+            .p-head-table td {
+                border: 0.8px solid #000000;
+                padding: 2px 4px;
+                vertical-align: middle;
+                color: #000000;
+            }
+
+            .p-brasao-cell {
+                width: 26%;
+                text-align: center;
+                vertical-align: middle;
+            }
+
+            .p-brasao-wrap {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 8px;
+            }
+
+            .p-brasao-img {
+                width: 42px;
+                height: auto;
+            }
+
+            .p-brasao-text {
+                font-size: 7.5pt;
+                font-weight: bold;
+                line-height: 1.2;
+                text-align: center;
+            }
+
+            .p-title-banner {
+                background-color: #D9D9D9 !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+                font-size: 11pt;
+                font-weight: bold;
+                text-align: center;
+                letter-spacing: 1.5px;
+                height: 24px;
+            }
+
+            .p-meta-cell {
+                text-align: center;
+                font-size: 6.5pt;
+                line-height: 1.2;
+            }
+
+            .p-meta-cell b {
+                font-size: 7.5pt;
+                display: block;
+                margin-top: 1px;
+            }
+
+            .p-legenda-cell {
+                font-size: 5.2pt;
+                font-weight: bold;
+                text-align: center;
+                padding: 1.5px 2px !important;
+                letter-spacing: 0.2px;
+            }
+
+            /* TABELA DE FREQUÊNCIA FRENTE */
+            .p-grid-table {
+                width: 100%;
+                border-collapse: collapse;
+                border: 1.5px solid #000000;
+                font-size: 6.8pt !important;
+                line-height: 1.05;
+            }
+
+            .p-grid-table th, .p-grid-table td {
+                border: 0.5px solid #000000;
+                padding: 1px 0.5px;
+                text-align: center;
+                color: #000000 !important;
+            }
+
+            .p-grid-head {
+                background-color: #D9D9D9 !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+                font-weight: bold;
+                font-size: 7pt;
+            }
+
+            .p-weekend-col {
+                background-color: #D9E1F2 !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+
+            .p-red-bold {
+                color: #C00000 !important;
+                font-weight: bold !important;
+            }
+
+            .p-sign-table {
+                width: 100%;
+                border-collapse: collapse;
+                border: 1.5px solid #000000;
+                margin-top: 4px;
+            }
+
+            .p-sign-table td {
+                border: 0.8px solid #000000;
+                padding: 4px;
+                text-align: center;
+                vertical-align: top;
+                height: 52px;
+                font-size: 7.5pt;
+                width: 33.33%;
+            }
+
+            .p-sign-title {
+                font-weight: bold;
+                margin-bottom: 18px;
+                font-size: 8pt;
+            }
+
+            .p-sign-name {
+                font-weight: bold;
+                font-size: 7.5pt;
+            }
+
+            .p-sign-cargo {
+                font-size: 7pt;
+            }
+
+            /* PÁGINA 2: VERSO */
+            .print-frequencia-verso {
+                display: block !important;
+                page-break-before: always !important;
+                break-before: page !important;
+                width: 100% !important;
+                margin-top: 10px !important;
+            }
+
+            .p-verso-table {
+                width: 100%;
+                border-collapse: collapse;
+                border: 1.5px solid #000000;
+                font-size: 7pt !important;
+            }
+
+            .p-verso-table th {
+                background-color: #D9D9D9 !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+                border: 0.8px solid #000000;
+                padding: 3px 6px;
+                text-align: left;
+                font-size: 8.5pt;
+                font-weight: bold;
+            }
+
+            .p-verso-table td {
+                border: 0.5px solid #000000;
+                padding: 1.8px 5px;
+                text-align: left;
+                color: #000000 !important;
+                font-size: 6.8pt;
+            }
+
+            .p-verso-footer {
+                margin-top: 12px;
+                font-size: 7pt;
+                font-family: 'Times New Roman', serif;
+                font-style: italic;
+            }
+        }
+
+        /* TOAST NOTIFICATION */
+        .toast {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            background: #181e2b;
+            border: 1px solid #3b82f6;
+            color: #fff;
+            padding: 12px 20px;
+            border-radius: 8px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.6);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 700;
+            font-size: 0.8rem;
+            z-index: 9999;
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.3s ease;
+        }
+        .toast.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+        .toast-success { border-color: #10b981; }
+        .toast-success i { color: #10b981; }
+    </style>
+</head>
+<body>
+
+    <!-- CABEÇALHO SUPERIOR (WEB UI) -->
+    <header class="no-print">
+        <div class="header-container">
+            <div class="header-brand">
+                <div class="header-badge">
+                    <i class="fa-solid fa-clipboard-user"></i>
+                </div>
+                <div class="header-titles">
+                    <h1>CONTROLE DE <span>FREQUÊNCIA</span> & DIÁRIAS</h1>
+                    <p>
+                        <span>CMM - SEÇÃO DE MANUTENÇÃO DE FROTA</span>
+                        <span>•</span>
+                        <span>CÓDIGO OPM: 303024100</span>
+                    </p>
+                </div>
+            </div>
+
+            <div class="header-actions">
+                <a href="index.html" class="btn btn-back">
+                    <i class="fa-solid fa-arrow-left"></i> GRADE DE ESCALA
+                </a>
+                <button class="btn btn-primary" onclick="syncFromEscala()">
+                    <i class="fa-solid fa-arrows-rotate"></i> RECARREGAR DA ESCALA
+                </button>
+                <button class="btn btn-success" onclick="saveFrequencia()">
+                    <i class="fa-solid fa-floppy-disk"></i> SALVAR FREQUÊNCIA
+                </button>
+                <button class="btn btn-outline" onclick="exportToExcel()">
+                    <i class="fa-solid fa-file-excel" style="color: #10b981;"></i> EXPORTAR EXCEL
+                </button>
+                <button class="btn btn-freq" onclick="imprimirFrequencia()">
+                    <i class="fa-solid fa-print"></i> IMPRIMIR PDF
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- CONTEÚDO PRINCIPAL -->
+    <div class="app-container no-print">
+
+        <!-- PAINEL DE CONTROLE DE MÊS / ANO -->
+        <div class="control-panel">
+            <div class="control-group">
+                <span class="control-label"><i class="fa-solid fa-calendar-days"></i> MÊS DE REFERÊNCIA:</span>
+                <select id="selFreqMes" class="form-select" onchange="onMonthOrYearChange()">
+                    <option value="1">01 - JANEIRO</option>
+                    <option value="2">02 - FEVEREIRO</option>
+                    <option value="3">03 - MARÇO</option>
+                    <option value="4">04 - ABRIL</option>
+                    <option value="5">05 - MAIO</option>
+                    <option value="6">06 - JUNHO</option>
+                    <option value="7">07 - JULHO</option>
+                    <option value="8">08 - AGOSTO</option>
+                    <option value="9" selected>09 - SETEMBRO</option>
+                    <option value="10">10 - OUTUBRO</option>
+                    <option value="11">11 - NOVEMBRO</option>
+                    <option value="12">12 - DEZEMBRO</option>
+                </select>
+
+                <span class="control-label" style="margin-left: 10px;">ANO:</span>
+                <select id="selFreqAno" class="form-select" onchange="onMonthOrYearChange()">
+                    <option value="2025">2025</option>
+                    <option value="2026" selected>2026</option>
+                    <option value="2027">2027</option>
+                </select>
+            </div>
+
+            <div class="control-group">
+                <span class="control-label"><i class="fa-solid fa-calculator"></i> TOTAIS DO MÊS:</span>
+                <span style="font-size: 0.75rem; color: var(--text-muted); font-weight: 700;">
+                    MILITARES: <b id="statTotalMilitares" style="color: #ffffff;">28</b> |
+                    1/2 D.A. GERAL: <b id="statTotalDA" style="color: #34d399;">0</b> |
+                    DIAS TRABALHADOS (A.A.): <b id="statTotalAA" style="color: #60a5fa;">0</b>
+                </span>
+            </div>
+        </div>
+
+        <!-- BARRA DE SELEÇÃO RÁPIDA DE CARIMBO -->
+        <div class="legend-card">
+            <div style="font-size: 0.72rem; font-weight: 800; color: var(--text-muted); display: flex; align-items: center; gap: 6px;">
+                <i class="fa-solid fa-stamp" style="color: var(--accent-red);"></i> CARIMBO ATIVO (CLIQUE NO DIA PARA APLICAR):
+            </div>
+            <div class="legend-items">
+                <div class="legend-chip chip-1 active" onclick="selectStamp('1', this)">"1" - ADM 8H ÀS 18H (1 PT)</div>
+                <div class="legend-chip chip-2" onclick="selectStamp('2', this)">"2" - 12X36 12H (2 PTS)</div>
+                <div class="legend-chip chip-0" onclick="selectStamp('0', this)">"0" - INF. 8H (0 PT)</div>
+                <div class="legend-chip chip-3" onclick="selectStamp('3', this)">"3" - 18H A 24H (3 PTS)</div>
+                <div class="legend-chip chip-a" onclick="selectStamp('A', this)">A - FOLGA / AFASTADO</div>
+                <div class="legend-chip chip-f" onclick="selectStamp('FE', this)">FE / F - FÉRIAS</div>
+                <div class="legend-chip chip-lp" onclick="selectStamp('LP', this)">LP - LICENÇA PRÊMIO</div>
+                <div class="legend-chip chip-fs" onclick="selectStamp('FS', this)">FS - FALTA AO SERVIÇO</div>
+            </div>
+        </div>
+
+        <!-- NAVEGAÇÃO DE ABAS (FRENTE / VERSO) -->
+        <div class="tabs-nav">
+            <button class="tab-btn active" id="tabFrenteBtn" onclick="switchFreqTab('frente')">
+                <i class="fa-solid fa-table"></i> TABELA DE FREQUÊNCIA MENSAL (FRENTE)
+            </button>
+            <button class="tab-btn" id="tabVersoBtn" onclick="switchFreqTab('verso')">
+                <i class="fa-solid fa-file-pen"></i> OBSERVAÇÕES & ASSINATURAS (VERSO)
+            </button>
+        </div>
+
+        <!-- ABA 1: TABELA DE FREQUÊNCIA (FRENTE) -->
+        <div id="freqFrenteContainer">
+            <div class="table-wrapper">
+                <table class="freq-table" id="freqTable">
+                    <thead id="freqTableHead">
+                        <!-- Gerado via JavaScript -->
+                    </thead>
+                    <tbody id="freqTableBody">
+                        <!-- Gerado via JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- ABA 2: OBSERVAÇÕES & ASSINATURAS (VERSO) -->
+        <div id="freqVersoContainer" class="verso-container">
+            <div class="verso-card">
+                <div class="verso-title">
+                    <i class="fa-solid fa-list-check" style="color: var(--accent-red);"></i>
+                    QUADRO DE OBSERVAÇÕES INDIVIDUAIS DOS MILITARES (VERSO DO DOCUMENTO)
+                </div>
+                <div class="obs-grid" id="obsListGrid">
+                    <!-- Gerado dinamicamente -->
+                </div>
+
+                <div class="verso-title" style="margin-top: 30px;">
+                    <i class="fa-solid fa-signature" style="color: #38bdf8;"></i>
+                    CONFIGURAÇÃO DE ASSINATURAS DO DOCUMENTO
+                </div>
+                <div class="signatures-grid">
+                    <div class="sign-box">
+                        <div class="sign-box-role">ELABORADOR:</div>
+                        <input type="text" id="signElabNome" class="form-input" value="VALDERLEY BRITO MOURA">
+                        <input type="text" id="signElabCargo" class="form-input" value="2º SGT PM AUX SEÇ MANUT FROTA">
+                    </div>
+                    <div class="sign-box">
+                        <div class="sign-box-role">CONFERÊNCIA:</div>
+                        <input type="text" id="signConfNome" class="form-input" value="FÁBIO DOS REIS PINHEIRO">
+                        <input type="text" id="signConfCargo" class="form-input" value="2º SGT PM ESCALANTE SEÇ MANUT FROTA">
+                    </div>
+                    <div class="sign-box">
+                        <div class="sign-box-role">DIRETOR / CMT / CHEFE:</div>
+                        <input type="text" id="signChefNome" class="form-input" value="JOSÉ MAYCON DE PAIVA HONORATO">
+                        <input type="text" id="signChefCargo" class="form-input" value="CAP PM CH SEÇ MANUT FROTA">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- CONTAINER OFICIAL DE IMPRESSÃO (FRENTE E VERSO EXATOS DO PDF PMESP) -->
+    <div id="printContainer">
+        <!-- PÁGINA 1: FRENTE -->
+        <div class="print-frequencia-frente">
+            <!-- CABEÇALHO OFICIAL COM BRASÃO -->
+            <table class="p-head-table">
+                <tr>
+                    <td rowspan="2" class="p-brasao-cell">
+                        <div class="p-brasao-wrap">
+                            <img src="assets/brasao_sp.png" alt="Brasão SP" class="p-brasao-img">
+                            <div class="p-brasao-text">
+                                POLÍCIA MILITAR<br>
+                                DO<br>
+                                ESTADO DE SÃO PAULO
+                            </div>
+                        </div>
+                    </td>
+                    <td colspan="6" class="p-title-banner">
+                        CONTROLE DE FREQUÊNCIA
+                    </td>
+                </tr>
+                <tr>
+                    <td class="p-meta-cell" style="width: 36%;">
+                        OPM
+                        <b>CMM - SEÇÃO DE MANUTENÇÃO DE FROTA</b>
+                    </td>
+                    <td class="p-meta-cell" style="width: 14%;">
+                        CÓDIGO DA OPM
+                        <b>303024100</b>
+                    </td>
+                    <td class="p-meta-cell" style="width: 6%;">
+                        MÊS
+                        <b id="pHeaderMes">9</b>
+                    </td>
+                    <td class="p-meta-cell" style="width: 6%;">
+                        ANO
+                        <b id="pHeaderAno">2026</b>
+                    </td>
+                    <td class="p-meta-cell" style="width: 6%;">
+                        Nº DE PÁGINAS
+                        <b>1</b>
+                    </td>
+                    <td class="p-meta-cell" style="width: 6%;">
+                        PÁGINA Nº
+                        <b>1/1</b>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="7" class="p-legenda-cell">
+                        "0" INFERIOR A 8H / "1" - IGUAL OU SUPERIOR 8H E INFERIOR A 12H / "2" - IGUAL OU SUPERIOR 12H E INFERIOR A 18H / "3" - IGUAL OU SUPERIOR 18H E IGUAL OU INFERIOR A 24H / F - FÉRIAS / LP - LICENÇA PRÊMIO / FS - FALTA AO SERVIÇO / A - DEMAIS AFASTAMENTOS
+                    </td>
+                </tr>
+            </table>
+
+            <!-- TABELA DE DIAS DA FREQUÊNCIA -->
+            <table class="p-grid-table">
+                <thead>
+                    <tr class="p-grid-head">
+                        <th rowspan="2" style="width: 58px;">POSTO/GRAD</th>
+                        <th rowspan="2" style="width: 54px;">RE</th>
+                        <th rowspan="2" style="width: 95px; text-align: left; padding-left: 3px;">NOME</th>
+                        <th colspan="31" style="letter-spacing: 2px;">D I A S   D O   M Ê S</th>
+                        <th colspan="2">TOTAL</th>
+                        <th rowspan="2" style="width: 140px;">OBSERVAÇÃO</th>
+                    </tr>
+                    <tr class="p-grid-head" id="pPrintDaysHeadRow">
+                        <!-- Gerado dinamicamente: 1..31 + 1/2 D.A. + A.A. -->
+                    </tr>
+                </thead>
+                <tbody id="pPrintTableBody">
+                    <!-- Gerado dinamicamente: 28 militares -->
+                </tbody>
+            </table>
+
+            <!-- ASSINATURAS DO RODAPÉ DA FRENTE -->
+            <table class="p-sign-table">
+                <tr>
+                    <td>
+                        <div class="p-sign-title">ELABORADOR</div>
+                        <div class="p-sign-name" id="pSignElabNome">VALDERLEY BRITO MOURA</div>
+                        <div class="p-sign-cargo" id="pSignElabCargo">2º Sgt PM Aux Seç Manut Frota</div>
+                    </td>
+                    <td>
+                        <div class="p-sign-title">CONFERÊNCIA</div>
+                        <div class="p-sign-name" id="pSignConfNome">FÁBIO DOS REIS PINHEIRO</div>
+                        <div class="p-sign-cargo" id="pSignConfCargo">2º Sgt PM Escalante Seç Manut Frota</div>
+                    </td>
+                    <td>
+                        <div class="p-sign-title">DIRETOR / CMT / CHEFE</div>
+                        <div class="p-sign-name" id="pSignChefNome">JOSÉ MAYCON DE PAIVA HONORATO</div>
+                        <div class="p-sign-cargo" id="pSignChefCargo">CAP PM Ch Seç Manut Frota</div>
+                    </td>
+                </tr>
+            </table>
+        </div>
+
+        <!-- PÁGINA 2: VERSO (QUADRO DE OBSERVAÇÕES OFICIAL) -->
+        <div class="print-frequencia-verso">
+            <table class="p-verso-table">
+                <thead>
+                    <tr>
+                        <th>OBSERVAÇÕES</th>
+                    </tr>
+                </thead>
+                <tbody id="pPrintVersoObsBody">
+                    <!-- Observações detalhadas de cada militar -->
+                </tbody>
+            </table>
+            <div class="p-verso-footer">
+                PM F-25 (Publicado no Bol G PM nº 188/2024)
+            </div>
+        </div>
+    </div>
+
+    <!-- TOAST NOTIFICATION -->
+    <div id="appToast" class="toast toast-success no-print">
+        <i class="fa-solid fa-circle-check"></i>
+        <span id="toastMsg">Operação realizada com sucesso!</span>
+    </div>
+
+    <script>
+        // CONSTANTES GLOBAIS
+        const MONTHS_SIGLAS = ['JAN', 'FEV', 'MAR', 'ABR', 'MAI', 'JUN', 'JUL', 'AGO', 'SET', 'OUT', 'NOV', 'DEZ'];
+        const MONTHS_EXTENSO = ['JANEIRO', 'FEVEREIRO', 'MARÇO', 'ABRIL', 'MAIO', 'JUNHO', 'JULHO', 'AGOSTO', 'SETEMBRO', 'OUTUBRO', 'NOVEMBRO', 'DEZEMBRO'];
+        const DIAS_KEYS = ['dom', 'seg', 'ter', 'qua', 'qui', 'sex', 'sab'];
+        const DIAS_LABELS_SHORT = ['DOM', 'SEG', 'TER', 'QUA', 'QUI', 'SEX', 'SAB'];
+
+        let currentYear = 2026;
+        let currentMonth = 9; // Setembro por padrão
+        let selectedStampValue = '1';
+        let freqData = {
+            ano: 2026,
+            mes: 9,
+            militares: [],
+            observacoes: {},
+            assinaturas: {
+                elaborador_nome: 'VALDERLEY BRITO MOURA',
+                elaborador_cargo: '2º Sgt PM Aux Seç Manut Frota',
+                conferente_nome: 'FÁBIO DOS REIS PINHEIRO',
+                conferente_cargo: '2º Sgt PM Escalante Seç Manut Frota',
+                chefe_nome: 'JOSÉ MAYCON DE PAIVA HONORATO',
+                chefe_cargo: 'CAP PM Ch Seç Manut Frota'
+            }
+        };
+
+        // INICIALIZAÇÃO
+        window.addEventListener('DOMContentLoaded', () => {
+            const savedAno = localStorage.getItem('CMM_CURRENT_ANO') || '2026';
+            const savedMes = localStorage.getItem('CMM_CURRENT_MES') || '9';
+            currentYear = parseInt(savedAno);
+            currentMonth = parseInt(savedMes);
+
+            document.getElementById('selFreqAno').value = currentYear;
+            document.getElementById('selFreqMes').value = currentMonth;
+
+            loadFrequenciaForPeriod(currentYear, currentMonth);
+            applyUpperCasing();
+        });
+
+        function applyUpperCasing() {
+            document.querySelectorAll('input[type="text"], textarea').forEach(el => {
+                el.addEventListener('input', (e) => {
+                    const start = el.selectionStart;
+                    const end = el.selectionEnd;
+                    el.value = el.value.toUpperCase();
+                    el.setSelectionRange(start, end);
+                });
+            });
+        }
+
+        function showToast(msg) {
+            const toast = document.getElementById('appToast');
+            const txt = document.getElementById('toastMsg');
+            if (txt) txt.textContent = msg;
+            if (toast) {
+                toast.classList.add('show');
+                setTimeout(() => toast.classList.remove('show'), 3000);
+            }
+        }
+
+        function selectStamp(val, el) {
+            selectedStampValue = val;
+            document.querySelectorAll('.legend-chip').forEach(c => c.classList.remove('active'));
+            if (el) el.classList.add('active');
+        }
+
+        function switchFreqTab(tab) {
+            const fCont = document.getElementById('freqFrenteContainer');
+            const vCont = document.getElementById('freqVersoContainer');
+            const tFrente = document.getElementById('tabFrenteBtn');
+            const tVerso = document.getElementById('tabVersoBtn');
+
+            if (tab === 'frente') {
+                fCont.style.display = 'block';
+                vCont.style.display = 'none';
+                tFrente.classList.add('active');
+                tVerso.classList.remove('active');
+            } else {
+                fCont.style.display = 'none';
+                vCont.style.display = 'block';
+                tFrente.classList.remove('active');
+                tVerso.classList.add('active');
+                renderVersoObsList();
+            }
+        }
+
+        function onMonthOrYearChange() {
+            currentYear = parseInt(document.getElementById('selFreqAno').value);
+            currentMonth = parseInt(document.getElementById('selFreqMes').value);
+            localStorage.setItem('CMM_CURRENT_ANO', currentYear);
+            localStorage.setItem('CMM_CURRENT_MES', currentMonth);
+            loadFrequenciaForPeriod(currentYear, currentMonth);
+        }
+
+        // CARREGA PERSISTÊNCIA GLOBAL DE OBSERVAÇÃO GERAL
+        function getGlobalObsGeralMap() {
+            try {
+                const s = localStorage.getItem('CMM_OBS_GERAL_PERSISTENTE');
+                return s ? JSON.parse(s) : {};
+            } catch(e) {
+                return {};
+            }
+        }
+
+        function saveGlobalObsGeral(re, text) {
+            const map = getGlobalObsGeralMap();
+            if (text && text.trim() !== '') {
+                map[re] = text.trim();
+            } else {
+                delete map[re];
+            }
+            localStorage.setItem('CMM_OBS_GERAL_PERSISTENTE', JSON.stringify(map));
+        }
+
+        // CARREGA EFETIVO PURGADO PADRÃO (28 MILITARES)
+        function getStandardEfetivo() {
+            let baseList = [];
+            try {
+                const saved = localStorage.getItem('CMM_EFETIVO_PADRAO');
+                if (saved) {
+                    const parsed = JSON.parse(saved);
+                    if (Array.isArray(parsed) && parsed.length > 0) {
+                        baseList = JSON.parse(JSON.stringify(parsed));
+                    }
+                }
+            } catch(e) {}
+
+            if (baseList.length === 0 && typeof INITIAL_ESCALA_DATA !== 'undefined' && INITIAL_ESCALA_DATA.grid) {
+                baseList = JSON.parse(JSON.stringify(INITIAL_ESCALA_DATA.grid));
+            }
+
+            // Expurgo absoluto de Carlos e Maciel
+            baseList = baseList.filter(m => {
+                const n = (m.nome || '').toUpperCase();
+                const r = (m.re || '');
+                return !n.includes('CARLOS') && !n.includes('MACIEL') && !r.includes('106571') && !r.includes('186571') && !r.includes('143641');
+            });
+
+            baseList.forEach((m, idx) => {
+                m.num = idx + 1;
+            });
+
+            return baseList;
+        }
+
+        // HELPER DE DATAS DENTRO DE INTERVALO
+        function isDateWithinRange(targetDate, startDateStr, endDateStr) {
+            if (!startDateStr) return false;
+            const target = new Date(Date.UTC(targetDate.getFullYear(), targetDate.getMonth(), targetDate.getDate())).getTime();
+            
+            const parseDateInput = (str) => {
+                if (!str) return null;
+                if (/^\d{4}-\d{2}-\d{2}$/.test(str)) {
+                    const [y, m, d] = str.split('-').map(Number);
+                    return new Date(Date.UTC(y, m - 1, d)).getTime();
+                }
+                if (/^\d{2}\/\d{2}\/\d{4}$/.test(str)) {
+                    const [d, m, y] = str.split('/').map(Number);
+                    return new Date(Date.UTC(y, m - 1, d)).getTime();
+                }
+                const parsed = new Date(str);
+                if (!isNaN(parsed.getTime())) {
+                    return new Date(Date.UTC(parsed.getFullYear(), parsed.getMonth(), parsed.getDate())).getTime();
+                }
+                return null;
+            };
+
+            const start = parseDateInput(startDateStr);
+            const end = endDateStr ? parseDateInput(endDateStr) : parseDateInput('2099-12-31');
+
+            if (start === null) return false;
+            if (end === null) return target >= start;
+            return target >= start && target <= end;
+        }
+
+        // CÁLCULO DA SEMANA SEQUENCIAL DO ANO
+        function getWeekOfYear(dateObj) {
+            const d = new Date(Date.UTC(dateObj.getFullYear(), dateObj.getMonth(), dateObj.getDate()));
+            const startOfYear = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+            while (startOfYear.getUTCDay() !== 0) {
+                startOfYear.setUTCDate(startOfYear.getUTCDate() + 1);
+            }
+            const diffDays = Math.floor((d - startOfYear) / (24 * 60 * 60 * 1000));
+            if (diffDays < 0) return 1;
+            return Math.floor(diffDays / 7) + 1;
+        }
+
+        // REGRAS DE ESCALA PADRÃO PARA CALCULAR O VALOR DE DIÁRIA DO DIA
+        function calculateDayValueFromScale(militar, dateObj) {
+            const dayOfWeek = dateObj.getDay(); // 0: Dom, 1: Seg, 2: Ter, 3: Qua, 4: Qui, 5: Sex, 6: Sab
+            const weekOfYear = getWeekOfYear(dateObj);
+            const isEquipeA4Services = (weekOfYear % 2 === 1);
+
+            const grupo = (militar.grupo || '').toUpperCase();
+            const secao = (militar.secao || '').toUpperCase();
+            const nome = (militar.nome || '').toUpperCase();
+            const reCode = (militar.re || '');
+
+            // 1. Verifica Situação Especial / Afastamento Programado (FÉRIAS, LP, AGREGADO, ETC)
+            let sit = militar.situacao_especial;
+            if (!sit || !sit.ativa) {
+                try {
+                    const map = JSON.parse(localStorage.getItem('CMM_SITUACOES_GLOBAIS') || '{}');
+                    if (map[reCode] && map[reCode].ativa) {
+                        sit = map[reCode];
+                    }
+                } catch(e) {}
+            }
+
+            if (sit && sit.ativa && isDateWithinRange(dateObj, sit.data_inicio, sit.data_fim)) {
+                const s = (sit.sigla || '').toUpperCase();
+                if (s === 'FE' || s === 'F') return 'FE';
+                if (s === 'LP') return 'LP';
+                if (s === 'FS') return 'FS';
+                if (s === 'AG') return 'A';
+                return 'A';
+            }
+
+            // 2. Cb PM Soares sempre Agregado
+            if (nome.includes('SOARES') || reCode.includes('122372')) {
+                return 'A';
+            }
+
+            // 3. Expediente Administrativo 08h às 18h (8h a 12h = 1 ponto)
+            if (grupo.includes('08H ÀS 18H') || grupo.includes('08H AS 18H')) {
+                if (dayOfWeek === 0 || dayOfWeek === 6) return 'A'; // Fim de semana = Folga (A)
+                if (nome.includes('AUGUSTO') && dayOfWeek === 1) return 'A'; // Augusto folga na 2ª
+                if (nome.includes('CLEBER') && dayOfWeek === 2) return 'A'; // Cleber folga na 3ª
+                return '1'; // Trabalha = 1 ponto de diária
+            }
+
+            // 4. Expediente 12x36 - 07h às 19h (12h de trabalho = 2 pontos)
+            if (grupo.includes('07H ÀS 19H') || grupo.includes('07H AS 19H')) {
+                const isTeamA = secao.includes('EQUIPE "A"') || secao.includes('EQUIPE A');
+                const isTeamB = secao.includes('EQUIPE "B"') || secao.includes('EQUIPE B');
+                const is4Services = (isTeamA && isEquipeA4Services) || (isTeamB && !isEquipeA4Services);
+
+                let works = false;
+                if (is4Services) {
+                    works = [1, 2, 4, 5].includes(dayOfWeek); // Seg, Ter, Qui, Sex
+                } else {
+                    works = [2, 3, 4].includes(dayOfWeek); // Ter, Qua, Qui
+                }
+                return works ? '2' : 'A';
+            }
+
+            // 5. Horário 12x36 - 06h às 18h
+            if (grupo.includes('06H ÀS 18H') || grupo.includes('06H AS 18H')) {
+                if (nome.includes('GARCIA')) {
+                    const is4Services = isEquipeA4Services;
+                    const works = is4Services ? [1, 2, 4, 5].includes(dayOfWeek) : [2, 3, 4].includes(dayOfWeek);
+                    return works ? '2' : 'A';
+                } else if (nome.includes('ALEXANDRE')) {
+                    const refDate = new Date(Date.UTC(2026, 0, 4));
+                    const curUtc = new Date(Date.UTC(dateObj.getFullYear(), dateObj.getMonth(), dateObj.getDate()));
+                    const diffDays = Math.round((curUtc - refDate) / (24 * 60 * 60 * 1000));
+                    return (diffDays % 2 === 0) ? '2' : 'A';
+                } else {
+                    return (dayOfWeek >= 1 && dayOfWeek <= 5) ? '2' : 'A';
+                }
+            }
+
+            // Padrão Geral
+            return (dayOfWeek >= 1 && dayOfWeek <= 5) ? '1' : 'A';
+        }
+
+        // CARREGA OU GERA OS DADOS DE FREQUÊNCIA PARA O MÊS/ANO
+        function loadFrequenciaForPeriod(year, month) {
+            const storageKey = `CMM_FREQ_${year}_${month}`;
+            const saved = localStorage.getItem(storageKey);
+            const globalObsMap = getGlobalObsGeralMap();
+
+            if (saved) {
+                try {
+                    freqData = JSON.parse(saved);
+                    // Garante que observações persistentes gerais sejam mantidas
+                    freqData.militares.forEach(m => {
+                        if (globalObsMap[m.re] && (!m.obs || m.obs.trim() === '')) {
+                            m.obs = globalObsMap[m.re];
+                        }
+                    });
+                    renderFreqTable();
+                    return;
+                } catch(e) {}
+            }
+
+            // Gera nova frequência automática a partir da escala
+            generateFrequencyData(year, month);
+            renderFreqTable();
+        }
+
+        function generateFrequencyData(year, month) {
+            const daysInMonth = new Date(year, month, 0).getDate();
+            const baseEfetivo = getStandardEfetivo();
+            const globalObsMap = getGlobalObsGeralMap();
+
+            freqData = {
+                ano: year,
+                mes: month,
+                militares: [],
+                observacoes: {},
+                assinaturas: {
+                    elaborador_nome: 'VALDERLEY BRITO MOURA',
+                    elaborador_cargo: '2º Sgt PM Aux Seç Manut Frota',
+                    conferente_nome: 'FÁBIO DOS REIS PINHEIRO',
+                    conferente_cargo: '2º Sgt PM Escalante Seç Manut Frota',
+                    chefe_nome: 'JOSÉ MAYCON DE PAIVA HONORATO',
+                    chefe_cargo: 'CAP PM Ch Seç Manut Frota'
+                }
+            };
+
+            baseEfetivo.forEach(m => {
+                const daysObj = {};
+                for (let d = 1; d <= 31; d++) {
+                    if (d <= daysInMonth) {
+                        const dateObj = new Date(year, month - 1, d);
+                        daysObj[d] = calculateDayValueFromScale(m, dateObj);
+                    } else {
+                        daysObj[d] = '';
+                    }
+                }
+
+                // Observação geral persistente
+                let obsGeral = globalObsMap[m.re] || '';
+                const nomeUpper = (m.nome || '').toUpperCase();
+                if (!obsGeral && (nomeUpper.includes('SOARES') || (m.re || '').includes('122372'))) {
+                    obsGeral = 'Agregado DOE SP 169, de 03SET24.';
+                    saveGlobalObsGeral(m.re, obsGeral);
+                }
+
+                // Observações detalhadas de férias ou licença para o Verso
+                let obsVerso = '';
+                let sit = m.situacao_especial;
+                if (!sit || !sit.ativa) {
+                    try {
+                        const sMap = JSON.parse(localStorage.getItem('CMM_SITUACOES_GLOBAIS') || '{}');
+                        if (sMap[m.re] && sMap[m.re].ativa) sit = sMap[m.re];
+                    } catch(e) {}
+                }
+
+                if (sit && sit.ativa && sit.data_inicio) {
+                    const sigla = (sit.sigla || '').toUpperCase();
+                    if (sigla === 'FE' || sigla === 'F') {
+                        obsVerso = `FÉRIAS DE ${formatDateBr(sit.data_inicio)} A ${formatDateBr(sit.data_fim)}`;
+                    } else if (sigla === 'LP') {
+                        obsVerso = `LICENÇA PRÊMIO DE ${formatDateBr(sit.data_inicio)} A ${formatDateBr(sit.data_fim)}`;
+                    } else {
+                        obsVerso = `${sigla} DE ${formatDateBr(sit.data_inicio)} A ${formatDateBr(sit.data_fim)}`;
+                    }
+                }
+
+                freqData.militares.push({
+                    num: m.num,
+                    grad: m.grad,
+                    re: m.re,
+                    nome: m.nome,
+                    grupo: m.grupo,
+                    secao: m.secao,
+                    days: daysObj,
+                    obs: obsGeral
+                });
+
+                freqData.observacoes[m.re] = obsVerso;
+            });
+        }
+
+        function formatDateBr(dateStr) {
+            if (!dateStr) return '';
+            if (/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) {
+                const [y, m, d] = dateStr.split('-');
+                return `${d}${MONTHS_SIGLAS[parseInt(m)-1]}${String(y).slice(-2)}`;
+            }
+            return dateStr.toUpperCase();
+        }
+
+        function syncFromEscala() {
+            if (confirm('Deseja recarregar a frequência do mês atual com base nas escalas e situações cadastradas? As observações gerais cadastradas serão preservadas.')) {
+                generateFrequencyData(currentYear, currentMonth);
+                saveFrequencia(false);
+                renderFreqTable();
+                showToast('Frequência sincronizada com sucesso!');
+            }
+        }
+
+        function saveFrequencia(showFeedback = true) {
+            // Atualiza assinaturas
+            freqData.assinaturas.elaborador_nome = (document.getElementById('signElabNome')?.value || '').trim();
+            freqData.assinaturas.elaborador_cargo = (document.getElementById('signElabCargo')?.value || '').trim();
+            freqData.assinaturas.conferente_nome = (document.getElementById('signConfNome')?.value || '').trim();
+            freqData.assinaturas.conferente_cargo = (document.getElementById('signConfCargo')?.value || '').trim();
+            freqData.assinaturas.chefe_nome = (document.getElementById('signChefNome')?.value || '').trim();
+            freqData.assinaturas.chefe_cargo = (document.getElementById('signChefCargo')?.value || '').trim();
+
+            const storageKey = `CMM_FREQ_${currentYear}_${currentMonth}`;
+            localStorage.setItem(storageKey, JSON.stringify(freqData));
+
+            if (showFeedback) {
+                showToast('Frequência salva com sucesso!');
+            }
+        }
+
+        // CÁLCULO DE 1/2 D.A. E A.A.
+        function calculateRowTotals(daysObj, daysInMonth) {
+            let totalDA = 0;
+            let totalAA = 0;
+
+            for (let d = 1; d <= daysInMonth; d++) {
+                const val = (daysObj[d] || '').toString().trim();
+                if (val === '0') {
+                    totalDA += 0;
+                    totalAA += 1;
+                } else if (val === '1') {
+                    totalDA += 1;
+                    totalAA += 1;
+                } else if (val === '2') {
+                    totalDA += 2;
+                    totalAA += 1;
+                } else if (val === '3') {
+                    totalDA += 3;
+                    totalAA += 1;
+                }
+            }
+
+            return { totalDA, totalAA };
+        }
+
+        // RENDERIZAÇÃO DA TABELA NA TELA E NO MÓDULO DE IMPRESSÃO
+        function renderFreqTable() {
+            const daysInMonth = new Date(currentYear, currentMonth, 0).getDate();
+            const thead = document.getElementById('freqTableHead');
+            const tbody = document.getElementById('freqTableBody');
+
+            if (!thead || !tbody) return;
+
+            // 1. MONTA CABEÇALHO NA WEB
+            let headTopHtml = `
+                <tr class="head-top">
+                    <th rowspan="3" style="width: 32px;">Nº</th>
+                    <th rowspan="3" style="width: 75px;">POSTO/GRAD</th>
+                    <th rowspan="3" style="width: 85px;">RE</th>
+                    <th rowspan="3" style="width: 140px; text-align: left; padding-left: 8px;">NOME DE GUERRA</th>
+                    <th colspan="31" style="letter-spacing: 2px;">DIAS DO MÊS (${MONTHS_EXTENSO[currentMonth-1]} / ${currentYear})</th>
+                    <th colspan="2">TOTAL</th>
+                    <th rowspan="3" style="width: 180px;">OBSERVAÇÃO GERAL</th>
+                </tr>
+                <tr class="head-days">
+            `;
+
+            let headNumHtml = `<tr class="head-num">`;
+
+            // Print Header
+            let printDaysHeadHtml = '';
+
+            for (let d = 1; d <= 31; d++) {
+                if (d <= daysInMonth) {
+                    const dateObj = new Date(currentYear, currentMonth - 1, d);
+                    const dayOfWeek = dateObj.getDay();
+                    const dayLabel = DIAS_LABELS_SHORT[dayOfWeek];
+                    const isWeekend = (dayOfWeek === 0 || dayOfWeek === 6);
+                    const weekendWebClass = isWeekend ? 'th-weekend' : '';
+                    const weekendPrintClass = isWeekend ? 'p-weekend-col' : '';
+
+                    headTopHtml += `<th class="${weekendWebClass}" style="min-width: 24px;">${dayLabel}</th>`;
+                    headNumHtml += `<th class="${weekendWebClass}">${d}</th>`;
+                    printDaysHeadHtml += `<th class="${weekendPrintClass}" style="width: 16.5px; font-size: 6.2pt;">${d}</th>`;
+                } else {
+                    headTopHtml += `<th style="min-width: 24px; opacity: 0.2;">-</th>`;
+                    headNumHtml += `<th style="opacity: 0.2;">${d}</th>`;
+                    printDaysHeadHtml += `<th style="width: 16.5px; font-size: 6.2pt; opacity: 0.3;">${d}</th>`;
+                }
+            }
+
+            headTopHtml += `
+                    <th rowspan="2" style="width: 48px; color: #34d399;">1/2 D.A.</th>
+                    <th rowspan="2" style="width: 48px; color: #60a5fa;">A.A.</th>
+                </tr>
+            `;
+            headNumHtml += `</tr>`;
+
+            thead.innerHTML = headTopHtml + headNumHtml;
+
+            // Header de Impressão Oficial
+            printDaysHeadHtml += `
+                <th style="width: 30px; font-size: 6.5pt;">1/2 D.A.</th>
+                <th style="width: 26px; font-size: 6.5pt;">A.A.</th>
+            `;
+            const pDaysHead = document.getElementById('pPrintDaysHeadRow');
+            if (pDaysHead) pDaysHead.innerHTML = printDaysHeadHtml;
+
+            // 2. MONTA CORPO DA TABELA
+            tbody.innerHTML = '';
+            const pPrintBody = document.getElementById('pPrintTableBody');
+            if (pPrintBody) pPrintBody.innerHTML = '';
+
+            let grandTotalDA = 0;
+            let grandTotalAA = 0;
+
+            freqData.militares.forEach((m, idx) => {
+                const { totalDA, totalAA } = calculateRowTotals(m.days, daysInMonth);
+                grandTotalDA += totalDA;
+                grandTotalAA += totalAA;
+
+                const tr = document.createElement('tr');
+
+                let rowHtml = `
+                    <td style="color: var(--text-muted); font-weight: 700;">${idx + 1}</td>
+                    <td class="td-grad">${m.grad}</td>
+                    <td class="td-re">${m.re}</td>
+                    <td class="td-nome td-left">${m.nome}</td>
+                `;
+
+                // Print row html (Oficial PMESP idêntico à foto 2)
+                let pRowHtml = `
+                    <td style="font-size: 6.8pt;">${m.grad}</td>
+                    <td style="font-size: 6.8pt;">${m.re}</td>
+                    <td style="text-align: left; padding-left: 3px; font-size: 7pt;">${m.nome}</td>
+                `;
+
+                for (let d = 1; d <= 31; d++) {
+                    const val = m.days[d] || '';
+                    if (d <= daysInMonth) {
+                        const dateObj = new Date(currentYear, currentMonth - 1, d);
+                        const isWeekend = (dateObj.getDay() === 0 || dateObj.getDay() === 6);
+                        const weekendWebClass = isWeekend ? 'cell-weekend-bg' : '';
+                        const weekendPrintClass = isWeekend ? 'p-weekend-col' : '';
+                        const valStr = String(val || '').trim().toUpperCase();
+                        const stampClass = getStampStyleClass(val);
+                        const isNumericStamp = ['0', '1', '2', '3'].includes(valStr);
+                        const isRedStamp = (valStr !== '' && !isNumericStamp);
+                        const redPrintClass = isRedStamp ? 'p-red-bold' : '';
+
+                        rowHtml += `
+                            <td class="td-day ${weekendWebClass} ${stampClass}" onclick="handleCellClick(${idx}, ${d}, this)">
+                                ${val}
+                            </td>
+                        `;
+
+                        pRowHtml += `<td class="${weekendPrintClass} ${redPrintClass}" style="font-weight: bold; font-size: 6.8pt;">${val}</td>`;
+                    } else {
+                        rowHtml += `<td style="opacity: 0.15; background: #0b0d13;"></td>`;
+                        pRowHtml += `<td></td>`;
+                    }
+                }
+
+                rowHtml += `
+                    <td class="td-da" id="da_cell_${idx}">${totalDA}</td>
+                    <td class="td-aa" id="aa_cell_${idx}">${totalAA}</td>
+                    <td class="td-obs">
+                        <input type="text" class="form-input" style="width: 100%; padding: 2px 4px; font-size: 0.68rem;" value="${m.obs || ''}" onchange="updateMilitarObs(${idx}, this.value)">
+                    </td>
+                `;
+
+                pRowHtml += `
+                    <td style="font-weight: bold; font-size: 7.2pt;">${totalDA}</td>
+                    <td style="font-weight: bold; font-size: 7.2pt;">${totalAA}</td>
+                    <td style="text-align: left; padding-left: 3px; font-size: 6.2pt;">${m.obs || ''}</td>
+                `;
+
+                tr.innerHTML = rowHtml;
+                tbody.appendChild(tr);
+
+                if (pPrintBody) {
+                    const pTr = document.createElement('tr');
+                    pTr.innerHTML = pRowHtml;
+                    pPrintBody.appendChild(pTr);
+                }
+            });
+
+            // Atualiza estatísticas no topo
+            document.getElementById('statTotalMilitares').textContent = freqData.militares.length;
+            document.getElementById('statTotalDA').textContent = grandTotalDA;
+            document.getElementById('statTotalAA').textContent = grandTotalAA;
+
+            // Atualiza campos de impressão
+            document.getElementById('pHeaderMes').textContent = currentMonth;
+            document.getElementById('pHeaderAno').textContent = currentYear;
+            
+            document.getElementById('pSignElabNome').textContent = freqData.assinaturas.elaborador_nome;
+            document.getElementById('pSignElabCargo').textContent = freqData.assinaturas.elaborador_cargo;
+            document.getElementById('pSignConfNome').textContent = freqData.assinaturas.conferente_nome;
+            document.getElementById('pSignConfCargo').textContent = freqData.assinaturas.conferente_cargo;
+            document.getElementById('pSignChefNome').textContent = freqData.assinaturas.chefe_nome;
+            document.getElementById('pSignChefCargo').textContent = freqData.assinaturas.chefe_cargo;
+
+            renderVersoObsList();
+        }
+
+        function getStampStyleClass(val) {
+            const v = String(val).trim().toUpperCase();
+            if (v === '0') return 'cell-s0';
+            if (v === '1') return 'cell-s1';
+            if (v === '2') return 'cell-s2';
+            if (v === '3') return 'cell-s3';
+            if (v === 'A') return 'cell-sA';
+            if (v === 'FE' || v === 'F') return 'cell-sFE';
+            if (v === 'LP') return 'cell-sLP';
+            if (v === 'FS') return 'cell-sFS';
+            return '';
+        }
+
+        // CLIQUE INTERATIVO EM UMA CÉLULA DE DIA
+        function handleCellClick(militarIdx, dayNum, cellEl) {
+            const currentVal = freqData.militares[militarIdx].days[dayNum] || '';
+            let newVal = selectedStampValue;
+
+            // Se clicou com o mesmo valor, alterna para 'A' ou '2'
+            if (currentVal === selectedStampValue) {
+                newVal = (selectedStampValue === 'A') ? '2' : 'A';
+            }
+
+            freqData.militares[militarIdx].days[dayNum] = newVal;
+            cellEl.textContent = newVal;
+            cellEl.className = 'td-day ' + getStampStyleClass(newVal);
+
+            // Recalcula totais da linha
+            const daysInMonth = new Date(currentYear, currentMonth, 0).getDate();
+            const { totalDA, totalAA } = calculateRowTotals(freqData.militares[militarIdx].days, daysInMonth);
+
+            const daEl = document.getElementById(`da_cell_${militarIdx}`);
+            const aaEl = document.getElementById(`aa_cell_${militarIdx}`);
+            if (daEl) daEl.textContent = totalDA;
+            if (aaEl) aaEl.textContent = totalAA;
+
+            // Recalcula totais globais
+            let grandTotalDA = 0;
+            let grandTotalAA = 0;
+            freqData.militares.forEach(m => {
+                const t = calculateRowTotals(m.days, daysInMonth);
+                grandTotalDA += t.totalDA;
+                grandTotalAA += t.totalAA;
+            });
+
+            document.getElementById('statTotalDA').textContent = grandTotalDA;
+            document.getElementById('statTotalAA').textContent = grandTotalAA;
+
+            saveFrequencia(false);
+        }
+
+        // ATUALIZAÇÃO DA OBSERVAÇÃO GERAL COM PERSISTÊNCIA ATÉ QUE O OPERADOR APAGUE
+        function updateMilitarObs(militarIdx, val) {
+            const cleanVal = val.trim().toUpperCase();
+            const m = freqData.militares[militarIdx];
+            m.obs = cleanVal;
+            saveGlobalObsGeral(m.re, cleanVal);
+            saveFrequencia(false);
+        }
+
+        // RENDERIZAÇÃO DO QUADRO DE OBSERVAÇÕES (VERSO)
+        function renderVersoObsList() {
+            const grid = document.getElementById('obsListGrid');
+            const pVersoBody = document.getElementById('pPrintVersoObsBody');
+            if (grid) grid.innerHTML = '';
+            if (pVersoBody) pVersoBody.innerHTML = '';
+
+            freqData.militares.forEach(m => {
+                const currentObs = freqData.observacoes[m.re] || '';
+
+                if (grid) {
+                    const item = document.createElement('div');
+                    item.className = 'obs-item';
+                    item.innerHTML = `
+                        <div class="obs-item-head">
+                            <span>${m.grad} ${m.nome} (RE: ${m.re})</span>
+                        </div>
+                        <textarea placeholder="DESCREVER AFASTAMENTOS, FÉRIAS, FOLGAS MENSAIS..." onchange="updateVersoObs('${m.re}', this.value)">${currentObs}</textarea>
+                    `;
+                    grid.appendChild(item);
+                }
+
+                // Verso para Impressão Oficial
+                if (pVersoBody) {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td>
+                            <b>${m.grad} ${m.nome}</b> - ${currentObs || ''}
+                        </td>
+                    `;
+                    pVersoBody.appendChild(tr);
+                }
+            });
+
+            // Carrega assinaturas nos inputs
+            if (freqData.assinaturas) {
+                const elabN = document.getElementById('signElabNome');
+                const elabC = document.getElementById('signElabCargo');
+                const confN = document.getElementById('signConfNome');
+                const confC = document.getElementById('signConfCargo');
+                const chefN = document.getElementById('signChefNome');
+                const chefC = document.getElementById('signChefCargo');
+
+                if (elabN) elabN.value = freqData.assinaturas.elaborador_nome || '';
+                if (elabC) elabC.value = freqData.assinaturas.elaborador_cargo || '';
+                if (confN) confN.value = freqData.assinaturas.conferente_nome || '';
+                if (confC) confC.value = freqData.assinaturas.conferente_cargo || '';
+                if (chefN) chefN.value = freqData.assinaturas.chefe_nome || '';
+                if (chefC) chefC.value = freqData.assinaturas.chefe_cargo || '';
+            }
+        }
+
+        function updateVersoObs(re, text) {
+            freqData.observacoes[re] = text.toUpperCase();
+            saveFrequencia(false);
+        }
+
+        function imprimirFrequencia() {
+            saveFrequencia(false);
+            renderFreqTable();
+            window.print();
+        }
+
+        // EXPORTAÇÃO FIEL EM EXCEL (.XLSX) VIA EXCELJS IDÊNTICA AO ORIGINAL (FOTO 2)
+        async function exportToExcel() {
+            saveFrequencia(false);
+
+            if (typeof ExcelJS === 'undefined') {
+                alert('A biblioteca ExcelJS não foi carregada. Verifique sua conexão.');
+                return;
+            }
+
+            const wb = new ExcelJS.Workbook();
+            wb.creator = 'CMM - Centro de Motomecanização';
+            wb.created = new Date();
+
+            const ws = wb.addWorksheet('Plan1', {
+                pageSetup: {
+                    orientation: 'landscape',
+                    paperSize: 9, // A4
+                    fitToPage: true,
+                    fitToWidth: 1,
+                    fitToHeight: 2,
+                    margins: { left: 0.2, right: 0.2, top: 0.2, bottom: 0.2, header: 0.1, footer: 0.1 }
+                }
+            });
+
+            // Definição das larguras de colunas idênticas ao template original
+            ws.columns = [
+                { key: 'colA', width: 2.5 },  // A (1)
+                { key: 'colB', width: 14.5 }, // B (2) - POSTO/GRAD
+                { key: 'colC', width: 11 },   // C (3) - RE
+                { key: 'colD', width: 18 },   // D (4) - NOME
+                ...Array.from({ length: 31 }, (_, i) => ({ key: `day_${i+1}`, width: 3.85 })), // E a AI (5 a 35)
+                { key: 'colAJ', width: 0.2 }, // AJ (36)
+                { key: 'colAK', width: 7.7 }, // AK (37) - 1/2 D.A.
+                { key: 'colAL', width: 4.6 }, // AL (38) - A.A.
+                { key: 'colAM', width: 3.2 }, // AM (39)
+                { key: 'colAN', width: 23 },  // AN (40) - OBSERVAÇÃO
+                { key: 'colAO', width: 8.8 }, // AO (41)
+                { key: 'colAP', width: 24 }   // AP (42)
+            ];
+
+            const borderThin = {
+                top: { style: 'thin' },
+                left: { style: 'thin' },
+                bottom: { style: 'thin' },
+                right: { style: 'thin' }
+            };
+
+            const fillGray = {
+                type: 'pattern',
+                pattern: 'solid',
+                fgColor: { argb: 'FFD9D9D9' }
+            };
+
+            const fillWeekend = {
+                type: 'pattern',
+                pattern: 'solid',
+                fgColor: { argb: 'FFD9E1F2' }
+            };
+
+            // LINHA 2: CABEÇALHO PMESP
+            ws.mergeCells('C2:G2');
+            ws.getCell('C2').value = 'POLÍCIA MILITAR';
+            ws.getCell('C2').font = { name: 'Arial', size: 10, bold: false };
+            ws.getCell('C2').alignment = { vertical: 'middle', horizontal: 'center' };
+
+            ws.mergeCells('I2:AP2');
+            ws.getCell('I2').value = 'CONTROLE DE FREQUÊNCIA';
+            ws.getCell('I2').font = { name: 'Arial', size: 11, bold: true };
+            ws.getCell('I2').alignment = { vertical: 'middle', horizontal: 'center' };
+            ws.getCell('I2').fill = fillGray;
+
+            // LINHA 3 & 4: DADOS DA OPM
+            ws.getCell('D3').value = 'DO';
+            ws.mergeCells('I3:X3');
+            ws.getCell('I3').value = 'OPM';
+            ws.mergeCells('Y3:AG3');
+            ws.getCell('Y3').value = 'CÓDIGO DA OPM';
+            ws.mergeCells('AH3:AI3');
+            ws.getCell('AH3').value = 'MÊS';
+            ws.mergeCells('AK3:AL3');
+            ws.getCell('AK3').value = 'ANO';
+            ws.mergeCells('AM3:AO3');
+            ws.getCell('AM3').value = 'Nº DE PÁGINAS';
+            ws.getCell('AP3').value = 'PÁGINA Nº';
+
+            [ 'D3', 'I3', 'Y3', 'AH3', 'AK3', 'AM3', 'AP3' ].forEach(cellId => {
+                ws.getCell(cellId).font = { name: 'Calibri', size: 9, bold: false };
+                ws.getCell(cellId).alignment = { vertical: 'middle', horizontal: 'center' };
+            });
+
+            ws.mergeCells('C4:G4');
+            ws.getCell('C4').value = 'ESTADO DE SÃO PAULO';
+            ws.mergeCells('I4:X4');
+            ws.getCell('I4').value = 'CMM - SEÇÃO DE MANUTENÇÃO DE FROTA';
+            ws.mergeCells('Y4:AG4');
+            ws.getCell('Y4').value = '303024100';
+            ws.mergeCells('AH4:AI4');
+            ws.getCell('AH4').value = currentMonth;
+            ws.mergeCells('AK4:AL4');
+            ws.getCell('AK4').value = currentYear;
+            ws.mergeCells('AM4:AO4');
+            ws.getCell('AM4').value = '1';
+            ws.getCell('AP4').value = '1/1';
+
+            [ 'C4', 'I4', 'Y4', 'AH4', 'AK4', 'AM4', 'AP4' ].forEach(cellId => {
+                ws.getCell(cellId).font = { name: 'Calibri', size: 10, bold: true };
+                ws.getCell(cellId).alignment = { vertical: 'middle', horizontal: 'center' };
+            });
+
+            // LINHA 5: LEGENDA
+            ws.mergeCells('B5:AP5');
+            ws.getCell('B5').value = '"0" INFERIOR A 8H  /  "1" - IGUAL OU SUPERIOR 8H E INFERIOR A 12H  /  "2" - IGUAL OU SUPERIOR 12H E INFERIOR A 18H  /  "3" - IGUAL OU SUPERIOR 18H E IGUAL OU INFERIOR A 24H  /  F - FÉRIAS  /  LP - LICENÇA PRÊMIO  /  FS - FALTA AO SERVIÇO  /  A - DEMAIS AFASTAMENTOS';
+            ws.getCell('B5').font = { name: 'Arial', size: 7, bold: true };
+            ws.getCell('B5').alignment = { vertical: 'middle', horizontal: 'center' };
+
+            // LINHA 7 & 8: CABEÇALHO DA TABELA
+            ws.mergeCells('B7:B8');
+            ws.getCell('B7').value = 'POSTO/GRAD';
+            ws.mergeCells('C7:C8');
+            ws.getCell('C7').value = 'RE';
+            ws.mergeCells('D7:D8');
+            ws.getCell('D7').value = 'NOME';
+            ws.mergeCells('E7:AJ7');
+            ws.getCell('E7').value = 'D I A S     D O     M Ê S';
+            ws.mergeCells('AK7:AM7');
+            ws.getCell('AK7').value = 'TOTAL';
+            ws.mergeCells('AN7:AP8');
+            ws.getCell('AN7').value = 'OBSERVAÇÃO';
+
+            [ 'B7', 'C7', 'D7', 'E7', 'AK7', 'AN7' ].forEach(cellId => {
+                ws.getCell(cellId).font = { name: 'Arial', size: 9, bold: true };
+                ws.getCell(cellId).alignment = { vertical: 'middle', horizontal: 'center' };
+                ws.getCell(cellId).fill = fillGray;
+            });
+
+            const daysInMonth = new Date(currentYear, currentMonth, 0).getDate();
+
+            // Linha 8: Dias 1 a 31 + 1/2 D.A. + A.A.
+            for (let d = 1; d <= 31; d++) {
+                const cell = ws.getCell(8, 4 + d);
+                cell.value = d;
+                cell.font = { name: 'Arial', size: 8, bold: true };
+                cell.alignment = { vertical: 'middle', horizontal: 'center' };
+                
+                if (d <= daysInMonth) {
+                    const dateObj = new Date(currentYear, currentMonth - 1, d);
+                    const isWeekend = (dateObj.getDay() === 0 || dateObj.getDay() === 6);
+                    cell.fill = isWeekend ? fillWeekend : fillGray;
+                } else {
+                    cell.fill = fillGray;
+                }
+                cell.border = borderThin;
+            }
+
+            ws.getCell('AK8').value = '1/2 D.A.';
+            ws.mergeCells('AL8:AM8');
+            ws.getCell('AL8').value = 'A.A.';
+            [ 'AK8', 'AL8' ].forEach(c => {
+                ws.getCell(c).font = { name: 'Arial', size: 8, bold: true };
+                ws.getCell(c).alignment = { vertical: 'middle', horizontal: 'center' };
+                ws.getCell(c).fill = fillGray;
+            });
+
+            // BORDAS DE CABEÇALHO
+            for (let r = 7; r <= 8; r++) {
+                for (let c = 2; c <= 42; c++) {
+                    ws.getCell(r, c).border = borderThin;
+                }
+            }
+
+            // LINHAS 9 a 37: MILITARES
+            let rowIdx = 9;
+            freqData.militares.forEach((m) => {
+                ws.getCell(rowIdx, 2).value = m.grad;
+                ws.getCell(rowIdx, 3).value = m.re;
+                ws.getCell(rowIdx, 4).value = m.nome;
+
+                ws.getCell(rowIdx, 2).alignment = { vertical: 'middle', horizontal: 'center' };
+                ws.getCell(rowIdx, 3).alignment = { vertical: 'middle', horizontal: 'center' };
+                ws.getCell(rowIdx, 4).alignment = { vertical: 'middle', horizontal: 'left' };
+
+                // Dias 1 a 31
+                for (let d = 1; d <= 31; d++) {
+                    const cell = ws.getCell(rowIdx, 4 + d);
+                    const val = m.days[d] || '';
+                    if (val !== '') {
+                        cell.value = isNaN(Number(val)) ? val : Number(val);
+                    }
+                    cell.alignment = { vertical: 'middle', horizontal: 'center' };
+                    
+                    const valStr = String(val || '').trim().toUpperCase();
+                    const isNumeric = ['0', '1', '2', '3'].includes(valStr);
+                    const isRed = (valStr !== '' && !isNumeric);
+                    cell.font = { 
+                        name: 'Arial', 
+                        size: 9, 
+                        bold: true,
+                        color: isRed ? { argb: 'FFFF0000' } : { argb: 'FF000000' }
+                    };
+
+                    if (d <= daysInMonth) {
+                        const dateObj = new Date(currentYear, currentMonth - 1, d);
+                        if (dateObj.getDay() === 0 || dateObj.getDay() === 6) {
+                            cell.fill = fillWeekend;
+                        }
+                    }
+                    cell.border = borderThin;
+                }
+
+                // Fórmulas Oficiais PMESP de 1/2 D.A. e A.A.
+                const startCol = 'E';
+                const endCol = 'AI';
+                const daFormula = `COUNTIF(${startCol}${rowIdx}:${endCol}${rowIdx},"0")*0+COUNTIF(${startCol}${rowIdx}:${endCol}${rowIdx},"1")*1+COUNTIF(${startCol}${rowIdx}:${endCol}${rowIdx},"2")*2+COUNTIF(${startCol}${rowIdx}:${endCol}${rowIdx},"3")*3`;
+                const aaFormula = `COUNTIF(${startCol}${rowIdx}:${endCol}${rowIdx},"0")*1+COUNTIF(${startCol}${rowIdx}:${endCol}${rowIdx},"1")*1+COUNTIF(${startCol}${rowIdx}:${endCol}${rowIdx},"2")*1+COUNTIF(${startCol}${rowIdx}:${endCol}${rowIdx},"3")*1`;
+
+                ws.getCell(`AK${rowIdx}`).value = { formula: daFormula };
+                ws.mergeCells(`AL${rowIdx}:AM${rowIdx}`);
+                ws.getCell(`AL${rowIdx}`).value = { formula: aaFormula };
+
+                ws.mergeCells(`AN${rowIdx}:AP${rowIdx}`);
+                ws.getCell(`AN${rowIdx}`).value = m.obs || '';
+                ws.getCell(`AN${rowIdx}`).alignment = { vertical: 'middle', horizontal: 'left' };
+
+                for (let c = 2; c <= 42; c++) {
+                    ws.getCell(rowIdx, c).border = borderThin;
+                    ws.getCell(rowIdx, c).font = ws.getCell(rowIdx, c).font || { name: 'Arial', size: 9 };
+                }
+
+                rowIdx++;
+            });
+
+            // LINHAS 39 a 42: ASSINATURAS
+            const rSignTitle = 39;
+            const rSignName = 41;
+            const rSignPost = 42;
+
+            ws.mergeCells(`B${rSignTitle}:J${rSignTitle}`);
+            ws.getCell(`B${rSignTitle}`).value = 'ELABORADOR';
+
+            ws.mergeCells(`L${rSignTitle}:AA${rSignTitle}`);
+            ws.getCell(`L${rSignTitle}`).value = 'CONFERÊNCIA';
+
+            ws.mergeCells(`AC${rSignTitle}:AP${rSignTitle}`);
+            ws.getCell(`AC${rSignTitle}`).value = 'DIRETOR / CMT / CHEFE';
+
+            [ `B${rSignTitle}`, `L${rSignTitle}`, `AC${rSignTitle}` ].forEach(c => {
+                ws.getCell(c).font = { name: 'Arial', size: 10, bold: true };
+                ws.getCell(c).alignment = { vertical: 'middle', horizontal: 'center' };
+            });
+
+            ws.mergeCells(`B${rSignName}:J${rSignName}`);
+            ws.getCell(`B${rSignName}`).value = freqData.assinaturas.elaborador_nome || 'VALDERLEY BRITO MOURA';
+
+            ws.mergeCells(`L${rSignName}:AA${rSignName}`);
+            ws.getCell(`L${rSignName}`).value = freqData.assinaturas.conferente_nome || 'FÁBIO DOS REIS PINHEIRO';
+
+            ws.mergeCells(`AC${rSignName}:AP${rSignName}`);
+            ws.getCell(`AC${rSignName}`).value = freqData.assinaturas.chefe_nome || 'JOSÉ MAYCON DE PAIVA HONORATO';
+
+            [ `B${rSignName}`, `L${rSignName}`, `AC${rSignName}` ].forEach(c => {
+                ws.getCell(c).font = { name: 'Arial', size: 10, bold: true };
+                ws.getCell(c).alignment = { vertical: 'middle', horizontal: 'center' };
+            });
+
+            ws.mergeCells(`B${rSignPost}:J${rSignPost}`);
+            ws.getCell(`B${rSignPost}`).value = freqData.assinaturas.elaborador_cargo || '2º Sgt PM Aux Seç Manut Frota';
+
+            ws.mergeCells(`L${rSignPost}:AA${rSignPost}`);
+            ws.getCell(`L${rSignPost}`).value = freqData.assinaturas.conferente_cargo || '2º Sgt PM Escalante Seç Manut Frota';
+
+            ws.mergeCells(`AC${rSignPost}:AP${rSignPost}`);
+            ws.getCell(`AC${rSignPost}`).value = freqData.assinaturas.chefe_cargo || 'CAP PM Ch Seç Manut Frota';
+
+            [ `B${rSignPost}`, `L${rSignPost}`, `AC${rSignPost}` ].forEach(c => {
+                ws.getCell(c).font = { name: 'Arial', size: 9, bold: false };
+                ws.getCell(c).alignment = { vertical: 'middle', horizontal: 'center' };
+            });
+
+            // LINHA 44: OBSERVAÇÕES (VERSO DO EXCEL)
+            let rObs = 44;
+            ws.mergeCells(`B${rObs}:AP${rObs}`);
+            ws.getCell(`B${rObs}`).value = 'OBSERVAÇÕES';
+            ws.getCell(`B${rObs}`).font = { name: 'Arial', size: 11, bold: true };
+            ws.getCell(`B${rObs}`).fill = fillGray;
+            ws.getCell(`B${rObs}`).alignment = { vertical: 'middle', horizontal: 'left' };
+            rObs++;
+
+            freqData.militares.forEach(m => {
+                const obsText = freqData.observacoes[m.re] || '';
+                ws.mergeCells(`B${rObs}:AP${rObs}`);
+                ws.getCell(`B${rObs}`).value = `${m.grad} ${m.nome} - ${obsText}`;
+                ws.getCell(`B${rObs}`).font = { name: 'Arial', size: 9, bold: false };
+                ws.getCell(`B${rObs}`).alignment = { vertical: 'middle', horizontal: 'left' };
+                rObs++;
+            });
+
+            // Rodapé Oficial
+            ws.mergeCells(`B${rObs}:AP${rObs}`);
+            ws.getCell(`B${rObs}`).value = 'PM F-25 (Publicado no Bol G PM nº 188/2024)';
+            ws.getCell(`B${rObs}`).font = { name: 'Times New Roman', size: 8, italic: true };
+            ws.getCell(`B${rObs}`).alignment = { vertical: 'middle', horizontal: 'left' };
+
+            // GERA DOWNLOAD
+            const buffer = await wb.xlsx.writeBuffer();
+            const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            const mesStr = String(currentMonth).padStart(2, '0');
+            a.href = url;
+            a.download = `0${currentMonth} - FREQUÊNCIA 01${MONTHS_SIGLAS[currentMonth-1]}${String(currentYear).slice(-2)} A ${new Date(currentYear, currentMonth, 0).getDate()}${MONTHS_SIGLAS[currentMonth-1]}${String(currentYear).slice(-2)}.xlsx`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);
+
+            showToast('Arquivo Excel gerado com sucesso!');
+        }
+    </script>
+</body>
+</html>

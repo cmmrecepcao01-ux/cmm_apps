@@ -565,6 +565,13 @@
             box-shadow: 0 0 12px rgba(59, 130, 246, 0.3);
         }
 
+        .btn-freq-nav:hover {
+            background: #ef4444 !important;
+            border-color: #f87171 !important;
+            box-shadow: 0 0 16px rgba(239, 68, 68, 0.6) !important;
+            transform: translateY(-1px);
+        }
+
         /* TABLE CONTAINER & OFFICIAL PMESP LAYOUT */
         .table-wrapper {
             background: var(--bg-card);
@@ -1733,6 +1740,7 @@
 
             <div class="tabs-header">
                 <button class="tab-btn active" id="tabGridBtn" onclick="switchViewTab('grid')"><i class="fa-solid fa-table-cells"></i> GRADE DE ESCALA</button>
+                <a href="frequencia.html" class="tab-btn btn-freq-nav" id="btnFreqTab" style="background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%); color: #ffffff !important; border: 1px solid #ef4444; box-shadow: 0 0 10px rgba(220, 38, 38, 0.45); text-decoration: none; display: inline-flex; align-items: center; gap: 6px;"><i class="fa-solid fa-calendar-check"></i> FREQUÊNCIA</a>
                 <button class="tab-btn" id="tabAfastBtn" onclick="switchViewTab('afastamentos')"><i class="fa-solid fa-bed-pulse"></i> AFASTAMENTOS & SITUAÇÕES</button>
                 <button class="tab-btn" id="tabAlterBtn" onclick="switchViewTab('alteracoes')"><i class="fa-solid fa-clock-rotate-left"></i> ALTERAÇÕES DIÁRIAS</button>
             </div>
