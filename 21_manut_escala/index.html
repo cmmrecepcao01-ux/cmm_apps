@@ -2577,6 +2577,12 @@ CREATE POLICY "Permissao Total Escalas" ON public.escalas_manutencao FOR ALL USI
             const grupo = (m.grupo || '').toUpperCase();
             const secao = (m.secao || '').toUpperCase();
             const nome = (m.nome || '').toUpperCase();
+            const reCode = (m.re || '');
+
+            // 0. CB PM SOARES: SEMPRE AG (AGREGADO) EM TODOS OS DIAS POR PADRÃO
+            if (nome.includes('SOARES') || reCode.includes('122372')) {
+                return { dom: 'AG', seg: 'AG', ter: 'AG', qua: 'AG', qui: 'AG', sex: 'AG', sab: 'AG' };
+            }
 
             // 1. EXPEDIENTE ADMINISTRATIVO DAS 08h às 18h
             if (grupo.includes('08H ÀS 18H') || grupo.includes('08H AS 18H')) {
@@ -2736,20 +2742,36 @@ CREATE POLICY "Permissao Total Escalas" ON public.escalas_manutencao FOR ALL USI
             await loadScaleForCurrentPeriod();
         }
 
-                // GESTÃO DO EFETIVO PADRÃO GLOBAL PERSISTENTE
+                // GESTÃO DO EFETIVO PADRÃO GLOBAL PERSISTENTE (PURGADOS CARLOS E MACIEL)
         function getGlobalEfetivo() {
+            let baseList = [];
             try {
                 const saved = localStorage.getItem('CMM_EFETIVO_PADRAO');
                 if (saved) {
                     const list = JSON.parse(saved);
-                    if (Array.isArray(list) && list.length > 0) return JSON.parse(JSON.stringify(list));
+                    if (Array.isArray(list) && list.length > 0) {
+                        baseList = JSON.parse(JSON.stringify(list));
+                    }
                 }
             } catch(e) {}
 
-            if (typeof INITIAL_ESCALA_DATA !== 'undefined' && INITIAL_ESCALA_DATA.grid) {
-                return JSON.parse(JSON.stringify(INITIAL_ESCALA_DATA.grid));
+            if (baseList.length === 0 && typeof INITIAL_ESCALA_DATA !== 'undefined' && INITIAL_ESCALA_DATA.grid) {
+                baseList = JSON.parse(JSON.stringify(INITIAL_ESCALA_DATA.grid));
             }
-            return [];
+
+            // Purga estrita de Carlos e Maciel do efetivo padrão
+            baseList = baseList.filter(m => {
+                const n = (m.nome || '').toUpperCase();
+                const r = (m.re || '');
+                return !n.includes('CARLOS') && !n.includes('MACIEL') && !r.includes('106571') && !r.includes('186571') && !r.includes('143641');
+            });
+
+            // Reordena e renumera
+            baseList.forEach((m, idx) => {
+                m.num = idx + 1;
+            });
+
+            return baseList;
         }
 
         function saveGlobalEfetivo(grid) {
@@ -2907,6 +2929,26 @@ CREATE POLICY "Permissao Total Escalas" ON public.escalas_manutencao FOR ALL USI
             }
 
             currentScaleData = loadedData;
+
+            // Purga automática de Carlos e Maciel em qualquer escala carregada
+            if (currentScaleData && currentScaleData.grid) {
+                currentScaleData.grid = currentScaleData.grid.filter(m => {
+                    const n = (m.nome || '').toUpperCase();
+                    const r = (m.re || '');
+                    return !n.includes('CARLOS') && !n.includes('MACIEL') && !r.includes('106571') && !r.includes('186571') && !r.includes('143641');
+                });
+                // Garante que Soares esteja como AG
+                currentScaleData.grid.forEach(m => {
+                    const n = (m.nome || '').toUpperCase();
+                    const r = (m.re || '');
+                    if (n.includes('SOARES') || r.includes('122372')) {
+                        if (!m.dias) m.dias = {};
+                        DIAS_KEYS.forEach(k => { m.dias[k] = 'AG'; });
+                    }
+                });
+                saveGlobalEfetivo(currentScaleData.grid);
+            }
+
             currentScaleData.ano = parseInt(ano);
             currentScaleData.mes = parseInt(mes);
             currentScaleData.semana = semObj.weekNum;
