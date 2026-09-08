@@ -1496,6 +1496,77 @@
                 font-weight: 800 !important;
             }
         }
+    
+        /* IAS & PVT STYLING */
+        @keyframes pulseOrange {
+            0% { transform: scale(1); opacity: 1; box-shadow: 0 0 0 rgba(245, 158, 11, 0.7); }
+            50% { transform: scale(1.06); opacity: 0.88; box-shadow: 0 0 8px rgba(245, 158, 11, 0.9); }
+            100% { transform: scale(1); opacity: 1; box-shadow: 0 0 0 rgba(245, 158, 11, 0); }
+        }
+
+        .blink-orange {
+            animation: pulseOrange 1.3s infinite ease-in-out;
+            background: #78350f !important;
+            color: #fbbf24 !important;
+            border: 1px solid #f59e0b !important;
+        }
+
+        .ias-badge-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 34px;
+            height: 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: all 0.2s;
+            user-select: none;
+        }
+
+        .ias-badge-ok {
+            background: rgba(16, 185, 129, 0.2);
+            color: #10b981;
+            border: 1px solid #059669;
+        }
+
+        .ias-badge-delayed {
+            background: rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+            border: 1px solid #dc2626;
+        }
+
+        .ias-badge-empty {
+            background: rgba(255, 255, 255, 0.03);
+            color: var(--text-dim);
+            border: 1px dashed var(--border);
+        }
+
+        .pvt-toggle-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 30px;
+            height: 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.95rem;
+            transition: all 0.15s;
+            user-select: none;
+        }
+
+        .pvt-ok {
+            background: rgba(16, 185, 129, 0.25);
+            color: #10b981;
+            border: 1px solid #059669;
+        }
+
+        .pvt-pending {
+            background: rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+            border: 1px solid #dc2626;
+        }
+
     </style>
 </head>
 <body>
@@ -1676,7 +1747,7 @@
                             <th rowspan="3" style="width: 38px;">Nº</th>
                             <th rowspan="3" style="width: 170px;">SEÇÃO / EQUIPE</th>
                             <th rowspan="3" style="width: 160px;">FUNÇÃO</th>
-                            <th colspan="3">IDENTIFICAÇÃO DO MILITAR</th>
+                            <th colspan="5">IDENTIFICAÇÃO DO MILITAR</th>
                             <th colspan="7">DIAS DA SEMANA</th>
                             <th rowspan="3" class="td-actions">AÇÕES</th>
                         </tr>
@@ -1684,6 +1755,8 @@
                             <th rowspan="2" style="width: 75px;">POST/GRAD</th>
                             <th rowspan="2" style="width: 85px;">RE</th>
                             <th rowspan="2" style="text-align: left; padding-left: 8px;">NOME DE GUERRA</th>
+                            <th rowspan="2" style="width: 55px; color: #38bdf8;" title="Inspeção Anual de Saúde">IAS</th>
+                            <th rowspan="2" style="width: 48px; color: #38bdf8;" title="Vídeo Instrução Mensal (PVT)">PVT</th>
                             <th class="day-weekend">DOM</th>
                             <th>SEG</th>
                             <th>TER</th>
@@ -2068,6 +2141,25 @@
                             <input type="text" id="militarNome" class="form-input" placeholder="EX: SILVA" required>
                         </div>
 
+                        <div class="form-group full-width">
+                            <label><i class="fa-solid fa-cake-candles" style="color: #38bdf8;"></i> MÊS DE ANIVERSÁRIO / INSPEÇÃO ANUAL DE SAÚDE (IAS - OPCIONAL)</label>
+                            <select id="militarMesIAS" class="form-select">
+                                <option value="">-- NÃO INFORMADO / SEM IAS DEFINIDA --</option>
+                                <option value="1">01 - JANEIRO</option>
+                                <option value="2">02 - FEVEREIRO</option>
+                                <option value="3">03 - MARÇO</option>
+                                <option value="4">04 - ABRIL</option>
+                                <option value="5">05 - MAIO</option>
+                                <option value="6">06 - JUNHO</option>
+                                <option value="7">07 - JULHO</option>
+                                <option value="8">08 - AGOSTO</option>
+                                <option value="9">09 - SETEMBRO</option>
+                                <option value="10">10 - OUTUBRO</option>
+                                <option value="11">11 - NOVEMBRO</option>
+                                <option value="12">12 - DEZEMBRO</option>
+                            </select>
+                        </div>
+
                         <!-- SEÇÃO DE RESTRIÇÃO MÉDICA DO MILITAR -->
                         <div class="form-group full-width section-subbox">
                             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
@@ -2090,12 +2182,56 @@
                                 </div>
                             </div>
                         </div>
+
+                        <!-- SEÇÃO DE SITUAÇÃO / AFASTAMENTO PROGRAMADO AUTOMÁTICO -->
+                        <div class="form-group full-width section-subbox" style="border-color: rgba(59, 130, 246, 0.4); background: rgba(59, 130, 246, 0.03);">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                                <label style="color: #60a5fa; font-weight: 800;"><i class="fa-solid fa-umbrella-beach"></i> SITUAÇÃO / AFASTAMENTO PROGRAMADO</label>
+                                <label style="display: inline-flex; align-items: center; gap: 6px; cursor: pointer; text-transform: none;">
+                                    <input type="checkbox" id="militarHasSituacao" onchange="toggleSituacaoFields(this.checked)">
+                                    <span style="font-size: 0.75rem; font-weight: 700; color: #fff;">Ativar Situação</span>
+                                </label>
+                            </div>
+
+                            <div id="militarSituacaoFields" style="display: none;">
+                                <div class="form-grid" style="margin-bottom: 8px;">
+                                    <div class="form-group full-width">
+                                        <label>TIPO DE SITUAÇÃO / SIGLA *</label>
+                                        <select id="militarSituacaoSigla" class="form-select">
+                                            <option value="FE">FE - FÉRIAS</option>
+                                            <option value="AG">AG - AGREGADO</option>
+                                            <option value="LP">LP - LICENÇA PRÊMIO</option>
+                                            <option value="LTS">LTS - LICENÇA TRATAMENTO DE SAÚDE</option>
+                                            <option value="DS">DS - DISPENSA DO SERVIÇO</option>
+                                            <option value="FM">FM - FOLGA MENSAL</option>
+                                            <option value="FR">FR - FERIADO</option>
+                                            <option value="CV">CV - CONVALESCENÇA</option>
+                                            <option value="LSV">LSV - LICENÇA SEM VENCIMENTOS</option>
+                                            <option value="EAP">EAP - ESTÁGIO ATUALIZAÇÃO PROFISSIONAL</option>
+                                            <option value="CS">CS - CURSO</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>DATA DE INÍCIO *</label>
+                                        <input type="date" id="militarSituacaoDataInicio" class="form-input" style="text-transform: none;">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>DATA DE TÉRMINO (OPCIONAL / INDETERMINADO)</label>
+                                        <input type="date" id="militarSituacaoDataFim" class="form-input" style="text-transform: none;">
+                                    </div>
+                                    <div class="form-group full-width">
+                                        <label>DETALHES / DOE / DOCUMENTO (OPCIONAL)</label>
+                                        <input type="text" id="militarSituacaoDetalhes" class="form-input" placeholder="EX: DOE SP 169, DE 03SET24 OU 30 DIAS">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </form>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" onclick="closeModal('militarModal')">CANCELAR</button>
-                <button type="button" class="btn btn-primary" onclick="document.getElementById('militarForm').requestSubmit()">SALVAR MILITAR</button>
+                <button type="button" class="btn btn-primary" onclick="saveMilitarForm(event)">SALVAR MILITAR</button>
             </div>
         </div>
     </div>
@@ -2362,6 +2498,46 @@ CREATE POLICY "Permissao Total Escalas" ON public.escalas_manutencao FOR ALL USI
     </div>
 
     <!-- TOAST NOTIFICATION -->
+    <div 
+    <!-- MODAL: GESTÃO DA INSPEÇÃO ANUAL DE SAÚDE (IAS) -->
+    <div class="modal-overlay" id="iasModal">
+        <div class="modal-card" style="max-width: 480px;">
+            <div class="modal-header">
+                <div class="modal-title"><i class="fa-solid fa-heart-pulse"></i> INSPEÇÃO ANUAL DE SAÚDE (IAS)</div>
+                <button class="btn-icon-sm" onclick="closeModal('iasModal')"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="iasMilitarRe" value="">
+                <div style="margin-bottom: 14px; background: rgba(255,255,255,0.03); padding: 10px 14px; border-radius: 8px; border: 1px solid var(--border);">
+                    <div style="font-size: 0.88rem; font-weight: 800; color: #fff;" id="iasMilitarNomeDisplay">-</div>
+                    <div style="font-size: 0.72rem; color: #38bdf8; margin-top: 2px; font-weight: 700;" id="iasMilitarMesDisplay">MÊS DE ANIVERSÁRIO: -</div>
+                </div>
+
+                <div id="iasBlockedNotice" style="display: none; background: rgba(16, 185, 129, 0.15); border: 1px solid #10b981; padding: 10px 12px; border-radius: 8px; font-size: 0.72rem; color: #6ee7b7; margin-bottom: 12px;">
+                    <i class="fa-solid fa-lock"></i> <strong>IAS REALIZADA NO ANO VIGENTE:</strong> Registrada em <span id="iasDataRealizadaText">-</span>. Alteração bloqueada até o próximo ano civil.
+                </div>
+
+                <div id="iasActionSection">
+                    <div class="form-group" style="margin-bottom: 12px;">
+                        <label>STATUS DA IAS NO ANO *</label>
+                        <select id="iasStatusSelect" class="form-select">
+                            <option value="OK">REALIZADA COM SUCESSO (CHECK VERDE - OK)</option>
+                            <option value="PENDENTE">PENDENTE / EM ANDAMENTO</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>DATA DA REALIZAÇÃO (SE REALIZADA)</label>
+                        <input type="date" id="iasDataInput" class="form-input" style="text-transform: none;">
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal('iasModal')">FECHAR</button>
+                <button class="btn btn-primary" id="iasSaveBtn" onclick="saveIasModalData()">SALVAR REGISTRO DE IAS</button>
+            </div>
+        </div>
+    </div>
+
     <div id="toastNotification" class="toast">
         <i class="fa-solid fa-check-circle" style="color: #10b981; font-size: 1.2rem;"></i>
         <span id="toastMessage">Operação realizada com sucesso!</span>
@@ -2579,73 +2755,69 @@ CREATE POLICY "Permissao Total Escalas" ON public.escalas_manutencao FOR ALL USI
             const nome = (m.nome || '').toUpperCase();
             const reCode = (m.re || '');
 
+            let dias = { dom: 'F', seg: 'S', ter: 'S', qua: 'S', qui: 'S', sex: 'S', sab: 'F' };
+
             // 0. CB PM SOARES: SEMPRE AG (AGREGADO) EM TODOS OS DIAS POR PADRÃO
             if (nome.includes('SOARES') || reCode.includes('122372')) {
-                return { dom: 'AG', seg: 'AG', ter: 'AG', qua: 'AG', qui: 'AG', sex: 'AG', sab: 'AG' };
+                dias = { dom: 'AG', seg: 'AG', ter: 'AG', qua: 'AG', qui: 'AG', sex: 'AG', sab: 'AG' };
             }
-
             // 1. EXPEDIENTE ADMINISTRATIVO DAS 08h às 18h
-            if (grupo.includes('08H ÀS 18H') || grupo.includes('08H AS 18H')) {
-                const dias = { dom: 'F', seg: 'S', ter: 'S', qua: 'S', qui: 'S', sex: 'S', sab: 'F' };
+            else if (grupo.includes('08H ÀS 18H') || grupo.includes('08H AS 18H')) {
+                dias = { dom: 'F', seg: 'S', ter: 'S', qua: 'S', qui: 'S', sex: 'S', sab: 'F' };
                 if (nome.includes('AUGUSTO')) {
                     dias.seg = 'F'; // Augusto sempre folga na segunda-feira
                 } else if (nome.includes('CLEBER')) {
                     dias.ter = 'F'; // Cleber sempre folga na terça-feira
                 }
-                return dias;
             }
-
             // 2. EXPEDIENTE ADM. HORÁRIO 12 X 36 - DAS 07h às 19h (EQUIPES A E B)
-            if (grupo.includes('07H ÀS 19H') || grupo.includes('07H AS 19H')) {
+            else if (grupo.includes('07H ÀS 19H') || grupo.includes('07H AS 19H')) {
                 const isTeamA = secao.includes('EQUIPE "A"') || secao.includes('EQUIPE A');
                 const isTeamB = secao.includes('EQUIPE "B"') || secao.includes('EQUIPE B');
-
                 const is4Services = (isTeamA && isEquipeA4Services) || (isTeamB && !isEquipeA4Services);
 
                 if (is4Services) {
-                    // Semana de 4 serviços: SEG, TER, QUI, SEX
-                    return { dom: 'F', seg: 'S', ter: 'S', qua: 'F', qui: 'S', sex: 'S', sab: 'F' };
+                    dias = { dom: 'F', seg: 'S', ter: 'S', qua: 'F', qui: 'S', sex: 'S', sab: 'F' };
                 } else {
-                    // Semana de 3 serviços: TER, QUA, QUI
-                    return { dom: 'F', seg: 'F', ter: 'S', qua: 'S', qui: 'S', sex: 'F', sab: 'F' };
+                    dias = { dom: 'F', seg: 'F', ter: 'S', qua: 'S', qui: 'S', sex: 'F', sab: 'F' };
                 }
             }
-
             // 3. HORÁRIO 12 X 36 - DAS 06h às 18h
-            if (grupo.includes('06H ÀS 18H') || grupo.includes('06H AS 18H')) {
-                // Cb PM Garcia segue cronograma da Equipe A
+            else if (grupo.includes('06H ÀS 18H') || grupo.includes('06H AS 18H')) {
                 if (nome.includes('GARCIA')) {
                     if (isEquipeA4Services) {
-                        return { dom: 'F', seg: 'S', ter: 'S', qua: 'F', qui: 'S', sex: 'S', sab: 'F' };
+                        dias = { dom: 'F', seg: 'S', ter: 'S', qua: 'F', qui: 'S', sex: 'S', sab: 'F' };
                     } else {
-                        return { dom: 'F', seg: 'F', ter: 'S', qua: 'S', qui: 'S', sex: 'F', sab: 'F' };
+                        dias = { dom: 'F', seg: 'F', ter: 'S', qua: 'S', qui: 'S', sex: 'F', sab: 'F' };
                     }
-                }
-
-                // Cb PM Alexandre N. segue 12x36 corrido ininterrupto (dia sim, dia não, inclusive sábado e domingo)
-                // Base de referência: 04JAN2026 (Domingo = S)
-                if (nome.includes('ALEXANDRE')) {
+                } else if (nome.includes('ALEXANDRE')) {
                     const refDate = new Date(Date.UTC(2026, 0, 4));
-                    const dias = {};
+                    dias = {};
                     if (semObj && semObj.daysList) {
                         semObj.daysList.forEach(dObj => {
                             const curUtc = new Date(Date.UTC(dObj.dateObj.getFullYear(), dObj.dateObj.getMonth(), dObj.dateObj.getDate()));
                             const diffDays = Math.round((curUtc - refDate) / (24 * 60 * 60 * 1000));
                             dias[dObj.dayKey] = (diffDays % 2 === 0) ? 'S' : 'F';
                         });
-                        return dias;
                     } else {
-                        if (weekOfYear % 2 === 1) {
-                            return { dom: 'S', seg: 'F', ter: 'S', qua: 'F', qui: 'S', sex: 'F', sab: 'S' };
-                        } else {
-                            return { dom: 'F', seg: 'S', ter: 'F', qua: 'S', qui: 'F', sex: 'S', sab: 'F' };
-                        }
+                        dias = (weekOfYear % 2 === 1) 
+                            ? { dom: 'S', seg: 'F', ter: 'S', qua: 'F', qui: 'S', sex: 'F', sab: 'S' }
+                            : { dom: 'F', seg: 'S', ter: 'F', qua: 'S', qui: 'F', sex: 'S', sab: 'F' };
                     }
                 }
             }
 
-            // Padrão geral
-            return { dom: 'F', seg: 'S', ter: 'S', qua: 'S', qui: 'S', sex: 'S', sab: 'F' };
+            // 4. APLICAÇÃO AUTOMÁTICA DA SITUAÇÃO / AFASTAMENTO PROGRAMADO NO INTERVALO DE DATAS
+            const sit = m.situacao_especial;
+            if (sit && sit.ativa && sit.sigla && sit.data_inicio && semObj && semObj.daysList) {
+                semObj.daysList.forEach(dObj => {
+                    if (isDateWithinRange(dObj.dateObj, sit.data_inicio, sit.data_fim)) {
+                        dias[dObj.dayKey] = sit.sigla.toUpperCase();
+                    }
+                });
+            }
+
+            return dias;
         }
 
         function calculateMonthWeeks(year, monthNum) {
@@ -2708,9 +2880,16 @@ CREATE POLICY "Permissao Total Escalas" ON public.escalas_manutencao FOR ALL USI
         }
 
         async function initApp() {
-            const ano = parseInt(document.getElementById('selAno').value);
-            const mes = parseInt(document.getElementById('selMes').value);
-            updateWeeksDropdown(ano, mes, 0);
+            const savedAno = localStorage.getItem('CMM_CURRENT_ANO') || '2026';
+            const savedMes = localStorage.getItem('CMM_CURRENT_MES') || '9';
+            const savedWeekIdx = parseInt(localStorage.getItem('CMM_CURRENT_SEMANA_IDX') || '0');
+
+            const selAno = document.getElementById('selAno');
+            const selMes = document.getElementById('selMes');
+            if (selAno) selAno.value = savedAno;
+            if (selMes) selMes.value = savedMes;
+
+            updateWeeksDropdown(parseInt(savedAno), parseInt(savedMes), savedWeekIdx);
             await loadScaleForCurrentPeriod();
         }
 
@@ -2733,12 +2912,16 @@ CREATE POLICY "Permissao Total Escalas" ON public.escalas_manutencao FOR ALL USI
         async function onYearOrMonthChange() {
             const ano = parseInt(document.getElementById('selAno').value);
             const mes = parseInt(document.getElementById('selMes').value);
+            localStorage.setItem('CMM_CURRENT_ANO', ano);
+            localStorage.setItem('CMM_CURRENT_MES', mes);
+            localStorage.setItem('CMM_CURRENT_SEMANA_IDX', '0');
             updateWeeksDropdown(ano, mes, 0);
             await loadScaleForCurrentPeriod();
         }
 
         async function onWeekChange() {
             selectedWeekIndex = parseInt(document.getElementById('selSemana').value);
+            localStorage.setItem('CMM_CURRENT_SEMANA_IDX', selectedWeekIndex);
             await loadScaleForCurrentPeriod();
         }
 
@@ -2784,9 +2967,67 @@ CREATE POLICY "Permissao Total Escalas" ON public.escalas_manutencao FOR ALL USI
                 grad: m.grad,
                 re: m.re,
                 nome: m.nome,
-                restricao: m.restricao ? JSON.parse(JSON.stringify(m.restricao)) : { ativa: false, periodo: '', codigos: [] }
+                mes_ias: m.mes_ias || '',
+                ias_registro: m.ias_registro ? JSON.parse(JSON.stringify(m.ias_registro)) : null,
+                restricao: m.restricao ? JSON.parse(JSON.stringify(m.restricao)) : { ativa: false, periodo: '', codigos: [] },
+                situacao_especial: m.situacao_especial ? JSON.parse(JSON.stringify(m.situacao_especial)) : { ativa: false, sigla: 'FE', data_inicio: '', data_fim: '', detalhes: '' }
             }));
             localStorage.setItem('CMM_EFETIVO_PADRAO', JSON.stringify(baseList));
+        }
+
+                // HELPER DE VERIFICAÇÃO DE DATA DENTRO DE INTERVALO
+        function isDateWithinRange(targetDate, startDateStr, endDateStr) {
+            if (!startDateStr) return false;
+            const target = new Date(Date.UTC(targetDate.getFullYear(), targetDate.getMonth(), targetDate.getDate())).getTime();
+            
+            const parseDateInput = (str) => {
+                if (!str) return null;
+                if (/^\d{4}-\d{2}-\d{2}$/.test(str)) {
+                    const [y, m, d] = str.split('-').map(Number);
+                    return new Date(Date.UTC(y, m - 1, d)).getTime();
+                }
+                if (/^\d{2}\/\d{2}\/\d{4}$/.test(str)) {
+                    const [d, m, y] = str.split('/').map(Number);
+                    return new Date(Date.UTC(y, m - 1, d)).getTime();
+                }
+                const parsed = new Date(str);
+                if (!isNaN(parsed.getTime())) {
+                    return new Date(Date.UTC(parsed.getFullYear(), parsed.getMonth(), parsed.getDate())).getTime();
+                }
+                return null;
+            };
+
+            const start = parseDateInput(startDateStr);
+            const end = endDateStr ? parseDateInput(endDateStr) : parseDateInput('2099-12-31');
+
+            if (start === null) return false;
+            if (end === null) return target >= start;
+            return target >= start && target <= end;
+        }
+
+        // GESTÃO DE SITUAÇÕES E AFASTAMENTOS PROGRAMADOS GLOBAIS
+        function getGlobalSituacoesMap() {
+            try {
+                const saved = localStorage.getItem('CMM_SITUACOES_GLOBAIS');
+                return saved ? JSON.parse(saved) : {};
+            } catch(e) {
+                return {};
+            }
+        }
+
+        function saveGlobalSituacao(re, situacaoObj) {
+            const map = getGlobalSituacoesMap();
+            if (situacaoObj && situacaoObj.ativa) {
+                map[re] = situacaoObj;
+            } else {
+                delete map[re];
+            }
+            localStorage.setItem('CMM_SITUACOES_GLOBAIS', JSON.stringify(map));
+        }
+
+        function toggleSituacaoFields(isShown) {
+            const f = document.getElementById('militarSituacaoFields');
+            if (f) f.style.display = isShown ? 'block' : 'none';
         }
 
         function getGlobalRestricoesMap() {
@@ -2964,9 +3205,26 @@ CREATE POLICY "Permissao Total Escalas" ON public.escalas_manutencao FOR ALL USI
             };
 
             const restricoesMap = getGlobalRestricoesMap();
+            const situacoesMap = getGlobalSituacoesMap();
+            const wYear = semObj ? (semObj.weekOfYear || getWeekOfYear(semObj.daysList[0].dateObj)) : 1;
+
             currentScaleData.grid.forEach(m => {
                 if (restricoesMap[m.re]) {
                     m.restricao = restricoesMap[m.re];
+                }
+                if (situacoesMap[m.re]) {
+                    m.situacao_especial = situacoesMap[m.re];
+                }
+
+                // Aplica imediatamente a situação programada aos dias que caem no intervalo desta semana
+                const sit = m.situacao_especial;
+                if (sit && sit.ativa && sit.sigla && sit.data_inicio && semObj && semObj.daysList) {
+                    if (!m.dias) m.dias = getDefaultDaysForMilitar(m, wYear, semObj);
+                    semObj.daysList.forEach(dObj => {
+                        if (isDateWithinRange(dObj.dateObj, sit.data_inicio, sit.data_fim)) {
+                            m.dias[dObj.dayKey] = sit.sigla.toUpperCase();
+                        }
+                    });
                 }
             });
 
@@ -3323,6 +3581,114 @@ CREATE POLICY "Permissao Total Escalas" ON public.escalas_manutencao FOR ALL USI
             }
         }
 
+        
+        // =========================================================================
+        // GESTÃO DE INSPEÇÃO ANUAL DE SAÚDE (IAS) E VÍDEO INSTRUÇÃO MENSAL (PVT)
+        // =========================================================================
+        function getGlobalIasMap() {
+            try {
+                const s = localStorage.getItem('CMM_IAS_REGISTROS');
+                return s ? JSON.parse(s) : {};
+            } catch(e) { return {}; }
+        }
+
+        function saveGlobalIas(re, iasRecord) {
+            const map = getGlobalIasMap();
+            map[re] = iasRecord;
+            localStorage.setItem('CMM_IAS_REGISTROS', JSON.stringify(map));
+        }
+
+        function getGlobalPvtMap() {
+            try {
+                const s = localStorage.getItem('CMM_PVT_REGISTROS');
+                return s ? JSON.parse(s) : {};
+            } catch(e) { return {}; }
+        }
+
+        function togglePvtStatus(re, militarIndex) {
+            const currentYear = document.getElementById('selAno').value;
+            const currentMonth = String(document.getElementById('selMes').value).padStart(2, '0');
+            const monthKey = `${currentYear}-${currentMonth}`;
+
+            const pvtMap = getGlobalPvtMap();
+            if (!pvtMap[monthKey]) pvtMap[monthKey] = {};
+
+            const curVal = !!pvtMap[monthKey][re];
+            pvtMap[monthKey][re] = !curVal;
+            localStorage.setItem('CMM_PVT_REGISTROS', JSON.stringify(pvtMap));
+
+            renderTableGrid(document.getElementById('searchInput').value);
+            scheduleAutoSave();
+            showToast(`PVT de ${monthKey} ${!curVal ? 'marcado como OK!' : 'redefinido para pendente.'}`);
+        }
+
+        function openIasModal(re, militarIndex) {
+            const m = currentScaleData.grid[militarIndex];
+            if (!m) return;
+
+            document.getElementById('iasMilitarRe').value = re;
+            document.getElementById('iasMilitarNomeDisplay').textContent = `${m.grad} ${m.re} ${m.nome}`;
+
+            const mesNum = parseInt(m.mes_ias);
+            const mesTxt = (mesNum >= 1 && mesNum <= 12) ? `${String(mesNum).padStart(2, '0')} - ${MONTHS_EXTENSO[mesNum - 1].toUpperCase()}` : 'NÃO CADASTRADO';
+            document.getElementById('iasMilitarMesDisplay').textContent = `MÊS DE ANIVERSÁRIO (IAS): ${mesTxt}`;
+
+            const currentYear = parseInt(document.getElementById('selAno').value);
+            const iasMap = getGlobalIasMap();
+            const iasRecord = m.ias_registro || iasMap[re] || {};
+
+            const isAlreadyOkThisYear = (iasRecord.status === 'OK' && iasRecord.ano === currentYear);
+
+            const blockedDiv = document.getElementById('iasBlockedNotice');
+            const actionSection = document.getElementById('iasActionSection');
+            const saveBtn = document.getElementById('iasSaveBtn');
+
+            if (isAlreadyOkThisYear) {
+                blockedDiv.style.display = 'block';
+                actionSection.style.display = 'none';
+                saveBtn.style.display = 'none';
+                document.getElementById('iasDataRealizadaText').textContent = iasRecord.data_realizacao || `${currentYear}`;
+            } else {
+                blockedDiv.style.display = 'none';
+                actionSection.style.display = 'block';
+                saveBtn.style.display = 'inline-flex';
+                document.getElementById('iasStatusSelect').value = 'OK';
+                
+                const now = new Date();
+                const todayStr = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`;
+                document.getElementById('iasDataInput').value = todayStr;
+            }
+
+            openModal('iasModal');
+        }
+
+        function saveIasModalData() {
+            const re = document.getElementById('iasMilitarRe').value;
+            const currentYear = parseInt(document.getElementById('selAno').value);
+            const status = document.getElementById('iasStatusSelect').value;
+            const dataRealizacao = document.getElementById('iasDataInput').value || new Date().toISOString().split('T')[0];
+
+            const iasRecord = {
+                status: status,
+                ano: currentYear,
+                data_realizacao: dataRealizacao,
+                updated_at: new Date().toISOString()
+            };
+
+            saveGlobalIas(re, iasRecord);
+
+            const m = currentScaleData.grid.find(item => item.re === re);
+            if (m) {
+                m.ias_registro = iasRecord;
+            }
+
+            saveGlobalEfetivo(currentScaleData.grid);
+            closeModal('iasModal');
+            renderTableGrid(document.getElementById('searchInput').value);
+            scheduleAutoSave();
+            showToast('IAS registrada com sucesso e bloqueada para o ano vigente!');
+        }
+
         function renderTableGrid(filterText = '') {
             const tbody = document.getElementById('escalaTableBody');
             tbody.innerHTML = '';
@@ -3364,7 +3730,7 @@ CREATE POLICY "Permissao Total Escalas" ON public.escalas_manutencao FOR ALL USI
                     const isTeamRow = sepKey.includes('_A') || sepKey.includes('_B');
                     headerTr.className = isTeamRow ? 'team-header-row' : 'group-header-row';
                     const icon = isTeamRow ? 'fa-people-group' : 'fa-clock';
-                    headerTr.innerHTML = `<td colspan="14"><i class="fa-solid ${icon}"></i> ${sepTitle}</td>`;
+                    headerTr.innerHTML = `<td colspan="16"><i class="fa-solid ${icon}"></i> ${sepTitle}</td>`;
                     tbody.appendChild(headerTr);
                 }
 
@@ -3396,6 +3762,38 @@ CREATE POLICY "Permissao Total Escalas" ON public.escalas_manutencao FOR ALL USI
                     ? `<i class="fa-solid fa-notes-medical" style="color: #fbbf24; margin-left: 6px; font-size: 0.75rem;" title="Restrição Médica: ${militar.restricao.codigos.join('/')}"></i>` 
                     : '';
 
+                // LÓGICA DO MOSTRADOR IAS (INSPEÇÃO ANUAL DE SAÚDE)
+                const currentScaleMonth = parseInt(document.getElementById('selMes').value);
+                const currentScaleYear = parseInt(document.getElementById('selAno').value);
+                const mesIas = militar.mes_ias ? parseInt(militar.mes_ias) : null;
+                const iasMap = getGlobalIasMap();
+                const iasRec = militar.ias_registro || iasMap[militar.re] || {};
+                const isIasOk = (iasRec.status === 'OK' && iasRec.ano === currentScaleYear);
+
+                let iasBadgeHtml = `<div class="ias-badge-btn ias-badge-empty" onclick="openIasModal('${militar.re}', ${index})" title="IAS não definida">-</div>`;
+                if (mesIas) {
+                    if (isIasOk) {
+                        iasBadgeHtml = `<div class="ias-badge-btn ias-badge-ok" onclick="openIasModal('${militar.re}', ${index})" title="IAS Realizada no ano (${iasRec.data_realizacao || currentScaleYear})"><i class="fa-solid fa-check"></i></div>`;
+                    } else if (currentScaleMonth === mesIas) {
+                        // Mês de aniversário atual piscando em laranja
+                        iasBadgeHtml = `<div class="ias-badge-btn blink-orange" onclick="openIasModal('${militar.re}', ${index})" title="ALERTA: Mês de aniversário da IAS! Clique para registrar"><i class="fa-solid fa-circle-exclamation"></i></div>`;
+                    } else if (currentScaleMonth > mesIas) {
+                        // Mês posterior ao aniversário sem realizar: X vermelho em atraso
+                        iasBadgeHtml = `<div class="ias-badge-btn ias-badge-delayed" onclick="openIasModal('${militar.re}', ${index})" title="IAS EM ATRASO (Venceu em ${MONTHS_SIGLAS[mesIas-1]}). Clique para registrar"><i class="fa-solid fa-xmark"></i></div>`;
+                    } else {
+                        // Mês anterior ao aniversário
+                        iasBadgeHtml = `<div class="ias-badge-btn ias-badge-empty" onclick="openIasModal('${militar.re}', ${index})" title="IAS prevista para ${MONTHS_SIGLAS[mesIas-1]}">${MONTHS_SIGLAS[mesIas-1]}</div>`;
+                    }
+                }
+
+                // LÓGICA DO MOSTRADOR PVT (VÍDEO INSTRUÇÃO MENSAL)
+                const monthKey = `${currentScaleYear}-${String(currentScaleMonth).padStart(2,'0')}`;
+                const pvtMap = getGlobalPvtMap();
+                const isPvtOk = !!(pvtMap[monthKey] && pvtMap[monthKey][militar.re]);
+                const pvtBadgeHtml = isPvtOk
+                    ? `<div class="pvt-toggle-btn pvt-ok" onclick="togglePvtStatus('${militar.re}', ${index})" title="PVT ${monthKey}: REALIZADO (Clique para alternar)"><i class="fa-solid fa-check"></i></div>`
+                    : `<div class="pvt-toggle-btn pvt-pending" onclick="togglePvtStatus('${militar.re}', ${index})" title="PVT ${monthKey}: PENDENTE (Clique para marcar realizado)"><i class="fa-solid fa-xmark"></i></div>`;
+
                 tr.innerHTML = `
                     <td class="td-num">${militar.num}</td>
                     <td class="td-secao">${secaoDisplay}</td>
@@ -3403,6 +3801,8 @@ CREATE POLICY "Permissao Total Escalas" ON public.escalas_manutencao FOR ALL USI
                     <td class="td-grad">${militar.grad}</td>
                     <td class="td-re">${militar.re}</td>
                     <td class="td-nome">${militar.nome} ${restrIcon}</td>
+                    <td style="width: 55px; text-align: center; padding: 2px;">${iasBadgeHtml}</td>
+                    <td style="width: 48px; text-align: center; padding: 2px;">${pvtBadgeHtml}</td>
                     ${daysHtml}
                     <td class="td-actions">
                         <button class="btn-icon-sm" onclick="openEditMilitarModal(${index})" title="Editar Militar / Restrições"><i class="fa-solid fa-pen-to-square"></i></button>
@@ -3743,6 +4143,14 @@ CREATE POLICY "Permissao Total Escalas" ON public.escalas_manutencao FOR ALL USI
             document.getElementById('militarHasRestricao').checked = false;
             toggleRestricaoFields(false);
             document.querySelectorAll('#restrChipsContainer .restr-toggle-chip').forEach(c => c.classList.remove('active'));
+            
+            document.getElementById('militarHasSituacao').checked = false;
+            toggleSituacaoFields(false);
+            document.getElementById('militarSituacaoSigla').value = 'FE';
+            document.getElementById('militarSituacaoDataInicio').value = '';
+            document.getElementById('militarSituacaoDataFim').value = '';
+            document.getElementById('militarSituacaoDetalhes').value = '';
+            
             openModal('militarModal');
         }
 
@@ -3769,6 +4177,7 @@ CREATE POLICY "Permissao Total Escalas" ON public.escalas_manutencao FOR ALL USI
             document.getElementById('militarGrad').value = m.grad || 'Cb PM';
             document.getElementById('militarRE').value = m.re || '';
             document.getElementById('militarNome').value = m.nome || '';
+            document.getElementById('militarMesIAS').value = m.mes_ias || '';
 
             const hasRestr = !!(m.restricao && m.restricao.ativa);
             document.getElementById('militarHasRestricao').checked = hasRestr;
@@ -3780,65 +4189,131 @@ CREATE POLICY "Permissao Total Escalas" ON public.escalas_manutencao FOR ALL USI
                 c.classList.toggle('active', selectedCods.includes(c.dataset.sigla));
             });
 
+            // Carrega dados da Situação Programada
+            const sit = m.situacao_especial;
+            const hasSit = !!(sit && sit.ativa);
+            document.getElementById('militarHasSituacao').checked = hasSit;
+            toggleSituacaoFields(hasSit);
+            if (hasSit) {
+                document.getElementById('militarSituacaoSigla').value = sit.sigla || 'FE';
+                document.getElementById('militarSituacaoDataInicio').value = sit.data_inicio || '';
+                document.getElementById('militarSituacaoDataFim').value = sit.data_fim || '';
+                document.getElementById('militarSituacaoDetalhes').value = sit.detalhes || '';
+            } else {
+                document.getElementById('militarSituacaoSigla').value = 'FE';
+                document.getElementById('militarSituacaoDataInicio').value = '';
+                document.getElementById('militarSituacaoDataFim').value = '';
+                document.getElementById('militarSituacaoDetalhes').value = '';
+            }
+
             openModal('militarModal');
         }
 
         function saveMilitarForm(event) {
-            event.preventDefault();
-            const editIdx = parseInt(document.getElementById('editMilitarIndex').value);
-            const re = document.getElementById('militarRE').value.toUpperCase().trim();
-            const hasRestr = document.getElementById('militarHasRestricao').checked;
-            
-            const activeCods = [];
-            if (hasRestr) {
-                document.querySelectorAll('#restrChipsContainer .restr-toggle-chip.active').forEach(c => {
-                    activeCods.push(c.dataset.sigla);
-                });
+            if (event) event.preventDefault();
+            try {
+                const editIdx = parseInt(document.getElementById('editMilitarIndex').value);
+                const re = (document.getElementById('militarRE').value || '').toUpperCase().trim();
+                const nome = (document.getElementById('militarNome').value || '').toUpperCase().trim();
+
+                if (!re || !nome) {
+                    alert('Por favor preencha o RE e o Nome de Guerra do militar.');
+                    return;
+                }
+
+                const hasRestr = document.getElementById('militarHasRestricao') ? document.getElementById('militarHasRestricao').checked : false;
+                const activeCods = [];
+                if (hasRestr) {
+                    document.querySelectorAll('#restrChipsContainer .restr-toggle-chip.active').forEach(c => {
+                        activeCods.push(c.dataset.sigla);
+                    });
+                }
+
+                const restricaoObj = {
+                    ativa: hasRestr && activeCods.length > 0,
+                    periodo: document.getElementById('militarRestrPeriodo') ? document.getElementById('militarRestrPeriodo').value.trim().toUpperCase() : '',
+                    codigos: activeCods
+                };
+
+                const hasSit = document.getElementById('militarHasSituacao') ? document.getElementById('militarHasSituacao').checked : false;
+                const situacaoObj = {
+                    ativa: hasSit && !!(document.getElementById('militarSituacaoDataInicio') && document.getElementById('militarSituacaoDataInicio').value),
+                    sigla: document.getElementById('militarSituacaoSigla') ? document.getElementById('militarSituacaoSigla').value : 'FE',
+                    data_inicio: document.getElementById('militarSituacaoDataInicio') ? document.getElementById('militarSituacaoDataInicio').value : '',
+                    data_fim: document.getElementById('militarSituacaoDataFim') ? document.getElementById('militarSituacaoDataFim').value : '',
+                    detalhes: document.getElementById('militarSituacaoDetalhes') ? document.getElementById('militarSituacaoDetalhes').value.trim().toUpperCase() : ''
+                };
+
+                const eqChoice = document.getElementById('selectedEquipeOption') ? document.getElementById('selectedEquipeOption').value : 'SEM_EQUIPE';
+                let secaoFinal = (document.getElementById('militarSecaoBase').value || 'MANUTENÇÃO DE FROTA').trim().toUpperCase();
+                if (eqChoice === 'A') {
+                    secaoFinal += '           Equipe "A"';
+                } else if (eqChoice === 'B') {
+                    secaoFinal += '           Equipe "B"';
+                }
+
+                const semObj = (currentMonthWeeks && currentMonthWeeks.length > selectedWeekIndex) ? currentMonthWeeks[selectedWeekIndex] : null;
+                const wYear = (semObj && semObj.daysList && semObj.daysList[0]) ? (semObj.weekOfYear || getWeekOfYear(semObj.daysList[0].dateObj)) : 1;
+
+                const mesIasVal = document.getElementById('militarMesIAS') ? document.getElementById('militarMesIAS').value : '';
+
+                // Preserva registro anterior de IAS do militar se já existente
+                const prevM = (editIdx >= 0 && currentScaleData && currentScaleData.grid) ? currentScaleData.grid[editIdx] : null;
+                const iasRec = prevM ? prevM.ias_registro : null;
+
+                const militarData = {
+                    grupo: document.getElementById('militarGrupo').value,
+                    secao: secaoFinal,
+                    funcao: (document.getElementById('militarFuncao').value || 'AUX SERV RAP E ALMOX').toUpperCase(),
+                    grad: document.getElementById('militarGrad').value,
+                    re: re,
+                    nome: nome,
+                    mes_ias: mesIasVal,
+                    ias_registro: iasRec,
+                    dias: { dom: 'F', seg: 'S', ter: 'S', qua: 'S', qui: 'S', sex: 'S', sab: 'F' },
+                    restricao: restricaoObj,
+                    situacao_especial: situacaoObj
+                };
+
+                saveGlobalRestricao(re, restricaoObj);
+                saveGlobalSituacao(re, situacaoObj);
+
+                if (!currentScaleData) currentScaleData = { grid: [] };
+                if (!currentScaleData.grid) currentScaleData.grid = [];
+
+                if (editIdx >= 0) {
+                    militarData.dias = (prevM && prevM.dias) ? JSON.parse(JSON.stringify(prevM.dias)) : getDefaultDaysForMilitar(militarData, wYear, semObj);
+                    militarData.num = prevM ? prevM.num : (editIdx + 1);
+
+                    const sit = militarData.situacao_especial;
+                    if (sit && sit.ativa && sit.sigla && sit.data_inicio && semObj && semObj.daysList) {
+                        semObj.daysList.forEach(dObj => {
+                            if (isDateWithinRange(dObj.dateObj, sit.data_inicio, sit.data_fim)) {
+                                militarData.dias[dObj.dayKey] = sit.sigla.toUpperCase();
+                            }
+                        });
+                    } else if (sit && !sit.ativa) {
+                        militarData.dias = getDefaultDaysForMilitar(militarData, wYear, semObj);
+                    }
+
+                    currentScaleData.grid[editIdx] = militarData;
+                    showToast('Militar atualizado com sucesso!');
+                } else {
+                    militarData.dias = getDefaultDaysForMilitar(militarData, wYear, semObj);
+                    currentScaleData.grid.push(militarData);
+                    showToast('Novo militar incluído na escala!');
+                }
+
+                sortMilitaresGrid(currentScaleData.grid);
+                saveGlobalEfetivo(currentScaleData.grid);
+                closeModal('militarModal');
+                syncAutomaticObservacoes();
+                renderAll();
+                scheduleAutoSave();
+            } catch(err) {
+                console.error('Erro ao salvar militar:', err);
+                alert('Erro ao salvar militar: ' + err.message);
             }
-
-            const restricaoObj = {
-                ativa: hasRestr && activeCods.length > 0,
-                periodo: document.getElementById('militarRestrPeriodo').value.trim().toUpperCase(),
-                codigos: activeCods
-            };
-
-            const eqChoice = document.getElementById('selectedEquipeOption').value;
-            let secaoFinal = document.getElementById('militarSecaoBase').value.trim().toUpperCase();
-            if (eqChoice === 'A') {
-                secaoFinal += '           Equipe "A"';
-            } else if (eqChoice === 'B') {
-                secaoFinal += '           Equipe "B"';
-            }
-
-            const militarData = {
-                grupo: document.getElementById('militarGrupo').value,
-                secao: secaoFinal,
-                funcao: document.getElementById('militarFuncao').value.toUpperCase(),
-                grad: document.getElementById('militarGrad').value,
-                re: re,
-                nome: document.getElementById('militarNome').value.toUpperCase(),
-                dias: { dom: 'F', seg: 'S', ter: 'S', qua: 'S', qui: 'S', sex: 'S', sab: 'F' },
-                restricao: restricaoObj
-            };
-
-            saveGlobalRestricao(re, restricaoObj);
-
-            if (editIdx >= 0) {
-                militarData.dias = currentScaleData.grid[editIdx].dias;
-                militarData.num = currentScaleData.grid[editIdx].num;
-                currentScaleData.grid[editIdx] = militarData;
-                showToast('Militar atualizado com sucesso!');
-            } else {
-                currentScaleData.grid.push(militarData);
-                showToast('Novo militar incluído na escala!');
-            }
-
-            sortMilitaresGrid(currentScaleData.grid);
-            saveGlobalEfetivo(currentScaleData.grid); // Grava como padrão para o futuro
-            closeModal('militarModal');
-            syncAutomaticObservacoes();
-            renderAll();
-            scheduleAutoSave();
         }
 
         function deleteMilitar(index) {
@@ -4570,11 +5045,16 @@ CREATE POLICY "Permissao Total Escalas" ON public.escalas_manutencao FOR ALL USI
 
         function showToast(msg) {
             const toast = document.getElementById('toastNotification');
-            document.getElementById('toastMessage').textContent = msg;
-            toast.classList.add('show');
-            setTimeout(() => {
-                toast.classList.remove('show');
-            }, 3000);
+            const msgEl = document.getElementById('toastMessage');
+            if (toast && msgEl) {
+                msgEl.textContent = msg;
+                toast.classList.add('show');
+                setTimeout(() => {
+                    toast.classList.remove('show');
+                }, 3000);
+            } else {
+                console.log('TOAST:', msg);
+            }
         }
     </script>
 </body>
