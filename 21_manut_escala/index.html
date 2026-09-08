@@ -633,6 +633,18 @@
             border-left: 5px solid #38bdf8;
         }
 
+        .team-header-row td {
+            background: #141c2e;
+            color: #93c5fd;
+            font-weight: 800;
+            font-size: 0.78rem;
+            letter-spacing: 1.2px;
+            padding: 8px 14px;
+            text-align: left;
+            border: 1px solid #23314a;
+            border-left: 5px solid #60a5fa;
+        }
+
         .escala-table tbody tr {
             border-bottom: 1px solid #1f293d;
             transition: background-color 0.15s;
@@ -1178,7 +1190,12 @@
 
             #officialPrintArea {
                 display: block !important;
-                width: 100% !important;
+                width: 95% !important;
+                max-width: 95% !important;
+                margin: 0 auto !important;
+                zoom: 0.95;
+                -webkit-transform: scale(0.95);
+                -webkit-transform-origin: top center;
             }
 
             /* PÁGINA 1: FRENTE DA ESCALA */
@@ -1286,12 +1303,13 @@
                 padding: 1px !important;
             }
 
-            .p-text-red {
+            .p-text-red, .p-main-table td.p-text-red, .p-main-table th.p-text-red {
                 color: #c00000 !important;
                 font-weight: 800 !important;
             }
 
-            .p-text-bold {
+            .p-text-bold, .p-main-table td.p-text-bold, .p-main-table th.p-text-bold {
+                color: #000000 !important;
                 font-weight: 800 !important;
             }
 
@@ -2541,6 +2559,89 @@ CREATE POLICY "Permissao Total Escalas" ON public.escalas_manutencao FOR ALL USI
             });
         }
 
+                // CÁLCULO DA SEMANA SEQUENCIAL DO ANO (1 a 52)
+        function getWeekOfYear(dateObj) {
+            const d = new Date(Date.UTC(dateObj.getFullYear(), dateObj.getMonth(), dateObj.getDate()));
+            const startOfYear = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+            while (startOfYear.getUTCDay() !== 0) {
+                startOfYear.setUTCDate(startOfYear.getUTCDate() + 1);
+            }
+            const diffDays = Math.floor((d - startOfYear) / (24 * 60 * 60 * 1000));
+            if (diffDays < 0) return 1;
+            return Math.floor(diffDays / 7) + 1;
+        }
+
+        // REGRAS PADRÃO DE ESCALA POR EXPEDIENTE E EQUIPES (AUGUSTO, CLEBER, EQUIPE A E B 12X36)
+        function getDefaultDaysForMilitar(m, weekOfYear, semObj) {
+            const isEquipeA4Services = (weekOfYear % 2 === 1);
+            const grupo = (m.grupo || '').toUpperCase();
+            const secao = (m.secao || '').toUpperCase();
+            const nome = (m.nome || '').toUpperCase();
+
+            // 1. EXPEDIENTE ADMINISTRATIVO DAS 08h às 18h
+            if (grupo.includes('08H ÀS 18H') || grupo.includes('08H AS 18H')) {
+                const dias = { dom: 'F', seg: 'S', ter: 'S', qua: 'S', qui: 'S', sex: 'S', sab: 'F' };
+                if (nome.includes('AUGUSTO')) {
+                    dias.seg = 'F'; // Augusto sempre folga na segunda-feira
+                } else if (nome.includes('CLEBER')) {
+                    dias.ter = 'F'; // Cleber sempre folga na terça-feira
+                }
+                return dias;
+            }
+
+            // 2. EXPEDIENTE ADM. HORÁRIO 12 X 36 - DAS 07h às 19h (EQUIPES A E B)
+            if (grupo.includes('07H ÀS 19H') || grupo.includes('07H AS 19H')) {
+                const isTeamA = secao.includes('EQUIPE "A"') || secao.includes('EQUIPE A');
+                const isTeamB = secao.includes('EQUIPE "B"') || secao.includes('EQUIPE B');
+
+                const is4Services = (isTeamA && isEquipeA4Services) || (isTeamB && !isEquipeA4Services);
+
+                if (is4Services) {
+                    // Semana de 4 serviços: SEG, TER, QUI, SEX
+                    return { dom: 'F', seg: 'S', ter: 'S', qua: 'F', qui: 'S', sex: 'S', sab: 'F' };
+                } else {
+                    // Semana de 3 serviços: TER, QUA, QUI
+                    return { dom: 'F', seg: 'F', ter: 'S', qua: 'S', qui: 'S', sex: 'F', sab: 'F' };
+                }
+            }
+
+            // 3. HORÁRIO 12 X 36 - DAS 06h às 18h
+            if (grupo.includes('06H ÀS 18H') || grupo.includes('06H AS 18H')) {
+                // Cb PM Garcia segue cronograma da Equipe A
+                if (nome.includes('GARCIA')) {
+                    if (isEquipeA4Services) {
+                        return { dom: 'F', seg: 'S', ter: 'S', qua: 'F', qui: 'S', sex: 'S', sab: 'F' };
+                    } else {
+                        return { dom: 'F', seg: 'F', ter: 'S', qua: 'S', qui: 'S', sex: 'F', sab: 'F' };
+                    }
+                }
+
+                // Cb PM Alexandre N. segue 12x36 corrido ininterrupto (dia sim, dia não, inclusive sábado e domingo)
+                // Base de referência: 04JAN2026 (Domingo = S)
+                if (nome.includes('ALEXANDRE')) {
+                    const refDate = new Date(Date.UTC(2026, 0, 4));
+                    const dias = {};
+                    if (semObj && semObj.daysList) {
+                        semObj.daysList.forEach(dObj => {
+                            const curUtc = new Date(Date.UTC(dObj.dateObj.getFullYear(), dObj.dateObj.getMonth(), dObj.dateObj.getDate()));
+                            const diffDays = Math.round((curUtc - refDate) / (24 * 60 * 60 * 1000));
+                            dias[dObj.dayKey] = (diffDays % 2 === 0) ? 'S' : 'F';
+                        });
+                        return dias;
+                    } else {
+                        if (weekOfYear % 2 === 1) {
+                            return { dom: 'S', seg: 'F', ter: 'S', qua: 'F', qui: 'S', sex: 'F', sab: 'S' };
+                        } else {
+                            return { dom: 'F', seg: 'S', ter: 'F', qua: 'S', qui: 'F', sex: 'S', sab: 'F' };
+                        }
+                    }
+                }
+            }
+
+            // Padrão geral
+            return { dom: 'F', seg: 'S', ter: 'S', qua: 'S', qui: 'S', sex: 'S', sab: 'F' };
+        }
+
         function calculateMonthWeeks(year, monthNum) {
             const monthIdx = monthNum - 1;
             const weeks = [];
@@ -2583,8 +2684,10 @@ CREATE POLICY "Permissao Total Escalas" ON public.escalas_manutencao FOR ALL USI
                 }
 
                 const periodStr = `${daysList[0].formatted} a ${daysList[6].formatted}`;
+                const wYear = getWeekOfYear(daysList[0].dateObj);
                 weeks.push({
                     weekNum: weekNum,
+                    weekOfYear: wYear,
                     label: `SEM ${String(weekNum).padStart(2, '0')}: ${periodStr.toUpperCase()}`,
                     period: periodStr,
                     daysList: daysList,
@@ -2631,6 +2734,37 @@ CREATE POLICY "Permissao Total Escalas" ON public.escalas_manutencao FOR ALL USI
         async function onWeekChange() {
             selectedWeekIndex = parseInt(document.getElementById('selSemana').value);
             await loadScaleForCurrentPeriod();
+        }
+
+                // GESTÃO DO EFETIVO PADRÃO GLOBAL PERSISTENTE
+        function getGlobalEfetivo() {
+            try {
+                const saved = localStorage.getItem('CMM_EFETIVO_PADRAO');
+                if (saved) {
+                    const list = JSON.parse(saved);
+                    if (Array.isArray(list) && list.length > 0) return JSON.parse(JSON.stringify(list));
+                }
+            } catch(e) {}
+
+            if (typeof INITIAL_ESCALA_DATA !== 'undefined' && INITIAL_ESCALA_DATA.grid) {
+                return JSON.parse(JSON.stringify(INITIAL_ESCALA_DATA.grid));
+            }
+            return [];
+        }
+
+        function saveGlobalEfetivo(grid) {
+            if (!Array.isArray(grid)) return;
+            const baseList = grid.map(m => ({
+                num: m.num,
+                grupo: m.grupo,
+                secao: m.secao,
+                funcao: m.funcao,
+                grad: m.grad,
+                re: m.re,
+                nome: m.nome,
+                restricao: m.restricao ? JSON.parse(JSON.stringify(m.restricao)) : { ativa: false, periodo: '', codigos: [] }
+            }));
+            localStorage.setItem('CMM_EFETIVO_PADRAO', JSON.stringify(baseList));
         }
 
         function getGlobalRestricoesMap() {
@@ -2802,15 +2936,20 @@ CREATE POLICY "Permissao Total Escalas" ON public.escalas_manutencao FOR ALL USI
 
         function cloneDataForNewWeek(sourceData, ano, mes, semObj) {
             const newGrid = JSON.parse(JSON.stringify(sourceData.grid || []));
-            
+            const wYear = semObj.weekOfYear || getWeekOfYear(semObj.daysList[0].dateObj);
+
             newGrid.forEach(m => {
+                const defaultDays = getDefaultDaysForMilitar(m, wYear, semObj);
                 if (!m.dias) {
-                    m.dias = { dom: 'F', seg: 'S', ter: 'S', qua: 'S', qui: 'S', sex: 'S', sab: 'F' };
+                    m.dias = defaultDays;
                 } else {
                     DIAS_KEYS.forEach(k => {
                         const v = m.dias[k];
-                        if (v === 'FM' || v === 'DS') {
-                            m.dias[k] = (k === 'dom' || k === 'sab') ? 'F' : 'S';
+                        // Afastamentos contínuos como Férias, Agregado, LP e LTS sobrepõem os dias normais
+                        if (['FE', 'AG', 'LP', 'LTS'].includes(v)) {
+                            // Mantém o afastamento
+                        } else {
+                            m.dias[k] = defaultDays[k];
                         }
                     });
                 }
@@ -2871,21 +3010,12 @@ CREATE POLICY "Permissao Total Escalas" ON public.escalas_manutencao FOR ALL USI
         }
 
         function createNewWeekData(ano, mes, semObj) {
-            let baseMilitares = [];
-            if (typeof INITIAL_ESCALA_DATA !== 'undefined' && INITIAL_ESCALA_DATA.grid) {
-                baseMilitares = JSON.parse(JSON.stringify(INITIAL_ESCALA_DATA.grid));
-            }
+            let baseMilitares = getGlobalEfetivo();
+
+            const wYear = semObj.weekOfYear || getWeekOfYear(semObj.daysList[0].dateObj);
 
             baseMilitares.forEach(m => {
-                m.dias = {
-                    dom: 'F',
-                    seg: 'S',
-                    ter: 'S',
-                    qua: 'S',
-                    qui: 'S',
-                    sex: 'S',
-                    sab: 'F'
-                };
+                m.dias = getDefaultDaysForMilitar(m, wYear, semObj);
             });
 
             return {
@@ -2916,26 +3046,30 @@ CREATE POLICY "Permissao Total Escalas" ON public.escalas_manutencao FOR ALL USI
 
         function resetCurrentWeekToDefaults() {
             if (!currentScaleData || !currentScaleData.grid) return;
-            if (confirm('Deseja zerar a escala desta semana para o padrão inicial (S nos dias úteis e F no final de semana)?')) {
+            const semObj = currentMonthWeeks[selectedWeekIndex];
+            const wYear = semObj ? (semObj.weekOfYear || getWeekOfYear(semObj.daysList[0].dateObj)) : 1;
+
+            if (confirm('Deseja zerar a escala desta semana para o padrão oficial das equipes e expedientes?')) {
                 currentScaleData.grid.forEach(m => {
-                    m.dias = {
-                        dom: 'F',
-                        seg: 'S',
-                        ter: 'S',
-                        qua: 'S',
-                        qui: 'S',
-                        sex: 'S',
-                        sab: 'F'
-                    };
+                    const defaultDays = getDefaultDaysForMilitar(m, wYear, semObj);
+                    if (!m.dias) m.dias = {};
+                    DIAS_KEYS.forEach(k => {
+                        const cur = m.dias[k];
+                        // Preserva afastamentos superiores (Férias, Agregado, LP, LTS)
+                        if (['FE', 'AG', 'LP', 'LTS'].includes(cur)) {
+                            // Mantém afastamento
+                        } else {
+                            m.dias[k] = defaultDays[k];
+                        }
+                    });
                 });
-                currentScaleData.afastamentos = [];
                 currentScaleData.observacoes_padrao = JSON.parse(JSON.stringify(OBSERVACOES_PADRAO_INSTITUCIONAIS));
                 currentScaleData.observacoes_manuais = [];
                 currentScaleData.observacoes_editadas = {};
                 syncAutomaticObservacoes();
                 renderAll();
                 scheduleAutoSave();
-                showToast('Escala redefinida para o padrão inicial!');
+                showToast('Escala redefinida com o padrão oficial de equipes e expedientes!');
             }
         }
 
@@ -2980,84 +3114,23 @@ CREATE POLICY "Permissao Total Escalas" ON public.escalas_manutencao FOR ALL USI
 
                 const milDesc = `${m.grad} ${m.re} ${m.nome}`;
 
+                // --- 1. SITUAÇÃO (AFASTAMENTOS): APENAS FÉRIAS, AGREGADO E LICENÇA PRÊMIO ---
+                // (Estes NÃO entram em OBSERVAÇÕES pois já constam no quadro SITUAÇÃO)
+
                 if (specialDays.FE && specialDays.FE.length > 0) {
                     const firstDayKey = specialDays.FE[0];
                     const lastDayKey = specialDays.FE[specialDays.FE.length - 1];
                     const dataIni = semObj.daysMap[firstDayKey].formatted;
                     const dataFim = semObj.daysMap[lastDayKey].formatted;
-                    const textoPeriodo = (firstDayKey === lastDayKey) ? `em ${dataIni}` : `no período de ${dataIni} a ${dataFim}`;
-                    const key = `FE_${m.re}`;
-                    const defaultText = `${milDesc} FÉRIAS ${textoPeriodo}.`;
-                    const finalText = currentScaleData.observacoes_editadas[key] || defaultText;
-
-                    autoObs.push({ key: key, text: finalText });
                     autoAfast.push({
                         num: m.num,
                         situacao: 'FÉRIAS',
                         nome: `${m.grad} ${m.re} ${m.nome}`,
-                        periodo: `${specialDays.FE.length} dias (${dataIni} a ${dataFim})`
-                    });
-                }
-
-                if (specialDays.FM && specialDays.FM.length > 0) {
-                    specialDays.FM.forEach(dayKey => {
-                        const dataFmt = semObj.daysMap[dayKey].formatted;
-                        const key = `FM_${m.re}_${dayKey}`;
-                        const defaultText = `${milDesc} FOLGA MENSAL em ${dataFmt} referente ao período de aquisição.`;
-                        const finalText = currentScaleData.observacoes_editadas[key] || defaultText;
-
-                        autoObs.push({ key: key, text: finalText });
-                        autoAfast.push({
-                            num: m.num,
-                            situacao: 'FOLGA MENSAL',
-                            nome: `${m.grad} ${m.re} ${m.nome}`,
-                            periodo: `em ${dataFmt}`
-                        });
-                    });
-                }
-
-                if (specialDays.LTS && specialDays.LTS.length > 0) {
-                    const firstDayKey = specialDays.LTS[0];
-                    const lastDayKey = specialDays.LTS[specialDays.LTS.length - 1];
-                    const dataIni = semObj.daysMap[firstDayKey].formatted;
-                    const dataFim = semObj.daysMap[lastDayKey].formatted;
-                    const textoPeriodo = (firstDayKey === lastDayKey) ? `em ${dataIni}` : `no período de ${dataIni} a ${dataFim}`;
-                    const key = `LTS_${m.re}`;
-                    const defaultText = `${milDesc} LICENÇA TRATAMENTO DE SAÚDE ${textoPeriodo}.`;
-                    const finalText = currentScaleData.observacoes_editadas[key] || defaultText;
-
-                    autoObs.push({ key: key, text: finalText });
-                    autoAfast.push({
-                        num: m.num,
-                        situacao: 'LICENÇA TRAT. DE SAÚDE',
-                        nome: `${m.grad} ${m.re} ${m.nome}`,
-                        periodo: `${dataIni} a ${dataFim}`
-                    });
-                }
-
-                if (specialDays.DS && specialDays.DS.length > 0) {
-                    specialDays.DS.forEach(dayKey => {
-                        const dataFmt = semObj.daysMap[dayKey].formatted;
-                        const key = `DS_${m.re}_${dayKey}`;
-                        const defaultText = `${milDesc} DISPENSA DO SERVIÇO em ${dataFmt}.`;
-                        const finalText = currentScaleData.observacoes_editadas[key] || defaultText;
-
-                        autoObs.push({ key: key, text: finalText });
-                        autoAfast.push({
-                            num: m.num,
-                            situacao: 'DISPENSA DO SERVIÇO',
-                            nome: `${m.grad} ${m.re} ${m.nome}`,
-                            periodo: `em ${dataFmt}`
-                        });
+                        periodo: `${specialDays.FE.length} DIAS (${dataIni} A ${dataFim})`
                     });
                 }
 
                 if (specialDays.AG && specialDays.AG.length > 0) {
-                    const key = `AG_${m.re}`;
-                    const defaultText = `${milDesc} na condição de AGREGADO conforme publicado em DOE.`;
-                    const finalText = currentScaleData.observacoes_editadas[key] || defaultText;
-
-                    autoObs.push({ key: key, text: finalText });
                     autoAfast.push({
                         num: m.num,
                         situacao: 'AGREGADO',
@@ -3071,29 +3144,60 @@ CREATE POLICY "Permissao Total Escalas" ON public.escalas_manutencao FOR ALL USI
                     const lastDayKey = specialDays.LP[specialDays.LP.length - 1];
                     const dataIni = semObj.daysMap[firstDayKey].formatted;
                     const dataFim = semObj.daysMap[lastDayKey].formatted;
-                    const key = `LP_${m.re}`;
-                    const defaultText = `${milDesc} LICENÇA PRÊMIO no período de ${dataIni} a ${dataFim}.`;
-                    const finalText = currentScaleData.observacoes_editadas[key] || defaultText;
-
-                    autoObs.push({ key: key, text: finalText });
                     autoAfast.push({
                         num: m.num,
-                        situacao: 'LICENÇA PRÊMIO',
+                        situacao: 'LP - LICENÇA PRÊMIO',
                         nome: `${m.grad} ${m.re} ${m.nome}`,
-                        periodo: `${dataIni} a ${dataFim}`
+                        periodo: `${specialDays.LP.length} DIAS (${dataIni} A ${dataFim})`
+                    });
+                }
+
+                // --- 2. OBSERVAÇÕES: FOLGA MENSAL, LTS, DISPENSA E DEMAIS CONDIÇÕES ESPECIAIS ---
+                // (Férias, AG e LP foram excluídos daqui para evitar duplicidade)
+
+                if (specialDays.FM && specialDays.FM.length > 0) {
+                    specialDays.FM.forEach(dayKey => {
+                        const dataFmt = semObj.daysMap[dayKey].formatted;
+                        const key = `FM_${m.re}_${dayKey}`;
+                        const defaultText = `${milDesc} FOLGA MENSAL em ${dataFmt} referente ao período de aquisição.`;
+                        const finalText = currentScaleData.observacoes_editadas[key] || defaultText;
+                        autoObs.push({ key: key, text: finalText });
+                    });
+                }
+
+                if (specialDays.LTS && specialDays.LTS.length > 0) {
+                    const firstDayKey = specialDays.LTS[0];
+                    const lastDayKey = specialDays.LTS[specialDays.LTS.length - 1];
+                    const dataIni = semObj.daysMap[firstDayKey].formatted;
+                    const dataFim = semObj.daysMap[lastDayKey].formatted;
+                    const textoPeriodo = (firstDayKey === lastDayKey) ? `em ${dataIni}` : `no período de ${dataIni} a ${dataFim}`;
+                    const key = `LTS_${m.re}`;
+                    const defaultText = `${milDesc} LICENÇA TRATAMENTO DE SAÚDE ${textoPeriodo}.`;
+                    const finalText = currentScaleData.observacoes_editadas[key] || defaultText;
+                    autoObs.push({ key: key, text: finalText });
+                }
+
+                if (specialDays.DS && specialDays.DS.length > 0) {
+                    specialDays.DS.forEach(dayKey => {
+                        const dataFmt = semObj.daysMap[dayKey].formatted;
+                        const key = `DS_${m.re}_${dayKey}`;
+                        const defaultText = `${milDesc} DISPENSA DO SERVIÇO em ${dataFmt}.`;
+                        const finalText = currentScaleData.observacoes_editadas[key] || defaultText;
+                        autoObs.push({ key: key, text: finalText });
                     });
                 }
 
                 Object.keys(specialDays).forEach(sig => {
-                    if (!['FE', 'FM', 'LTS', 'DS', 'AG', 'LP'].includes(sig)) {
+                    if (!['FE', 'AG', 'LP', 'FM', 'LTS', 'DS'].includes(sig)) {
                         const sigObj = TODAS_SIGLAS_PMESP.find(s => s.sigla === sig);
                         const desc = sigObj ? sigObj.desc : sig;
-                        const dayKey = specialDays[sig][0];
-                        const dataFmt = semObj.daysMap[dayKey].formatted;
-                        const key = `${sig}_${m.re}_${dayKey}`;
-                        const defaultText = `${milDesc} ${desc} (${sig}) em ${dataFmt}.`;
-                        const finalText = currentScaleData.observacoes_editadas[key] || defaultText;
-                        autoObs.push({ key: key, text: finalText });
+                        specialDays[sig].forEach(dayKey => {
+                            const dataFmt = semObj.daysMap[dayKey].formatted;
+                            const key = `${sig}_${m.re}_${dayKey}`;
+                            const defaultText = `${milDesc} ${desc} (${sig}) em ${dataFmt}.`;
+                            const finalText = currentScaleData.observacoes_editadas[key] || defaultText;
+                            autoObs.push({ key: key, text: finalText });
+                        });
                     }
                 });
             });
@@ -3183,7 +3287,7 @@ CREATE POLICY "Permissao Total Escalas" ON public.escalas_manutencao FOR ALL USI
 
             if (!currentScaleData || !currentScaleData.grid) return;
 
-            let currentGroup = '';
+            let currentSeparatorKey = '';
             const query = (filterText || '').toUpperCase().trim();
 
             currentScaleData.grid.forEach((militar, index) => {
@@ -3196,13 +3300,35 @@ CREATE POLICY "Permissao Total Escalas" ON public.escalas_manutencao FOR ALL USI
                     if (!match) return;
                 }
 
-                if (militar.grupo && militar.grupo !== currentGroup) {
-                    currentGroup = militar.grupo;
-                    const groupTr = document.createElement('tr');
-                    groupTr.className = 'group-header-row';
-                    groupTr.innerHTML = `<td colspan="14"><i class="fa-solid fa-clock"></i> ${currentGroup}</td>`;
-                    tbody.appendChild(groupTr);
+                // Identifica seções e separadores por grupo e por equipe A / B
+                let sepKey = militar.grupo || '';
+                let sepTitle = militar.grupo || '';
+                const is12x36_07_19 = sepKey.toUpperCase().includes('07H ÀS 19H') || sepKey.toUpperCase().includes('07H AS 19H');
+
+                if (is12x36_07_19) {
+                    const secUpper = (militar.secao || '').toUpperCase();
+                    if (secUpper.includes('EQUIPE "A"') || secUpper.includes('EQUIPE A')) {
+                        sepKey = '12X36_07_19_A';
+                        sepTitle = 'EXPEDIENTE ADM. HORÁRIO 12 X 36 - DAS 07h às 19h • EQUIPE "A"';
+                    } else if (secUpper.includes('EQUIPE "B"') || secUpper.includes('EQUIPE B')) {
+                        sepKey = '12X36_07_19_B';
+                        sepTitle = 'EXPEDIENTE ADM. HORÁRIO 12 X 36 - DAS 07h às 19h • EQUIPE "B"';
+                    }
                 }
+
+                if (sepKey !== currentSeparatorKey) {
+                    currentSeparatorKey = sepKey;
+                    const headerTr = document.createElement('tr');
+                    const isTeamRow = sepKey.includes('_A') || sepKey.includes('_B');
+                    headerTr.className = isTeamRow ? 'team-header-row' : 'group-header-row';
+                    const icon = isTeamRow ? 'fa-people-group' : 'fa-clock';
+                    headerTr.innerHTML = `<td colspan="14"><i class="fa-solid ${icon}"></i> ${sepTitle}</td>`;
+                    tbody.appendChild(headerTr);
+                }
+
+                // Exibe a seção limpa como MANUTENÇÃO DE FROTA sem poluir com Equipe A / B em cada linha
+                let secaoDisplay = militar.secao || 'MANUTENÇÃO DE FROTA';
+                secaoDisplay = secaoDisplay.replace(/Equipe\s*["']?[AB]["']?/gi, '').trim();
 
                 const tr = document.createElement('tr');
 
@@ -3230,7 +3356,7 @@ CREATE POLICY "Permissao Total Escalas" ON public.escalas_manutencao FOR ALL USI
 
                 tr.innerHTML = `
                     <td class="td-num">${militar.num}</td>
-                    <td class="td-secao">${militar.secao}</td>
+                    <td class="td-secao">${secaoDisplay}</td>
                     <td class="td-funcao">${militar.funcao}</td>
                     <td class="td-grad">${militar.grad}</td>
                     <td class="td-re">${militar.re}</td>
@@ -3666,6 +3792,7 @@ CREATE POLICY "Permissao Total Escalas" ON public.escalas_manutencao FOR ALL USI
             }
 
             sortMilitaresGrid(currentScaleData.grid);
+            saveGlobalEfetivo(currentScaleData.grid); // Grava como padrão para o futuro
             closeModal('militarModal');
             syncAutomaticObservacoes();
             renderAll();
@@ -3676,10 +3803,11 @@ CREATE POLICY "Permissao Total Escalas" ON public.escalas_manutencao FOR ALL USI
             if (confirm('Deseja realmente remover este militar da escala?')) {
                 currentScaleData.grid.splice(index, 1);
                 sortMilitaresGrid(currentScaleData.grid);
+                saveGlobalEfetivo(currentScaleData.grid); // Grava como padrão para o futuro
                 syncAutomaticObservacoes();
                 renderAll();
                 scheduleAutoSave();
-                showToast('Militar removido da escala.');
+                showToast('Militar removido da escala e efetivo padrão atualizado.');
             }
         }
 
@@ -3864,6 +3992,8 @@ CREATE POLICY "Permissao Total Escalas" ON public.escalas_manutencao FOR ALL USI
 
         async function saveAllData(notifyUser = true) {
             if (!currentScaleData) return;
+            if (currentScaleData.grid) saveGlobalEfetivo(currentScaleData.grid);
+
             const ano = document.getElementById('selAno').value;
             const mes = String(document.getElementById('selMes').value).padStart(2, '0');
             const semObj = currentMonthWeeks[selectedWeekIndex];
@@ -3980,10 +4110,12 @@ CREATE POLICY "Permissao Total Escalas" ON public.escalas_manutencao FOR ALL USI
                     DIAS_KEYS.forEach(day => {
                         const val = (mil.dias && mil.dias[day]) ? mil.dias[day].toUpperCase() : '';
                         let valClass = '';
-                        if (['FE', 'FR', 'LTS', 'AG'].includes(val)) {
-                            valClass = 'p-text-red';
-                        } else if (['FM', 'DS', 'LP', 'S'].includes(val)) {
-                            valClass = 'p-text-bold';
+                        if (val) {
+                            if (val === 'FM') {
+                                valClass = 'p-text-bold'; // Somente negrito
+                            } else if (val !== 'S' && val !== 'F') {
+                                valClass = 'p-text-red';  // Todas as demais siglas em vermelho negrito
+                            }
                         }
                         daysHtml += `<td class="${valClass}">${val || ''}</td>`;
                     });
@@ -4214,17 +4346,20 @@ CREATE POLICY "Permissao Total Escalas" ON public.escalas_manutencao FOR ALL USI
                         cNome.value = m.nome || '';
                         cNome.font = { name: 'Arial', size: 18, bold: true };
 
-                        // Dias da Semana (Fonte 18.0, Vermelho para FE, FR, LTS, AG)
+                        // Dias da Semana: Todas as siglas especiais em VERMELHO e NEGRITO (exceto S, F e FM)
                         dayCols.forEach(d => {
                             const cell = row.getCell(d.colNum);
                             const val = (m.dias && m.dias[d.key]) ? m.dias[d.key].toUpperCase() : '';
                             cell.value = val;
 
-                            if (['FE', 'FR', 'LTS', 'AG'].includes(val)) {
+                            if (val && !['S', 'F', 'FM'].includes(val)) {
+                                // Todas as condições especiais (FE, AG, LP, LTS, DS, FR, CV, etc.) em VERMELHO e NEGRITO
                                 cell.font = { name: 'Arial', size: 18, bold: true, color: { argb: 'FFFF0000' } };
-                            } else if (['FM', 'DS', 'LP', 'S'].includes(val)) {
+                            } else if (val === 'FM') {
+                                // FM apenas em NEGRITO
                                 cell.font = { name: 'Arial', size: 18, bold: true, color: { argb: 'FF000000' } };
                             } else {
+                                // S e F normais
                                 cell.font = { name: 'Arial', size: 18, bold: false, color: { argb: 'FF000000' } };
                             }
                         });
