@@ -1383,23 +1383,28 @@
             const reCode = (militar.re || '');
             const cleanRe = reCode.replace(/\D/g, '');
 
-            // 1. PRIORIDADE 1: ALTERAÇÕES DIÁRIAS REGISTRADAS (SOBRESCREVEM A ESCALA)
+            // 1. PRIORIDADE 1: ALTERAÇÕES DIÁRIAS REGISTRADAS (SOBRESCREVEM A ESCALA COM VALOR DIRETO DE FREQUÊNCIA)
             const alt = findAlteracaoForDateAndMilitar(reCode, dateObj);
-            if (alt && alt.sigla) {
-                const s = alt.sigla.toUpperCase();
-                if (s === 'EAP') return '1';
-                if (s === 'S') {
-                    if (grupo.includes('08H ÀS 18H') || grupo.includes('08H AS 18H')) return '1';
-                    return '2';
+            if (alt) {
+                if (alt.freq) {
+                    return String(alt.freq).toUpperCase().trim();
                 }
-                if (s === 'FE' || s === 'FÉRIAS' || s === 'FERIAS') return 'FE';
-                if (s === 'LP') return 'LP';
-                if (s === 'FS') return 'FS';
-                if (s === 'F' || s === 'FOLGA') return 'A';
-                if (s === 'FM' || s === 'FOLGA MENSAL') return 'A';
-                if (s === 'LTS' || s === 'DS' || s === 'CV' || s === 'AG' || s === 'FR') return 'A';
-                if (s === 'M' || s === 'T') return '1';
-                return 'A';
+                if (alt.sigla) {
+                    const s = alt.sigla.toUpperCase();
+                    if (s === 'EAP') return '1';
+                    if (s === 'S') {
+                        if (grupo.includes('08H ÀS 18H') || grupo.includes('08H AS 18H')) return '1';
+                        return '2';
+                    }
+                    if (s === 'FE' || s === 'FÉRIAS' || s === 'FERIAS') return 'FE';
+                    if (s === 'LP') return 'LP';
+                    if (s === 'FS') return 'FS';
+                    if (s === 'F' || s === 'FOLGA') return 'A';
+                    if (s === 'FM' || s === 'FOLGA MENSAL') return 'A';
+                    if (s === 'LTS' || s === 'DS' || s === 'CV' || s === 'AG' || s === 'FR') return 'A';
+                    if (s === 'M' || s === 'T') return '1';
+                    return 'A';
+                }
             }
 
             // 2. PRIORIDADE 2: ESCALA SEMANAL GRAVADA PELO OPERADOR
