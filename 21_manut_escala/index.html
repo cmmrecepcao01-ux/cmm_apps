@@ -1864,6 +1864,41 @@
             }
         }
 
+
+        /* DESTAQUE TOTAL DAS COLUNAS DE FIM DE SEMANA (DOM E SAB) EM VERMELHO */
+        .escala-table thead tr.days-head th.day-weekend {
+            color: #ffffff !important;
+            background: #991b1b !important;
+            border-color: #b91c1c !important;
+            font-weight: 900 !important;
+        }
+
+        .escala-table thead tr.dates-head th.day-weekend {
+            color: #ffffff !important;
+            background: #7f1d1d !important;
+            border-color: #991b1b !important;
+            font-weight: 900 !important;
+        }
+
+        .td-day-cell.day-weekend-cell {
+            background: rgba(220, 38, 38, 0.10) !important;
+            border-left: 1px solid rgba(220, 38, 38, 0.3) !important;
+            border-right: 1px solid rgba(220, 38, 38, 0.3) !important;
+        }
+
+        .td-day-cell.day-weekend-cell .status-badge.status-F {
+            background: rgba(220, 38, 38, 0.22) !important;
+            border-color: #ef4444 !important;
+            color: #fca5a5 !important;
+            font-weight: 900 !important;
+        }
+
+        .td-day-cell.day-weekend-cell .status-badge.status-EMPTY {
+            background: rgba(220, 38, 38, 0.05) !important;
+            border-color: rgba(220, 38, 38, 0.2) !important;
+            color: #f87171 !important;
+        }
+
     </style>
 </head>
 <body>
@@ -2287,9 +2322,17 @@
             </table>
 
             <!-- PAINEL DE OBSERVAÇÕES (FOTO 1) -->
-            <div class="p-obs-box">
+            <div class="p-obs-box" id="pObsBox">
                 <div class="p-obs-header">OBSERVAÇÕES</div>
                 <div class="p-obs-content" id="pObsContent">
+                    <!-- Preenchido dinamicamente -->
+                </div>
+            </div>
+
+            <!-- PAINEL DE RESTRIÇÕES (FOTO 1) -->
+            <div class="p-obs-box" id="pRestrBox" style="border-top: none;">
+                <div class="p-obs-header">RESTRIÇÕES</div>
+                <div class="p-obs-content" id="pRestrContent">
                     <!-- Preenchido dinamicamente -->
                 </div>
             </div>
@@ -3399,13 +3442,26 @@ CREATE POLICY "Permissao Total Escalas" ON public.escalas_manutencao FOR ALL USI
             if (f) f.style.display = isShown ? 'block' : 'none';
         }
 
+        const DEFAULT_RESTRICOES_MAP = {
+            '982262-3': { ativa: true, codigos: ['EF', 'FO', 'LP', 'OU', 'PO', 'SG', 'SP', 'UU'], periodo: 'de 02ABR26 a 23SET26' },
+            '982379-4': { ativa: true, codigos: ['FO', 'LP', 'OU', 'PO', 'SG', 'SP'], periodo: 'de 01ABR26 a 27SET26' },
+            '112223-1': { ativa: true, codigos: ['LP', 'OU', 'PO', 'SE', 'SP'], periodo: 'de 05AGO26 a 31JAN27' },
+            '121441-1': { ativa: true, codigos: ['LP', 'PO', 'SG', 'SP', 'UU'], periodo: 'de 06ABR26 a 05ABR27' },
+            '157019-6': { ativa: true, codigos: ['EF', 'FO', 'LP', 'LS', 'OU', 'PO', 'PT', 'SE', 'SG', 'SP', 'UA', 'UB', 'US', 'UU'], periodo: 'de 19MAI26 a 18MAI27' },
+            '132970-7': { ativa: true, codigos: ['EF', 'SE', 'SP', 'UU'], periodo: 'de 17JUN26 a 13DEZ26' },
+            '143092-A': { ativa: true, codigos: ['EF', 'FO', 'LP', 'OU', 'PO', 'PT', 'SE', 'SG', 'SP', 'UU'], periodo: 'de 04NOV25 a 03NOV26' },
+            '144643-6': { ativa: true, codigos: ['EF', 'SP'], periodo: 'de 02ABR26 a 28SET26' }
+        };
+
         function getGlobalRestricoesMap() {
             try {
                 const saved = localStorage.getItem('CMM_RESTRICOES_GLOBAIS');
-                return saved ? JSON.parse(saved) : {};
-            } catch(e) {
-                return {};
-            }
+                if (saved) {
+                    const parsed = JSON.parse(saved);
+                    if (Object.keys(parsed).length > 0) return parsed;
+                }
+            } catch(e) {}
+            return JSON.parse(JSON.stringify(DEFAULT_RESTRICOES_MAP));
         }
 
         function saveGlobalRestricao(re, restricaoObj) {
@@ -4415,6 +4471,8 @@ CREATE POLICY "Permissao Total Escalas" ON public.escalas_manutencao FOR ALL USI
 
                 let daysHtml = '';
                 DIAS_KEYS.forEach(day => {
+                    const isWeekend = (day === 'dom' || day === 'sab');
+                    const weekendClass = isWeekend ? 'day-weekend-cell' : '';
                     const val = (militar.dias && militar.dias[day]) ? militar.dias[day].toUpperCase() : '';
                     let badgeClass = 'status-EMPTY';
                     if (val) {
@@ -4425,7 +4483,7 @@ CREATE POLICY "Permissao Total Escalas" ON public.escalas_manutencao FOR ALL USI
                         }
                     }
                     daysHtml += `
-                        <td class="td-day-cell" onclick="handleCellClick(${index}, '${day}')" title="Clique para aplicar carimbo ou alternar">
+                        <td class="td-day-cell ${weekendClass}" onclick="handleCellClick(${index}, '${day}')" title="Clique para aplicar carimbo ou alternar">
                             <div class="status-badge ${badgeClass}">${val || '-'}</div>
                         </td>
                     `;
@@ -4666,7 +4724,20 @@ CREATE POLICY "Permissao Total Escalas" ON public.escalas_manutencao FOR ALL USI
             if (!container) return;
             container.innerHTML = '';
 
-            const assinantes = currentScaleData.assinaturas || getGlobalAssinaturas();
+                        const rawAssinantes = currentScaleData.assinaturas || getGlobalAssinaturas();
+            let assinantes = [];
+            if (Array.isArray(rawAssinantes)) {
+                assinantes = rawAssinantes;
+            } else if (typeof rawAssinantes === 'object') {
+                assinantes = getGlobalAssinaturas().map(g => {
+                    if (rawAssinantes[g.id]) {
+                        return { ...g, nome: typeof rawAssinantes[g.id] === 'string' ? rawAssinantes[g.id] : (rawAssinantes[g.id].nome || g.nome) };
+                    }
+                    return g;
+                });
+            } else {
+                assinantes = getGlobalAssinaturas();
+            }
 
             assinantes.forEach((s, idx) => {
                 const box = document.createElement('div');
@@ -4683,7 +4754,20 @@ CREATE POLICY "Permissao Total Escalas" ON public.escalas_manutencao FOR ALL USI
         }
 
         function openEditSignModal(idx) {
-            const assinantes = currentScaleData.assinaturas || getGlobalAssinaturas();
+                        const rawAssinantes = currentScaleData.assinaturas || getGlobalAssinaturas();
+            let assinantes = [];
+            if (Array.isArray(rawAssinantes)) {
+                assinantes = rawAssinantes;
+            } else if (typeof rawAssinantes === 'object') {
+                assinantes = getGlobalAssinaturas().map(g => {
+                    if (rawAssinantes[g.id]) {
+                        return { ...g, nome: typeof rawAssinantes[g.id] === 'string' ? rawAssinantes[g.id] : (rawAssinantes[g.id].nome || g.nome) };
+                    }
+                    return g;
+                });
+            } else {
+                assinantes = getGlobalAssinaturas();
+            }
             const s = assinantes[idx];
             if (!s) return;
 
@@ -4697,7 +4781,20 @@ CREATE POLICY "Permissao Total Escalas" ON public.escalas_manutencao FOR ALL USI
 
         function saveSignData() {
             const idx = parseInt(document.getElementById('editSignKey').value);
-            const assinantes = currentScaleData.assinaturas || getGlobalAssinaturas();
+                        const rawAssinantes = currentScaleData.assinaturas || getGlobalAssinaturas();
+            let assinantes = [];
+            if (Array.isArray(rawAssinantes)) {
+                assinantes = rawAssinantes;
+            } else if (typeof rawAssinantes === 'object') {
+                assinantes = getGlobalAssinaturas().map(g => {
+                    if (rawAssinantes[g.id]) {
+                        return { ...g, nome: typeof rawAssinantes[g.id] === 'string' ? rawAssinantes[g.id] : (rawAssinantes[g.id].nome || g.nome) };
+                    }
+                    return g;
+                });
+            } else {
+                assinantes = getGlobalAssinaturas();
+            }
             
             if (assinantes[idx]) {
                 assinantes[idx].role = document.getElementById('signRoleSelect').value;
@@ -5572,8 +5669,62 @@ CREATE POLICY "Permissao Total Escalas" ON public.escalas_manutencao FOR ALL USI
                 });
             }
 
+            // Restrições (Foto 1)
+            const restrBox = document.getElementById('pRestrBox');
+            const restrContainer = document.getElementById('pRestrContent');
+            if (restrBox && restrContainer) {
+                restrContainer.innerHTML = '';
+                let restrList = currentScaleData.restricoes;
+                if (!restrList || restrList.length === 0) {
+                    const rMap = getGlobalRestricoesMap();
+                    restrList = [];
+                    (currentScaleData.grid || []).forEach(m => {
+                        let r = m.restricao;
+                        if ((!r || !r.ativa) && rMap[m.re] && rMap[m.re].ativa) {
+                            r = rMap[m.re];
+                        }
+                        if (r && r.ativa && r.codigos && r.codigos.length > 0) {
+                            const cods = r.codigos.join('/');
+                            const per = r.periodo ? ` ${r.periodo}` : '';
+                            restrList.push({
+                                re: m.re,
+                                nome: `${m.grad} ${m.re} ${m.nome}`,
+                                texto: `${m.grad} ${m.re} ${m.nome}${per} - ${cods}.`
+                            });
+                        }
+                    });
+                    currentScaleData.restricoes = restrList;
+                }
+
+                if (restrList && restrList.length > 0) {
+                    restrBox.style.display = 'block';
+                    restrList.forEach(r => {
+                        const div = document.createElement('div');
+                        div.className = 'p-obs-row';
+                        const texto = typeof r === 'string' ? r : (r.texto || '');
+                        div.innerHTML = `<i>${texto}</i>`;
+                        restrContainer.appendChild(div);
+                    });
+                } else {
+                    restrBox.style.display = 'none';
+                }
+            }
+
             // Rodapé Oficial: Auxiliar de Semana, Data, QPO e Assinaturas (Foto 3)
-            const assinantes = currentScaleData.assinaturas || getGlobalAssinaturas();
+                        const rawAssinantes = currentScaleData.assinaturas || getGlobalAssinaturas();
+            let assinantes = [];
+            if (Array.isArray(rawAssinantes)) {
+                assinantes = rawAssinantes;
+            } else if (typeof rawAssinantes === 'object') {
+                assinantes = getGlobalAssinaturas().map(g => {
+                    if (rawAssinantes[g.id]) {
+                        return { ...g, nome: typeof rawAssinantes[g.id] === 'string' ? rawAssinantes[g.id] : (rawAssinantes[g.id].nome || g.nome) };
+                    }
+                    return g;
+                });
+            } else {
+                assinantes = getGlobalAssinaturas();
+            }
             
             const auxTitular = assinantes.find(s => s.id === 'aux_titular' || s.role.includes('SUBSTITUTO') === false && s.role.includes('AUXILIAR')) || { nome: '2º Sgt PM 107774-A Luciano' };
             const auxSubstituto = assinantes.find(s => s.id === 'aux_substituto' || s.role.includes('SUBSTITUTO')) || { nome: '3º Sgt PM 191651-3 Ricardo Borges' };
@@ -5819,7 +5970,20 @@ CREATE POLICY "Permissao Total Escalas" ON public.escalas_manutencao FOR ALL USI
                 }
 
                 // 7. Auxiliares de Semana (Fonte 18)
-                const assinantes = currentScaleData.assinaturas || getGlobalAssinaturas();
+                            const rawAssinantes = currentScaleData.assinaturas || getGlobalAssinaturas();
+            let assinantes = [];
+            if (Array.isArray(rawAssinantes)) {
+                assinantes = rawAssinantes;
+            } else if (typeof rawAssinantes === 'object') {
+                assinantes = getGlobalAssinaturas().map(g => {
+                    if (rawAssinantes[g.id]) {
+                        return { ...g, nome: typeof rawAssinantes[g.id] === 'string' ? rawAssinantes[g.id] : (rawAssinantes[g.id].nome || g.nome) };
+                    }
+                    return g;
+                });
+            } else {
+                assinantes = getGlobalAssinaturas();
+            }
                 const auxTitular = assinantes.find(s => s.id === 'aux_titular' || (s.role.includes('AUXILIAR') && !s.role.includes('SUBSTITUTO'))) || { nome: '2º Sgt PM 107774-A Luciano' };
                 const auxSubstituto = assinantes.find(s => s.id === 'aux_substituto' || s.role.includes('SUBSTITUTO')) || { nome: '3º Sgt PM 191651-3 Ricardo Borges' };
 
