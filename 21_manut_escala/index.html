@@ -9,6 +9,7 @@
     <!-- FontAwesome -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <!-- ExcelJS para exportação fiel ao template original -->
+    <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js"></script>
     <!-- Supabase JS CDN -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -1576,6 +1577,293 @@
             border: 1px solid #dc2626;
         }
 
+
+        /* ========================================================================= */
+        /* QUADRO VISUAL DA ESCALA POR DEPARTAMENTO                                 */
+        /* ========================================================================= */
+        .visual-escala-card {
+            background: #ffffff;
+            color: #0f172a;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 4px 25px rgba(0, 0, 0, 0.4);
+            border: 1px solid #cbd5e1;
+            margin-bottom: 30px;
+        }
+
+        .visual-escala-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+            margin-bottom: 18px;
+            padding-bottom: 16px;
+            border-bottom: 2px solid #e2e8f0;
+        }
+
+        .visual-escala-title h2 {
+            font-size: 1.35rem;
+            font-weight: 900;
+            color: #166534;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            letter-spacing: 0.5px;
+        }
+
+        .visual-escala-title p {
+            font-size: 0.85rem;
+            color: #64748b;
+            margin: 4px 0 0 0;
+            font-weight: 600;
+        }
+
+        .visual-legend-bar {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .visual-leg-chip {
+            font-size: 11px;
+            font-weight: 800;
+            padding: 5px 10px;
+            border-radius: 6px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .visual-leg-green { background: #86efac; color: #064e3b; border: 1px solid #4ade80; }
+        .visual-leg-yellow { background: #fef08a; color: #713f12; border: 1px solid #facc15; }
+        .visual-leg-red { background: #f87171; color: #7f1d1d; border: 1px solid #ef4444; }
+
+        .visual-table-wrapper {
+            overflow-x: auto;
+            border: 2px solid #166534;
+            border-radius: 8px;
+            background: #ffffff;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+        }
+
+        .visual-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            font-size: 12.5px;
+            text-transform: uppercase;
+        }
+
+        .visual-table th {
+            background: #1b4332;
+            color: #ffffff;
+            font-weight: 800;
+            font-size: 13.5px;
+            padding: 10px 8px;
+            text-align: center;
+            border: 1px solid #143728;
+            letter-spacing: 0.5px;
+            user-select: none;
+        }
+
+        .visual-table th.th-dept {
+            text-align: left;
+            padding-left: 14px;
+            width: 175px;
+        }
+
+        .visual-table td.dept-label-cell {
+            background: #f8fafc;
+            color: #0f172a;
+            font-weight: 800;
+            font-size: 12.5px;
+            padding: 10px 14px;
+            border: 1px solid #cbd5e1;
+            text-align: left;
+            vertical-align: middle;
+            letter-spacing: 0.3px;
+        }
+
+        .visual-table td.cell-data {
+            border: 1px solid #cbd5e1;
+            padding: 6px 8px;
+            vertical-align: top;
+            transition: filter 0.15s;
+        }
+
+        .visual-table td.cell-data:hover {
+            filter: brightness(0.97);
+        }
+
+        .visual-cell-inner {
+            min-height: 48px;
+            line-height: 1.35;
+            outline: none;
+        }
+
+        .visual-count-line {
+            font-size: 11px;
+            font-weight: 700;
+            margin-bottom: 5px;
+            opacity: 0.95;
+            display: block;
+        }
+
+        .visual-names-list {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            font-size: 12px;
+            font-weight: 800;
+            color: #0f172a;
+        }
+
+        .visual-cell-green {
+            background-color: #86efac !important;
+            color: #022c22 !important;
+        }
+
+        .visual-cell-yellow {
+            background-color: #fef08a !important;
+            color: #451a03 !important;
+        }
+
+        .visual-cell-red {
+            background-color: #f87171 !important;
+            color: #450a0a !important;
+        }
+
+        .visual-cell-red .visual-names-list,
+        .visual-cell-red .visual-count-line {
+            color: #450a0a !important;
+        }
+
+        /* IMPRESSÃO EXCLUSIVA DO QUADRO VISUAL (FOLHA ÚNICA - PAISAGEM) */
+        @media print {
+            body.printing-visual {
+                background: #ffffff !important;
+                color: #000000 !important;
+                padding: 0 !important;
+                margin: 0 !important;
+            }
+
+            body.printing-visual header,
+            body.printing-visual .top-toolbar,
+            body.printing-visual .legend-bar,
+            body.printing-visual .filter-row,
+            body.printing-visual #viewGridContainer,
+            body.printing-visual #viewAfastContainer,
+            body.printing-visual #viewAlterContainer,
+            body.printing-visual #officialPrintArea,
+            body.printing-visual .visual-escala-header,
+            body.printing-visual .visual-info-hint,
+            body.printing-visual .tabs-header,
+            body.printing-visual .role-selector,
+            body.printing-visual .header-actions {
+                display: none !important;
+            }
+
+            body.printing-visual #viewVisualEscalaContainer {
+                display: block !important;
+                width: 100% !important;
+                max-width: 100% !important;
+                margin: 0 auto !important;
+                padding: 0 !important;
+                page-break-after: avoid !important;
+                break-after: avoid !important;
+            }
+
+            body.printing-visual .visual-escala-card {
+                box-shadow: none !important;
+                border: none !important;
+                padding: 0 !important;
+                margin: 0 !important;
+                background: #ffffff !important;
+            }
+
+            body.printing-visual .visual-table-wrapper {
+                border: 1.8px solid #166534 !important;
+                box-shadow: none !important;
+                width: 100% !important;
+                overflow: visible !important;
+                zoom: 0.84 !important;
+                -webkit-transform-origin: top left !important;
+                page-break-inside: avoid !important;
+                break-inside: avoid !important;
+            }
+
+            body.printing-visual .visual-table {
+                width: 100% !important;
+                font-size: 7.8pt !important;
+                border-collapse: collapse !important;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+                page-break-inside: avoid !important;
+                break-inside: avoid !important;
+            }
+
+            body.printing-visual .visual-table th,
+            body.printing-visual .visual-table td {
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+                padding: 2.5px 4px !important;
+                line-height: 1.15 !important;
+            }
+
+            body.printing-visual .visual-table th {
+                background: #1b4332 !important;
+                color: #ffffff !important;
+                font-size: 8pt !important;
+                padding: 4px 2px !important;
+            }
+
+            body.printing-visual .visual-table th[colspan="8"] {
+                font-size: 9.2pt !important;
+                padding: 5px 4px !important;
+            }
+
+            body.printing-visual .visual-table td.dept-label-cell {
+                font-size: 7.8pt !important;
+                padding: 3px 6px !important;
+                font-weight: 800 !important;
+            }
+
+            body.printing-visual .visual-cell-inner {
+                min-height: auto !important;
+                line-height: 1.15 !important;
+            }
+
+            body.printing-visual .visual-count-line {
+                font-size: 6.8pt !important;
+                margin-bottom: 2px !important;
+                font-weight: 800 !important;
+            }
+
+            body.printing-visual .visual-names-list {
+                font-size: 7.2pt !important;
+                line-height: 1.15 !important;
+                gap: 1px !important;
+            }
+
+            body.printing-visual .visual-cell-green {
+                background-color: #86efac !important;
+                color: #022c22 !important;
+            }
+
+            body.printing-visual .visual-cell-yellow {
+                background-color: #fef08a !important;
+                color: #451a03 !important;
+            }
+
+            body.printing-visual .visual-cell-red {
+                background-color: #f87171 !important;
+                color: #450a0a !important;
+            }
+        }
+
     </style>
 </head>
 <body>
@@ -1606,6 +1894,7 @@
             <div class="header-actions">
                 <button class="btn btn-back" onclick="history.back()"><i class="fa-solid fa-arrow-left"></i> VOLTAR</button>
                 <button class="btn btn-secondary" onclick="openSupabaseModal()"><i class="fa-solid fa-database"></i> SUPABASE / BD</button>
+                <button class="btn btn-success" onclick="switchViewTab('visual_escala')" style="background: linear-gradient(135deg, #15803d 0%, #166534 100%); border: 1px solid #22c55e;"><i class="fa-solid fa-table-columns"></i> VISUAL DA ESCALA</button>
                 <button class="btn btn-outline" onclick="triggerOfficialPrint()"><i class="fa-solid fa-print"></i> IMPRIMIR PDF</button>
                 <button class="btn btn-success" onclick="exportToExcel()"><i class="fa-solid fa-file-excel"></i> EXPORTAR EXCEL</button>
                 <button class="btn btn-primary" onclick="saveAllData(true)"><i class="fa-solid fa-floppy-disk"></i> SALVAR ESCALA</button>
@@ -1745,6 +2034,7 @@
                 <a href="frequencia.html" class="tab-btn btn-freq-nav" id="btnFreqTab" style="background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%); color: #ffffff !important; border: 1px solid #ef4444; box-shadow: 0 0 10px rgba(220, 38, 38, 0.45); text-decoration: none; display: inline-flex; align-items: center; gap: 6px;"><i class="fa-solid fa-calendar-check"></i> FREQUÊNCIA</a>
                 <button class="tab-btn" id="tabAfastBtn" onclick="switchViewTab('afastamentos')"><i class="fa-solid fa-bed-pulse"></i> AFASTAMENTOS & SITUAÇÕES</button>
                 <button class="tab-btn" id="tabAlterBtn" onclick="switchViewTab('alteracoes')"><i class="fa-solid fa-clock-rotate-left"></i> ALTERAÇÕES DIÁRIAS</button>
+                <button class="tab-btn" id="tabVisualEscalaBtn" onclick="switchViewTab('visual_escala')" style="border-color: rgba(34, 197, 94, 0.4);"><i class="fa-solid fa-table-cells-large"></i> VISUAL DA ESCALA</button>
             </div>
         </div>
 
@@ -1882,6 +2172,40 @@
                         <tbody id="alterTableBody">
                             <!-- Renderizado via JS -->
                         </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- ABA 4: QUADRO VISUAL DA ESCALA POR DEPARTAMENTO -->
+        <div id="viewVisualEscalaContainer" style="display: none;">
+            <div class="visual-escala-card">
+                <div class="visual-escala-header">
+                    <div class="visual-escala-title">
+                        <h2><i class="fa-solid fa-table-columns"></i> QUADRO VISUAL DA ESCALA POR DEPARTAMENTO</h2>
+                        <p id="visualEscalaSubtitle">SEMANA ATIVA • REPRESENTAÇÃO VISUAL DA ESCALA SEMANAL POR SEÇÃO E DIAS</p>
+                    </div>
+
+                    <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+                        <div class="visual-legend-bar">
+                            <span class="visual-leg-chip visual-leg-green"><i class="fa-solid fa-circle"></i> 2+ MILITARES</span>
+                            <span class="visual-leg-chip visual-leg-yellow"><i class="fa-solid fa-circle"></i> 1 MILITAR</span>
+                            <span class="visual-leg-chip visual-leg-red"><i class="fa-solid fa-circle"></i> 0 MILITAR</span>
+                        </div>
+                        <button class="btn btn-secondary" style="font-size: 0.72rem; background: #334155; color: #ffffff;" onclick="renderVisualEscala()" title="Recarrega os dados diretamente da escala semanal"><i class="fa-solid fa-rotate"></i> RECARREGAR DA ESCALA</button>
+                        <button class="btn btn-primary" style="font-size: 0.72rem; background: #166534; border-color: #22c55e;" onclick="printVisualEscala()" title="Imprimir em Modo Paisagem (Foto / PDF)"><i class="fa-solid fa-print"></i> IMPRIMIR / FOTO</button>
+                        <button class="btn" style="font-size: 0.72rem; background: #25d366; color: #ffffff; border: 1px solid #16a34a; font-weight: 800; display: inline-flex; align-items: center; gap: 6px;" onclick="sendVisualEscalaWhatsApp()" title="Enviar Quadro Visual por WhatsApp"><i class="fa-brands fa-whatsapp" style="font-size: 14px;"></i> ENVIAR WHATSAPP</button>
+                    </div>
+                </div>
+
+                <div class="visual-info-hint" style="margin-bottom: 12px; font-size: 11.5px; color: #475569; font-style: italic; display: flex; align-items: center; gap: 6px;">
+                    <i class="fa-solid fa-circle-info" style="color: #166534;"></i>
+                    <span>Todas as células e nomes abaixo são <strong>editáveis diretamente na tela</strong> (clique em qualquer campo para alterar texto ou militares antes de tirar foto/print).</span>
+                </div>
+
+                <div class="visual-table-wrapper">
+                    <table class="visual-table" id="visualEscalaTable">
+                        <!-- Gerado dinamicamente via JS -->
                     </table>
                 </div>
             </div>
@@ -2128,6 +2452,21 @@
                         <div class="form-group">
                             <label>FUNÇÃO *</label>
                             <input type="text" id="militarFuncao" class="form-input" placeholder="EX: AUX SERV RAP E ALMOX, AUX TEC..." required>
+                        </div>
+
+                        <div class="form-group">
+                            <label>DEPARTAMENTO / QUADRO VISUAL</label>
+                            <select id="militarDepartamento" class="form-select">
+                                <option value="">AUTO (BASEADO NO NOME / FUNÇÃO)</option>
+                                <option value="ALMOXARIFADO">ALMOXARIFADO</option>
+                                <option value="CMD FORÇA">CMD FORÇA</option>
+                                <option value="GRAFISMO">GRAFISMO</option>
+                                <option value="MECÂNICA">MECÂNICA</option>
+                                <option value="MECÂNICA PESADOS">MECÂNICA PESADOS</option>
+                                <option value="RECEPÇÃO">RECEPÇÃO</option>
+                                <option value="SETOR TÉCNICO">SETOR TÉCNICO</option>
+                                <option value="SINALIZADOR">SINALIZADOR</option>
+                            </select>
                         </div>
 
                         <div class="form-group">
@@ -3618,6 +3957,270 @@ CREATE POLICY "Permissao Total Escalas" ON public.escalas_manutencao FOR ALL USI
             currentScaleData.restricoes = restricoesList;
         }
 
+        
+        // =========================================================================
+        // QUADRO VISUAL DA ESCALA POR DEPARTAMENTO
+        // =========================================================================
+        const VISUAL_DEPARTAMENTOS_LIST = [
+            { id: 'ALMOXARIFADO', label: 'ALMOXARIFADO' },
+            { id: 'CMD FORÇA', label: 'CMD FORÇA' },
+            { id: 'GRAFISMO', label: 'GRAFISMO' },
+            { id: 'MECÂNICA', label: 'MECÂNICA' },
+            { id: 'MECÂNICA PESADOS', label: 'MECÂNICA PESADOS' },
+            { id: 'RECEPÇÃO', label: 'RECEPÇÃO' },
+            { id: 'SETOR TÉCNICO', label: 'SETOR TÉCNICO' },
+            { id: 'SINALIZADOR', label: 'SINALIZADOR' }
+        ];
+
+        function getMilitarDepartamento(m) {
+            if (m.departamento) return m.departamento;
+            const nome = (m.nome || '').toUpperCase();
+            const func = (m.funcao || '').toUpperCase();
+            const sec = (m.secao || '').toUpperCase();
+
+            if (nome.includes('FABIANO')) return 'CMD FORÇA';
+
+            if (nome.includes('AUGUSTO') || nome.includes('CLEBER') || nome.includes('ANDREA') || nome.includes('JULIANA')) {
+                return 'ALMOXARIFADO';
+            }
+            if (nome.includes('TORQUATO') || nome.includes('BAZONI') || nome.includes('ZULEICA') || nome.includes('LEONARDO')) {
+                return 'GRAFISMO';
+            }
+            if (nome.includes('GARCIA') || nome.includes('ALEXANDRE') || sec.includes('PESADO') || func.includes('PESADA')) {
+                return 'MECÂNICA PESADOS';
+            }
+            if (nome.includes('FAUSTINO') || nome.includes('THIAGO') || nome.includes('NETO')) {
+                return 'RECEPÇÃO';
+            }
+            if (nome.includes('BRITO') || nome.includes('BARONE') || nome.includes('SANTIAGO') || nome.includes('TIBURCIO') || nome.includes('SOARES') || sec.includes('TÉCNICO') || func.includes('AUX TEC')) {
+                return 'SETOR TÉCNICO';
+            }
+            if (nome.includes('DANTAS') || nome.includes('MOURA') || sec.includes('SINALIZADOR') || func.includes('SINALIZADOR')) {
+                return 'SINALIZADOR';
+            }
+            return 'MECÂNICA';
+        }
+
+        
+        
+        // =========================================================================
+        // ENVIO AUTOMÁTICO DO QUADRO VISUAL VIA WHATSAPP
+        // =========================================================================
+        let lastVisualImageBlob = null;
+        let lastVisualImageDataUrl = null;
+
+        async function generateVisualEscalaImage() {
+            const tableWrapper = document.querySelector('#viewVisualEscalaContainer .visual-table-wrapper');
+            if (!tableWrapper) return null;
+
+            if (typeof html2canvas === 'undefined') {
+                showToast('Carregando biblioteca gráfica...', 'info');
+                return null;
+            }
+
+            try {
+                const canvas = await html2canvas(tableWrapper, {
+                    backgroundColor: '#ffffff',
+                    scale: 2,
+                    useCORS: true,
+                    logging: false
+                });
+
+                lastVisualImageDataUrl = canvas.toDataURL('image/png');
+
+                return new Promise(resolve => {
+                    canvas.toBlob(blob => {
+                        lastVisualImageBlob = blob;
+                        resolve(blob);
+                    }, 'image/png');
+                });
+            } catch (err) {
+                console.error('Erro ao gerar imagem canvas:', err);
+                return null;
+            }
+        }
+
+        async function sendVisualEscalaWhatsApp() {
+            showToast('Gerando imagem e preparando WhatsApp Web...', 'info');
+            const blob = await generateVisualEscalaImage();
+
+            // Copia imagem de alta definição diretamente para a Área de Transferência
+            if (blob && navigator.clipboard && window.ClipboardItem) {
+                try {
+                    await navigator.clipboard.write([
+                        new ClipboardItem({ 'image/png': blob })
+                    ]);
+                } catch(e) {
+                    console.warn('Cópia direta para clipboard:', e);
+                }
+            }
+
+            // Abre diretamente o WhatsApp Web no navegador para o Sgt Brito (5514997377073)
+            openWhatsAppContact('5514997377073');
+            showToast('✅ Imagem copiada! Pressione CTRL+V no WhatsApp Web para colar a foto.', 'success');
+        }
+
+        function getWhatsAppEscalaText() {
+            const per = currentScaleData && currentScaleData.periodo ? currentScaleData.periodo.toUpperCase() : 'SEMANA ATIVA';
+            return `*POLÍCIA MILITAR DO ESTADO DE SÃO PAULO - CMM*\n*QUADRO VISUAL DA ESCALA DE SERVIÇO*\n📅 *PERÍODO:* ${per}\n📍 *SEÇÃO:* MANUTENÇÃO DE FROTA\n\n📸 *A imagem do quadro visual foi copiada! Pressione CTRL+V nesta conversa para colar e enviar.*`;
+        }
+
+        function openWhatsAppContact(phone) {
+            const text = encodeURIComponent(getWhatsAppEscalaText());
+            // Abre o WhatsApp Web no navegador diretamente na conversa
+            const url = `https://web.whatsapp.com/send?phone=${phone}&text=${text}`;
+            window.open(url, '_blank');
+        }
+
+        function openWhatsAppBoth() {
+            openWhatsAppContact('5514997377073');
+            setTimeout(() => {
+                openWhatsAppContact('5511991283736');
+            }, 500);
+        }
+
+        function downloadVisualEscalaImage() {
+            if (!lastVisualImageDataUrl) {
+                generateVisualEscalaImage().then(() => {
+                    triggerDownload();
+                });
+            } else {
+                triggerDownload();
+            }
+
+            function triggerDownload() {
+                if (!lastVisualImageDataUrl) return;
+                const a = document.createElement('a');
+                const per = currentScaleData && currentScaleData.periodo ? currentScaleData.periodo.replace(/\s+/g, '_') : 'semana';
+                a.download = `Quadro_Visual_Escala_${per}.png`;
+                a.href = lastVisualImageDataUrl;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                showToast('Arquivo PNG baixado!', 'success');
+            }
+        }
+
+        function printVisualEscala() {
+            document.body.classList.add('printing-visual');
+            
+            let styleEl = document.getElementById('visualPrintLandscapeStyle');
+            if (!styleEl) {
+                styleEl = document.createElement('style');
+                styleEl.id = 'visualPrintLandscapeStyle';
+                styleEl.innerHTML = `@page { size: A4 landscape !important; margin: 3.5mm 3.5mm 3.5mm 3.5mm !important; }`;
+                document.head.appendChild(styleEl);
+            }
+
+            window.print();
+
+            setTimeout(() => {
+                document.body.classList.remove('printing-visual');
+                const s = document.getElementById('visualPrintLandscapeStyle');
+                if (s) s.remove();
+            }, 1000);
+        }
+
+        function renderVisualEscala() {
+            const table = document.getElementById('visualEscalaTable');
+            if (!table || !currentScaleData) return;
+
+            const sub = document.getElementById('visualEscalaSubtitle');
+            if (sub && currentScaleData.periodo) {
+                sub.textContent = `SEMANA: ${currentScaleData.periodo} • REPRESENTAÇÃO VISUAL DA ESCALA POR SEÇÃO E EFETIVO`;
+            }
+
+            const days = [
+                { key: 'dom', label: 'Dom' },
+                { key: 'seg', label: 'Seg' },
+                { key: 'ter', label: 'Ter' },
+                { key: 'qua', label: 'Qua' },
+                { key: 'qui', label: 'Qui' },
+                { key: 'sex', label: 'Sex' },
+                { key: 'sab', label: 'Sáb' }
+            ];
+
+            const periodoTxt = currentScaleData.periodo ? currentScaleData.periodo.toUpperCase() : 'SEMANA ATIVA';
+
+            let html = `
+                <thead>
+                    <tr>
+                        <th colspan="8" contenteditable="true" style="background: #1b4332; color: #ffffff; font-size: 13.5px; font-weight: 900; text-align: center; padding: 10px; border: 1.5px solid #143728; letter-spacing: 0.8px;">
+                            QUADRO VISUAL DA ESCALA DE SERVIÇO &bull; PERÍODO: ${periodoTxt} &bull; SEÇÃO DE MANUTENÇÃO DE FROTA
+                        </th>
+                    </tr>
+                    <tr>
+                        <th class="th-dept">Departamento <i class="fa-solid fa-caret-down" style="font-size: 11px; opacity: 0.7;"></i></th>
+            `;
+            days.forEach(d => {
+                html += `<th>${d.label} <i class="fa-solid fa-caret-down" style="font-size: 11px; opacity: 0.7;"></i></th>`;
+            });
+            html += `
+                    </tr>
+                </thead>
+                <tbody>
+            `;
+
+            VISUAL_DEPARTAMENTOS_LIST.forEach(dept => {
+                html += `<tr>`;
+                html += `<td class="dept-label-cell" contenteditable="true">${dept.label}</td>`;
+
+                days.forEach(d => {
+                    let list = [];
+                    if (dept.id === 'CMD FORÇA') {
+                        const mil = currentScaleData.grid ? currentScaleData.grid.find(m => getMilitarDepartamento(m) === 'CMD FORÇA') : null;
+                        if (mil && mil.dias) {
+                            if (mil.dias[d.key] === 'S' || mil.dias[d.key] === 's') {
+                                list.push(`${mil.grad} ${mil.nome}`);
+                            }
+                        } else {
+                            // Padrão solicitado: 1º Ten PM Fabiano de seg a qui
+                            if (['seg', 'ter', 'qua', 'qui'].includes(d.key)) {
+                                list.push('1º TEN PM FABIANO');
+                            }
+                        }
+                    } else {
+                        if (currentScaleData.grid && Array.isArray(currentScaleData.grid)) {
+                            currentScaleData.grid.forEach(m => {
+                                if (getMilitarDepartamento(m) === dept.id) {
+                                    if (m.dias && (m.dias[d.key] === 'S' || m.dias[d.key] === 's')) {
+                                        list.push(`${m.grad} ${m.nome}`);
+                                    }
+                                }
+                            });
+                        }
+                    }
+
+                    const count = list.length;
+                    let colorClass = 'visual-cell-red';
+                    if (count >= 2) {
+                        colorClass = 'visual-cell-green';
+                    } else if (count === 1) {
+                        colorClass = 'visual-cell-yellow';
+                    }
+
+                    let namesHtml = '';
+                    if (count > 0) {
+                        namesHtml = `<div class="visual-names-list">${list.map(name => `<div>${name}</div>`).join('')}</div>`;
+                    }
+
+                    html += `
+                        <td class="cell-data ${colorClass}">
+                            <div class="visual-cell-inner" contenteditable="true">
+                                <span class="visual-count-line">Nº militar(es): ${count}</span>
+                                ${namesHtml}
+                            </div>
+                        </td>
+                    `;
+                });
+
+                html += `</tr>`;
+            });
+
+            html += `</tbody>`;
+            table.innerHTML = html;
+        }
+
         function renderAll() {
             renderHeaderDates();
             renderTableGrid();
@@ -3629,6 +4232,9 @@ CREATE POLICY "Permissao Total Escalas" ON public.escalas_manutencao FOR ALL USI
             renderAssinantes();
             populateMilitarSelects();
             renderOfficialPrintArea();
+            if (typeof renderVisualEscala === 'function') {
+                renderVisualEscala();
+            }
         }
 
         function renderHeaderDates() {
@@ -4193,10 +4799,17 @@ CREATE POLICY "Permissao Total Escalas" ON public.escalas_manutencao FOR ALL USI
             document.getElementById('tabGridBtn').classList.toggle('active', tab === 'grid');
             document.getElementById('tabAfastBtn').classList.toggle('active', tab === 'afastamentos');
             document.getElementById('tabAlterBtn').classList.toggle('active', tab === 'alteracoes');
+            const tabVisualBtn = document.getElementById('tabVisualEscalaBtn');
+            if (tabVisualBtn) tabVisualBtn.classList.toggle('active', tab === 'visual_escala');
 
             document.getElementById('viewGridContainer').style.display = (tab === 'grid') ? 'block' : 'none';
             document.getElementById('viewAfastContainer').style.display = (tab === 'afastamentos') ? 'block' : 'none';
             document.getElementById('viewAlterContainer').style.display = (tab === 'alteracoes') ? 'block' : 'none';
+            const vContainer = document.getElementById('viewVisualEscalaContainer');
+            if (vContainer) {
+                vContainer.style.display = (tab === 'visual_escala') ? 'block' : 'none';
+                if (tab === 'visual_escala') renderVisualEscala();
+            }
         }
 
         function openModal(id) {
@@ -4212,6 +4825,7 @@ CREATE POLICY "Permissao Total Escalas" ON public.escalas_manutencao FOR ALL USI
             document.getElementById('militarModalTitle').innerHTML = '<i class="fa-solid fa-user-plus"></i> ADICIONAR MILITAR NA ESCALA';
             document.getElementById('militarForm').reset();
             document.getElementById('militarSecaoBase').value = 'MANUTENÇÃO DE FROTA';
+            if (document.getElementById('militarDepartamento')) document.getElementById('militarDepartamento').value = '';
             selectEquipeChoice('SEM_EQUIPE');
             document.getElementById('militarHasRestricao').checked = false;
             toggleRestricaoFields(false);
@@ -4247,6 +4861,7 @@ CREATE POLICY "Permissao Total Escalas" ON public.escalas_manutencao FOR ALL USI
             document.getElementById('militarSecaoBase').value = secaoBase || 'MANUTENÇÃO DE FROTA';
 
             document.getElementById('militarFuncao').value = m.funcao || '';
+            if (document.getElementById('militarDepartamento')) document.getElementById('militarDepartamento').value = m.departamento || '';
             document.getElementById('militarGrad').value = m.grad || 'Cb PM';
             document.getElementById('militarRE').value = m.re || '';
             document.getElementById('militarNome').value = m.nome || '';
@@ -4338,6 +4953,7 @@ CREATE POLICY "Permissao Total Escalas" ON public.escalas_manutencao FOR ALL USI
                     grupo: document.getElementById('militarGrupo').value,
                     secao: secaoFinal,
                     funcao: (document.getElementById('militarFuncao').value || 'AUX SERV RAP E ALMOX').toUpperCase(),
+                departamento: (document.getElementById('militarDepartamento') ? document.getElementById('militarDepartamento').value : '').toUpperCase(),
                     grad: document.getElementById('militarGrad').value,
                     re: re,
                     nome: nome,
