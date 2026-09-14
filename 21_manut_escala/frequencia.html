@@ -1350,25 +1350,98 @@
         
         const scaleCache = {};
 
+        function parsePmespDateStr(str, defaultYear = 2026) {
+            if (!str) return null;
+            const match = str.trim().match(/(\d{1,2})([A-Z]{3})(\d{2,4})?/i);
+            if (!match) return null;
+            const d = parseInt(match[1], 10);
+            const mStr = match[2].toUpperCase();
+            const mIdx = MONTHS_SIGLAS.indexOf(mStr);
+            if (mIdx === -1) return null;
+            let y = defaultYear;
+            if (match[3]) {
+                y = parseInt(match[3], 10);
+                if (y < 100) y += 2000;
+            }
+            return new Date(Date.UTC(y, mIdx, d));
+        }
+
+        function parsePeriodoRange(periodoStr, defaultYear = 2026) {
+            if (!periodoStr) return null;
+            const parts = periodoStr.split(/\s+a\s+|\s+A\s+/i);
+            if (parts.length !== 2) return null;
+            const dIni = parsePmespDateStr(parts[0], defaultYear);
+            const dFim = parsePmespDateStr(parts[1], defaultYear);
+            if (!dIni || !dFim) return null;
+            return { start: dIni, end: dFim };
+        }
+
         function getScaleSavedForDate(year, month, dateObj) {
+            const curTime = new Date(Date.UTC(dateObj.getFullYear(), dateObj.getMonth(), dateObj.getDate())).getTime();
+            const dayKey = DIAS_KEYS[dateObj.getDay()];
             const d = dateObj.getDate();
-            const mesStr = String(month).padStart(2, '0');
-            for (let w = 1; w <= 6; w++) {
-                const key = `CMM_ESCALA_${year}_M${mesStr}_W${w}`;
-                if (!scaleCache[key]) {
-                    const raw = localStorage.getItem(key);
-                    if (raw) {
-                        try { scaleCache[key] = JSON.parse(raw); } catch(e) {}
+
+            // 1. Busca em escalas do mês atual, mês anterior e mês posterior (semanas que cruzam virada de mês)
+            const monthsToCheck = [
+                { y: year, m: month },
+                { y: (month === 1 ? year - 1 : year), m: (month === 1 ? 12 : month - 1) },
+                { y: (month === 12 ? year + 1 : year), m: (month === 12 ? 1 : month + 1) }
+            ];
+
+            for (const item of monthsToCheck) {
+                const mesStr = String(item.m).padStart(2, '0');
+                for (let w = 1; w <= 6; w++) {
+                    const key = `CMM_ESCALA_${item.y}_M${mesStr}_W${w}`;
+                    if (!scaleCache[key]) {
+                        const raw = localStorage.getItem(key);
+                        if (raw) {
+                            try { scaleCache[key] = JSON.parse(raw); } catch(e) {}
+                        }
                     }
-                }
-                const scale = scaleCache[key];
-                if (scale && scale.dias_datas) {
-                    const dayKey = DIAS_KEYS[dateObj.getDay()];
-                    if (scale.dias_datas[dayKey] && parseInt(scale.dias_datas[dayKey], 10) === d) {
-                        return { scale, dayKey };
+                    const scale = scaleCache[key];
+                    if (scale && scale.grid && scale.grid.length > 0) {
+                        // Verifica por período de datas completo (ex: 27SET26 a 03OUT26)
+                        if (scale.periodo) {
+                            const range = parsePeriodoRange(scale.periodo, item.y);
+                            if (range && curTime >= range.start.getTime() && curTime <= range.end.getTime()) {
+                                return { scale, dayKey };
+                            }
+                        }
+                        // Fallback por dias_datas
+                        if (scale.dias_datas && scale.dias_datas[dayKey]) {
+                            if (parseInt(scale.dias_datas[dayKey], 10) === d) {
+                                // Garante que o mês corresponde se o período não foi parseado
+                                if (!scale.periodo || item.m === (dateObj.getMonth() + 1)) {
+                                    return { scale, dayKey };
+                                }
+                            }
+                        }
                     }
                 }
             }
+
+            // 2. Varredura global em qualquer chave CMM_ESCALA_* salva no localStorage
+            try {
+                for (let i = 0; i < localStorage.length; i++) {
+                    const k = localStorage.key(i);
+                    if (k && k.startsWith('CMM_ESCALA_')) {
+                        if (!scaleCache[k]) {
+                            const raw = localStorage.getItem(k);
+                            if (raw) {
+                                try { scaleCache[k] = JSON.parse(raw); } catch(e) {}
+                            }
+                        }
+                        const scale = scaleCache[k];
+                        if (scale && scale.periodo && scale.grid && scale.grid.length > 0) {
+                            const range = parsePeriodoRange(scale.periodo, year);
+                            if (range && curTime >= range.start.getTime() && curTime <= range.end.getTime()) {
+                                return { scale, dayKey };
+                            }
+                        }
+                    }
+                }
+            } catch(e) {}
+
             return null;
         }
 

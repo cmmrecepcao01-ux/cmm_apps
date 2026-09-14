@@ -3939,18 +3939,9 @@ CREATE POLICY "Permissao Total Escalas" ON public.escalas_manutencao FOR ALL USI
                     autoObs.push({ key: key, text: finalText });
                 }
 
-                if (specialDays.DS && specialDays.DS.length > 0) {
-                    specialDays.DS.forEach(dayKey => {
-                        const dataFmt = semObj.daysMap[dayKey].formatted;
-                        const key = `DS_${m.re}_${dayKey}`;
-                        const defaultText = `${milDesc} DISPENSA DO SERVIÇO em ${dataFmt}.`;
-                        const finalText = currentScaleData.observacoes_editadas[key] || defaultText;
-                        autoObs.push({ key: key, text: finalText });
-                    });
-                }
-
+                // DS, M, T e FERIADO não geram observações (condições normais de rotina)
                 Object.keys(specialDays).forEach(sig => {
-                    if (!['FE', 'AG', 'LP', 'FM', 'LTS', 'DS', 'EAP'].includes(sig)) {
+                    if (!['FE', 'AG', 'LP', 'FM', 'LTS', 'DS', 'EAP', 'M', 'T', 'FER', 'FERIADO', 'S', 'F'].includes(sig)) {
                         const sigObj = TODAS_SIGLAS_PMESP.find(s => s.sigla === sig);
                         const desc = sigObj ? sigObj.desc : sig;
                         specialDays[sig].forEach(dayKey => {
@@ -4418,11 +4409,88 @@ CREATE POLICY "Permissao Total Escalas" ON public.escalas_manutencao FOR ALL USI
             showToast('IAS registrada com sucesso e bloqueada para o ano vigente!');
         }
 
+        
+        // =========================================================================
+        // VERIFICAÇÃO DE EXPIRAÇÃO DE RESTRIÇÃO MÉDICA
+        // =========================================================================
+        function parsePmespDateStr(str, defaultYear = 2026) {
+            if (!str) return null;
+            const match = str.trim().match(/(\d{1,2})([A-Z]{3})(\d{2,4})?/i);
+            if (!match) return null;
+            const d = parseInt(match[1], 10);
+            const mStr = match[2].toUpperCase();
+            const mIdx = MONTHS_SIGLAS.indexOf(mStr);
+            if (mIdx === -1) return null;
+            let y = defaultYear;
+            if (match[3]) {
+                y = parseInt(match[3], 10);
+                if (y < 100) y += 2000;
+            }
+            return new Date(Date.UTC(y, mIdx, d));
+        }
+
+        function getRestricaoEndDate(restr, defaultYear = 2026) {
+            if (!restr) return null;
+            if (restr.data_fim) {
+                if (/^\d{4}-\d{2}-\d{2}$/.test(restr.data_fim)) {
+                    const [y, m, d] = restr.data_fim.split('-').map(Number);
+                    return { date: new Date(Date.UTC(y, m - 1, d)), text: restr.data_fim };
+                }
+            }
+            if (restr.periodo) {
+                const parts = restr.periodo.split(/\s+a\s+|\s+A\s+/i);
+                const lastPart = parts[parts.length - 1].trim().replace(/\.$/, '');
+                const parsed = parsePmespDateStr(lastPart, defaultYear);
+                if (parsed) {
+                    return { date: parsed, text: lastPart.toUpperCase() };
+                }
+            }
+            return null;
+        }
+
+        function buildRestricaoBadgeHtml(militar, currentScaleYear = 2026) {
+            const restricoesMap = getGlobalRestricoesMap();
+            let restr = militar.restricao;
+            if ((!restr || !restr.ativa) && restricoesMap[militar.re] && restricoesMap[militar.re].ativa) {
+                restr = restricoesMap[militar.re];
+            }
+
+            if (!restr || !restr.ativa || !restr.codigos || restr.codigos.length === 0) {
+                return '';
+            }
+
+            const codigosStr = restr.codigos.join('/');
+            const endInfo = getRestricaoEndDate(restr, currentScaleYear);
+            
+            // Data de referência da escala ou data atual
+            const todayUtc = new Date();
+            const curUtc = new Date(Date.UTC(todayUtc.getFullYear(), todayUtc.getMonth(), todayUtc.getDate()));
+
+            let isExpired = false;
+            let expDateStr = endInfo ? endInfo.text : '';
+
+            if (endInfo && curUtc > endInfo.date) {
+                isExpired = true;
+            }
+
+            if (isExpired) {
+                return `<i class="fa-solid fa-notes-medical" style="color: #ef4444; margin-left: 6px; font-size: 0.82rem; cursor: help;" title="RESTRIÇÃO VENCIDA / EXPIRADA EM ${expDateStr}! (Códigos: ${codigosStr})"></i>`;
+            } else {
+                const validStr = expDateStr ? ` - Válida até ${expDateStr}` : '';
+                return `<i class="fa-solid fa-notes-medical" style="color: #fbbf24; margin-left: 6px; font-size: 0.75rem; cursor: help;" title="Restrição Médica (${codigosStr})${validStr}"></i>`;
+            }
+        }
+
         function renderTableGrid(filterText = '') {
             const tbody = document.getElementById('escalaTableBody');
             tbody.innerHTML = '';
 
             if (!currentScaleData || !currentScaleData.grid) return;
+
+            const selMesEl = document.getElementById('selMes');
+            const selAnoEl = document.getElementById('selAno');
+            const currentScaleMonth = selMesEl ? parseInt(selMesEl.value, 10) : (currentScaleData.mes || 9);
+            const currentScaleYear = selAnoEl ? parseInt(selAnoEl.value, 10) : (currentScaleData.ano || 2026);
 
             let currentSeparatorKey = '';
             const query = (filterText || '').toUpperCase().trim();
@@ -4489,13 +4557,9 @@ CREATE POLICY "Permissao Total Escalas" ON public.escalas_manutencao FOR ALL USI
                     `;
                 });
 
-                const restrIcon = (militar.restricao && militar.restricao.ativa) 
-                    ? `<i class="fa-solid fa-notes-medical" style="color: #fbbf24; margin-left: 6px; font-size: 0.75rem;" title="Restrição Médica: ${militar.restricao.codigos.join('/')}"></i>` 
-                    : '';
+                const restrIcon = buildRestricaoBadgeHtml(militar, currentScaleYear);
 
                 // LÓGICA DO MOSTRADOR IAS (INSPEÇÃO ANUAL DE SAÚDE)
-                const currentScaleMonth = parseInt(document.getElementById('selMes').value);
-                const currentScaleYear = parseInt(document.getElementById('selAno').value);
                 const mesIas = militar.mes_ias ? parseInt(militar.mes_ias) : null;
                 const iasMap = getGlobalIasMap();
                 const iasRec = militar.ias_registro || iasMap[militar.re] || {};
@@ -5773,27 +5837,15 @@ CREATE POLICY "Permissao Total Escalas" ON public.escalas_manutencao FOR ALL USI
             const alterTbody = document.getElementById('pAlterTableBody');
             alterTbody.innerHTML = '';
 
-            const registeredAlts = currentScaleData.alteracoes || [];
             const totalPage2Rows = 24;
-
             for (let idx = 0; idx < totalPage2Rows; idx++) {
                 const tr = document.createElement('tr');
-                if (idx < registeredAlts.length) {
-                    const alt = registeredAlts[idx];
-                    tr.innerHTML = `
-                        <td style="font-weight: bold; text-align: left; padding-left: 4px;">${alt.militar || ''}</td>
-                        <td style="text-align: left; padding-left: 4px;">${alt.desc || ''}</td>
-                        <td style="text-align: center;">${alt.transcreveu || ''}</td>
-                        <td style="text-align: center;">${alt.status === 'AUTORIZADO' ? 'RUBRICADO' : ''}</td>
-                    `;
-                } else {
-                    tr.innerHTML = `
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                    `;
-                }
+                tr.innerHTML = `
+                    <td style="height: 24.5px;"></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                `;
                 alterTbody.appendChild(tr);
             }
         }
