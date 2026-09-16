@@ -1,0 +1,81 @@
+www.policiamilitar.sp.gov.br
+cmmtecmec@policiamilitar.sp.gov.br
+SECRETARIA DA SEGURANÇA PÚBLICA
+POLÍCIA MILITAR DO ESTADO DE SÃO PAULO
+CENTRO DE MOTOMECANIZAÇÃO
+PARECER TÉCNICO Nº CMM-24/30.3/26
+1. Ao vigésimo quarto dia do mês de junho do ano de dois mil e vinte e seis, na Cidade de São Paulo, na sede do Centro de Motomecanização da Polícia Militar do Estado de São Paulo, em conformidade com as I-15-PM, I-16-PM e com o Boletim Interno Nº CMM-08/24, reuniu-se a Comissão Técnica nomeada para elaborar o presente parecer.
+DA MOTIVAÇÃO
+2. A solicitação tem o intento de subsidiar a sindicância instaurada para apurar os motivos do sinistro envolvendo a viatura marca HYUNDAI, modelo CRETA 2025, ano 2025, VIN BHPE81FGTP260603, placas UDD9H03, prefixo M-18262, patrimônio 225033962-A, conforme solicitado por meio do OFÍCIO Nº18BPMM-174/70.10/26, de 01JUN26, referentes ao IPM nº18BPMM-13/70/26.
+ANÁLISE TÉCNICA
+3. Identificação do veículo oficial:
+3.1. identificação realizada por emplacamento, prefixo operacional, VIN (Fotos 1-2).
+   
+Foto 01Foto 02
+4. Painel de Instrumentos;
+4.1. luzes indicadoras de advertências e anomalias funcionando normalmente (foto3);
+4.2. indicação de quilometragem atual 5.257 km permanecendo acesa luzes espias de sistema de alerta pré-colisão, sensor de calibragem pneu (foto 4).
+  
+Foto 03Foto 04
+5. Condição de apresentação do veículo em análise:
+5.1. o veículo foi apresentado nesse Centro de Motomecanização com danos no para-choques dianteiro, grades, farol esquerdo, para-lamas dianteiro esquerdo e sua moldura, suspensão dianteira esquerda e sistema de transmissão esquerdo (cruzeta ou homocinética) (fotos 5 a 8); com o sistema mecânico, eletrônico, elétrico, Power Train (sistemas motor e de transmissão) montados e funcionando.
+5.2. não foi apresentado o R.I.V.
+  
+Foto 05       Foto 06
+  
+Foto 07Foto 08
+6. Informações técnicas relacionadas:
+6.1. a função principal do sistema de freios é transmitir a força aplicada pelo condutor ao pedal gerando o atrito necessário à desaceleração ou à manutenção da inércia. A aplicação da força de frenagem também se vale de dois princípios físicos, o princípio da força de alavanca e a multiplicação hidráulica;
+6.2. desenho esquemático do sistema de freio ABS e componentes relacionados ao modelo de veículo analisado:
+Figura 1 ABS
+Figura 2 Freio a disco
+                          Figura 3 - Revista física Super Profissionais Bosch
+7. Rastreamento eletrônico de falhas:
+7.1. submetido à varredura do sistema eletrônico com equipamento Rasther III S;
+7.2. no sistema de motor não foram constatados defeitos (foto 9);
+7.3. no sistema de freios ABS foram constatados 03 falhas (foto 10):
+C1638 - falha de comunicação CAN ou divergência de dados entre os módulos de segurança e assistência do veículo, como o controle de estabilidade, piloto automático adaptativo, direção elétrica ou sensor de ângulo do volante;
+C16B8 - falhas de calibração ou problemas no sensor de ângulo de direção, ou a erros de comunicação na rede CAN com o módulo de direção elétrica (MDPS);
+C1818 indica um tempo limite excedido de comunicação na rede CAN (Timeout) com o módulo de Assistência de Ponto Cego (BSD/BCW) ou o Assistente de Mudança de Faixa (LCA);
+  
+Foto 09Foto 10
+7.4. não é possível consignar o lapso temporal de quais os horários e/ou data exata das falhas apresentadas, já que nosso equipamento de diagnóstico não apresenta o exato histórica de condução.
+8. Elementos sob análise;
+8.1. identificação e análise de itens relacionados;
+8.1.1. subsistema mecânico de freios das rodas dianteiras: discos estão regulares e não apresentam ondulações ou fissuras, pastilhas de freio com boa espessura da massa de atrito; não foram identificadas falhas de funcionamento ou erros de montagem, sem vazamentos ou travamentos (fotos 11 a 14);
+dianteira direita externa 9,01mmdianteira direita externa 9,01mmdianteira direita interna 8,81mmdianteira direita interna 8,81mmdianteira esquerda externa 9,15mmdianteira esquerda externa 9,15mmdianteira esquerda interna 8,78mmdianteira esquerda interna 8,78mm  
+dianteira direita externa 9,01mm
+dianteira direita externa 9,01mm
+dianteira direita interna 8,81mm
+dianteira direita interna 8,81mm
+dianteira esquerda externa 9,15mm
+dianteira esquerda externa 9,15mm
+dianteira esquerda interna 8,78mm
+dianteira esquerda interna 8,78mm
+Foto 11Foto 12
+Traseira direita interna 8,78mmTraseira direita interna 8,78mmTraseira direita externa 8,99mmTraseira direita externa 8,99mmTraseira esquerda externa 9,03mmTraseira esquerda externa 9,03mmTraseira esquerda interna 9,06mmTraseira esquerda interna 9,06mm  
+Traseira direita interna 8,78mm
+Traseira direita interna 8,78mm
+Traseira direita externa 8,99mm
+Traseira direita externa 8,99mm
+Traseira esquerda externa 9,03mm
+Traseira esquerda externa 9,03mm
+Traseira esquerda interna 9,06mm
+Traseira esquerda interna 9,06mm
+Foto 13Foto 14
+8.1.3. em análise ao fluído de freio este apresentou coloração límpida e quantidade entre as marcas mínimas e máximas, realizado teste higroscópico este apresentou índice de umidade bom (foto 15);
+Foto 15
+8.2. não foi realizado teste dinâmico e /ou estático devido às avarias da viatura;
+9. Quanto aos quesitos apresentados no OFÍCIO Nº18BPMM-174/70.10/26, de 01JUN26, referentes ao IPM nº18BPMM-13/70/26.Sobre tudo no que tange a constatação de possíveis defeitos mecânicos nos itens de segurança, com especial atenção a irregularidades no sistema freios essa comissão passa a discorrer:
+9.1. durante a realização da análise foi constatado que o sistema mecânico de freio assim como o fluido de freio está em condição regular, sem sinais de anomalia ou erro de montagem;
+9.2. em analise ao sistema eletrônico foram constatados 3 códigos de falhas eletrônicas, porém nosso equipamento de diagnóstico não apresenta o histórico de condução, não sendo possível informar o horário e data exata de cada falha, se estas se apresentaram anteriores ou posteriores ao evento da colisão, cabe salientar que as falhas detectadas estão ligadas ao conjunto de assistências de direção e frenagem automática, não interferindo negativamente no funcionamento mecânico do sistema de freios , poderá trazer prejuízo a qualidade da frenagem do sistema de ABS.
+9.3. não foi possível realizar testes dinâmicos e/ou estáticos devido as avarias no veículo, restando prejudicado este tipo de analise;
+9.4. convém esclarecer que para ser determinada a distância segura de frenagem de um veículo ou as possíveis causas que levaram a um sinistro, muitos fatores devem ser considerados, individual e cumulativamente, como: tipo e peso do veículo, as condições do tempo (sol, chuva, neblina, etc), velocidade empregada, tipo de via relacionada ao coeficiente de atrito (asfalto, concreto, terra, etc), condições da via (seca, úmida, com cascalho, com óleo, etc), ângulo da via (aclive ou declive), ângulo de inclinação da via, condições dos pneus, dos componentes do sistema de freio e da suspensão, tempo/distância de reação do motorista, distância de segmento, vícios de dirigibilidade, entre outros.
+10. Este é o Parecer.
+São Paulo, 17 de agosto de 2026.
+JOSÉ MAYCON DE PAIVA HONORATO
+Cap PM Membro Técnico
+ARTUR SANTIAGO DA SILVA ALMEIDA                     MARCELO BARONE RODRIGUES
+                 Cb PM Auxiliar Técnico                     Cb PM Auxiliar Técnico
+_________________________________________________________________________
+Nós, Policiais Militares sob a proteção de Deus, estamos compromissados com a defesa da Vida, da Integridade Física e da Dignidade da Pessoa Humana.”

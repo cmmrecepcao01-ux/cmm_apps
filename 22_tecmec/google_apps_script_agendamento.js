@@ -149,6 +149,33 @@ function doPost(e) {
       return jsonResponse({ status: updated ? "SUCCESS" : "NOT_FOUND", protocolo: proto, data_parecer: dataParecer });
     }
 
+    // AÇÃO 3: SALVAMENTO DO PARECER TÉCNICO COMPLETO
+    if (action === "SALVAR_PARECER_TECNICO") {
+      var ss = SpreadsheetApp.getActiveSpreadsheet();
+      var sheetPt = getOrCreateSheet(ss, "PARECERES_TECNICOS_EMITIDOS", [
+        "DATA_REGISTRO", "PROTOCOLO", "PLACA", "OPM", "NUM_PARECER", "BOLETIM_INTERNO",
+        "RELATOR", "PRESIDENTE", "DATA_PARECER", "CONTEUDO_JSON"
+      ]);
+
+      var proto = (d.protocolo || "").toUpperCase().trim();
+      var now = Utilities.formatDate(new Date(), "America/Sao_Paulo", "dd/MM/yyyy HH:mm:ss");
+
+      sheetPt.appendRow([
+        now,
+        proto,
+        d.placa || "",
+        d.opm || "",
+        d.numParecer || "",
+        d.boletimInterno || "",
+        d.relator || "",
+        d.presidente || "",
+        d.dataParecer || Utilities.formatDate(new Date(), "America/Sao_Paulo", "yyyy-MM-dd"),
+        JSON.stringify(d)
+      ]);
+
+      return jsonResponse({ status: "SUCCESS", protocolo: proto, message: "Parecer técnico gravado com sucesso." });
+    }
+
     return jsonResponse({ status: "INVALID_ACTION" });
   } catch (err) {
     return jsonResponse({ status: "ERROR", message: err.toString() });

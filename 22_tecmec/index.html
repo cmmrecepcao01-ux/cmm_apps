@@ -1,0 +1,3700 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CMM TECMEC - Portal de Gestão e Pareceres Técnicos | PMESP</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600;700&family=Cinzel:wght@700&display=swap" rel="stylesheet">
+    <!-- FontAwesome 6 -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <!-- QRCode Generator CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <!-- Base de dados SIPL e OPMs -->
+    <script src="frota_data.js"></script>
+    <style>
+        :root {
+            --bg-base: #080c14;
+            --bg-surface: #0f1626;
+            --bg-card: #141d30;
+            --bg-card-hover: #1b2742;
+            --bg-input: #192338;
+            --bg-input-focus: #21304d;
+            --border: #223252;
+            --border-focus: #38bdf8;
+            --border-danger: #ef4444;
+            
+            --text-main: #f1f5f9;
+            --text-muted: #94a3b8;
+            --text-dim: #64748b;
+            
+            --accent-blue: #0284c7;
+            --accent-cyan: #06b6d4;
+            --accent-green: #10b981;
+            --accent-amber: #f59e0b;
+            --accent-rose: #f43f5e;
+            --accent-gold: #fbbf24;
+            --accent-purple: #8b5cf6;
+
+            --radius-sm: 6px;
+            --radius-md: 10px;
+            --radius-lg: 14px;
+            --shadow-sm: 0 2px 8px rgba(0,0,0,0.3);
+            --shadow-md: 0 8px 24px rgba(0,0,0,0.45);
+            --shadow-lg: 0 16px 36px rgba(0,0,0,0.6);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            text-transform: uppercase;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background-color: var(--bg-base);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            font-size: 13px;
+            line-height: 1.5;
+        }
+
+        /* HEADER */
+        header {
+            background: linear-gradient(180deg, #111c30 0%, #0b1220 100%);
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.6);
+        }
+
+        .header-wrap {
+            max-width: 1560px;
+            margin: 0 auto;
+            padding: 10px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            cursor: pointer;
+        }
+
+        .brand-logos {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .logo-img {
+            height: 44px;
+            width: auto;
+            object-fit: contain;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));
+        }
+
+        .brand-text h1 {
+            font-size: 15px;
+            font-weight: 800;
+            letter-spacing: 0.5px;
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .brand-text h1 .badge-sys {
+            background: linear-gradient(135deg, var(--accent-blue), #0369a1);
+            color: #ffffff;
+            font-size: 10px;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 4px;
+            letter-spacing: 1px;
+        }
+
+        .brand-text p {
+            font-size: 10px;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .operator-info-pill {
+            background: rgba(6, 182, 212, 0.12);
+            border: 1px solid var(--accent-cyan);
+            color: #38bdf8;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .nav-btn {
+            background: var(--bg-surface);
+            border: 1px solid var(--border);
+            color: var(--text-main);
+            padding: 8px 14px;
+            border-radius: var(--radius-sm);
+            font-size: 11px;
+            font-weight: 700;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s ease;
+        }
+
+        .nav-btn:hover {
+            background: var(--bg-card-hover);
+            border-color: var(--accent-cyan);
+            color: #ffffff;
+            transform: translateY(-1px);
+        }
+
+        .nav-btn.active {
+            background: linear-gradient(135deg, var(--accent-blue), #0369a1);
+            border-color: var(--accent-cyan);
+            color: #ffffff;
+            box-shadow: 0 2px 10px rgba(2, 132, 199, 0.4);
+        }
+
+        /* MAIN CONTAINER */
+        main {
+            flex: 1;
+            max-width: 1560px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* ==========================================================================
+           TELA 1: CAPA / PORTAL PRINCIPAL COM 2 GRANDES BOTÕES
+           ========================================================================== */
+        .portal-hero {
+            padding: 40px 20px;
+            text-align: center;
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        .portal-hero-title {
+            font-size: 26px;
+            font-weight: 900;
+            letter-spacing: 1px;
+            color: #ffffff;
+            margin-bottom: 8px;
+        }
+
+        .portal-hero-sub {
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-bottom: 36px;
+            max-width: 750px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .portal-access-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            margin-bottom: 30px;
+        }
+
+        @media (max-width: 768px) {
+            .portal-access-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .portal-card {
+            background: linear-gradient(180deg, #131c2e 0%, #0e1524 100%);
+            border: 2px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 32px 24px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            min-height: 280px;
+            box-shadow: var(--shadow-md);
+        }
+
+        .portal-card:hover {
+            transform: translateY(-4px);
+            border-color: var(--accent-cyan);
+            box-shadow: 0 12px 30px rgba(6, 182, 212, 0.25);
+        }
+
+        .portal-card.card-operator:hover {
+            border-color: var(--accent-amber);
+            box-shadow: 0 12px 30px rgba(245, 158, 11, 0.25);
+        }
+
+        .portal-card-icon {
+            width: 72px;
+            height: 72px;
+            border-radius: 50%;
+            background: rgba(2, 132, 199, 0.15);
+            color: var(--accent-cyan);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            margin: 0 auto 16px auto;
+            border: 1px solid rgba(6, 182, 212, 0.3);
+        }
+
+        .portal-card.card-operator .portal-card-icon {
+            background: rgba(245, 158, 11, 0.15);
+            color: var(--accent-amber);
+            border-color: rgba(245, 158, 11, 0.3);
+        }
+
+        .portal-card h2 {
+            font-size: 18px;
+            font-weight: 900;
+            color: #ffffff;
+            margin-bottom: 8px;
+            letter-spacing: 0.5px;
+        }
+
+        .portal-card p {
+            font-size: 12px;
+            color: var(--text-muted);
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        .portal-card-btn {
+            background: linear-gradient(135deg, var(--accent-blue), #0284c7);
+            color: #ffffff;
+            padding: 12px 24px;
+            border-radius: var(--radius-sm);
+            font-weight: 800;
+            font-size: 12px;
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            box-shadow: 0 4px 14px rgba(2, 132, 199, 0.4);
+        }
+
+        .portal-card.card-operator .portal-card-btn {
+            background: linear-gradient(135deg, #d97706, #f59e0b);
+            color: #000000;
+            box-shadow: 0 4px 14px rgba(245, 158, 11, 0.4);
+        }
+
+        /* CARDS & FORMS */
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: var(--shadow-md);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            padding-bottom: 14px;
+            border-bottom: 1px solid var(--border);
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .card-header-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .card-header-title i {
+            font-size: 18px;
+            color: var(--accent-cyan);
+            background: rgba(6, 182, 212, 0.12);
+            width: 36px;
+            height: 36px;
+            border-radius: var(--radius-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .card-header-title h2 {
+            font-size: 15px;
+            font-weight: 800;
+            color: #ffffff;
+            letter-spacing: 0.3px;
+        }
+
+        .card-header-title p {
+            font-size: 11px;
+            color: var(--text-muted);
+            font-weight: 400;
+        }
+
+        /* WIZARD SOLICITANTE (5 ETAPAS) */
+        .wizard-steps {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 10px;
+            margin-bottom: 24px;
+        }
+
+        @media (max-width: 1024px) {
+            .wizard-steps {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        @media (max-width: 600px) {
+            .wizard-steps {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .step-item {
+            background: var(--bg-surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            padding: 12px 14px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.25s ease;
+        }
+
+        .step-item.active {
+            border-color: var(--accent-cyan);
+            background: linear-gradient(135deg, rgba(6, 182, 212, 0.12), rgba(2, 132, 199, 0.05));
+            box-shadow: 0 4px 16px rgba(6, 182, 212, 0.15);
+        }
+
+        .step-item.completed {
+            border-color: var(--accent-green);
+            background: rgba(16, 185, 129, 0.06);
+        }
+
+        .step-num {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 12px;
+            color: var(--text-muted);
+            flex-shrink: 0;
+        }
+
+        .step-item.active .step-num {
+            background: var(--accent-cyan);
+            color: #000000;
+            border-color: var(--accent-cyan);
+        }
+
+        .step-item.completed .step-num {
+            background: var(--accent-green);
+            color: #ffffff;
+            border-color: var(--accent-green);
+        }
+
+        .step-info .step-title {
+            font-size: 11px;
+            font-weight: 800;
+            color: #ffffff;
+            display: block;
+        }
+
+        .step-info .step-sub {
+            font-size: 10px;
+            color: var(--text-dim);
+            display: block;
+        }
+
+        /* FORMS & GRIDS */
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(12, 1fr);
+            gap: 16px;
+        }
+
+        .col-12 { grid-column: span 12; }
+        .col-8  { grid-column: span 8; }
+        .col-6  { grid-column: span 6; }
+        .col-4  { grid-column: span 4; }
+        .col-3  { grid-column: span 3; }
+        .col-2  { grid-column: span 2; }
+
+        @media (max-width: 900px) {
+            .col-8, .col-6, .col-4, .col-3 { grid-column: span 12; }
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            position: relative;
+        }
+
+        .form-group label {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--text-muted);
+            letter-spacing: 0.5px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .form-group label .required {
+            color: var(--accent-rose);
+            font-weight: 900;
+            margin-left: 4px;
+        }
+
+        .form-control {
+            width: 100%;
+            height: 42px;
+            background: var(--bg-input);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            color: #ffffff;
+            font-family: 'Inter', sans-serif;
+            font-size: 12px;
+            font-weight: 600;
+            padding: 0 14px;
+            transition: all 0.2s ease;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--border-focus);
+            background: var(--bg-input-focus);
+            box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.2);
+        }
+
+        .form-control::placeholder {
+            color: var(--text-dim);
+            font-weight: 400;
+        }
+
+        .form-control:read-only, .form-control:disabled {
+            background: rgba(15, 23, 42, 0.7);
+            border-color: rgba(35, 53, 84, 0.6);
+            color: #94a3b8;
+            cursor: pointer;
+        }
+
+        textarea.form-control {
+            height: auto;
+            padding: 10px 14px;
+            min-height: 80px;
+            resize: vertical;
+        }
+
+        /* AUTOCOMPLETE */
+        .autocomplete-wrapper {
+            position: relative;
+            width: 100%;
+        }
+
+        .search-plate-input {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 15px;
+            font-weight: 800;
+            letter-spacing: 2px;
+            color: var(--accent-cyan);
+            border-color: var(--accent-blue);
+        }
+
+        .autocomplete-dropdown {
+            position: absolute;
+            top: calc(100% + 4px);
+            left: 0;
+            right: 0;
+            background: #111928;
+            border: 1px solid var(--accent-blue);
+            border-radius: var(--radius-md);
+            max-height: 280px;
+            overflow-y: auto;
+            z-index: 500;
+            box-shadow: var(--shadow-lg);
+            display: none;
+        }
+
+        .autocomplete-dropdown.show { display: block; }
+
+        .autocomplete-item {
+            padding: 10px 14px;
+            border-bottom: 1px solid rgba(35, 53, 84, 0.4);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            transition: background 0.15s ease;
+        }
+
+        .autocomplete-item:hover { background: var(--bg-card-hover); }
+
+        .autocomplete-plate {
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 800;
+            font-size: 13px;
+            color: var(--accent-gold);
+            background: rgba(251, 191, 36, 0.1);
+            padding: 2px 8px;
+            border-radius: 4px;
+            border: 1px solid rgba(251, 191, 36, 0.3);
+        }
+
+        /* PAINEL READ-ONLY DA VIATURA */
+        .vehicle-locked-card {
+            background: linear-gradient(180deg, #101929 0%, #0d1422 100%);
+            border: 1px solid #1e3a5f;
+            border-radius: var(--radius-md);
+            padding: 18px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .vehicle-specs-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .spec-box {
+            background: rgba(15, 23, 42, 0.8);
+            border: 1px solid rgba(35, 53, 84, 0.8);
+            border-radius: var(--radius-sm);
+            padding: 8px 12px;
+        }
+
+        .spec-box-label {
+            font-size: 9px;
+            font-weight: 700;
+            color: var(--text-dim);
+            letter-spacing: 0.5px;
+            display: block;
+            margin-bottom: 2px;
+        }
+
+        .spec-box-value {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+            font-weight: 700;
+            color: #ffffff;
+            word-break: break-all;
+        }
+
+        /* BADGES */
+        .badge-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 10px;
+            font-weight: 800;
+            white-space: nowrap;
+        }
+
+        .badge-status.operacao {
+            background: rgba(16, 185, 129, 0.15);
+            color: #34d399;
+            border: 1px solid rgba(16, 185, 129, 0.4);
+        }
+
+        .badge-status.descarga {
+            background: rgba(239, 68, 68, 0.15);
+            color: #f87171;
+            border: 1px solid rgba(239, 68, 68, 0.4);
+        }
+
+        .badge-status.analise {
+            background: rgba(245, 158, 11, 0.15);
+            color: #fbbf24;
+            border: 1px solid rgba(245, 158, 11, 0.4);
+        }
+
+        .badge-operator-tag {
+            background: rgba(139, 92, 246, 0.15);
+            border: 1px solid rgba(139, 92, 246, 0.4);
+            color: #c4b5fd;
+            font-size: 10px;
+            font-weight: 800;
+            padding: 3px 8px;
+            border-radius: 4px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* KPI METRICS (PAINEL DO OPERADOR) */
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .metric-card {
+            background: var(--bg-surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            padding: 16px 20px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .metric-icon {
+            width: 46px;
+            height: 46px;
+            border-radius: var(--radius-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+
+        .metric-val {
+            font-size: 22px;
+            font-weight: 900;
+            color: #ffffff;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .metric-lbl {
+            font-size: 11px;
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+
+        /* TABELA DE GESTÃO DO OPERADOR */
+        .table-responsive {
+            width: 100%;
+            max-width: 100%;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            box-sizing: border-box;
+            background: var(--bg-surface);
+        }
+
+        .custom-table {
+            width: 100%;
+            min-width: 1050px;
+            border-collapse: collapse;
+            font-size: 11.5px;
+            text-align: left;
+        }
+
+        .custom-table th {
+            background: #0d1524;
+            color: var(--text-muted);
+            padding: 12px 14px;
+            font-weight: 800;
+            border-bottom: 2px solid var(--border);
+            white-space: nowrap;
+            letter-spacing: 0.5px;
+        }
+
+        .custom-table td {
+            padding: 11px 13px;
+            border-bottom: 1px solid rgba(35, 53, 84, 0.5);
+            color: #ffffff;
+            vertical-align: middle;
+            font-size: 11px;
+            white-space: nowrap;
+        }
+
+        .custom-table tr:hover {
+            background: rgba(27, 39, 66, 0.4);
+        }
+
+        /* ==========================================================================
+           EDITOR DO PARECER TÉCNICO OFICIAL
+           ========================================================================== */
+        .parecer-editor-card {
+            background: #111827;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+
+        .parecer-section-block {
+            background: var(--bg-surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .parecer-section-title {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 12px;
+            border-bottom: 1px solid rgba(35, 53, 84, 0.6);
+            padding-bottom: 8px;
+        }
+
+        .parecer-section-title h3 {
+            font-size: 13px;
+            font-weight: 800;
+            color: var(--accent-cyan);
+            letter-spacing: 0.5px;
+        }
+
+        /* HALL DE RESPOSTAS RÁPIDAS */
+        .snippets-bar {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-bottom: 10px;
+            background: rgba(15, 23, 42, 0.6);
+            padding: 8px 12px;
+            border-radius: var(--radius-sm);
+            border: 1px solid rgba(35, 53, 84, 0.5);
+        }
+
+        .btn-snippet {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            color: #cbd5e1;
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 10px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-snippet:hover {
+            background: var(--accent-blue);
+            color: #ffffff;
+            border-color: var(--accent-cyan);
+        }
+
+        /* GERENCIADOR DE FOTOS EM BULK */
+        .bulk-photo-uploader {
+            background: rgba(15, 23, 42, 0.7);
+            border: 2px dashed var(--accent-blue);
+            border-radius: var(--radius-md);
+            padding: 20px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .photo-gallery-preview {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 12px;
+            margin-top: 16px;
+        }
+
+        .photo-thumb-card {
+            background: #0b111e;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            padding: 6px;
+            position: relative;
+            text-align: center;
+        }
+
+        .photo-thumb-img {
+            width: 100%;
+            height: 95px;
+            object-fit: cover;
+            border-radius: 4px;
+        }
+
+        .photo-thumb-label {
+            font-size: 10px;
+            font-weight: 800;
+            color: #ffffff;
+            margin-top: 4px;
+            display: block;
+        }
+
+        /* FOTOS INSERIDAS NO PARECER (PADRÃO OFICIAL: UNIDADE, PAR, TRIO, QUARTETO) */
+        .parecer-photo-row {
+            margin: 16px 0;
+            display: grid;
+            gap: 14px;
+            background: #ffffff;
+            padding: 12px;
+            border-radius: 4px;
+            border: 1px solid #cbd5e1;
+        }
+
+        .parecer-photo-row.layout-1 {
+            grid-template-columns: 1fr;
+            max-width: 500px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .parecer-photo-row.layout-2 {
+            grid-template-columns: 1fr 1fr;
+        }
+
+        .parecer-photo-row.layout-3 {
+            grid-template-columns: 1fr 1fr 1fr;
+        }
+
+        .parecer-photo-row.layout-4 {
+            grid-template-columns: 1fr 1fr;
+        }
+
+        .parecer-photo-box {
+            text-align: center;
+        }
+
+        .parecer-photo-box img {
+            width: 100%;
+            height: 240px;
+            object-fit: cover;
+            border: 1px solid #94a3b8;
+            border-radius: 2px;
+            display: block;
+        }
+
+        .parecer-photo-caption {
+            font-size: 11px;
+            font-weight: 800;
+            color: #000000;
+            margin-top: 6px;
+            display: block;
+            letter-spacing: 0.5px;
+        }
+
+        /* ==========================================================================
+           COMPROVANTE OFICIAL IMPRESSO DO PARECER (MODELO PMESP EXATO)
+           ========================================================================== */
+        .doc-parecer-sheet {
+            background: #ffffff;
+            color: #000000;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 45px 50px;
+            box-shadow: var(--shadow-lg);
+            border: 1px solid #d1d5db;
+            font-family: 'Times New Roman', Times, serif;
+            font-size: 13.5px;
+            line-height: 1.6;
+            text-align: justify;
+        }
+
+        .doc-header {
+            text-align: center;
+            border-bottom: 1.5px solid #000000;
+            padding-bottom: 14px;
+            margin-bottom: 22px;
+        }
+
+        .doc-header p {
+            margin: 1px 0;
+            font-size: 11px;
+            font-family: Arial, sans-serif;
+            font-weight: bold;
+        }
+
+        .doc-header h2 {
+            font-size: 16px;
+            font-weight: 900;
+            margin-top: 8px;
+            letter-spacing: 0.8px;
+            font-family: Arial, sans-serif;
+        }
+
+        .doc-section-title {
+            font-weight: bold;
+            text-transform: uppercase;
+            margin-top: 14px;
+            margin-bottom: 4px;
+            font-size: 14px;
+        }
+
+        .doc-sign-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-top: 40px;
+            text-align: center;
+            font-family: Arial, sans-serif;
+        }
+
+        .doc-sign-line {
+            border-top: 1px solid #000000;
+            padding-top: 4px;
+            font-size: 11px;
+            font-weight: bold;
+        }
+
+        /* MODAL */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.8);
+            backdrop-filter: blur(4px);
+            z-index: 9999;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .modal-box {
+            background: var(--bg-card);
+            border: 1px solid var(--border-focus);
+            border-radius: var(--radius-lg);
+            max-width: 520px;
+            width: 100%;
+            padding: 28px;
+            box-shadow: var(--shadow-lg);
+        }
+
+        /* BUTTONS GERAIS */
+        .btn {
+            height: 40px;
+            padding: 0 20px;
+            border-radius: var(--radius-sm);
+            font-family: 'Inter', sans-serif;
+            font-size: 11px;
+            font-weight: 800;
+            letter-spacing: 0.5px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all 0.2s ease;
+            border: none;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent-blue), #0284c7);
+            color: #ffffff;
+            box-shadow: 0 4px 14px rgba(2, 132, 199, 0.4);
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #0369a1, #0284c7);
+            transform: translateY(-1px);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #059669, #10b981);
+            color: #ffffff;
+            box-shadow: 0 4px 14px rgba(16, 185, 129, 0.4);
+        }
+
+        .btn-success:hover {
+            background: linear-gradient(135deg, #047857, #059669);
+            transform: translateY(-1px);
+        }
+
+        .btn-warning {
+            background: linear-gradient(135deg, #d97706, #f59e0b);
+            color: #000000;
+        }
+
+        .btn-secondary {
+            background: var(--bg-surface);
+            border: 1px solid var(--border);
+            color: var(--text-muted);
+        }
+
+        .btn-secondary:hover {
+            background: var(--bg-card-hover);
+            color: #ffffff;
+        }
+
+        .btn-group {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 12px;
+            margin-top: 20px;
+            padding-top: 14px;
+            border-top: 1px solid var(--border);
+        }
+
+        /* PRINT STYLES */
+        @media print {
+            body {
+                background: #ffffff !important;
+                color: #000000 !important;
+                padding: 0 !important;
+            }
+            header, .wizard-steps, .btn-group, .nav-btn, .non-printable, .modal-overlay, #toastMsg {
+                display: none !important;
+            }
+            main {
+                padding: 0 !important;
+                max-width: 100% !important;
+            }
+            .card, .parecer-editor-card {
+                border: none !important;
+                box-shadow: none !important;
+                padding: 0 !important;
+                background: transparent !important;
+            }
+            .doc-parecer-sheet {
+                box-shadow: none !important;
+                border: none !important;
+                max-width: 100% !important;
+                padding: 0 !important;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- CABEÇALHO DO SISTEMA -->
+    <header>
+        <div class="header-wrap">
+            <div class="brand" onclick="abrirPortalCapa()">
+                <div class="brand-logos">
+                    <img src="brasao_pmesp.png" alt="Brasão PMESP" class="logo-img" onerror="this.style.display='none'">
+                    <img src="cmmasa.png" alt="CMM ASA" class="logo-img" onerror="this.style.display='none'">
+                </div>
+                <div class="brand-text">
+                    <h1 style="font-size: 15px; font-weight: 800; color: #ffffff;">CENTRO DE MOTOMECANIZAÇÃO - AGENDAMENTO DE ANÁLISE TÉCNICA</h1>
+                </div>
+            </div>
+
+            <div class="header-right" id="headerRightArea">
+                <div id="operatorPill" class="operator-info-pill" style="display: none;">
+                    <i class="fa-solid fa-user-shield"></i>
+                    <span id="operatorPillText">SETOR TÉCNICO</span>
+                    <button style="background: none; border: none; color: #f87171; cursor: pointer; margin-left: 6px;" title="Sair do Operador" onclick="logoutOperador()">
+                        <i class="fa-solid fa-right-from-bracket"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <!-- ====================================================================
+             TELA 1: CAPA DO WEB APP (DOIS GRANDES BOTÕES DE ENTRADA)
+             ==================================================================== -->
+        <div id="viewPortalCapa">
+            <div class="portal-hero" style="padding: 60px 20px;">
+                <div class="portal-access-grid">
+                    <!-- BOTÃO 1: AGENDAR ANÁLISE -->
+                    <div class="portal-card" onclick="abrirAreaSolicitante()" style="min-height: 240px; justify-content: center; align-items: center; gap: 20px;">
+                        <div class="portal-card-icon" style="margin-bottom: 0;">
+                            <i class="fa-solid fa-calendar-plus"></i>
+                        </div>
+                        <div>
+                            <h2 style="font-size: 22px; font-weight: 900; letter-spacing: 1px;">AGENDAR ANÁLISE</h2>
+                        </div>
+                        <button class="portal-card-btn" style="width: 100%; max-width: 260px; font-size: 13px;">
+                            <i class="fa-solid fa-arrow-right"></i> ACESSAR
+                        </button>
+                    </div>
+
+                    <!-- BOTÃO 2: PAINEL DO GESTOR -->
+                    <div class="portal-card card-operator" onclick="abrirAreaOperador()" style="min-height: 240px; justify-content: center; align-items: center; gap: 16px;">
+                        <div class="portal-card-icon" style="margin-bottom: 0;">
+                            <i class="fa-solid fa-shield-halved"></i>
+                        </div>
+                        <div>
+                            <h2 style="font-size: 22px; font-weight: 900; letter-spacing: 1px;">PAINEL DO GESTOR</h2>
+                            <p style="font-size: 12px; color: var(--accent-amber); margin: 6px 0 0 0; text-transform: lowercase; font-weight: 600;">(acesso do cmm somente)</p>
+                        </div>
+                        <button class="portal-card-btn" style="width: 100%; max-width: 260px; font-size: 13px;">
+                            <i class="fa-solid fa-lock"></i> ACESSAR
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ====================================================================
+        TELA 2: ÁREA DO SOLICITANTE / OPM (WIZARD DE 5 ETAPAS)
+             ==================================================================== -->
+        <div id="viewSolicitante" style="display: none;">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px;">
+                <div>
+                    <h2 style="font-size: 16px; font-weight: 900; color: #ffffff;">MÓDULO DE SOLICITAÇÃO DE ANÁLISE TÉCNICA (OPM)</h2>
+                    <p style="font-size: 11px; color: var(--text-muted);">Preenchimento oficial e obrigatório para ingresso de veículos sinistrados/avariados no CMM</p>
+                </div>
+                <div style="display: flex; gap: 8px;">
+                    <button class="nav-btn" onclick="abrirModalConsulta()">
+                        <i class="fa-solid fa-magnifying-glass"></i> CONSULTAR PROTOCOLO
+                    </button>
+                    <button class="nav-btn" onclick="abrirPortalCapa()">
+                        <i class="fa-solid fa-arrow-left"></i> VOLTAR AO PORTAL
+                    </button>
+                </div>
+            </div>
+
+            <!-- INDICADOR DE ETAPAS -->
+            <div class="wizard-steps non-printable">
+                <div class="step-item active" id="stepIndicator1">
+                    <div class="step-num">1</div>
+                    <div class="step-info"><span class="step-title">TRIAGEM</span><span class="step-sub">Sindicância/IPM</span></div>
+                </div>
+                <div class="step-item" id="stepIndicator2">
+                    <div class="step-num">2</div>
+                    <div class="step-info"><span class="step-title">VIATURA</span><span class="step-sub">Identificação SIPL</span></div>
+                </div>
+                <div class="step-item" id="stepIndicator3">
+                    <div class="step-num">3</div>
+                    <div class="step-info"><span class="step-title">DOCUMENTOS</span><span class="step-sub">Uploads PDF</span></div>
+                </div>
+                <div class="step-item" id="stepIndicator4">
+                    <div class="step-num">4</div>
+                    <div class="step-info"><span class="step-title">PERGUNTAS</span><span class="step-sub">Do Presidente</span></div>
+                </div>
+                <div class="step-item" id="stepIndicator5">
+                    <div class="step-num">5</div>
+                    <div class="step-info"><span class="step-title">CONFIRMAÇÃO</span><span class="step-sub">Data & Guia</span></div>
+                </div>
+            </div>
+
+            <!-- ETAPA 1: TRIAGEM -->
+            <div class="card" id="stepCard1">
+                <div class="card-header">
+                    <div class="card-header-title">
+                        <i class="fa-solid fa-scale-balanced"></i>
+                        <div>
+                            <h2>ETAPA 1: TRIAGEM ADMINISTRATIVA MILITAR</h2>
+                            <p>Validação preliminar de abertura de procedimento apuratório oficial</p>
+                        </div>
+                    </div>
+                    <span class="badge-status operacao"><i class="fa-solid fa-lock"></i> REQUISITO OBRIGATÓRIO</span>
+                </div>
+
+                                <div style="background: rgba(220, 38, 38, 0.18); border: 2px solid #ef4444; border-radius: 8px; padding: 14px 18px; margin-bottom: 20px; text-align: center; color: #ffffff; font-size: 13px; font-weight: 800; letter-spacing: 0.5px; display: flex; align-items: center; justify-content: center; gap: 10px; box-shadow: 0 4px 16px rgba(239, 68, 68, 0.2);">
+                    <span style="font-size: 18px;">⚠️</span>
+                    <span>É OBRIGATÓRIO INFORMAR O NÚMERO DE SIND/IPM PARA PROSSEGUIR</span>
+                    <span style="font-size: 18px;">⚠️</span>
+                </div>
+
+                <div class="form-grid">
+                    <div class="col-4 form-group">
+                        <label>TIPO DE PROCEDIMENTO APURATÓRIO <span class="required">*</span></label>
+                        <select id="tipoProcedimento" class="form-control" onchange="autoSave()">
+                            <option value="SINDICÂNCIA" selected>SINDICÂNCIA</option>
+                            <option value="INQUÉRITO POLICIAL MILITAR (IPM)">INQUÉRITO POLICIAL MILITAR (IPM)</option>
+                            <option value="INQUÉRITO TÉCNICO (IT)">INQUÉRITO TÉCNICO (IT)</option>
+                            <option value="PROCESSO DE DESCARGA">PROCESSO DE DESCARGA DE VIATURA</option>
+                            <option value="LAUDO TÉCNICO PERICIAL">LAUDO TÉCNICO PERICIAL DO CMM</option>
+                        </select>
+                    </div>
+
+                    <div class="col-8 form-group">
+                        <label>NÚMERO DA SINDICÂNCIA / PORTARIA DO IPM <span class="required">* (OBRIGATÓRIO)</span></label>
+                        <input type="text" id="numSindicancia" class="form-control" placeholder="EX: X.BPMM-00X/XX/XX" oninput="autoSave()">
+                        <small style="color: var(--text-dim); font-size: 10px;">INFORME O NÚMERO EXATO REGISTRADO NO SISTEMA SEI OU LIVRO DA OPM (MODELO: X.BPMM-00X/XX/XX).</small>
+                    </div>
+
+                    <div class="col-12" style="margin: 8px 0; border-top: 1px dashed var(--border);"></div>
+
+                    <div class="col-3 form-group">
+                        <label>POSTO / GRADUAÇÃO <span class="required">*</span></label>
+                        <select id="postoGrad" class="form-control" onchange="autoSave()">
+                            <option value="CEL PM">CEL PM</option>
+                            <option value="TEN CEL PM">TEN CEL PM</option>
+                            <option value="MAJ PM">MAJ PM</option>
+                            <option value="CAP PM">CAP PM</option>
+                            <option value="1º TEN PM">1º TEN PM</option>
+                            <option value="2º TEN PM">2º TEN PM</option>
+                            <option value="ASP OF PM">ASP OF PM</option>
+                            <option value="SUBTEN PM">SUBTEN PM</option>
+                            <option value="1º SGT PM">1º SGT PM</option>
+                            <option value="2º SGT PM">2º SGT PM</option>
+                            <option value="3º SGT PM">3º SGT PM</option>
+                            <option value="CB PM" selected>CB PM</option>
+                            <option value="SD PM 1ª CL">SD PM 1ª CL</option>
+                            <option value="SD PM 2ª CL">SD PM 2ª CL</option>
+                            <option value="FUNCIONÁRIO CIVIL">FUNCIONÁRIO CIVIL</option>
+                        </select>
+                    </div>
+
+                    <div class="col-3 form-group">
+                        <label>RE MILITAR <span class="required">* (SEM DÍGITO)</span></label>
+                        <input type="text" id="militarRe" class="form-control" placeholder="EX: 123456" maxlength="8" oninput="autoSave()">
+                    </div>
+
+                    <div class="col-6 form-group">
+                        <label>NOME COMPLETO DO MILITAR RESPONSÁVEL <span class="required">*</span></label>
+                        <input type="text" id="militarNome" class="form-control" placeholder="EX: JOÃO CARLOS DA SILVA" oninput="autoSave()">
+                    </div>
+
+                    <div class="col-6 form-group">
+                        <label>TELEFONE FUNCIONAL / WHATSAPP <span class="required">*</span></label>
+                        <input type="text" id="militarTelefone" class="form-control" placeholder="EX: (11) 98765-4321" oninput="autoSave()">
+                    </div>
+
+                    <div class="col-6 form-group">
+                        <label>E-MAIL CORPORATIVO (@POLICIAMILITAR.SP.GOV.BR) <span class="required">*</span></label>
+                        <input type="email" id="militarEmail" class="form-control" placeholder="EX: josemaycon@policiamilitar.sp.gov.br" style="text-transform: none;" oninput="autoSave()">
+                    </div>
+                </div>
+
+                <div class="btn-group">
+                    <button class="btn btn-secondary" onclick="abrirPortalCapa()"><i class="fa-solid fa-arrow-left"></i> VOLTAR AO INÍCIO</button>
+                    <button class="btn btn-primary" onclick="avancarParaEtapa(2)">
+                        AVANÇAR PARA VIATURA <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- ETAPA 2: VIATURA SIPL -->
+            <div class="card" id="stepCard2" style="display: none;">
+                <div class="card-header">
+                    <div class="card-header-title">
+                        <i class="fa-solid fa-truck-pickup"></i>
+                        <div>
+                            <h2>ETAPA 2: IDENTIFICAÇÃO E SELEÇÃO DA VIATURA</h2>
+                            <p>Preenchimento blindado a partir do banco de dados oficial do SIPL da PMESP</p>
+                        </div>
+                    </div>
+                    <span class="badge-status operacao"><i class="fa-solid fa-database"></i> 26.516 VIATURAS SIPL</span>
+                </div>
+
+                <div class="form-grid">
+                    <div class="col-6 form-group">
+                        <label>OPM DETENTORA DA VIATURA <span class="required">*</span></label>
+                        <input type="text" id="opmSelectInput" list="opmList" class="form-control" placeholder="DIGITE OU SELECIONE A OPM (EX: 1.BPM/M, 18.BPM/M...)" oninput="filtrarPorOpm(); autoSave();">
+                        <datalist id="opmList"></datalist>
+                    </div>
+
+                    <div class="col-6 form-group">
+                        <label>BUSCA DE VIATURA POR PLACA OU PREFIXO <span class="required">* (DIGITE PARA BUSCAR)</span></label>
+                        <div class="autocomplete-wrapper">
+                            <input type="text" id="searchPlateInput" class="form-control search-plate-input" placeholder="DIGITE A PLACA (EX: UDD9H03) OU PREFIXO..." autocomplete="off" oninput="buscarViaturas(this.value)">
+                            <div class="autocomplete-dropdown" id="plateDropdown"></div>
+                        </div>
+                    </div>
+
+                    <!-- PAINEL READ-ONLY -->
+                    <div class="col-12" id="boxVeiculoDetalhes" style="display: none;">
+                        <div class="vehicle-locked-card">
+                            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
+                                <div style="display: flex; align-items: center; gap: 10px;">
+                                    <span class="autocomplete-plate" id="cardVtrPlaca" style="font-size: 18px; padding: 4px 12px;">---</span>
+                                    <span style="font-size: 15px; font-weight: 800; color: #ffffff;" id="cardVtrPrefixo">PREFIXO: ---</span>
+                                </div>
+                                <span class="badge-status operacao" id="cardVtrSituacao">OPERACAO</span>
+                            </div>
+
+                            <div class="vehicle-specs-grid">
+                                <div class="spec-box"><span class="spec-box-label">MARCA / MODELO:</span><span class="spec-box-value" id="cardVtrModelo">---</span></div>
+                                <div class="spec-box"><span class="spec-box-label">ANO:</span><span class="spec-box-value" id="cardVtrAno">---</span></div>
+                                <div class="spec-box"><span class="spec-box-label">COR OFICIAL:</span><span class="spec-box-value" id="cardVtrCor">---</span></div>
+                                <div class="spec-box"><span class="spec-box-label">OPM:</span><span class="spec-box-value" id="cardVtrOpm" style="color: var(--accent-cyan);">---</span></div>
+                                <div class="spec-box"><span class="spec-box-label">PATRIMÔNIO:</span><span class="spec-box-value" id="cardVtrPatrimonio">---</span></div>
+                                <div class="spec-box"><span class="spec-box-label">CHASSI / VIN:</span><span class="spec-box-value" id="cardVtrChassi">---</span></div>
+                                <div class="spec-box"><span class="spec-box-label">MOTOR:</span><span class="spec-box-value" id="cardVtrMotor">---</span></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="btn-group">
+                    <button class="btn btn-secondary" onclick="avancarParaEtapa(1)"><i class="fa-solid fa-arrow-left"></i> VOLTAR</button>
+                    <button class="btn btn-primary" id="btnAvancarEtapa2" onclick="avancarParaEtapa(3)">
+                        AVANÇAR PARA DOCUMENTOS <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- ETAPA 3: CONDICIONAMENTO E UPLOAD DE DOCUMENTOS -->
+            <div class="card" id="stepCard3" style="display: none;">
+                <div class="card-header">
+                    <div class="card-header-title">
+                        <i class="fa-solid fa-file-pdf"></i>
+                        <div>
+                            <h2>ETAPA 3: CONDICIONAMENTO E UPLOADS DOCUMENTAIS (.PDF)</h2>
+                            <p>Envio da documentação oficial em formato digital e declaração do estado do veículo</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-grid">
+                    <div class="col-6 form-group">
+                        <label>CONDIÇÃO DE CHEGADA AO CMM <span class="required">*</span></label>
+                        <select id="condicaoVeiculo" class="form-control" onchange="autoSave()">
+                            <option value="RODANDO POR MEIOS PRÓPRIOS" selected>RODANDO POR MEIOS PRÓPRIOS</option>
+                            <option value="TRANSPORTADO POR GUINCHO / REBOQUE">TRANSPORTADO POR GUINCHO / REBOQUE</option>
+                        </select>
+                    </div>
+
+                    <div class="col-6 form-group">
+                        <label>HODÔMETRO ATUAL (KM) <span class="required">*</span></label>
+                        <input type="number" id="kmAtual" class="form-control" placeholder="EX: 45200" oninput="autoSave()">
+                    </div>
+
+                    <div class="col-12 form-group">
+                        <label>
+                            DESCRIÇÃO RESUMIDA DA AVARIA / MOTIVO DA ANÁLISE TÉCNICA <span class="required">* (MÍNIMO 20 CARACTERES)</span>
+                            <span id="charCountMotivo" style="color: var(--accent-amber); font-size: 10px;">0 / 20 CARACTERES</span>
+                        </label>
+                        <textarea id="motivoVistoria" class="form-control" placeholder="DESCREVA DETALHADAMENTE O MOTIVO DA ANÁLISE TÉCNICA (MÍNIMO 20 CARACTERES OBRIGATÓRIO)." oninput="atualizarContadorMotivo(); autoSave();"></textarea>
+                    </div>
+
+                    <!-- UPLOADS -->
+                    <div class="col-12">
+                        <div style="background: var(--bg-surface); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 16px;">
+                            <strong style="color: #ffffff; font-size: 12px; display: block; margin-bottom: 12px;">
+                                <i class="fa-solid fa-cloud-arrow-up" style="color: var(--accent-cyan);"></i> UPLOAD DE DOCUMENTOS OFICIAIS (APENAS FORMATO .PDF)
+                            </strong>
+
+                            <!-- UPLOAD 1 -->
+                            <div class="upload-item" id="boxUpload1">
+                                <div class="upload-item-info">
+                                    <i class="fa-solid fa-file-pdf upload-item-icon"></i>
+                                    <div class="upload-item-text">
+                                        <strong>1. OFÍCIO DE APRESENTAÇÃO <span style="color: var(--accent-rose);">* (OBRIGATÓRIO)</span></strong>
+                                        <span id="fileName1">NENHUM ARQUIVO SELECIONADO</span>
+                                    </div>
+                                </div>
+                                <span class="file-status-badge pending" id="badgeFile1">PENDENTE</span>
+                                <input type="file" id="inputFile1" accept=".pdf" style="display: none;" onchange="handleFileUpload(1, this)">
+                                <button type="button" class="btn-upload-file" onclick="document.getElementById('inputFile1').click()"><i class="fa-solid fa-upload"></i> ANEXAR PDF</button>
+                            </div>
+
+                            <!-- UPLOAD 2 -->
+                            <div class="upload-item" id="boxUpload2">
+                                <div class="upload-item-info">
+                                    <i class="fa-solid fa-file-pdf upload-item-icon"></i>
+                                    <div class="upload-item-text">
+                                        <strong>2. PORTARIA DE SINDICÂNCIA OU IPM <span style="color: var(--accent-rose);">* (OBRIGATÓRIO)</span></strong>
+                                        <span id="fileName2">NENHUM ARQUIVO SELECIONADO</span>
+                                    </div>
+                                </div>
+                                <span class="file-status-badge pending" id="badgeFile2">PENDENTE</span>
+                                <input type="file" id="inputFile2" accept=".pdf" style="display: none;" onchange="handleFileUpload(2, this)">
+                                <button type="button" class="btn-upload-file" onclick="document.getElementById('inputFile2').click()"><i class="fa-solid fa-upload"></i> ANEXAR PDF</button>
+                            </div>
+
+                            <!-- UPLOAD 3 -->
+                            <div class="upload-item" id="boxUpload3">
+                                <div class="upload-item-info">
+                                    <i class="fa-solid fa-file-pdf upload-item-icon"></i>
+                                    <div class="upload-item-text">
+                                        <strong>3. CÓPIA DE OITIVA (APENAS DO CONDUTOR) <span style="color: var(--accent-rose);">* (OBRIGATÓRIO)</span></strong>
+                                        <span id="fileName3">NENHUM ARQUIVO SELECIONADO</span>
+                                    </div>
+                                </div>
+                                <span class="file-status-badge pending" id="badgeFile3">PENDENTE</span>
+                                <input type="file" id="inputFile3" accept=".pdf" style="display: none;" onchange="handleFileUpload(3, this)">
+                                <button type="button" class="btn-upload-file" onclick="document.getElementById('inputFile3').click()"><i class="fa-solid fa-upload"></i> ANEXAR PDF</button>
+                            </div>
+
+                            <!-- UPLOAD 4 -->
+                            <div class="upload-item" id="boxUpload4">
+                                <div class="upload-item-info">
+                                    <i class="fa-solid fa-file-pdf upload-item-icon" style="color: var(--accent-cyan);"></i>
+                                    <div class="upload-item-text">
+                                        <strong>4. TRANSCRIÇÃO DE VÍDEO DA COP <span style="color: var(--text-muted);">(OPCIONAL, PORÉM RELEVANTE)</span></strong>
+                                        <span id="fileName4">NENHUM ARQUIVO SELECIONADO</span>
+                                    </div>
+                                </div>
+                                <span class="file-status-badge pending" id="badgeFile4">OPCIONAL</span>
+                                <input type="file" id="inputFile4" accept=".pdf" style="display: none;" onchange="handleFileUpload(4, this)">
+                                <button type="button" class="btn-upload-file" onclick="document.getElementById('inputFile4').click()"><i class="fa-solid fa-upload"></i> ANEXAR PDF</button>
+                            </div>
+
+                            <!-- UPLOAD 5 -->
+                            <div class="upload-item" id="boxUpload5">
+                                <div class="upload-item-info">
+                                    <i class="fa-solid fa-file-pdf upload-item-icon" style="color: var(--accent-cyan);"></i>
+                                    <div class="upload-item-text">
+                                        <strong>5. DEMAIS COMPROVANTES (NOTAS FISCAIS, ORÇAMENTOS, OS) <span style="color: var(--text-muted);">(OPCIONAL)</span></strong>
+                                        <span id="fileName5">NENHUM ARQUIVO SELECIONADO</span>
+                                    </div>
+                                </div>
+                                <span class="file-status-badge pending" id="badgeFile5">OPCIONAL</span>
+                                <input type="file" id="inputFile5" accept=".pdf" style="display: none;" onchange="handleFileUpload(5, this)">
+                                <button type="button" class="btn-upload-file" onclick="document.getElementById('inputFile5').click()"><i class="fa-solid fa-upload"></i> ANEXAR PDF</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-12 form-group" style="margin-top: 10px;">
+                        <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; color: var(--accent-gold);">
+                            <input type="checkbox" id="checkTermo" style="width: 18px; height: 18px; cursor: pointer;" onchange="autoSave()">
+                            DECLARO QUE AS INFORMAÇÕES PRESTADAS SÃO VERÍDICAS E QUE O VEÍCULO SERÁ APRESENTADO COM OS RESPECTIVOS DOCUMENTOS OBRIGATÓRIOS.
+                        </label>
+                    </div>
+                </div>
+
+                <div class="btn-group">
+                    <button class="btn btn-secondary" onclick="avancarParaEtapa(2)"><i class="fa-solid fa-arrow-left"></i> VOLTAR</button>
+                    <button class="btn btn-primary" onclick="avancarParaEtapa(4)">
+                        AVANÇAR PARA PERGUNTAS DO PRESIDENTE <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- ETAPA 4: PERGUNTAS DO PRESIDENTE -->
+            <div class="card" id="stepCard4" style="display: none;">
+                <div class="card-header">
+                    <div class="card-header-title">
+                        <i class="fa-solid fa-clipboard-question"></i>
+                        <div>
+                            <h2>ETAPA 4: PERGUNTAS DO PRESIDENTE DO PROCEDIMENTO</h2>
+                            <p>Indicação do objetivo pericial e quesitos formulados no ofício</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="background: rgba(2, 132, 199, 0.12); border: 1px solid var(--accent-blue); border-left: 5px solid var(--accent-cyan); border-radius: var(--radius-md); padding: 14px 18px; margin-bottom: 20px;">
+                    <strong style="color: var(--accent-cyan); font-size: 12px; display: block; margin-bottom: 4px;">
+                        <i class="fa-solid fa-circle-info"></i> ORIENTAÇÃO AO PRESIDENTE:
+                    </strong>
+                    <p style="color: #cbd5e1; font-size: 11px; line-height: 1.6;">
+                        COPIE E COLE AS PERGUNTAS DO OFÍCIO DE APRESENTAÇÃO. O OBJETIVO É OBRIGATÓRIO (NORMALMENTE CONSTA NO ITEM 1 DO SEU OFÍCIO).
+                    </p>
+                </div>
+
+                <div class="form-grid">
+                    <div class="col-12 form-group">
+                        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px;">
+                            <label>OBJETIVO DA ANÁLISE TÉCNICA <span class="required">* (OBRIGATÓRIO - ITEM 1 DO OFÍCIO)</span></label>
+                            <button type="button" class="btn-secondary" style="height: 26px; padding: 0 10px; font-size: 10px; border-radius: 4px;" onclick="preencherTextoModeloObjetivo()">
+                                <i class="fa-solid fa-wand-magic-sparkles"></i> DÚVIDA / CARREGAR MODELO
+                            </button>
+                        </div>
+                        <textarea id="objetivoAnalise" class="form-control" style="min-height: 85px;" placeholder="DESCREVA O OBJETIVO DA ANÁLISE TÉCNICA..." oninput="autoSave()"></textarea>
+                    </div>
+
+                    <div class="col-12 form-group" style="margin-top: 10px;">
+                        <div style="background: var(--bg-surface); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 14px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;">
+                            <div>
+                                <strong style="color: #ffffff; font-size: 12px;">POSSUI PERGUNTAS ESPECÍFICAS DO PRESIDENTE?</strong>
+                                <span style="display: block; color: var(--text-muted); font-size: 10px;">QUESITOS TÉCNICOS A SEREM RESPONDIDOS NO LAUDO PERICIAL.</span>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 16px;">
+                                <label style="display: flex; align-items: center; gap: 6px; cursor: pointer; color: #ffffff;">
+                                    <input type="radio" name="radioPerguntas" value="NAO" checked onchange="togglePerguntasEspecificas(false); autoSave();"> NÃO
+                                </label>
+                                <label style="display: flex; align-items: center; gap: 6px; cursor: pointer; color: var(--accent-cyan); font-weight: 800;">
+                                    <input type="radio" name="radioPerguntas" value="SIM" onchange="togglePerguntasEspecificas(true); autoSave();"> SIM
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-12" id="containerPerguntasArea" style="display: none;">
+                        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
+                            <strong style="color: #ffffff; font-size: 12px;"><i class="fa-solid fa-list-ol"></i> QUESITOS CADASTRADOS:</strong>
+                            <button type="button" class="btn btn-primary" style="height: 32px; padding: 0 14px; font-size: 11px;" onclick="adicionarNovaPergunta()">
+                                <i class="fa-solid fa-plus"></i> ADICIONAR NOVA PERGUNTA
+                            </button>
+                        </div>
+                        <div id="listaPerguntasDinamicas"></div>
+                    </div>
+                </div>
+
+                <div class="btn-group">
+                    <button class="btn btn-secondary" onclick="avancarParaEtapa(3)"><i class="fa-solid fa-arrow-left"></i> VOLTAR</button>
+                    <button class="btn btn-primary" onclick="avancarParaEtapa(5)">
+                        AVANÇAR PARA DATA E PROTOCOLO <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- ETAPA 5: DATA, CHECKLIST E CONCLUSÃO -->
+            <div class="card" id="stepCard5" style="display: none;">
+                <div class="card-header">
+                    <div class="card-header-title">
+                        <i class="fa-solid fa-calendar-check"></i>
+                        <div>
+                            <h2>ETAPA 5: DATA E CONFERÊNCIA OBRIGATÓRIA</h2>
+                            <p>Escolha da semana de agendamento e conferência dos itens físicos e digitais</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-grid">
+                    <div class="col-6 form-group">
+                        <label>MÊS DO AGENDAMENTO <span class="required">*</span></label>
+                        <select id="mesAgendamentoSelect" class="form-control" onchange="gerarSemanasDoMes(); autoSave();"></select>
+                    </div>
+
+                    <div class="col-6 form-group">
+                        <label>DIA ESPECÍFICO (SEGUNDA A SEXTA) <span class="required">*</span></label>
+                        <select id="diaSemanaSelect" class="form-control" onchange="atualizarDataSelecionada(); autoSave();">
+                            <option value="1">SEGUNDA-FEIRA</option>
+                            <option value="2">TERÇA-FEIRA</option>
+                            <option value="3" selected>QUARTA-FEIRA</option>
+                            <option value="4">QUINTA-FEIRA</option>
+                            <option value="5">SEXTA-FEIRA</option>
+                        </select>
+                    </div>
+
+                    <div class="col-12 form-group">
+                        <label>SEMANA DO MÊS PARA AGENDAMENTO <span class="required">* (MÁX. 1 VTR POR SEMANA POR OPM)</span></label>
+                        <div class="week-selector-grid" id="semanasContainer"></div>
+                    </div>
+
+                    <div class="col-12" style="margin: 8px 0; border-top: 1px dashed var(--border);"></div>
+
+                    <!-- CHECKLIST OBRIGATÓRIO -->
+                    <div class="col-12">
+                        <div style="background: var(--bg-surface); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 16px;">
+                            <strong style="color: #ffffff; font-size: 13px; display: block; margin-bottom: 8px;">
+                                <i class="fa-solid fa-list-check" style="color: var(--accent-cyan);"></i> CONFERÊNCIA DE DOCUMENTAÇÃO E ITENS OBRIGATÓRIOS:
+                            </strong>
+                            <p style="color: var(--text-muted); font-size: 11px; margin-bottom: 12px;">CONFIRME CADA UM DOS ITENS ABAIXO ANTES DE CONCLUIR:</p>
+
+                            <label class="checklist-item"><input type="checkbox" id="chkDoc1" checked disabled> <span>1. OFÍCIO DE APRESENTAÇÃO (OBRIGATÓRIO SOMENTE DIGITAL - ANEXADO NA ETAPA 3)</span></label>
+                            <label class="checklist-item"><input type="checkbox" id="chkDoc2" checked disabled> <span>2. PORTARIA DE SINDICÂNCIA OU IPM (OBRIGATÓRIO SOMENTE DIGITAL - ANEXADO NA ETAPA 3)</span></label>
+                            <label class="checklist-item"><input type="checkbox" id="chkDoc3" checked disabled> <span>3. CÓPIA DE OITIVA DO CONDUTOR (OBRIGATÓRIO SOMENTE DIGITAL - ANEXADO NA ETAPA 3)</span></label>
+                            <label class="checklist-item"><input type="checkbox" id="chkDoc4"> <span>4. TRANSCRIÇÃO DE VÍDEO DA COP (OPCIONAL, PORÉM RELEVANTE SOMENTE DIGITAL)</span></label>
+                            <label class="checklist-item"><input type="checkbox" id="chkDoc5"> <span>5. DEMAIS COMPROVANTES (NOTAS FISCAIS, COMPROVANTES, ORÇAMENTOS, ETC.)</span></label>
+                            <label class="checklist-item"><input type="checkbox" id="chkDoc6" required> <span><strong>6. RIV (FÍSICO)</strong> - DEVERÁ SER APRESENTADO IMPRESSO NA GUARDA DO CMM <span class="required">*</span></span></label>
+                            <label class="checklist-item"><input type="checkbox" id="chkDoc7" required> <span><strong>7. CHAVE DO VEÍCULO</strong> - ENTREGA FÍSICA OBRIGATÓRIA NA CHEGADA <span class="required">*</span></span></label>
+                            <label class="checklist-item"><input type="checkbox" id="chkDoc8" required> <span><strong>8. TODOS OS COMPONENTES DO VEÍCULO NAS MESMAS CONDIÇÕES DO SINISTRO</strong> (BATERIA, PEÇAS ÍNTEGRAS E AVARIADAS) <span class="required">*</span></span></label>
+                        </div>
+                    </div>
+
+                    <div class="col-12 form-group" style="margin-top: 14px;">
+                        <label style="display: flex; align-items: flex-start; gap: 8px; cursor: pointer; color: var(--accent-gold); font-size: 11px;">
+                            <input type="checkbox" id="checkFinalTermo" style="width: 20px; height: 20px; margin-top: 2px;" required>
+                            DECLARO QUE ANEXEI OS DOCUMENTOS EM UPLOAD NESTE FORMULÁRIO E QUE ENVIAREI O RIV FÍSICO JUNTAMENTE COM A CHAVE DO VEÍCULO E SEUS COMPONENTES COMPLETOS.
+                        </label>
+                    </div>
+                </div>
+
+                <div class="btn-group">
+                    <button class="btn btn-secondary" onclick="avancarParaEtapa(4)"><i class="fa-solid fa-arrow-left"></i> VOLTAR</button>
+                    <button class="btn btn-success" onclick="finalizarAgendamento()">
+                        <i class="fa-solid fa-check-double"></i> CONCLUIR AGENDAMENTO
+                    </button>
+                </div>
+            </div>
+
+            <!-- GUIA OFICIAL EMITIDA -->
+            <div class="card" id="stepCardConfirmacao" style="display: none;">
+                <div class="receipt-container" id="printableReceipt">
+                    <div class="receipt-header">
+                        <img src="brasao_pmesp.png" alt="PMESP" style="height: 55px;" onerror="this.style.display='none'">
+                        <div class="receipt-header-text">
+                            <h3>POLÍCIA MILITAR DO ESTADO DE SÃO PAULO</h3>
+                            <h4>CENTRO DE MOTOMECANIZAÇÃO - CMM</h4>
+                            <p>SEÇÃO DE MANUTENÇÃO DE FROTA - OFICINA CENTRAL</p>
+                            <p style="font-weight: 900; margin-top: 6px; font-size: 13px; color: #0284c7;">
+                                GUIA OFICIAL DE ENCAMINHAMENTO PARA ANÁLISE TÉCNICA
+                            </p>
+                        </div>
+                        <img src="cmmasa.png" alt="CMM" style="height: 55px;" onerror="this.style.display='none'">
+                    </div>
+
+                    <div class="receipt-protocol-box">
+                        <div>
+                            <span style="font-size: 10px; color: #475569; font-weight: 800; display: block;">PROTOCOLO OFICIAL:</span>
+                            <span class="receipt-proto-code" id="receiptProtocolo">CMM-AT-2026-000000</span>
+                        </div>
+                        <div id="qrcodeBox" style="width: 70px; height: 70px;"></div>
+                    </div>
+
+                    <table class="receipt-table">
+                        <tr><th>DATA / SEMANA AGENDADA:</th><td id="recDataHora" style="font-size: 13px; font-weight: 800; color: #0369a1;">---</td></tr>
+                        <tr><th>SINDICÂNCIA / IPM Nº:</th><td id="recSindicancia" style="font-size: 13px; font-weight: 800; color: #dc2626;">---</td></tr>
+                        <tr><th>TIPO DE PROCEDIMENTO:</th><td id="recProcedimento">---</td></tr>
+                        <tr><th>VIATURA (PLACA / PREFIXO):</th><td id="recVtrPlacaPrefixo" style="font-weight: 800;">---</td></tr>
+                        <tr><th>MARCA / MODELO / ANO:</th><td id="recVtrModelo">---</td></tr>
+                        <tr><th>CHASSI / MOTOR / PATRIMÔNIO:</th><td id="recVtrSpecs">---</td></tr>
+                        <tr><th>OPM SOLICITANTE:</th><td id="recOpm">---</td></tr>
+                        <tr><th>MILITAR RESPONSÁVEL:</th><td id="recMilitar">---</td></tr>
+                        <tr><th>CONTATO / E-MAIL:</th><td id="recContato">---</td></tr>
+                        <tr><th>CONDIÇÃO DO VEÍCULO / KM:</th><td id="recCondicao">---</td></tr>
+                        <tr><th>DESCRIÇÃO DA AVARIA:</th><td id="recMotivo">---</td></tr>
+                        <tr><th>OBJETIVO DA ANÁLISE:</th><td id="recObjetivo">---</td></tr>
+                        <tr><th>PERGUNTAS DO PRESIDENTE:</th><td id="recPerguntas">---</td></tr>
+                        <tr><th>DOCUMENTAÇÃO ANEXADA (.PDF):</th><td id="recDocumentos">---</td></tr>
+                    </table>
+
+                    <div class="receipt-rules">
+                        <strong>INSTRUÇÕES OBRIGATÓRIAS PARA APRESENTAÇÃO NO CMM:</strong><br>
+                        1. Apresentar esta guia impressa na Guarda / Recepção do CMM no ato da entrega da viatura.<br>
+                        2. É obrigatória a apresentação do <strong>RIV FÍSICO</strong> e da <strong>CHAVE DO VEÍCULO</strong>.<br>
+                        3. Todos os componentes do veículo devem estar nas mesmas condições do sinistro.<br>
+                        4. A OPM fica ciente de que um novo veículo só poderá ser agendado após a conclusão e emissão da <strong>Data do Parecer Técnico</strong> desta viatura.
+                    </div>
+
+                    <div class="receipt-signatures">
+                        <div>
+                            <div class="sign-line">ENCARREGADO / CONDUTOR DA OPM</div>
+                            <span id="signMilitarNome" style="font-size: 10px; color: #475569;">---</span>
+                        </div>
+                        <div>
+                            <div class="sign-line">RECEBIDO NO CMM (GUARDA / OFICINA)</div>
+                            <span style="font-size: 10px; color: #475569;">DATA: _____/_____/2026 - ASSINATURA / CARIMBO</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="btn-group non-printable" style="justify-content: center; margin-top: 24px;">
+                    <button class="btn btn-primary" style="height: 48px; padding: 0 32px; font-size: 13px;" onclick="window.print()">
+                        <i class="fa-solid fa-print"></i> IMPRIMIR GUIA OFICIAL / SALVAR PDF
+                    </button>
+                    <button class="btn btn-secondary" onclick="abrirPortalCapa()">
+                        <i class="fa-solid fa-house"></i> RETORNAR AO INÍCIO
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ====================================================================
+             TELA 3: ÁREA DO OPERADOR (CMM)
+             ==================================================================== -->
+        <div id="viewOperador" style="display: none;">
+            <!-- SUB-ABAS DO OPERADOR -->
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; flex-wrap: wrap; gap: 12px;">
+                <div style="display: flex; gap: 10px;">
+                    <button class="nav-btn active" id="btnOpSubPainel" onclick="switchOperadorSubView('painel')">
+                        <i class="fa-solid fa-list-check"></i> SETOR TÉCNICO
+                    </button>
+                    <button class="nav-btn" id="btnOpSubEditor" onclick="switchOperadorSubView('editor')">
+                        <i class="fa-solid fa-file-signature"></i> RELATÓRIO DO PARECER TÉCNICO
+                    </button>
+                    <button class="nav-btn" id="btnOpSubDocOficial" onclick="switchOperadorSubView('doc')">
+                        <i class="fa-solid fa-file-lines"></i> VISUALIZAR PARECER OFICIAL
+                    </button>
+                </div>
+                <div style="display: flex; gap: 8px;">
+                    <button class="btn btn-secondary" onclick="atualizarTabelaGestaoOperador()">
+                        <i class="fa-solid fa-rotate"></i> ATUALIZAR DADOS
+                    </button>
+                    <button class="btn btn-secondary" onclick="abrirPortalCapa()">
+                        <i class="fa-solid fa-house"></i> SAIR DO PAINEL
+                    </button>
+                </div>
+            </div>
+
+            <!-- SUB-SEÇÃO 1: GESTÃO DO PAINEL DE ATENDIMENTO -->
+            <div id="opSubSecPainel">
+                <!-- CARDS KPI DE GESTÃO -->
+                <div class="metrics-grid">
+                    <div class="metric-card">
+                        <div class="metric-icon" style="background: rgba(2, 132, 199, 0.15); color: var(--accent-cyan);">
+                            <i class="fa-solid fa-warehouse"></i>
+                        </div>
+                        <div>
+                            <div class="metric-val" id="kpiVagasPatio">8 / 8</div>
+                            <div class="metric-lbl">VAGAS LIVRES NO PÁTIO (MÁX: 8)</div>
+                        </div>
+                    </div>
+
+                    <div class="metric-card">
+                        <div class="metric-icon" style="background: rgba(245, 158, 11, 0.15); color: var(--accent-amber);">
+                            <i class="fa-solid fa-clock"></i>
+                        </div>
+                        <div>
+                            <div class="metric-val" id="kpiAguardandoAutorizacao">0</div>
+                            <div class="metric-lbl">PENDENTES DE AUTORIZAÇÃO</div>
+                        </div>
+                    </div>
+
+                    <div class="metric-card">
+                        <div class="metric-icon" style="background: rgba(139, 92, 246, 0.15); color: var(--accent-purple);">
+                            <i class="fa-solid fa-pen-to-square"></i>
+                        </div>
+                        <div>
+                            <div class="metric-val" id="kpiEmConfeccao">0</div>
+                            <div class="metric-lbl">EM CONFECÇÃO DE PARECER</div>
+                        </div>
+                    </div>
+
+                    <div class="metric-card">
+                        <div class="metric-icon" style="background: rgba(16, 185, 129, 0.15); color: var(--accent-green);">
+                            <i class="fa-solid fa-circle-check"></i>
+                        </div>
+                        <div>
+                            <div class="metric-val" id="kpiConcluidos">0</div>
+                            <div class="metric-lbl">PARECERES CONCLUÍDOS</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- FILTROS E BUSCADOR -->
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-header-title">
+                            <i class="fa-solid fa-filter"></i>
+                            <div>
+                                <h2>FILTRO DE ATENDIMENTO</h2>
+                                
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-grid">
+                        <div class="col-3 form-group">
+                            <label>FILTRAR POR STATUS</label>
+                            <select id="opFiltroStatus" class="form-control" onchange="atualizarTabelaGestaoOperador()">
+                                <option value="">TODOS OS STATUS</option>
+                                <option value="PENDENTE DE AUTORIZAÇÃO">PENDENTE DE AUTORIZAÇÃO</option>
+                                <option value="AUTORIZADO / AGENDADO">AUTORIZADO / AGENDADO</option>
+                                <option value="NO PÁTIO (AGUARDANDO ANÁLISE)">NO PÁTIO (AGUARDANDO ANÁLISE)</option>
+                                <option value="EM CONFECÇÃO DE PARECER">EM CONFECÇÃO DE PARECER</option>
+                                <option value="CONCLUÍDO (PARECER EMITIDO)">CONCLUÍDO (PARECER EMITIDO)</option>
+                            </select>
+                        </div>
+
+                        <div class="col-3 form-group">
+                            <label>FILTRAR POR OPM</label>
+                            <input type="text" id="opFiltroOpm" class="form-control" placeholder="DIGITE A OPM..." oninput="atualizarTabelaGestaoOperador()">
+                        </div>
+
+                        <div class="col-6 form-group">
+                            <label>BUSCA GERAL (PLACA, PROTOCOLO, SINDICÂNCIA OU OPERADOR)</label>
+                            <input type="text" id="opFiltroTexto" class="form-control" placeholder="BUSCAR POR QUALQUER TERMO..." oninput="atualizarTabelaGestaoOperador()">
+                        </div>
+                    </div>
+
+                    <!-- TABELA DE GESTÃO -->
+                    <div class="table-responsive" style="margin-top: 18px;">
+                        <table class="custom-table" id="tabelaGestaoOperador">
+                            <thead>
+                                <tr>
+                                    <th>SEMANA / DATA</th>
+                                    <th>PROTOCOLO</th>
+                                    <th>VIATURA (PLACA/PREF)</th>
+                                    <th>OPM</th>
+                                    <th>SINDICÂNCIA / IPM</th>
+                                    <th>STATUS DO TICKET</th>
+                                    <th>OPERADOR RESPONSÁVEL</th>
+                                    <th>DATA PARECER</th>
+                                    <th>AÇÕES OPERACIONAIS</th>
+                                </tr>
+                            </thead>
+                            <tbody id="corpoTabelaGestao">
+                                <!-- Preenchido dinamicamente -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SUB-SEÇÃO 2: RELATÓRIO DO PARECER TÉCNICO (EDITOR DO OPERADOR) -->
+            <div id="opSubSecEditor" style="display: none;">
+                <div class="parecer-editor-card">
+                    <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border); padding-bottom: 14px; margin-bottom: 20px; flex-wrap: wrap; gap: 12px;">
+                        <div>
+                            <span class="badge-operator-tag" id="editorOperadorBadge">RELATOR: ---</span>
+                            <h2 style="font-size: 16px; font-weight: 900; color: #ffffff; margin-top: 4px;">
+                                CONFECÇÃO DO PARECER TÉCNICO OFICIAL - CMM
+                            </h2>
+                            <p style="font-size: 11px; color: var(--text-muted);" id="editorTicketInfo">SELECIONE UM TICKET NO PAINEL PARA INICIAR A CONFECÇÃO</p>
+                        </div>
+                        <div style="display: flex; gap: 8px;">
+                            <button class="btn btn-secondary" onclick="salvarRascunhoParecer()">
+                                <i class="fa-solid fa-floppy-disk"></i> SALVAR RASCUNHO
+                            </button>
+                            <button class="btn btn-primary" onclick="visualizarParecerOficialFormatado()">
+                                <i class="fa-solid fa-eye"></i> VISUALIZAR PARECER
+                            </button>
+                            <button class="btn btn-success" onclick="concluirParecerRegistrarData()">
+                                <i class="fa-solid fa-stamp"></i> CONCLUIR E REGISTRAR DATA DO PARECER
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- SEÇÃO 1 DO PARECER: CABEÇALHO E PREÂMBULO -->
+                                        <!-- SEÇÃO DE UPLOAD EM BULK DE FOTOS -->
+                    <div class="parecer-section-block" style="border: 2px solid var(--accent-cyan); background: linear-gradient(180deg, rgba(6,182,212,0.08) 0%, var(--bg-surface) 100%);">
+                        <div class="parecer-section-title">
+                            <h3 style="color: var(--accent-cyan);"><i class="fa-solid fa-images"></i> UPLOAD DE FOTOS EM BULK (BANCO DE FOTOS DO LAUDO)</h3>
+                            <span class="badge-status operacao" id="bulkCountBadge">0 FOTOS CARREGADAS</span>
+                        </div>
+
+                        <div class="bulk-photo-uploader">
+                            <i class="fa-solid fa-cloud-arrow-up" style="font-size: 36px; color: var(--accent-cyan); margin-bottom: 8px;"></i>
+                            <h4 style="font-size: 13px; color: #ffffff;">SELECIONE MÚLTIPLAS FOTOS DO VEÍCULO (EM BULK / LOTE)</h4>
+                            <p style="font-size: 11px; color: var(--text-muted); margin-bottom: 12px;">CARREGUE INICIALMENTE TODAS AS FOTOS DO VEÍCULO (PLACA, VIN, PAINEL, AVARIAS, SCANNER, PASTILHAS, ETC.). ELAS FICARÃO DISPONÍVEIS IMEDIATAMENTE PARA ESCOLHA EM QUALQUER ITEM ABAIXO.</p>
+                            <input type="file" id="bulkPhotoInput" accept="image/*" multiple style="display: none;" onchange="handleBulkPhotoUpload(this)">
+                            <button type="button" class="btn btn-primary" onclick="document.getElementById('bulkPhotoInput').click()">
+                                <i class="fa-solid fa-folder-open"></i> CARREGAR FOTOS EM LOTE
+                            </button>
+                        </div>
+
+                        <div class="photo-gallery-preview" id="bulkGalleryContainer"></div>
+                    </div>
+
+                    <div class="parecer-section-block">
+                        <div class="parecer-section-title">
+                            <h3>1. NÚMERO DO PARECER E DATA DA COMISSÃO</h3>
+                        </div>
+                        <div class="form-grid">
+                            <div class="col-4 form-group">
+                                <label>Nº DO PARECER TÉCNICO</label>
+                                <input type="text" id="ptNumParecer" class="form-control" value="CMM-24/30.3/26">
+                            </div>
+                            <div class="col-4 form-group">
+                                <label>DATA DA REUNIÃO DA COMISSÃO (POR EXTENSO)</label>
+                                <input type="text" id="ptDataExtenso" class="form-control" value="AO VIGÉSIMO QUARTO DIA DO MÊS DE JUNHO DO ANO DE DOIS MIL E VINTE E SEIS">
+                            </div>
+                            <div class="col-4 form-group">
+                                <label>BOLETIM INTERNO DO CMM</label>
+                                <input type="text" id="ptBoletimInterno" class="form-control" value="BOLETIM INTERNO Nº CMM-08/24">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- SEÇÃO 2 DO PARECER: DA MOTIVAÇÃO (AUTO-PUXADO) -->
+                    <div class="parecer-section-block">
+                        <div class="parecer-section-title">
+                            <h3>2. DA MOTIVAÇÃO (DADOS AUTOMÁTICOS DO CADASTRO)</h3>
+                            <button type="button" class="btn-snippet" onclick="recuperarDadosTicketMotivacao()"><i class="fa-solid fa-arrows-rotate"></i> RECARREGAR DO TICKET</button>
+                        </div>
+                        <div class="form-group">
+                            <textarea id="ptTextoMotivacao" class="form-control" style="min-height: 90px;"></textarea>
+                        </div>
+                    </div>
+
+                    <!-- SEÇÃO 3: IDENTIFICAÇÃO DO VEÍCULO E FOTOS 1 E 2 -->
+                    <div class="parecer-section-block">
+                        <div class="parecer-section-title">
+                            <h3>3. IDENTIFICAÇÃO DO VEÍCULO OFICIAL (FOTOS 1 E 2)</h3>
+                            <div class="snippets-bar" style="margin: 0; padding: 2px 6px;">
+                                <button type="button" class="btn-snippet" onclick="inserirSnippet('ptItem3', 'IDENTIFICAÇÃO REALIZADA POR EMPLACAMENTO, PREFIXO OPERACIONAL E NÚMERO DO VIN.')">PADRÃO</button>
+                            </div>
+                        </div>
+                        <div class="form-group" style="margin-bottom: 12px;">
+                            <textarea id="ptItem3" class="form-control" style="min-height: 60px;">3.1. IDENTIFICAÇÃO REALIZADA POR EMPLACAMENTO, PREFIXO OPERACIONAL, VIN (FOTOS 1-2).</textarea>
+                        </div>
+
+                        
+                        <!-- 4 SELETORES DE FOTOS DISPONÍVEIS PARA O ITEM 3 -->
+                        <div style="background: rgba(15, 23, 42, 0.8); padding: 10px 14px; border-radius: var(--radius-sm); border: 1px solid var(--border); margin-top: 10px;">
+                            <span style="font-size: 11px; font-weight: 700; color: var(--accent-cyan); display: block; margin-bottom: 8px;">
+                                <i class="fa-solid fa-camera"></i> FOTOS DO ITEM 3 (EMPLACAMENTO / CHASSI / VIN - ESCOLHA DE 1 A 4 FOTOS):
+                            </span>
+                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 8px;">
+                                <select id="selFotoItem3A" class="form-control" style="height: 32px;" onchange="renderizarPreviaFotosItem(3)"><option value="">FOTO 01: SELECIONE...</option></select>
+                                <select id="selFotoItem3B" class="form-control" style="height: 32px;" onchange="renderizarPreviaFotosItem(3)"><option value="">FOTO 02: SELECIONE...</option></select>
+                                <select id="selFotoItem3C" class="form-control" style="height: 32px;" onchange="renderizarPreviaFotosItem(3)"><option value="">FOTO 03: SELECIONE...</option></select>
+                                <select id="selFotoItem3D" class="form-control" style="height: 32px;" onchange="renderizarPreviaFotosItem(3)"><option value="">FOTO 04: SELECIONE...</option></select>
+                            </div>
+                        </div>
+                        <div id="previaFotosItem3" style="margin-top: 10px;"></div>
+                    </div>
+
+                    <!-- SEÇÃO 4: PAINEL DE INSTRUMENTOS E FOTOS 3 E 4 -->
+                    <div class="parecer-section-block">
+                        <div class="parecer-section-title">
+                            <h3>4. PAINEL DE INSTRUMENTOS (FOTOS 3 E 4)</h3>
+                            <div class="snippets-bar" style="margin: 0; padding: 2px 6px;">
+                                <button type="button" class="btn-snippet" onclick="inserirSnippet('ptItem4', 'LUZES INDICADORAS DE ADVERTÊNCIAS E ANOMALIAS FUNCIONANDO NORMALMENTE. QUILOMETRAGEM VERIFICADA E REGISTRADA.')">LUZES OK</button>
+                                <button type="button" class="btn-snippet" onclick="inserirSnippet('ptItem4', 'PERMANECENDO ACESA LUZES ESPIAS DE SISTEMA DE ALERTA PRÉ-COLISÃO E SENSOR DE CALIBRAGEM DE PNEUS.')">LUZES PRÉ-COLISÃO ACESAS</button>
+                            </div>
+                        </div>
+                        <div class="form-group" style="margin-bottom: 12px;">
+                            <textarea id="ptItem4" class="form-control" style="min-height: 70px;">4.1. LUZES INDICADORAS DE ADVERTÊNCIAS E ANOMALIAS FUNCIONANDO NORMALMENTE (FOTO 3);
+4.2. INDICAÇÃO DE QUILOMETRAGEM ATUAL PERMANECENDO ACESA LUZES ESPIAS DE SISTEMA DE ALERTA PRÉ-COLISÃO (FOTO 4).</textarea>
+                        </div>
+
+                        
+                        <!-- 4 SELETORES DE FOTOS DISPONÍVEIS PARA O ITEM 4 -->
+                        <div style="background: rgba(15, 23, 42, 0.8); padding: 10px 14px; border-radius: var(--radius-sm); border: 1px solid var(--border); margin-top: 10px;">
+                            <span style="font-size: 11px; font-weight: 700; color: var(--accent-cyan); display: block; margin-bottom: 8px;">
+                                <i class="fa-solid fa-camera"></i> FOTOS DO ITEM 4 (PAINEL DE INSTRUMENTOS E HODÔMETRO - ESCOLHA DE 1 A 4 FOTOS):
+                            </span>
+                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 8px;">
+                                <select id="selFotoItem4A" class="form-control" style="height: 32px;" onchange="renderizarPreviaFotosItem(4)"><option value="">FOTO 01: SELECIONE...</option></select>
+                                <select id="selFotoItem4B" class="form-control" style="height: 32px;" onchange="renderizarPreviaFotosItem(4)"><option value="">FOTO 02: SELECIONE...</option></select>
+                                <select id="selFotoItem4C" class="form-control" style="height: 32px;" onchange="renderizarPreviaFotosItem(4)"><option value="">FOTO 03: SELECIONE...</option></select>
+                                <select id="selFotoItem4D" class="form-control" style="height: 32px;" onchange="renderizarPreviaFotosItem(4)"><option value="">FOTO 04: SELECIONE...</option></select>
+                            </div>
+                        </div>
+                        <div id="previaFotosItem4" style="margin-top: 10px;"></div>
+                    </div>
+
+                    <!-- SEÇÃO 5: CONDIÇÃO DE APRESENTAÇÃO E AVARIAS (FOTOS 5 A 8 - QUARTETO) -->
+                    <div class="parecer-section-block">
+                        <div class="parecer-section-title">
+                            <h3>5. CONDIÇÃO DE APRESENTAÇÃO DO VEÍCULO (FOTOS 5 A 8)</h3>
+                            <div class="snippets-bar" style="margin: 0; padding: 2px 6px;">
+                                <button type="button" class="btn-snippet" onclick="inserirSnippet('ptItem5', 'O VEÍCULO FOI APRESENTADO COM DANOS NO PARA-CHOQUE DIANTEIRO, GRADES, FAROL ESQUERDO E SUSPENSÃO; POWER TRAIN MONTADO E FUNCIONANDO.')">COLISÃO DIANTEIRA</button>
+                                <button type="button" class="btn-snippet" onclick="inserirSnippet('ptItem5', 'NÃO FOI APRESENTADO O R.I.V.')">SEM R.I.V.</button>
+                                <button type="button" class="btn-snippet" onclick="inserirSnippet('ptItem5', 'APRESENTADO COM O DEVIDO R.I.V. DEVIDAMENTE PREENCHIDO E ASSINADO.')">COM R.I.V.</button>
+                            </div>
+                        </div>
+                        <div class="form-group" style="margin-bottom: 12px;">
+                            <textarea id="ptItem5" class="form-control" style="min-height: 85px;">5.1. O VEÍCULO FOI APRESENTADO NESSE CENTRO DE MOTOMECANIZAÇÃO COM DANOS DE COLISÃO; COM O SISTEMA MECÂNICO, ELETRÔNICO E POWER TRAIN MONTADOS E FUNCIONANDO.
+5.2. APRESENTADO COM DOCUMENTAÇÃO REGULAR.</textarea>
+                        </div>
+
+                        <!-- 4 FOTOS (QUARTETO) -->
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 8px; background: rgba(15, 23, 42, 0.8); padding: 8px 12px; border-radius: var(--radius-sm); border: 1px solid var(--border);">
+                            <select id="selFotoItem5A" class="form-control" style="height: 32px;" onchange="renderizarPreviaFotosItem(5)"><option value="">FOTO 05: SELECIONE...</option></select>
+                            <select id="selFotoItem5B" class="form-control" style="height: 32px;" onchange="renderizarPreviaFotosItem(5)"><option value="">FOTO 06: SELECIONE...</option></select>
+                            <select id="selFotoItem5C" class="form-control" style="height: 32px;" onchange="renderizarPreviaFotosItem(5)"><option value="">FOTO 07: SELECIONE...</option></select>
+                            <select id="selFotoItem5D" class="form-control" style="height: 32px;" onchange="renderizarPreviaFotosItem(5)"><option value="">FOTO 08: SELECIONE...</option></select>
+                        </div>
+                        <div id="previaFotosItem5" style="margin-top: 10px;"></div>
+                    </div>
+
+                    <!-- SEÇÃO 6: INFORMAÇÕES TÉCNICAS RELACIONADAS -->
+                    <div class="parecer-section-block">
+                        <div class="parecer-section-title">
+                            <h3>6. INFORMAÇÕES TÉCNICAS RELACIONADAS</h3>
+                            <div class="snippets-bar" style="margin: 0; padding: 2px 6px;">
+                                <button type="button" class="btn-snippet" onclick="inserirSnippet('ptItem6', 'A FUNÇÃO PRINCIPAL DO SISTEMA DE FREIOS É TRANSMITIR A FORÇA APLICADA PELO CONDUTOR AO PEDAL GERANDO O ATRITO NECESSÁRIO À DESACELERAÇÃO OU À MANUTENÇÃO DA INÉRCIA.')">CONCEITO DE FREIOS</button>
+                                <button type="button" class="btn-snippet" onclick="inserirSnippet('ptItem6', 'O SISTEMA DE DIREÇÃO E SUSPENSÃO ATUA DIRETAMENTE NA ESTABILIDADE DIRECIONAL E ABSORÇÃO DE IMPACTOS DA VIA.')">CONCEITO SUSPENSÃO</button>
+                            </div>
+                        </div>
+                        <textarea id="ptItem6" class="form-control" style="min-height: 80px;">6.1. A FUNÇÃO PRINCIPAL DO SISTEMA DE FREIOS É TRANSMITIR A FORÇA APLICADA PELO CONDUTOR AO PEDAL GERANDO O ATRITO NECESSÁRIO À DESACELERAÇÃO OU À MANUTENÇÃO DA INÉRCIA. A APLICAÇÃO DA FORÇA DE FRENAGEM TAMBÉM SE VALE DO PRINCÍPIO DA FORÇA DE ALAVANCA E MULTIPLICAÇÃO HIDRÁULICA.</textarea>
+                    </div>
+
+                    <!-- SEÇÃO 7: RASTREAMENTO ELETRÔNICO (SCANNER RASTHER) -->
+                    <div class="parecer-section-block">
+                        <div class="parecer-section-title">
+                            <h3>7. RASTREAMENTO ELETRÔNICO DE FALHAS (SCANNER DIAGNÓSTICO)</h3>
+                            <div class="snippets-bar" style="margin: 0; padding: 2px 6px;">
+                                <button type="button" class="btn-snippet" onclick="inserirSnippet('ptItem7', 'SUBMETIDO À VARREDURA DO SISTEMA ELETRÔNICO COM EQUIPAMENTO RASTHER III S; NO SISTEMA DE MOTOR NÃO FORAM CONSTATADOS DEFEITOS.')">RASTHER MOTOR OK</button>
+                                <button type="button" class="btn-snippet" onclick="inserirSnippet('ptItem7', 'NÃO É POSSÍVEL CONSIGNAR O LAPSO TEMPORAL DE QUAIS OS HORÁRIOS E/OU DATA EXATA DAS FALHAS APRESENTADAS.')">SEM HISTÓRICO TEMPORAL</button>
+                            </div>
+                        </div>
+                        <div class="form-group" style="margin-bottom: 12px;">
+                            <textarea id="ptItem7" class="form-control" style="min-height: 90px;">7.1. SUBMETIDO À VARREDURA DO SISTEMA ELETRÔNICO COM EQUIPAMENTO DIAGNÓSTICO RASTHER III S;
+7.2. NO SISTEMA DE MOTOR NÃO FORAM CONSTATADAS FALHAS MECÂNICAS;
+7.3. DETECTADAS FALHAS EM MÓDULOS DE ASSISTÊNCIA DEVIDO AO IMPACTO (TIMEOUT DE REDE CAN);
+7.4. NÃO É POSSÍVEL CONSIGNAR O LAPSO TEMPORAL DE QUAIS OS HORÁRIOS E/OU DATA EXATA DAS FALHAS APRESENTADAS.</textarea>
+                        </div>
+                        
+                        <!-- 4 SELETORES DE FOTOS DISPONÍVEIS PARA O ITEM 7 -->
+                        <div style="background: rgba(15, 23, 42, 0.8); padding: 10px 14px; border-radius: var(--radius-sm); border: 1px solid var(--border); margin-top: 10px;">
+                            <span style="font-size: 11px; font-weight: 700; color: var(--accent-cyan); display: block; margin-bottom: 8px;">
+                                <i class="fa-solid fa-camera"></i> FOTOS DO ITEM 7 (RASTREAMENTO ELETRÔNICO / SCANNER RASTHER - ESCOLHA DE 1 A 4 FOTOS):
+                            </span>
+                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 8px;">
+                                <select id="selFotoItem7A" class="form-control" style="height: 32px;" onchange="renderizarPreviaFotosItem(7)"><option value="">FOTO 01: SELECIONE...</option></select>
+                                <select id="selFotoItem7B" class="form-control" style="height: 32px;" onchange="renderizarPreviaFotosItem(7)"><option value="">FOTO 02: SELECIONE...</option></select>
+                                <select id="selFotoItem7C" class="form-control" style="height: 32px;" onchange="renderizarPreviaFotosItem(7)"><option value="">FOTO 03: SELECIONE...</option></select>
+                                <select id="selFotoItem7D" class="form-control" style="height: 32px;" onchange="renderizarPreviaFotosItem(7)"><option value="">FOTO 04: SELECIONE...</option></select>
+                            </div>
+                        </div>
+                        <div id="previaFotosItem7" style="margin-top: 10px;"></div>
+                    </div>
+
+                    <!-- SEÇÃO 8: ELEMENTOS SOB ANÁLISE (MEDIÇÕES) -->
+                    <div class="parecer-section-block">
+                        <div class="parecer-section-title">
+                            <h3>8. ELEMENTOS SOB ANÁLISE (PASTILHAS, DISCOS, FLUIDO)</h3>
+                            <div class="snippets-bar" style="margin: 0; padding: 2px 6px;">
+                                <button type="button" class="btn-snippet" onclick="inserirSnippet('ptItem8', 'DISCOS ESTÃO REGULARES E NÃO APRESENTAM ONDULAÇÕES OU FISSURAS, PASTILHAS COM BOA ESPESSURA DA MASSA DE ATRITO.')">PASTILHAS/DISCOS OK</button>
+                                <button type="button" class="btn-snippet" onclick="inserirSnippet('ptItem8', 'FLUIDO DE FREIO APRESENTOU COLORAÇÃO LÍMPIDA E NÍVEL REGULAR; TESTE HIGROSCÓPICO COM ÍNDICE BOM.')">FLUIDO HIGROSCÓPICO OK</button>
+                                <button type="button" class="btn-snippet" onclick="inserirSnippet('ptItem8', 'NÃO FOI REALIZADO TESTE DINÂMICO DE RODAGEM DEVIDO ÀS AVARIAS MECÂNICAS DA VIATURA.')">TESTE DINÂMICO PREJUDICADO</button>
+                            </div>
+                        </div>
+                        <div class="form-group" style="margin-bottom: 12px;">
+                            <textarea id="ptItem8" class="form-control" style="min-height: 90px;">8.1. SUBSISTEMA MECÂNICO DE FREIOS DAS RODAS DIANTEIRAS E TRASEIRAS: DISCOS REGULARES, PASTILHAS DE FREIO COM BOA ESPESSURA DA MASSA DE ATRITO, SEM VAZAMENTOS;
+8.2. FLUIDO DE FREIO LÍMPIDO COM TESTE HIGROSCÓPICO EM NÍVEL ADEQUADO;
+8.3. NÃO FOI REALIZADO TESTE DINÂMICO E/OU ESTÁTICO DEVIDO ÀS AVARIAS DA VIATURA.</textarea>
+                        </div>
+
+                        <!-- 4 SELETORES DE FOTOS DISPONÍVEIS PARA O ITEM 8 -->
+                        <div style="background: rgba(15, 23, 42, 0.8); padding: 10px 14px; border-radius: var(--radius-sm); border: 1px solid var(--border); margin-top: 10px;">
+                            <span style="font-size: 11px; font-weight: 700; color: var(--accent-cyan); display: block; margin-bottom: 8px;">
+                                <i class="fa-solid fa-camera"></i> FOTOS DO ITEM 8 (MEDIÇÕES DE PASTILHAS / DISCOS / FLUIDO - ESCOLHA DE 1 A 4 FOTOS):
+                            </span>
+                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 8px;">
+                                <select id="selFotoItem8A" class="form-control" style="height: 32px;" onchange="renderizarPreviaFotosItem(8)"><option value="">FOTO 01: SELECIONE...</option></select>
+                                <select id="selFotoItem8B" class="form-control" style="height: 32px;" onchange="renderizarPreviaFotosItem(8)"><option value="">FOTO 02: SELECIONE...</option></select>
+                                <select id="selFotoItem8C" class="form-control" style="height: 32px;" onchange="renderizarPreviaFotosItem(8)"><option value="">FOTO 03: SELECIONE...</option></select>
+                                <select id="selFotoItem8D" class="form-control" style="height: 32px;" onchange="renderizarPreviaFotosItem(8)"><option value="">FOTO 04: SELECIONE...</option></select>
+                            </div>
+                        </div>
+                        <div id="previaFotosItem8" style="margin-top: 10px;"></div>
+                    </div>
+
+                    <!-- SEÇÃO 9: RESPOSTA AOS QUESITOS DO PRESIDENTE (PUXA DO CADASTRO AUTOMATICAMENTE) -->
+                    <div class="parecer-section-block">
+                        <div class="parecer-section-title">
+                            <h3>9. RESPOSTAS AOS QUESITOS DO PRESIDENTE DO IPM/SINDICÂNCIA</h3>
+                            <div class="snippets-bar" style="margin: 0; padding: 2px 6px;">
+                                <span style="font-size: 10px; color: var(--text-muted); font-weight: 700;">HALL DE RESPOSTAS PRONTAS:</span>
+                                <button type="button" class="btn-snippet" onclick="inserirTextoNaRespostaAtiva('SISTEMA DE FREIOS EM CONDIÇÃO REGULAR, SEM SINAIS DE ANOMALIA MECÂNICA OU ERRO DE MONTAGEM.')">SISTEMA MECÂNICO REGULAR</button>
+                                <button type="button" class="btn-snippet" onclick="inserirTextoNaRespostaAtiva('FALHAS DETECTADAS LIGADAS AO IMPACTO, NÃO INTERFERINDO NEGATIVAMENTE NO FUNCIONAMENTO MECÂNICO.')">SEM INTERFERÊNCIA MECÂNICA</button>
+                                <button type="button" class="btn-snippet" onclick="inserirTextoNaRespostaAtiva('NÃO FOI POSSÍVEL REALIZAR TESTES DINÂMICOS DEVIDO ÀS AVARIAS NO VEÍCULO, RESTANDO PREJUDICADA ESTA ANÁLISE.')">TESTES PREJUDICADOS</button>
+                                <button type="button" class="btn-snippet" onclick="inserirTextoNaRespostaAtiva('A DISTÂNCIA DE SEGURANÇA E FRENAGEM DEPENDE CUMULATIVAMENTE DE VELOCIDADE, TEMPO DE REAÇÃO E ATRITO DA VIA.')">FATOR REAÇÃO/DISTÂNCIA</button>
+                            </div>
+                        </div>
+
+                        <p style="font-size: 11px; color: var(--text-muted); margin-bottom: 12px;">
+                            AS PERGUNTAS ABAIXO FORAM IMPORTADAS AUTOMATICAMENTE DO CADASTRO DA OPM. RESPONDA CADA QUESITO TÉCNICO:
+                        </p>
+
+                        <div id="containerRespostasQuesitos">
+                            <!-- Inserido dinamicamente para cada pergunta cadastrada -->
+                        </div>
+                    </div>
+
+                                        <!-- SEÇÃO 10: ASSINATURAS DA COMISSÃO TÉCNICA (3 MILITARES) -->
+                    <div class="parecer-section-block">
+                        <div class="parecer-section-title">
+                            <h3>10. MEMBROS DA COMISSÃO TÉCNICA DO CMM (03 INTEGRANTES)</h3>
+                        </div>
+                        <p style="font-size: 11px; color: var(--text-muted); margin-bottom: 12px;">
+                            Conforme portaria da Comissão Técnica do CMM, o Parecer é assinado por 03 militares (Presidente centralizado acima, Relator e Auxiliar Técnico abaixo).
+                        </p>
+                        <div class="form-grid">
+                            <div class="col-4 form-group">
+                                <label>1º INTEGRANTE (PRESIDENTE TÉCNICO) <span class="required">*</span></label>
+                                <input type="text" id="ptMembroPresidente" class="form-control" value="JOSÉ MAYCON DE PAIVA HONORATO" placeholder="NOME DO PRESIDENTE">
+                                <small style="color: var(--text-dim); font-size: 10px;">CAP PM PRESIDENTE TÉCNICO</small>
+                            </div>
+                            <div class="col-4 form-group">
+                                <label>2º INTEGRANTE (MEMBRO RELATOR) <span class="required">*</span></label>
+                                <input type="text" id="ptMembroRelator" class="form-control" placeholder="NOME DO RELATOR">
+                                <small style="color: var(--text-dim); font-size: 10px;">AUXILIAR TÉCNICO RELATOR</small>
+                            </div>
+                            <div class="col-4 form-group">
+                                <label>3º INTEGRANTE (AUXILIAR TÉCNICO 2) <span class="required">*</span></label>
+                                <input type="text" id="ptMembroAuxiliar2" class="form-control" value="MARCELO BARONE RODRIGUES" placeholder="NOME DO 3º INTEGRANTE">
+                                <small style="color: var(--text-dim); font-size: 10px;">CB PM AUXILIAR TÉCNICO</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                    
+                </div>
+            </div>
+
+            <!-- SUB-SEÇÃO 3: VISUALIZADOR DO PARECER OFICIAL (FORMATO PMESP / IMPRESSÃO) -->
+            <div id="opSubSecDocOficial" style="display: none;">
+                <div style="display: flex; justify-content: center; gap: 12px; margin-bottom: 16px;" class="non-printable">
+                    <button class="btn btn-primary" style="height: 44px; font-size: 12px;" onclick="window.print()">
+                        <i class="fa-solid fa-print"></i> IMPRIMIR PARECER TÉCNICO / SALVAR EM PDF
+                    </button>
+                    <button class="btn btn-secondary" onclick="switchOperadorSubView('editor')">
+                        <i class="fa-solid fa-pen"></i> VOLTAR AO EDITOR
+                    </button>
+                </div>
+
+                <!-- FOLHA DO PARECER TÉCNICO OFICIAL (ESTILO DOCX EXATO) -->
+                <div class="doc-parecer-sheet" id="parecerOficialSheet">
+                    <div class="doc-header" style="position: relative; border-bottom: 1.5px solid #000000; padding-bottom: 10px; margin-bottom: 20px;">
+                        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
+                            <span style="font-size: 10px; font-family: Arial, sans-serif; color: #1e3a8a; text-decoration: underline;">www.policiamilitar.sp.gov.br</span>
+                            <img src="brasao_pmesp.png" alt="PMESP" style="height: 62px; object-fit: contain;" onerror="this.style.display='none'">
+                            <span style="font-size: 10px; font-family: Arial, sans-serif; color: #1e3a8a; text-decoration: underline;">cmmtecmec@policiamilitar.sp.gov.br</span>
+                        </div>
+                        <p style="font-size: 11px; font-family: Arial, sans-serif; font-weight: bold; margin: 1px 0;">SECRETARIA DA SEGURANÇA PÚBLICA</p>
+                        <p style="font-size: 11px; font-family: Arial, sans-serif; font-weight: bold; margin: 1px 0;">POLÍCIA MILITAR DO ESTADO DE SÃO PAULO</p>
+                        <p style="font-size: 11px; font-family: Arial, sans-serif; font-weight: bold; margin: 1px 0;">CENTRO DE MOTOMECANIZAÇÃO</p>
+                        <h2 id="docPrintNumeroParecer" style="font-size: 15px; font-weight: 900; font-family: Arial, sans-serif; margin-top: 10px; letter-spacing: 0.5px;">PARECER TÉCNICO Nº CMM-24/30.3/26</h2>
+                    </div>
+
+                    <p id="docPrintPreambulo" style="margin-bottom: 14px;">---</p>
+
+                    <div class="doc-section-title">DA MOTIVAÇÃO</div>
+                    <p id="docPrintMotivacao" style="margin-bottom: 14px;">---</p>
+
+                    <div class="doc-section-title">ANÁLISE TÉCNICA</div>
+                    <p id="docPrintItem3" style="margin-bottom: 10px;">---</p>
+                    <div id="docPrintFotosItem3"></div>
+
+                    <p id="docPrintItem4" style="margin-top: 14px; margin-bottom: 10px;">---</p>
+                    <div id="docPrintFotosItem4"></div>
+
+                    <p id="docPrintItem5" style="margin-top: 14px; margin-bottom: 10px;">---</p>
+                    <div id="docPrintFotosItem5"></div>
+
+                    <p id="docPrintItem6" style="margin-top: 14px; margin-bottom: 10px;">---</p>
+
+                    <p id="docPrintItem7" style="margin-top: 14px; margin-bottom: 10px;">---</p>
+                    <div id="docPrintFotosItem7"></div>
+
+                    <p id="docPrintItem8" style="margin-top: 14px; margin-bottom: 10px;">---</p>
+                    <div id="docPrintFotosItem8"></div>
+
+                    <div class="doc-section-title">RESPOSTAS AOS QUESITOS FORMULADOS</div>
+                    <div id="docPrintQuesitos" style="margin-bottom: 14px;">---</div>
+
+                    <p style="margin-top: 20px; font-weight: bold;">10. Este é o Parecer.</p>
+                    <p id="docPrintDataLocal" style="margin-top: 10px;">São Paulo, 17 de agosto de 2026.</p>
+
+                    
+                    <div style="margin-top: 45px; text-align: center;">
+                        <div style="display: inline-block; width: 360px; border-top: 1px solid #000000; padding-top: 4px; font-size: 11.5px; font-weight: bold; line-height: 1.4;" id="docPrintSignPresidente">
+                            JOSÉ MAYCON DE PAIVA HONORATO<br><span style="font-weight: normal; font-size: 10.5px;">Cap PM Presidente Técnico</span>
+                        </div>
+                    </div>
+
+                    <div class="doc-sign-grid" style="margin-top: 45px; display: grid; grid-template-columns: 1fr 1fr; gap: 50px; text-align: center;">
+                        <div>
+                            <div class="doc-sign-line" id="docPrintSignRelator" style="border-top: 1px solid #000000; padding-top: 4px; font-size: 11.5px; font-weight: bold; line-height: 1.4;">
+                                ARTUR SANTIAGO DA SILVA ALMEIDA<br><span style="font-weight: normal; font-size: 10.5px;">Cb PM Auxiliar Técnico</span>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="doc-sign-line" id="docPrintSignAuxiliar2" style="border-top: 1px solid #000000; padding-top: 4px; font-size: 11.5px; font-weight: bold; line-height: 1.4;">
+                                MARCELO BARONE RODRIGUES<br><span style="font-weight: normal; font-size: 10.5px;">Cb PM Auxiliar Técnico</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="margin-top: 40px; border-top: 1px solid #94a3b8; padding-top: 8px; font-size: 10px; text-align: center; font-style: italic;">
+                        “Nós, Policiais Militares sob a proteção de Deus, estamos compromissados com a defesa da Vida, da Integridade Física e da Dignidade da Pessoa Humana.”
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    
+    
+    <!-- MODAL DE ENVIO DE E-MAIL INSTITUCIONAL -->
+    <div class="modal-overlay" id="modalEmailNotificacao">
+        <div class="modal-box" style="max-width: 680px; width: 100%;">
+            <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border); padding-bottom: 12px; margin-bottom: 16px;">
+                <h3 style="color: #ffffff; font-size: 14px; font-weight: 800;"><i class="fa-solid fa-envelope-circle-check" style="color: var(--accent-cyan);"></i> NOTIFICAÇÃO OFICIAL À OPM</h3>
+                <button style="background: none; border: none; color: #ffffff; cursor: pointer; font-size: 20px;" onclick="fecharModalEmail()">&times;</button>
+            </div>
+            <div class="form-grid">
+                <div class="col-12 form-group">
+                    <label>DESTINATÁRIO INSTITUCIONAL (@POLICIAMILITAR.SP.GOV.BR) <span class="required">*</span></label>
+                    <input type="email" id="emailDestinatario" class="form-control" style="text-transform: none;">
+                </div>
+                <div class="col-12 form-group">
+                    <label>ASSUNTO DA MENSAGEM <span class="required">*</span></label>
+                    <input type="text" id="emailAssunto" class="form-control">
+                </div>
+                <div class="col-12 form-group">
+                    <label>CORPO DO E-MAIL (MENSAGEM AUTOMÁTICA EDITÁVEL) <span class="required">*</span></label>
+                    <textarea id="emailCorpo" class="form-control" style="min-height: 170px; font-family: monospace; font-size: 12px; line-height: 1.5;"></textarea>
+                </div>
+                <div class="col-12" style="background: #ffffff; padding: 12px; border-radius: 4px; border: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between;">
+                    <div>
+                        <span style="color: #000000; font-size: 11px; font-weight: 800; display: block;">CARIMBO DIGITAL DO SETOR:</span>
+                        <span style="color: #475569; font-size: 10px;">SEÇÃO DE MANUTENÇÃO DE FROTA / TECMEC CMM</span>
+                    </div>
+                    <img src="carimbo_tecmec.png" alt="Carimbo TECMEC" style="height: 65px; object-fit: contain;">
+                </div>
+            </div>
+            <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 18px;">
+                <button class="btn btn-secondary" onclick="fecharModalEmail()">CANCELAR</button>
+                <button class="btn btn-primary" onclick="dispararEnvioEmail()">
+                    <i class="fa-solid fa-paper-plane"></i> ENVIAR E-MAIL OFICIAL
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL DE IDENTIFICAÇÃO DO OPERADOR AO ABRIR O PARECER -->
+    <div class="modal-overlay" id="modalIdentificarOperadorParecer">
+        <div class="modal-box">
+            <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border); padding-bottom: 12px; margin-bottom: 16px;">
+                <h3 style="color: #ffffff; font-size: 14px; font-weight: 800;"><i class="fa-solid fa-user-pen" style="color: var(--accent-cyan);"></i> IDENTIFICAÇÃO DO OPERADOR RESPONSÁVEL</h3>
+                <button style="background: none; border: none; color: #ffffff; cursor: pointer; font-size: 20px;" onclick="fecharModalIdentificarOperador()">&times;</button>
+            </div>
+            <p style="font-size: 11px; color: var(--text-muted); margin-bottom: 16px;">
+                Informe sua identificação funcional para assumir a confecção e relatoria deste Parecer Técnico Pericial.
+            </p>
+            <div class="form-grid">
+                <div class="col-6 form-group">
+                    <label>POSTO / GRADUAÇÃO <span class="required">*</span></label>
+                    <select id="modalOpPostoGrad" class="form-control">
+                        <option value="CAP PM">CAP PM</option>
+                        <option value="1º TEN PM">1º TEN PM</option>
+                        <option value="2º TEN PM">2º TEN PM</option>
+                        <option value="SUBTEN PM">SUBTEN PM</option>
+                        <option value="1º SGT PM">1º SGT PM</option>
+                        <option value="2º SGT PM">2º SGT PM</option>
+                        <option value="3º SGT PM" selected>3º SGT PM</option>
+                        <option value="CB PM">CB PM</option>
+                        <option value="SD PM 1ª CL">SD PM 1ª CL</option>
+                    </select>
+                </div>
+                <div class="col-6 form-group">
+                    <label>RE (SEM DÍGITO) <span class="required">*</span></label>
+                    <input type="text" id="modalOpRe" class="form-control" placeholder="EX: 123456" maxlength="8">
+                </div>
+                <div class="col-12 form-group">
+                    <label>NOME DE GUERRA (QRA) <span class="required">*</span></label>
+                    <input type="text" id="modalOpQra" class="form-control" placeholder="EX: SGT SILVA OU CB ALMEIDA">
+                </div>
+            </div>
+            <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px;">
+                <button class="btn btn-secondary" onclick="fecharModalIdentificarOperador()">CANCELAR</button>
+                <button class="btn btn-primary" onclick="confirmarIdentificacaoEIniciarParecer()">INICIAR TRABALHOS</button>
+            </div>
+        </div>
+    </div>
+
+        <!-- MODAL DE ACESSO DO SOLICITANTE (OPM E PLACA) -->
+    <div class="modal-overlay" id="modalAcessoSolicitante">
+        <div class="modal-box" style="max-width: 520px; width: 100%;">
+            <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border); padding-bottom: 12px; margin-bottom: 16px;">
+                <h3 style="color: #ffffff; font-size: 14px; font-weight: 800;"><i class="fa-solid fa-car-side" style="color: var(--accent-cyan);"></i> ACESSO AO AGENDAMENTO - IDENTIFICAÇÃO</h3>
+                <button style="background: none; border: none; color: #ffffff; cursor: pointer; font-size: 20px;" onclick="fecharModalAcessoSolicitante()">&times;</button>
+            </div>
+
+            <p style="font-size: 11px; color: var(--text-muted); margin-bottom: 16px;">
+                INFORME A OPM DETENTORA E A PLACA DA VIATURA PARA INICIAR O AGENDAMENTO.
+            </p>
+
+            <div class="form-grid">
+                <div class="col-12 form-group">
+                    <label>OPM DETENTORA DA VIATURA <span class="required">*</span></label>
+                    <input type="text" id="acessoOpm" list="opmList" class="form-control" placeholder="DIGITE OU SELECIONE A OPM (EX: 1.BPM/M, 18.BPM/M...)">
+                </div>
+                <div class="col-12 form-group">
+                    <label>PLACA DO VEÍCULO <span class="required">*</span></label>
+                    <input type="text" id="acessoPlaca" class="form-control search-plate-input" placeholder="EX: ABC1234 OU ABC1D23" maxlength="8" oninput="this.value = this.value.toUpperCase()">
+                </div>
+            </div>
+
+            <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px;">
+                <button class="btn btn-secondary" onclick="fecharModalAcessoSolicitante()">CANCELAR</button>
+                <button class="btn btn-primary" onclick="confirmarAcessoSolicitante()">
+                    <i class="fa-solid fa-arrow-right"></i> ACESSAR AGENDAMENTO
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL DE LOGIN DO OPERADOR -->
+    <div class="modal-overlay" id="modalLoginOperador">
+        <div class="modal-box">
+            <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border); padding-bottom: 12px; margin-bottom: 16px;">
+                <h3 style="color: #ffffff; font-size: 14px; font-weight: 800;"><i class="fa-solid fa-lock" style="color: var(--accent-amber);"></i> AUTENTICAÇÃO DO OPERADOR CMM</h3>
+                <button style="background: none; border: none; color: #ffffff; cursor: pointer; font-size: 20px;" onclick="fecharModalLogin()">&times;</button>
+            </div>
+
+            <div class="form-grid">
+                <div class="col-6 form-group">
+                    <label>USUÁRIO</label>
+                    <input type="text" id="loginUsuario" class="form-control" placeholder="USUÁRIO" value="">
+                </div>
+                <div class="col-6 form-group">
+                    <label>SENHA</label>
+                    <input type="password" id="loginSenha" class="form-control" placeholder="SENHA" value="">
+                </div>
+
+                
+            </div>
+
+            <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px;">
+                <button class="btn btn-secondary" onclick="fecharModalLogin()">CANCELAR</button>
+                <button class="btn btn-primary" onclick="confirmarLoginOperador()">ACESSAR PAINEL</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL DE CONSULTA DE PROTOCOLO -->
+    <div class="modal-overlay" id="modalConsulta">
+        <div class="modal-box" style="max-width: 650px;">
+            <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border); padding-bottom: 12px; margin-bottom: 16px;">
+                <h3 style="color: #ffffff; font-size: 14px; font-weight: 800;"><i class="fa-solid fa-magnifying-glass"></i> CONSULTA DE PROTOCOLO</h3>
+                <button style="background: none; border: none; color: #ffffff; cursor: pointer; font-size: 20px;" onclick="fecharModalConsulta()">&times;</button>
+            </div>
+            <div class="form-grid">
+                <div class="col-8 form-group">
+                    <input type="text" id="inputModalConsulta" class="form-control" placeholder="DIGITE O PROTOCOLO OU PLACA...">
+                </div>
+                <div class="col-4 form-group">
+                    <button class="btn btn-primary" style="width: 100%;" onclick="executarBuscaModalConsulta()"><i class="fa-solid fa-search"></i> BUSCAR</button>
+                </div>
+            </div>
+            <div id="resultadoModalConsulta" style="margin-top: 14px; display: none;"></div>
+        </div>
+    </div>
+
+    
+
+    <div class="toast" id="toastMsg"></div>
+
+    <script>
+        // CONFIGURAÇÕES GLOBAIS
+        const CONFIG = {
+            API_URL: "",
+            DRIVE_FOLDER_URL: "https://drive.google.com/drive/u/4/folders/1YOR-IJ0Vo4cdKWqa-oo9cO6642N0r3Nu",
+            STORAGE_KEY: "CMM_AGENDAMENTOS_TECMEC_DB",
+            OPERATOR_KEY: "CMM_OPERADOR_LOGADO",
+            CAPACIDADE_MAXIMA_PATIO: 8
+        };
+
+        // ESTADO GLOBAL
+        let state = {
+            operador: null,
+            ticketSelecionado: null,
+            viaturaSelecionada: null,
+            semanaSelecionada: null,
+            documentos: { 1: null, 2: null, 3: null, 4: null, 5: null },
+            perguntas: [],
+            bulkFotos: [], // Banco de fotos em bulk para o laudo
+            agendamentos: []
+        };
+
+        // INICIALIZAÇÃO
+        document.addEventListener("DOMContentLoaded", () => {
+            carregarStorage();
+            verificarSessaoOperador();
+            popularOpms();
+            popularMeses();
+            seedExemplosSeVazio();
+            atualizarTabelaGestaoOperador();
+        });
+
+        // POPULA COM EXEMPLOS REAIS (INCLUINDO CRETA DA FOTO DO TEMPLATE) SE VAZIO
+        function seedExemplosSeVazio() {
+            if (state.agendamentos.length === 0) {
+                state.agendamentos = [
+                    {
+                        protocolo: "CMM-AT-2026-819204",
+                        timestamp: new Date().toISOString(),
+                        status: "NO PÁTIO (AGUARDANDO ANÁLISE)",
+                        tipo_procedimento: "INQUÉRITO POLICIAL MILITAR (IPM)",
+                        sindicancia_ipm: "18BPMM-13/70/26",
+                        posto_grad: "CAP PM",
+                        re: "112233",
+                        nome: "JOSÉ MAYCON DE PAIVA HONORATO",
+                        telefone: "(11) 98765-4321",
+                        email: "josemaycon@policiamilitar.sp.gov.br",
+                        opm: "18.BPM/M",
+                        placa: "UDD9H03",
+                        prefixo: "M-18262",
+                        modelo: "HYUNDAI CRETA 2025",
+                        ano: "2025",
+                        cor: "BRANCA (PADRÃO PM)",
+                        chassi: "BHPE81FGTP260603",
+                        motor: "G4NLNU98231",
+                        patrimonio: "225033962-A",
+                        condicao: "TRANSPORTADO POR GUINCHO / REBOQUE",
+                        km: "5257",
+                        motivo: "SINISTRO COM AVARIA DIANTEIRA ESQUERDA E SUSPENSÃO; ALEGAÇÃO DE FALHA NA FRENAGEM PELO CONDUTOR.",
+                        objetivo: "CONSIDERANDO A NECESSIDADE DE SUBSIDIAR O IPM Nº 18BPMM-13/70/26, ENCAMINHO O VEÍCULO PARA ANÁLISE TÉCNICA PERICIAL PARA CONSTATAÇÃO DE POSSÍVEL IRREGULARIDADE NO SISTEMA DE FREIOS.",
+                        perguntas: [
+                            "O SISTEMA DE FREIOS DA VIATURA APRESENTAVA DEFEITO OU FALHA ANTERIOR À COLISÃO?",
+                            "A FRENAGEM PODERIA TER SIDO PREJUDICADA POR VÍCIO OCULTO DO VEÍCULO?",
+                            "AS AVARIAS CONSTATADAS SÃO DECORRENTES DO IMPACTO OU DE DESGASTE PREMATURO?"
+                        ],
+                        semanaKey: "2026-6-SEM3",
+                        semanaLabel: "SEMANA 3 (15/06 A 21/06)",
+                        dataCalculada: "2026-06-17",
+                        documentosAnexados: { oficio: true, portaria: true, oitiva: true, cop: true, comprovantes: false },
+                        dataParecer: null,
+                        operadorDesignado: null,
+                        parecerDados: null
+                    }
+                ];
+                salvarStorage();
+            }
+        }
+
+        // ====================================================================
+        // ROTEAMENTO DE VISUALIZAÇÕES
+        // ====================================================================
+        function abrirPortalCapa() {
+            document.getElementById("viewPortalCapa").style.display = "block";
+            document.getElementById("viewSolicitante").style.display = "none";
+            document.getElementById("viewOperador").style.display = "none";
+            document.getElementById("btnNavPortal").classList.add("active");
+            document.getElementById("btnNavSolicitante").classList.remove("active");
+            document.getElementById("btnNavOperador").classList.remove("active");
+        }
+
+        // ====================================================================
+        // ACESSO DO SOLICITANTE COM IDENTIFICAÇÃO PRÉVIA DE OPM E PLACA
+        // ====================================================================
+        function abrirModalAcessoSolicitante() {
+            document.getElementById("acessoOpm").value = document.getElementById("opmSelectInput").value || "";
+            document.getElementById("acessoPlaca").value = document.getElementById("searchPlateInput").value || "";
+            document.getElementById("modalAcessoSolicitante").style.display = "flex";
+        }
+
+        function fecharModalAcessoSolicitante() {
+            document.getElementById("modalAcessoSolicitante").style.display = "none";
+        }
+
+        function confirmarAcessoSolicitante() {
+            const opm = (document.getElementById("acessoOpm").value || "").trim().toUpperCase();
+            const placa = (document.getElementById("acessoPlaca").value || "").trim().toUpperCase();
+
+            if (!opm || !placa) {
+                showToast("É obrigatório informar a OPM e a Placa do veículo para prosseguir.", "error");
+                return;
+            }
+
+            // Preenche os campos oficiais
+            document.getElementById("opmSelectInput").value = opm;
+            document.getElementById("searchPlateInput").value = placa;
+
+            // Busca e seleciona a viatura no SIPL
+            const frota = window.SIPL_FROTA || [];
+            const v = frota.find(item => item.p === placa);
+            if (v) {
+                selecionarViatura(v.p);
+            } else {
+                state.viaturaSelecionada = { p: placa, opm: opm, pr: '', m: 'VIATURA REGISTRADA', a: '---' };
+                document.getElementById("cardVtrPlaca").textContent = placa;
+                document.getElementById("cardVtrOpm").textContent = opm;
+                document.getElementById("cardVtrPrefixo").textContent = "PREFIXO: S/N";
+                document.getElementById("cardVtrModelo").textContent = "PADRÃO PMESP";
+                document.getElementById("cardVtrAno").textContent = "---";
+                document.getElementById("cardVtrCor").textContent = "BRANCA (PADRÃO PM)";
+                document.getElementById("boxVeiculoDetalhes").style.display = "block";
+                document.getElementById("btnAvancarEtapa2").removeAttribute("disabled");
+            }
+
+            fecharModalAcessoSolicitante();
+
+            // Abre a tela do solicitante na Etapa 1
+            document.getElementById("viewPortalCapa").style.display = "none";
+            document.getElementById("viewSolicitante").style.display = "block";
+            document.getElementById("viewOperador").style.display = "none";
+            document.getElementById("btnNavPortal").classList.remove("active");
+            document.getElementById("btnNavSolicitante").classList.add("active");
+            document.getElementById("btnNavOperador").classList.remove("active");
+
+            avancarParaEtapa(1);
+            showToast(`Acesso iniciado para a viatura ${placa} (${opm}).`, "success");
+        }
+
+        function abrirAreaSolicitante() {
+            abrirModalAcessoSolicitante();
+        }
+
+        function abrirAreaOperador() {
+            if (!state.operador) {
+                document.getElementById("modalLoginOperador").style.display = "flex";
+                return;
+            }
+            document.getElementById("viewPortalCapa").style.display = "none";
+            document.getElementById("viewSolicitante").style.display = "none";
+            document.getElementById("viewOperador").style.display = "block";
+            document.getElementById("btnNavPortal").classList.remove("active");
+            document.getElementById("btnNavSolicitante").classList.remove("active");
+            document.getElementById("btnNavOperador").classList.add("active");
+            switchOperadorSubView('painel');
+            atualizarTabelaGestaoOperador();
+        }
+
+        function switchOperadorSubView(sub) {
+            document.getElementById("opSubSecPainel").style.display = sub === "painel" ? "block" : "none";
+            document.getElementById("opSubSecEditor").style.display = sub === "editor" ? "block" : "none";
+            document.getElementById("opSubSecDocOficial").style.display = sub === "doc" ? "block" : "none";
+
+            document.getElementById("btnOpSubPainel").classList.toggle("active", sub === "painel");
+            document.getElementById("btnOpSubEditor").classList.toggle("active", sub === "editor");
+            document.getElementById("btnOpSubDocOficial").classList.toggle("active", sub === "doc");
+
+            if (sub === "doc") {
+                gerarVisualizacaoParecerImpressao();
+            }
+        }
+
+        // ====================================================================
+        // AUTENTICAÇÃO DO OPERADOR (CMM / CMMTECMEC + QRA / RE)
+        // ====================================================================
+        function fecharModalLogin() {
+            document.getElementById("modalLoginOperador").style.display = "none";
+        }
+
+        function confirmarLoginOperador() {
+            const u = (document.getElementById("loginUsuario").value || "").trim().toLowerCase();
+            const s = (document.getElementById("loginSenha").value || "").trim().toLowerCase();
+
+            if (u !== "cmm" || s !== "cmmtecmec") {
+                showToast("ACESSO NEGADO: Usuário ou senha do CMM incorretos.", "error");
+                return;
+            }
+
+            state.operador = {
+                autenticado: true
+            };
+
+            sessionStorage.setItem(CONFIG.OPERATOR_KEY, JSON.stringify(state.operador));
+            fecharModalLogin();
+            atualizarPillOperador();
+            abrirAreaOperador();
+        }
+
+        function verificarSessaoOperador() {
+            try {
+                const raw = sessionStorage.getItem(CONFIG.OPERATOR_KEY);
+                if (raw) {
+                    state.operador = JSON.parse(raw);
+                    atualizarPillOperador();
+                }
+            } catch (e) {}
+        }
+
+        function atualizarPillOperador() {
+            const pill = document.getElementById("operatorPill");
+            const text = document.getElementById("operatorPillText");
+            if (state.operador) {
+                text.textContent = state.operador.nomeCompleto;
+                pill.style.display = "flex";
+            } else {
+                pill.style.display = "none";
+            }
+        }
+
+        function logoutOperador() {
+            state.operador = null;
+            sessionStorage.removeItem(CONFIG.OPERATOR_KEY);
+            atualizarPillOperador();
+            showToast("Sessão do operador encerrada.", "info");
+            abrirPortalCapa();
+        }
+
+        // ====================================================================
+        // SEÇÃO 1 DO OPERADOR: PAINEL DE GESTÃO, NOTIFICAÇÕES E VAGAS (+150 OPMS)
+        // ====================================================================
+        function atualizarTabelaGestaoOperador() {
+            const corpo = document.getElementById("corpoTabelaGestao");
+            if (!corpo) return;
+
+            const filtroStatus = document.getElementById("opFiltroStatus").value;
+            const filtroOpm = (document.getElementById("opFiltroOpm").value || "").trim().toUpperCase();
+            const filtroTexto = (document.getElementById("opFiltroTexto").value || "").trim().toUpperCase();
+
+            let lista = state.agendamentos;
+
+            if (filtroStatus) lista = lista.filter(a => a.status === filtroStatus);
+            if (filtroOpm) lista = lista.filter(a => a.opm && a.opm.includes(filtroOpm));
+            if (filtroTexto) {
+                lista = lista.filter(a => 
+                    a.placa.includes(filtroTexto) ||
+                    (a.prefixo && a.prefixo.includes(filtroTexto)) ||
+                    a.protocolo.includes(filtroTexto) ||
+                    a.sindicancia_ipm.includes(filtroTexto) ||
+                    (a.operadorDesignado && a.operadorDesignado.includes(filtroTexto))
+                );
+            }
+
+            // Atualiza KPIs
+            const totalNoPatio = state.agendamentos.filter(a => a.status.includes("PÁTIO") || a.status.includes("CONFECÇÃO")).length;
+            const livres = Math.max(0, CONFIG.CAPACIDADE_MAXIMA_PATIO - totalNoPatio);
+            document.getElementById("kpiVagasPatio").textContent = `${livres} / ${CONFIG.CAPACIDADE_MAXIMA_PATIO}`;
+            document.getElementById("kpiAguardandoAutorizacao").textContent = state.agendamentos.filter(a => a.status.includes("PENDENTE")).length;
+            document.getElementById("kpiEmConfeccao").textContent = state.agendamentos.filter(a => a.status.includes("CONFECÇÃO")).length;
+            document.getElementById("kpiConcluidos").textContent = state.agendamentos.filter(a => a.status.includes("CONCLUÍDO")).length;
+
+            if (lista.length === 0) {
+                corpo.innerHTML = `<tr><td colspan="9" style="text-align: center; color: var(--text-dim); padding: 24px;">NENHUM REGISTRO ENCONTRADO</td></tr>`;
+                return;
+            }
+
+            let html = "";
+            lista.forEach(a => {
+                const tagOp = a.operadorDesignado ? 
+                    `<span class="badge-operator-tag"><i class="fa-solid fa-user-pen"></i> ${a.operadorDesignado}</span>` : 
+                    `<span style="color: var(--text-dim); font-size: 10px;">NÃO ATRIBUÍDO</span>`;
+
+                const statusBadge = a.status.includes("CONCLUÍDO") ? "operacao" : (a.status.includes("CONFECÇÃO") ? "analise" : "descarga");
+
+                html += `
+                    <tr>
+                        <td><strong>${a.semanaLabel || a.dataCalculada}</strong></td>
+                        <td style="font-family: monospace; color: var(--accent-cyan); font-weight: 700;">${a.protocolo}</td>
+                        <td><strong style="color: var(--accent-gold);">${a.placa}</strong> <span style="font-size: 10px; color: var(--text-muted);">${a.prefixo ? '(' + a.prefixo + ')' : ''}</span></td>
+                        <td><span class="autocomplete-opm">${a.opm}</span></td>
+                        <td style="color: var(--accent-rose); font-weight: 700;">${a.sindicancia_ipm}</td>
+                        <td><span class="badge-status ${statusBadge}">${a.status}</span></td>
+                        <td>${tagOp}</td>
+                        <td style="color: ${a.dataParecer ? 'var(--accent-green)' : 'var(--accent-amber)'}; font-weight: 700;">${a.dataParecer || 'PENDENTE'}</td>
+                        <td>
+                            <div style="display: flex; gap: 6px;">
+                                <button class="btn btn-warning" style="height: 28px; padding: 0 10px; font-size: 10px;" onclick="iniciarConfeccaoParecer('${a.protocolo}')" title="Assumir confecção do parecer técnico">
+                                    <i class="fa-solid fa-file-pen"></i> PARECER
+                                </button>
+                                <button class="btn btn-primary" style="height: 28px; padding: 0 10px; font-size: 10px;" onclick="abrirModalEmail('${a.protocolo}')" title="Enviar e-mail de notificação à OPM">
+                                    <i class="fa-solid fa-paper-plane"></i> E-MAIL
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            });
+
+            corpo.innerHTML = html;
+        }
+
+        // DISPARO AUTOMÁTICO DE NOTIFICAÇÃO POR E-MAIL COM 1 CLIQUE
+        
+        let ticketEmailAtivo = null;
+        function abrirModalEmail(protocolo) {
+            const item = state.agendamentos.find(a => a.protocolo === protocolo);
+            if (!item) return;
+            ticketEmailAtivo = item;
+
+            const numParecer = item.parecerDados?.numParecer || "CMM-24/30.3/26";
+            const prefixoStr = item.prefixo ? `prefixo ${item.prefixo}` : "sem prefixo registrado";
+            
+            document.getElementById("emailDestinatario").value = item.email || "";
+            document.getElementById("emailAssunto").value = `[CMM TECMEC] Liberação de Veículo e Parecer Técnico - Vtr ${item.placa} (${item.opm})`;
+            
+            const msgPadrao = `Prezado Oficial Subfrota/Motomec de ${item.opm},\n\ninformamos que seu veículo ${item.placa}, ${prefixoStr} encontra-se pronto para retirada. Solicitamos que seja retirado no prazo máximo de 07 dias por questões de limitação de vagas no pátio. O PARECER TÉCNICO Nº ${numParecer}, encontra-se pronto e somente é liberado no sistema após a retirada do veículo no CMM. Agradecemos pela colaboração.\n\nAt.te,\nCENTRO DE MOTOMECANIZAÇÃO - CMM\nSeção de Manutenção de Frota - TECMEC`;
+            
+            document.getElementById("emailCorpo").value = msgPadrao;
+            document.getElementById("modalEmailNotificacao").style.display = "flex";
+        }
+
+        function fecharModalEmail() {
+            document.getElementById("modalEmailNotificacao").style.display = "none";
+            ticketEmailAtivo = null;
+        }
+
+        function dispararEnvioEmail() {
+            const dest = document.getElementById("emailDestinatario").value.trim();
+            const assunto = document.getElementById("emailAssunto").value.trim();
+            const corpo = document.getElementById("emailCorpo").value.trim();
+
+            if (!dest) {
+                showToast("Informe o e-mail do destinatário.", "error");
+                return;
+            }
+
+            // Abre mailto formatado com o texto editado
+            const mailtoUrl = `mailto:${encodeURIComponent(dest)}?subject=${encodeURIComponent(assunto)}&body=${encodeURIComponent(corpo)}`;
+            window.open(mailtoUrl, '_blank');
+            fecharModalEmail();
+            showToast(`E-mail institucional enviado para ${dest}.`, "success");
+        }
+
+        function enviarNotificacaoAutomatica_legado(protocolo) {
+            const item = state.agendamentos.find(a => a.protocolo === protocolo);
+            if (!item) return;
+
+            const assunto = encodeURIComponent(`[CMM TECMEC] Atualização de Análise Técnica - Vtr ${item.placa} (${item.opm}) - Protocolo ${item.protocolo}`);
+            const corpo = encodeURIComponent(
+                `POLÍCIA MILITAR DO ESTADO DE SÃO PAULO\n` +
+                `CENTRO DE MOTOMECANIZAÇÃO - SEÇÃO DE MANUTENÇÃO DE FROTA\n\n` +
+                `Senhor Presidente / Encarregado da ${item.opm},\n\n` +
+                `Informamos a atualização do processo de Análise Técnica referente à viatura:\n` +
+                `- Viatura: ${item.placa} (Prefixo: ${item.prefixo || 'N/A'})\n` +
+                `- Procedimento: ${item.tipo_procedimento} nº ${item.sindicancia_ipm}\n` +
+                `- Protocolo: ${item.protocolo}\n` +
+                `- Status Atual: ${item.status}\n` +
+                `- Operador Responsável no CMM: ${item.operadorDesignado || 'Equipe Técnica CMM'}\n\n` +
+                (item.dataParecer ? `O Parecer Técnico foi concluído e homologado em ${item.dataParecer}. A viatura está liberada para retirada e sua OPM está liberada para novos agendamentos.\n\n` : `A viatura encontra-se em análise pericial na oficina central do CMM.\n\n`) +
+                `Atenciosamente,\n` +
+                `SEÇÃO DE MANUTENÇÃO DE FROTA - CMM PMESP`
+            );
+
+            // Abre cliente padrão de e-mail institucional
+            window.open(`mailto:${item.email}?subject=${assunto}&body=${corpo}`);
+            showToast(`Janela de notificação institucional aberta para ${item.email}.`, "success");
+        }
+
+        // ====================================================================
+        // SEÇÃO 2 DO OPERADOR: CONFECÇÃO DO PARECER TÉCNICO (TEMPLATE OFICIAL)
+        // ====================================================================
+        let protocoloPendenteConfeccao = null;
+        function fecharModalIdentificarOperador() {
+            document.getElementById("modalIdentificarOperadorParecer").style.display = "none";
+            protocoloPendenteConfeccao = null;
+        }
+
+        function iniciarConfeccaoParecer(protocolo) {
+            const item = state.agendamentos.find(a => a.protocolo === protocolo);
+            if (!item) return;
+
+            // Se ainda não tiver operador identificado para o trabalho, solicita agora
+            if (!state.operador || !state.operador.nomeCompleto) {
+                protocoloPendenteConfeccao = protocolo;
+                document.getElementById("modalIdentificarOperadorParecer").style.display = "flex";
+                return;
+            }
+
+            executarAberturaParecer(item);
+        }
+
+        function confirmarIdentificacaoEIniciarParecer() {
+            const posto = document.getElementById("modalOpPostoGrad").value;
+            const re = document.getElementById("modalOpRe").value.trim();
+            const qra = document.getElementById("modalOpQra").value.trim().toUpperCase();
+
+            if (!re || !qra) {
+                showToast("É obrigatório informar seu RE e Nome de Guerra (QRA).", "error");
+                return;
+            }
+
+            state.operador = {
+                postoGrad: posto,
+                re: re,
+                qra: qra,
+                nomeCompleto: `${posto} ${qra} (RE ${re})`
+            };
+
+            sessionStorage.setItem(CONFIG.OPERATOR_KEY, JSON.stringify(state.operador));
+            atualizarPillOperador();
+            fecharModalIdentificarOperador();
+
+            if (protocoloPendenteConfeccao) {
+                const item = state.agendamentos.find(a => a.protocolo === protocoloPendenteConfeccao);
+                if (item) executarAberturaParecer(item);
+            }
+        }
+
+        function executarAberturaParecer(item) {
+            if (!item.operadorDesignado && state.operador && state.operador.nomeCompleto) {
+                item.operadorDesignado = state.operador.nomeCompleto;
+                item.status = "EM CONFECÇÃO DE PARECER";
+                salvarStorage();
+            }
+
+            state.ticketSelecionado = item;
+
+            // Preenche os campos do editor
+            document.getElementById("editorOperadorBadge").textContent = `RELATOR TÉCNICO: ${item.operadorDesignado || (state.operador ? state.operador.nomeCompleto : '---')}`;
+            document.getElementById("editorTicketInfo").textContent = `VTR ${item.placa} (${item.prefixo ? 'PREF ' + item.prefixo : ''}) | OPM: ${item.opm} | SINDICÂNCIA: ${item.sindicancia_ipm} | PROTOCOLO: ${item.protocolo}`;
+            document.getElementById("ptMembroRelator").value = item.operadorDesignado || (state.operador ? state.operador.nomeCompleto : '');
+
+            // Preenche a motivação
+            recuperarDadosTicketMotivacao();
+
+            // Preenche as perguntas do presidente dinamicamente
+            renderizarPerguntasNoEditorParecer(item);
+
+            // Se já tiver rascunho de parecer salvo, carrega
+            if (item.parecerDados) {
+                carregarDadosSalvosParecer(item.parecerDados);
+            }
+
+            // Atualiza selects de fotos com as fotos do banco bulk
+            atualizarSelectsDeFotos();
+
+            switchOperadorSubView('editor');
+            showToast(`Viatura ${item.placa} vinculada para elaboração do parecer técnico.`, "info");
+        }
+
+        function recuperarDadosTicketMotivacao() {
+            if (!state.ticketSelecionado) return;
+            const t = state.ticketSelecionado;
+            const texto = `2. A SOLICITAÇÃO TEM O INTENTO DE SUBSIDIAR O PROCEDIMENTO INSTAURADO PARA APURAR OS MOTIVOS DO SINISTRO ENVOLVENDO A VIATURA MARCA ${t.modelo || 'NÃO INFORMADA'}, ANO ${t.ano || '---'}, VIN/CHASSI ${t.chassi || '---'}, PLACAS ${t.placa}, PREFIXO ${t.prefixo || 'S/N'}, PATRIMÔNIO ${t.patrimonio || '---'}, CONFORME SOLICITADO POR MEIO DO OFÍCIO DE APRESENTAÇÃO DA OPM ${t.opm}, REFERENTES AO IPM/SINDICÂNCIA Nº ${t.sindicancia_ipm}.`;
+            document.getElementById("ptTextoMotivacao").value = texto;
+        }
+
+        function renderizarPerguntasNoEditorParecer(ticket) {
+            const container = document.getElementById("containerRespostasQuesitos");
+            if (!container) return;
+            container.innerHTML = "";
+
+            const perguntas = ticket.perguntas || [];
+            if (perguntas.length === 0) {
+                container.innerHTML = `<div style="color: var(--text-dim); padding: 12px; font-size: 11px;">O SOLICITANTE NÃO CADASTROU PERGUNTAS ESPECÍFICAS NO OFÍCIO. RESPONDA AOS QUESITOS TÉCNICOS GERAIS ABAIXO:</div>`;
+                container.innerHTML += `
+                    <div style="margin-bottom: 12px;">
+                        <label style="color: var(--accent-cyan); font-weight: 800; font-size: 11px;">QUESITO TÉCNICO GERAL (SISTEMA DE FREIOS / AVARIAS):</label>
+                        <textarea id="ptRespQuesito0" class="form-control" style="min-height: 80px;" onfocus="definirRespostaAtiva(0)">DURANTE A REALIZAÇÃO DA ANÁLISE FOI CONSTATADO QUE O SISTEMA MECÂNICO DE FREIO ASSIM COMO O FLUIDO DE FREIO ESTÁ EM CONDIÇÃO REGULAR, SEM SINAIS DE ANOMALIA OU ERRO DE MONTAGEM.</textarea>
+                    </div>
+                `;
+                return;
+            }
+
+            perguntas.forEach((q, idx) => {
+                container.innerHTML += `
+                    <div style="background: rgba(15, 23, 42, 0.7); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 12px; margin-bottom: 14px;">
+                        <strong style="color: var(--accent-gold); font-size: 11px; display: block; margin-bottom: 4px;">
+                            QUESITO Nº ${idx + 1} FORMULADO PELO PRESIDENTE:
+                        </strong>
+                        <p style="color: #ffffff; font-size: 12px; margin-bottom: 8px; font-weight: 700;">${q}</p>
+                        <label style="color: var(--text-muted); font-size: 10px;">RESPOSTA TÉCNICA DA COMISSÃO DO CMM:</label>
+                        <textarea id="ptRespQuesito${idx}" class="form-control" style="min-height: 70px;" placeholder="DIGITE A RESPOSTA PERICIAL OU CLIQUE EM UM MODELO DO HALL ACIMA..." onfocus="definirRespostaAtiva(${idx})"></textarea>
+                    </div>
+                `;
+            });
+        }
+
+        let campoRespostaAtivoIdx = 0;
+        function definirRespostaAtiva(idx) {
+            campoRespostaAtivoIdx = idx;
+        }
+
+        function inserirTextoNaRespostaAtiva(texto) {
+            const el = document.getElementById(`ptRespQuesito${campoRespostaAtivoIdx}`);
+            if (el) {
+                el.value = (el.value ? el.value + " " : "") + texto;
+                showToast("Texto técnico inserido na resposta ativa.", "info");
+            }
+        }
+
+        function inserirSnippet(elementId, snippet) {
+            const el = document.getElementById(elementId);
+            if (el) {
+                el.value = (el.value ? el.value + "\n" : "") + snippet;
+                showToast("Texto padrão inserido.", "info");
+            }
+        }
+
+        // ====================================================================
+        // UPLOAD EM BULK DE FOTOS E INSERÇÃO PADRONIZADA (UNIDADE, PAR, QUARTETO)
+        // ====================================================================
+        function handleBulkPhotoUpload(input) {
+            if (!input.files || input.files.length === 0) return;
+            const files = Array.from(input.files);
+
+            files.forEach((f, idx) => {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const fotoId = `foto_${Date.now()}_${idx}`;
+                    const fotoObj = {
+                        id: fotoId,
+                        nome: f.name.toUpperCase(),
+                        src: e.target.result,
+                        numero: state.bulkFotos.length + 1
+                    };
+                    state.bulkFotos.push(fotoObj);
+                    renderizarGaleriaBulk();
+                    atualizarSelectsDeFotos();
+                };
+                reader.readAsDataURL(f);
+            });
+
+            input.value = "";
+            showToast(`${files.length} foto(s) carregadas no banco do laudo.`, "success");
+        }
+
+        function renderizarGaleriaBulk() {
+            const container = document.getElementById("bulkGalleryContainer");
+            const badge = document.getElementById("bulkCountBadge");
+            if (!container) return;
+
+            badge.textContent = `${state.bulkFotos.length} FOTOS CARREGADAS`;
+            container.innerHTML = "";
+
+            state.bulkFotos.forEach((f, i) => {
+                container.innerHTML += `
+                    <div class="photo-thumb-card">
+                        <img src="${f.src}" class="photo-thumb-img" alt="Foto">
+                        <span class="photo-thumb-label">FOTO ${String(i + 1).padStart(2, '0')}</span>
+                    </div>
+                `;
+            });
+        }
+
+                function atualizarSelectsDeFotos() {
+            const selects = [
+                "selFotoItem3A", "selFotoItem3B", "selFotoItem3C", "selFotoItem3D",
+                "selFotoItem4A", "selFotoItem4B", "selFotoItem4C", "selFotoItem4D",
+                "selFotoItem5A", "selFotoItem5B", "selFotoItem5C", "selFotoItem5D",
+                "selFotoItem7A", "selFotoItem7B", "selFotoItem7C", "selFotoItem7D",
+                "selFotoItem8A", "selFotoItem8B", "selFotoItem8C", "selFotoItem8D"
+            ];
+
+            selects.forEach(id => {
+                const sel = document.getElementById(id);
+                if (!sel) return;
+                const valAtual = sel.value;
+                sel.innerHTML = `<option value="">SELECIONAR FOTO...</option>`;
+                state.bulkFotos.forEach((f, i) => {
+                    const opt = document.createElement("option");
+                    opt.value = f.id;
+                    opt.textContent = `FOTO ${String(i + 1).padStart(2, '0')} (${f.nome})`;
+                    sel.appendChild(opt);
+                });
+                sel.value = valAtual;
+            });
+        }
+
+        // CONCLUIR E REGISTRAR DATA DO PARECER (LIBERA A OPM)
+        
+        // ====================================================================
+        // SALVAMENTO E RECUPERAÇÃO DO PARECER TÉCNICO E PRÉVIAS DE FOTOS
+        // ====================================================================
+        function renderizarPreviaFotosItem(itemNum) {
+            const container = document.getElementById(`previaFotosItem${itemNum}`);
+            if (!container) return;
+
+            const fotoIds = ['A', 'B', 'C', 'D'].map(l => {
+                const sel = document.getElementById(`selFotoItem${itemNum}${l}`);
+                return sel ? sel.value : '';
+            }).filter(Boolean);
+
+            const fotos = fotoIds.map(id => state.bulkFotos.find(f => f.id === id)).filter(Boolean);
+
+            if (fotos.length === 0) {
+                container.innerHTML = "";
+                return;
+            }
+
+            let html = `<div style="display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px;">`;
+            fotos.forEach(f => {
+                html += `
+                    <div style="position: relative; border: 1px solid var(--border); border-radius: 4px; overflow: hidden; width: 110px; height: 85px; background: #000;">
+                        <img src="${f.src}" style="width: 100%; height: 100%; object-fit: cover;">
+                        <span style="position: absolute; bottom: 0; left: 0; right: 0; background: rgba(0,0,0,0.75); font-size: 9px; color: #fff; text-align: center; padding: 2px 0; font-weight: 700;">FOTO ${String(f.numero).padStart(2, '0')}</span>
+                    </div>
+                `;
+            });
+            html += `</div>`;
+            container.innerHTML = html;
+        }
+
+        function salvarRascunhoParecer() {
+            if (!state.ticketSelecionado) return;
+            const t = state.ticketSelecionado;
+
+            // Coleta respostas de quesitos
+            const respostasQuesitos = [];
+            const containerQuesitos = document.getElementById("containerRespostasQuesitos");
+            if (containerQuesitos) {
+                const textareas = containerQuesitos.querySelectorAll("textarea");
+                textareas.forEach((ta, idx) => {
+                    const labelEl = ta.closest("div") ? ta.closest("div").querySelector("strong, label") : null;
+                    const pergunta = labelEl ? labelEl.textContent.trim() : `Quesito ${idx + 1}`;
+                    respostasQuesitos.push({
+                        pergunta: pergunta,
+                        resposta: ta.value.trim()
+                    });
+                });
+            }
+
+            // Coleta fotos vinculadas por item
+            const getFotosItem = (num) => {
+                return ['A', 'B', 'C', 'D']
+                    .map(letter => {
+                        const el = document.getElementById(`selFotoItem${num}${letter}`);
+                        return el ? el.value : '';
+                    })
+                    .filter(Boolean);
+            };
+
+            t.parecerDados = {
+                numParecer: document.getElementById("ptNumParecer")?.value || "CMM-24/30.3/26",
+                dataExtenso: document.getElementById("ptDataComissao")?.value || "",
+                boletimInterno: document.getElementById("ptBoletimInterno")?.value || "Boletim Interno Nº CMM-08/24",
+                motivacao: document.getElementById("ptTextoMotivacao")?.value || "",
+                item3: document.getElementById("ptItem3")?.value || "",
+                item4: document.getElementById("ptItem4")?.value || "",
+                item5: document.getElementById("ptItem5")?.value || "",
+                item6: document.getElementById("ptItem6")?.value || "",
+                item7: document.getElementById("ptItem7")?.value || "",
+                item8: document.getElementById("ptItem8")?.value || "",
+                respostasQuesitos: respostasQuesitos,
+                fotosVinculadas: {
+                    item3: getFotosItem(3),
+                    item4: getFotosItem(4),
+                    item5: getFotosItem(5),
+                    item7: getFotosItem(7),
+                    item8: getFotosItem(8)
+                },
+                presidente: document.getElementById("ptMembroPresidente")?.value || "JOSÉ MAYCON DE PAIVA HONORATO",
+                relator: document.getElementById("ptMembroRelator")?.value || (t.operadorDesignado || "ARTUR SANTIAGO DA SILVA ALMEIDA"),
+                auxiliar2: document.getElementById("ptMembroAuxiliar2")?.value || "MARCELO BARONE RODRIGUES"
+            };
+
+            salvarStorage();
+            showToast("Rascunho do Parecer Técnico salvo com sucesso.", "success");
+        }
+
+        function carregarDadosSalvosParecer(d) {
+            if (!d) return;
+            if (d.numParecer && document.getElementById("ptNumParecer")) document.getElementById("ptNumParecer").value = d.numParecer;
+            if (d.dataExtenso && document.getElementById("ptDataComissao")) document.getElementById("ptDataComissao").value = d.dataExtenso;
+            if (d.boletimInterno && document.getElementById("ptBoletimInterno")) document.getElementById("ptBoletimInterno").value = d.boletimInterno;
+            if (d.motivacao && document.getElementById("ptTextoMotivacao")) document.getElementById("ptTextoMotivacao").value = d.motivacao;
+            if (d.item3 && document.getElementById("ptItem3")) document.getElementById("ptItem3").value = d.item3;
+            if (d.item4 && document.getElementById("ptItem4")) document.getElementById("ptItem4").value = d.item4;
+            if (d.item5 && document.getElementById("ptItem5")) document.getElementById("ptItem5").value = d.item5;
+            if (d.item6 && document.getElementById("ptItem6")) document.getElementById("ptItem6").value = d.item6;
+            if (d.item7 && document.getElementById("ptItem7")) document.getElementById("ptItem7").value = d.item7;
+            if (d.item8 && document.getElementById("ptItem8")) document.getElementById("ptItem8").value = d.item8;
+
+            if (d.presidente && document.getElementById("ptMembroPresidente")) document.getElementById("ptMembroPresidente").value = d.presidente;
+            if (d.relator && document.getElementById("ptMembroRelator")) document.getElementById("ptMembroRelator").value = d.relator;
+            if (d.auxiliar2 && document.getElementById("ptMembroAuxiliar2")) document.getElementById("ptMembroAuxiliar2").value = d.auxiliar2;
+
+            // Carregar respostas aos quesitos
+            if (d.respostasQuesitos && Array.isArray(d.respostasQuesitos)) {
+                const containerQuesitos = document.getElementById("containerRespostasQuesitos");
+                if (containerQuesitos) {
+                    const textareas = containerQuesitos.querySelectorAll("textarea");
+                    d.respostasQuesitos.forEach((item, idx) => {
+                        if (textareas[idx] && item.resposta) {
+                            textareas[idx].value = item.resposta;
+                        }
+                    });
+                }
+            }
+
+            // Carregar selects de fotos e exibir prévias
+            if (d.fotosVinculadas) {
+                [3, 4, 5, 7, 8].forEach(num => {
+                    const fotos = d.fotosVinculadas[`item${num}`] || [];
+                    ['A', 'B', 'C', 'D'].forEach((letter, idx) => {
+                        const sel = document.getElementById(`selFotoItem${num}${letter}`);
+                        if (sel && fotos[idx]) {
+                            sel.value = fotos[idx];
+                        }
+                    });
+                    renderizarPreviaFotosItem(num);
+                });
+            }
+        }
+
+        function concluirParecerRegistrarData() {
+            if (!state.ticketSelecionado) return;
+            salvarRascunhoParecer();
+
+            const hoje = new Date().toISOString().split("T")[0];
+            state.ticketSelecionado.dataParecer = hoje;
+            state.ticketSelecionado.status = "CONCLUÍDO (PARECER EMITIDO)";
+            salvarStorage();
+
+            atualizarTabelaGestaoOperador();
+            showToast(`PARECER CONCLUÍDO! A Data do Parecer (${hoje}) foi homologada. A OPM ${state.ticketSelecionado.opm} está liberada para novos agendamentos.`, "success");
+            visualizarParecerOficialFormatado();
+        }
+
+        // ====================================================================
+        // GERAÇÃO DO PARECER OFICIAL FORMATADO (MODELO DOCX)
+        // ====================================================================
+        function visualizarParecerOficialFormatado() {
+            salvarRascunhoParecer();
+            switchOperadorSubView('doc');
+        }
+
+        function gerarVisualizacaoParecerImpressao() {
+            if (!state.ticketSelecionado) return;
+            const d = state.ticketSelecionado.parecerDados || {};
+
+            document.getElementById("docPrintNumeroParecer").textContent = `PARECER TÉCNICO Nº ${d.numParecer || 'CMM-24/30.3/26'}`;
+            document.getElementById("docPrintPreambulo").textContent = `1. ${d.dataExtenso || '---'}, na Cidade de São Paulo, na sede do Centro de Motomecanização da Polícia Militar do Estado de São Paulo, em conformidade com as I-15-PM, I-16-PM e com o ${d.boletimInterno || 'Boletim Interno Nº CMM-08/24'}, reuniu-se a Comissão Técnica nomeada para elaborar o presente parecer.`;
+            document.getElementById("docPrintMotivacao").textContent = d.motivacao || "---";
+
+            document.getElementById("docPrintItem3").textContent = d.item3 || "---";
+            renderizarFotosNoDoc("docPrintFotosItem3", d.fotosVinculadas?.item3);
+
+            document.getElementById("docPrintItem4").textContent = d.item4 || "---";
+            renderizarFotosNoDoc("docPrintFotosItem4", d.fotosVinculadas?.item4);
+
+            document.getElementById("docPrintItem5").textContent = d.item5 || "---";
+            renderizarFotosNoDoc("docPrintFotosItem5", d.fotosVinculadas?.item5);
+
+            document.getElementById("docPrintItem6").textContent = d.item6 || "---";
+
+            document.getElementById("docPrintItem7").textContent = d.item7 || "---";
+            renderizarFotosNoDoc("docPrintFotosItem7", d.fotosVinculadas?.item7);
+
+            document.getElementById("docPrintItem8").textContent = d.item8 || "---";
+            renderizarFotosNoDoc("docPrintFotosItem8", d.fotosVinculadas?.item8);
+
+            // Quesitos
+            const containerQuesitos = document.getElementById("docPrintQuesitos");
+            containerQuesitos.innerHTML = "";
+            const respostas = d.respostasQuesitos || [];
+            if (respostas.length === 0) {
+                containerQuesitos.innerHTML = `<p>Sem quesitos específicos formulados.</p>`;
+            } else {
+                respostas.forEach((r, idx) => {
+                    containerQuesitos.innerHTML += `
+                        <p style="margin-top: 8px;"><strong>9.${idx + 1}. Quanto ao quesito: "${r.pergunta}":</strong></p>
+                        <p style="margin-left: 14px;">${r.resposta || 'Análise técnica em conformidade com os padrões operacionais.'}</p>
+                    `;
+                });
+            }
+
+            document.getElementById("docPrintSignPresidente").innerHTML = `${d.presidente || 'JOSÉ MAYCON DE PAIVA HONORATO'}<br><span style="font-weight: normal; font-size: 10.5px;">Cap PM Presidente Técnico</span>`;
+            document.getElementById("docPrintSignRelator").innerHTML = `${d.relator || 'ARTUR SANTIAGO DA SILVA ALMEIDA'}<br><span style="font-weight: normal; font-size: 10.5px;">Cb PM Auxiliar Técnico</span>`;
+            const aux2 = document.getElementById("docPrintSignAuxiliar2");
+            if (aux2) aux2.innerHTML = `${d.auxiliar2 || 'MARCELO BARONE RODRIGUES'}<br><span style="font-weight: normal; font-size: 10.5px;">Cb PM Auxiliar Técnico</span>`;
+
+            const dataAtual = new Date().toLocaleDateString('pt-BR', { day: 'numeric', month: 'long', year: 'numeric' });
+            document.getElementById("docPrintDataLocal").textContent = `São Paulo, ${dataAtual}.`;
+        }
+
+        function renderizarFotosNoDoc(containerId, fotosIds) {
+            const container = document.getElementById(containerId);
+            if (!container || !fotosIds) return;
+            const fotos = fotosIds.map(id => state.bulkFotos.find(f => f.id === id)).filter(Boolean);
+            if (fotos.length === 0) {
+                container.innerHTML = "";
+                return;
+            }
+
+            const layoutClass = `layout-${fotos.length <= 2 ? fotos.length : (fotos.length === 3 ? 3 : 4)}`;
+            let html = `<div class="parecer-photo-row ${layoutClass}">`;
+            fotos.forEach(f => {
+                html += `
+                    <div class="parecer-photo-box">
+                        <img src="${f.src}" alt="Foto">
+                        <span class="parecer-photo-caption">Foto ${String(f.numero).padStart(2, '0')}</span>
+                    </div>
+                `;
+            });
+            html += `</div>`;
+            container.innerHTML = html;
+        }
+
+        // ====================================================================
+        // LÓGICA DO SOLICITANTE / OPM (WIZARD 5 ETAPAS)
+        // ====================================================================
+        function popularOpms() {
+            const listEl = document.getElementById("opmList");
+            if (!listEl) return;
+            listEl.innerHTML = "";
+            const opms = window.SIPL_OPMS || [];
+            opms.forEach(opm => {
+                const opt = document.createElement("option");
+                opt.value = opm;
+                listEl.appendChild(opt);
+            });
+        }
+
+        function popularMeses() {
+            const select = document.getElementById("mesAgendamentoSelect");
+            if (!select) return;
+            select.innerHTML = "";
+            const mesesNomes = ["JANEIRO", "FEVEREIRO", "MARÇO", "ABRIL", "MAIO", "JUNHO", "JULHO", "AGOSTO", "SETEMBRO", "OUTUBRO", "NOVEMBRO", "DEZEMBRO"];
+            const hoje = new Date();
+            for (let i = 0; i < 4; i++) {
+                const d = new Date(hoje.getFullYear(), hoje.getMonth() + i, 1);
+                const opt = document.createElement("option");
+                opt.value = `${d.getFullYear()}-${d.getMonth() + 1}`;
+                opt.textContent = `${mesesNomes[d.getMonth()]} / ${d.getFullYear()}`;
+                select.appendChild(opt);
+            }
+            gerarSemanasDoMes();
+        }
+
+        function gerarSemanasDoMes() {
+            const select = document.getElementById("mesAgendamentoSelect");
+            const container = document.getElementById("semanasContainer");
+            if (!select || !container) return;
+
+            const [anoStr, mesStr] = select.value.split("-");
+            const ano = parseInt(anoStr);
+            const mes = parseInt(mesStr) - 1;
+            const totalDias = new Date(ano, mes + 1, 0).getDate();
+            container.innerHTML = "";
+
+            let startDay = 1;
+            let semanaIndex = 1;
+            const opmAtual = (document.getElementById("opmSelectInput").value || "").trim().toUpperCase();
+
+            while (startDay <= totalDias) {
+                let endDay = Math.min(startDay + 6, totalDias);
+                const semanaLabel = `SEMANA ${semanaIndex} (${String(startDay).padStart(2, '0')}/${String(mes + 1).padStart(2, '0')} A ${String(endDay).padStart(2, '0')}/${String(mes + 1).padStart(2, '0')})`;
+                const semanaKey = `${ano}-${mes + 1}-SEM${semanaIndex}`;
+
+                // TRAVA 1: MESMA OPM NÃO PODE NA MESMA SEMANA
+                let opmBloqueadaSemana = false;
+                if (opmAtual) {
+                    opmBloqueadaSemana = state.agendamentos.some(a => 
+                        a.opm === opmAtual && a.semanaKey === semanaKey && a.status !== "CANCELADO"
+                    );
+                }
+
+                const card = document.createElement("div");
+                card.className = `week-card ${opmBloqueadaSemana ? 'disabled' : ''} ${state.semanaSelecionada === semanaKey ? 'selected' : ''}`;
+                card.innerHTML = `
+                    <strong style="display: block; font-size: 11px; margin-bottom: 4px;">${semanaLabel}</strong>
+                    <span style="font-size: 10px; color: ${opmBloqueadaSemana ? 'var(--accent-rose)' : 'var(--accent-green)'};">
+                        ${opmBloqueadaSemana ? 'OPM JÁ TEM VTR NESTA SEMANA' : 'DISPONÍVEL'}
+                    </span>
+                `;
+
+                if (!opmBloqueadaSemana) {
+                    card.onclick = () => {
+                        state.semanaSelecionada = semanaKey;
+                        state.semanaLabel = semanaLabel;
+                        state.diaInicioSemana = startDay;
+                        state.mesSemana = mes;
+                        state.anoSemana = ano;
+                        atualizarDataSelecionada();
+                        gerarSemanasDoMes();
+                    };
+                }
+                container.appendChild(card);
+                startDay = endDay + 1;
+                semanaIndex++;
+            }
+        }
+
+        function atualizarDataSelecionada() {
+            if (!state.semanaSelecionada) return;
+            const diaOffset = parseInt(document.getElementById("diaSemanaSelect").value) - 1;
+            const diaFinal = Math.min(state.diaInicioSemana + diaOffset, 31);
+            state.dataCalculada = `${state.anoSemana}-${String(state.mesSemana + 1).padStart(2, '0')}-${String(diaFinal).padStart(2, '0')}`;
+        }
+
+        function atualizarContadorMotivo() {
+            const t = document.getElementById("motivoVistoria").value.trim();
+            const counter = document.getElementById("charCountMotivo");
+            counter.textContent = `${t.length} / 20 CARACTERES`;
+            counter.style.color = t.length >= 20 ? "var(--accent-green)" : "var(--accent-amber)";
+        }
+
+        function autoSave() {
+            // Salva rascunho de digitação no localStorage
+            const rascunho = {
+                tipo: document.getElementById("tipoProcedimento")?.value,
+                sindicancia: document.getElementById("numSindicancia")?.value,
+                re: document.getElementById("militarRe")?.value,
+                nome: document.getElementById("militarNome")?.value,
+                tel: document.getElementById("militarTelefone")?.value,
+                email: document.getElementById("militarEmail")?.value,
+                opm: document.getElementById("opmSelectInput")?.value,
+                km: document.getElementById("kmAtual")?.value,
+                motivo: document.getElementById("motivoVistoria")?.value,
+                objetivo: document.getElementById("objetivoAnalise")?.value
+            };
+            localStorage.setItem("CMM_DRAFT_SOLICITANTE", JSON.stringify(rascunho));
+        }
+
+        function preencherTextoModeloObjetivo() {
+            document.getElementById("objetivoAnalise").value = "CONSIDERANDO A NECESSIDADE DE [DESCREVA A NECESSIDADE], ENCAMINHO O VEÍCULO PARA ANÁLISE TÉCNICA PARA CONSTATAÇÃO DE POSSÍVEL IRREGULARIDADE EM [INFORME QUAL É A ALEGAÇÃO DO CONDUTOR].";
+            autoSave();
+            showToast("Texto modelo carregado.", "info");
+        }
+
+        function togglePerguntasEspecificas(show) {
+            document.getElementById("containerPerguntasArea").style.display = show ? "block" : "none";
+            if (show && state.perguntas.length === 0) adicionarNovaPergunta();
+        }
+
+        function adicionarNovaPergunta() {
+            state.perguntas.push("");
+            renderizarPerguntasSolicitante();
+        }
+
+        function removerPergunta(idx) {
+            state.perguntas.splice(idx, 1);
+            renderizarPerguntasSolicitante();
+        }
+
+        function renderizarPerguntasSolicitante() {
+            const container = document.getElementById("listaPerguntasDinamicas");
+            if (!container) return;
+            container.innerHTML = "";
+            state.perguntas.forEach((q, idx) => {
+                container.innerHTML += `
+                    <div class="question-card">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
+                            <strong style="color: var(--accent-cyan); font-size: 11px;">QUESITO Nº ${idx + 1}:</strong>
+                            <button type="button" class="btn-remove-q" onclick="removerPergunta(${idx})">REMOVER</button>
+                        </div>
+                        <textarea class="form-control" style="min-height: 55px;" placeholder="COPIE E COLE A PERGUNTA DO OFÍCIO..." oninput="state.perguntas[${idx}] = this.value.toUpperCase();">${q}</textarea>
+                    </div>
+                `;
+            });
+        }
+
+        function handleFileUpload(index, input) {
+            if (!input.files || !input.files[0]) return;
+            const file = input.files[0];
+            if (!file.name.toLowerCase().endsWith(".pdf")) {
+                showToast("Somente arquivos .PDF são permitidos.", "error");
+                input.value = "";
+                return;
+            }
+            const sizeMb = (file.size / (1024 * 1024)).toFixed(2);
+            document.getElementById(`fileName${index}`).textContent = `${file.name.toUpperCase()} (${sizeMb} MB)`;
+            document.getElementById(`badgeFile${index}`).textContent = "ANEXADO";
+            document.getElementById(`badgeFile${index}`).className = "file-status-badge done";
+            document.getElementById(`boxUpload${index}`).classList.add("attached");
+
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                state.documentos[index] = { nome: file.name.toUpperCase(), base64: e.target.result };
+                const chk = document.getElementById(`chkDoc${index}`);
+                if (chk) chk.checked = true;
+                showToast(`PDF ${index} anexado.`, "success");
+            };
+            reader.readAsDataURL(file);
+        }
+
+        
+        function iniciarAgendamentoPorViatura() {
+            avancarParaEtapa(1);
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        
+        function avancarDaViaturaParaTriagem() {
+            if (!state.viaturaSelecionada) {
+                showToast("Selecione uma viatura na lista para prosseguir.", "error");
+                return;
+            }
+            const opmAtual = (document.getElementById("opmSelectInput").value || "").trim().toUpperCase();
+            const pendente = state.agendamentos.find(a => 
+                a.opm === opmAtual && (!a.dataParecer || a.status !== "CONCLUÍDO (PARECER EMITIDO)") && a.status !== "CANCELADO"
+            );
+            if (pendente) {
+                showToast(`BLOQUEIO: A OPM ${opmAtual} já possui viatura (${pendente.placa}) no CMM aguardando Data do Parecer. Não é permitido novo agendamento.`, "error");
+                return;
+            }
+
+            for (let i = 1; i <= 5; i++) {
+                const c = document.getElementById(`stepCard${i}`);
+                if (c) c.style.display = i === 1 ? "block" : "none";
+                const ind = document.getElementById(`stepIndicator${i}`);
+                if (ind) {
+                    ind.classList.toggle("active", i === 1);
+                    ind.classList.toggle("completed", i === 2);
+                }
+            }
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function avancarParaEtapa(step) {
+            if (step >= 2) {
+                const sind = document.getElementById("numSindicancia").value.trim();
+                const re = document.getElementById("militarRe").value.trim();
+                const nome = document.getElementById("militarNome").value.trim();
+                const tel = document.getElementById("militarTelefone").value.trim();
+                const email = document.getElementById("militarEmail").value.trim().toLowerCase();
+
+                if (!sind || sind.length < 3) {
+                    showToast("⚠️ É OBRIGATÓRIO INFORMAR O NÚMERO DE SIND/IPM PARA PROSSEGUIR ⚠️", "error");
+                    return;
+                }
+                if (!re || !nome || !tel) {
+                    showToast("Preencha todos os dados obrigatórios do militar responsável.", "error");
+                    return;
+                }
+                if (!email.endsWith("@policiamilitar.sp.gov.br")) {
+                    showToast("TRAVA: Aceita unicamente e-mail @policiamilitar.sp.gov.br.", "error");
+                    return;
+                }
+            }
+
+            if (step >= 3) {
+                if (!state.viaturaSelecionada) {
+                    showToast("Selecione uma viatura na lista para prosseguir.", "error");
+                    return;
+                }
+                // TRAVA 2: MESMA OPM NÃO PODE SEM DATA DO PARECER ANTERIOR
+                const opmAtual = (document.getElementById("opmSelectInput").value || "").trim().toUpperCase();
+                const pendente = state.agendamentos.find(a => 
+                    a.opm === opmAtual && (!a.dataParecer || a.status !== "CONCLUÍDO (PARECER EMITIDO)") && a.status !== "CANCELADO"
+                );
+                if (pendente) {
+                    showToast(`BLOQUEIO: A OPM ${opmAtual} já possui viatura (${pendente.placa}) no CMM aguardando Data do Parecer. Não é permitido novo agendamento.`, "error");
+                    return;
+                }
+            }
+
+            if (step >= 4) {
+                const km = document.getElementById("kmAtual").value.trim();
+                const motivo = document.getElementById("motivoVistoria").value.trim();
+                const check = document.getElementById("checkTermo").checked;
+
+                if (!km) { showToast("Informe o hodômetro atual (KM).", "error"); return; }
+                if (motivo.length < 20) { showToast("A descrição do motivo deve ter no mínimo 20 caracteres.", "error"); return; }
+                if (!state.documentos[1] || !state.documentos[2] || !state.documentos[3]) {
+                    showToast("Anexe os 3 PDFs obrigatórios (Ofício, Portaria e Oitiva).", "error");
+                    return;
+                }
+                if (!check) { showToast("Marque a declaração para continuar.", "error"); return; }
+            }
+
+            if (step >= 5) {
+                const obj = document.getElementById("objetivoAnalise").value.trim();
+                if (obj.length < 15) {
+                    showToast("Informe o Objetivo da Análise Técnica.", "error");
+                    return;
+                }
+                gerarSemanasDoMes();
+            }
+
+            for (let i = 1; i <= 5; i++) {
+                const c = document.getElementById(`stepCard${i}`);
+                if (c) c.style.display = i === step ? "block" : "none";
+                const ind = document.getElementById(`stepIndicator${i}`);
+                if (ind) {
+                    ind.classList.toggle("active", i === step);
+                    ind.classList.toggle("completed", i < step);
+                }
+            }
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function buscarViaturas(query) {
+            query = (query || "").trim().toUpperCase();
+            const dropdown = document.getElementById("plateDropdown");
+            if (!dropdown) return;
+            if (query.length < 2) {
+                dropdown.innerHTML = "";
+                dropdown.classList.remove("show");
+                return;
+            }
+            const frota = window.SIPL_FROTA || [];
+            const opmFiltro = document.getElementById("opmSelectInput").value.trim().toUpperCase();
+
+            let matches = [];
+            for (let i = 0; i < frota.length && matches.length < 15; i++) {
+                const v = frota[i];
+                if (opmFiltro && v.opm && !v.opm.toUpperCase().includes(opmFiltro)) continue;
+                if ((v.p && v.p.includes(query)) || (v.pr && v.pr.includes(query)) || (v.m && v.m.includes(query))) {
+                    matches.push(v);
+                }
+            }
+
+            if (matches.length === 0) {
+                dropdown.innerHTML = `<div style="padding: 10px; color: var(--text-dim); text-align: center; font-size: 11px;">NENHUMA VIATURA ENCONTRADA</div>`;
+                dropdown.classList.add("show");
+                return;
+            }
+
+            let html = "";
+            matches.forEach(v => {
+                html += `
+                    <div class="autocomplete-item" onclick="selecionarViatura('${v.p}')">
+                        <div>
+                            <span class="autocomplete-plate">${v.p}</span>
+                            <span style="font-weight: 700; color: #fff; font-size: 11px; margin-left: 8px;">${v.pr ? 'VTR ' + v.pr : 'S/ PREF'}</span>
+                            <span style="color: var(--text-muted); font-size: 11px; margin-left: 8px;">${v.m || ''}</span>
+                        </div>
+                        <span class="autocomplete-opm">${v.opm || 'CMM'}</span>
+                    </div>
+                `;
+            });
+            dropdown.innerHTML = html;
+            dropdown.classList.add("show");
+        }
+
+        function filtrarPorOpm() {
+            const searchVal = document.getElementById("searchPlateInput").value.trim();
+            if (searchVal) buscarViaturas(searchVal);
+        }
+
+        function selecionarViatura(placa) {
+            const frota = window.SIPL_FROTA || [];
+            const v = frota.find(item => item.p === placa);
+            if (!v) return;
+
+            state.viaturaSelecionada = v;
+            document.getElementById("searchPlateInput").value = v.p;
+            document.getElementById("plateDropdown").classList.remove("show");
+
+            if (!document.getElementById("opmSelectInput").value && v.opm) {
+                document.getElementById("opmSelectInput").value = v.opm;
+            }
+
+            document.getElementById("cardVtrPlaca").textContent = v.p || "---";
+            document.getElementById("cardVtrPrefixo").textContent = v.pr ? `PREFIXO: ${v.pr}` : "PREFIXO: S/N";
+            document.getElementById("cardVtrModelo").textContent = v.m || "---";
+            document.getElementById("cardVtrAno").textContent = v.a || "---";
+            document.getElementById("cardVtrCor").textContent = v.cor || "BRANCA (PADRÃO PM)";
+            document.getElementById("cardVtrOpm").textContent = v.opm || "---";
+            document.getElementById("cardVtrPatrimonio").textContent = v.pat || "N/A";
+            document.getElementById("cardVtrChassi").textContent = v.ch || "N/A";
+            document.getElementById("cardVtrMotor").textContent = v.mot || "N/A";
+
+            document.getElementById("boxVeiculoDetalhes").style.display = "block";
+            document.getElementById("btnAvancarEtapa2").removeAttribute("disabled");
+            showToast(`Viatura ${v.p} vinculada ao formulário.`, "success");
+        }
+
+        function finalizarAgendamento() {
+            if (!state.semanaSelecionada) {
+                showToast("Selecione uma semana disponível.", "error");
+                return;
+            }
+            if (!document.getElementById("chkDoc6").checked || !document.getElementById("chkDoc7").checked || !document.getElementById("chkDoc8").checked) {
+                showToast("Confirme o checklist físico do RIV, Chave e Componentes.", "error");
+                return;
+            }
+            if (!document.getElementById("checkFinalTermo").checked) {
+                showToast("Marque a declaração final para concluir.", "error");
+                return;
+            }
+
+            const anoAtual = new Date().getFullYear();
+            const randNum = Math.floor(100000 + Math.random() * 900000);
+            const protocolo = `CMM-AT-${anoAtual}-${randNum}`;
+
+            const agendamento = {
+                protocolo: protocolo,
+                timestamp: new Date().toISOString(),
+                status: "NO PÁTIO (AGUARDANDO ANÁLISE)",
+                tipo_procedimento: document.getElementById("tipoProcedimento").value,
+                sindicancia_ipm: document.getElementById("numSindicancia").value.trim().toUpperCase(),
+                posto_grad: document.getElementById("postoGrad").value,
+                re: document.getElementById("militarRe").value.trim(),
+                nome: document.getElementById("militarNome").value.trim().toUpperCase(),
+                telefone: document.getElementById("militarTelefone").value.trim(),
+                email: document.getElementById("militarEmail").value.trim().toLowerCase(),
+                opm: document.getElementById("opmSelectInput").value.trim().toUpperCase() || state.viaturaSelecionada.opm || "CMM",
+                placa: state.viaturaSelecionada.p,
+                prefixo: state.viaturaSelecionada.pr || "",
+                modelo: state.viaturaSelecionada.m || "",
+                ano: state.viaturaSelecionada.a || "",
+                cor: state.viaturaSelecionada.cor || "",
+                chassi: state.viaturaSelecionada.ch || "",
+                motor: state.viaturaSelecionada.mot || "",
+                patrimonio: state.viaturaSelecionada.pat || "",
+                condicao: document.getElementById("condicaoVeiculo").value,
+                km: document.getElementById("kmAtual").value.trim(),
+                motivo: document.getElementById("motivoVistoria").value.trim().toUpperCase(),
+                objetivo: document.getElementById("objetivoAnalise").value.trim().toUpperCase(),
+                perguntas: state.perguntas.filter(q => q.trim().length > 0),
+                semanaKey: state.semanaSelecionada,
+                semanaLabel: state.semanaLabel,
+                dataCalculada: state.dataCalculada,
+                documentosAnexados: { oficio: true, portaria: true, oitiva: true, cop: !!state.documentos[4], comprovantes: !!state.documentos[5] },
+                dataParecer: null,
+                operadorDesignado: null,
+                parecerDados: null
+            };
+
+            state.agendamentos.push(agendamento);
+            salvarStorage();
+            localStorage.removeItem("CMM_DRAFT_SOLICITANTE");
+
+            atualizarTabelaGestaoOperador();
+            exibirGuiaOficial(agendamento);
+        }
+
+        function exibirGuiaOficial(a) {
+            for (let i = 1; i <= 5; i++) {
+                const c = document.getElementById(`stepCard${i}`);
+                if (c) c.style.display = "none";
+            }
+            document.querySelector(".wizard-steps").style.display = "none";
+
+            document.getElementById("receiptProtocolo").textContent = a.protocolo;
+            document.getElementById("recDataHora").textContent = `${a.semanaLabel} - PREVISTO: ${a.dataCalculada}`;
+            document.getElementById("recSindicancia").textContent = a.sindicancia_ipm;
+            document.getElementById("recProcedimento").textContent = a.tipo_procedimento;
+            document.getElementById("recVtrPlacaPrefixo").textContent = `${a.placa} ${a.prefixo ? '(PREFIXO: ' + a.prefixo + ')' : ''}`;
+            document.getElementById("recVtrModelo").textContent = `${a.modelo} - ANO: ${a.ano} - COR: ${a.cor}`;
+            document.getElementById("recVtrSpecs").textContent = `CHASSI: ${a.chassi || 'N/A'} | MOTOR: ${a.motor || 'N/A'} | PATR: ${a.patrimonio || 'N/A'}`;
+            document.getElementById("recOpm").textContent = a.opm;
+            document.getElementById("recMilitar").textContent = `${a.posto_grad} RE ${a.re} ${a.nome}`;
+            document.getElementById("recContato").textContent = `${a.telefone} | ${a.email}`;
+            document.getElementById("recCondicao").textContent = `${a.condicao} | KM: ${a.km}`;
+            document.getElementById("recMotivo").textContent = a.motivo;
+            document.getElementById("recObjetivo").textContent = a.objetivo;
+
+            let pergs = a.perguntas && a.perguntas.length > 0 ? a.perguntas.join("; ") : "SEM PERGUNTAS ESPECÍFICAS";
+            document.getElementById("recPerguntas").textContent = pergs;
+            document.getElementById("recDocumentos").textContent = "OFÍCIO (PDF), PORTARIA (PDF), OITIVA (PDF)";
+            document.getElementById("signMilitarNome").textContent = `${a.posto_grad} RE ${a.re} ${a.nome}`;
+
+            const qrBox = document.getElementById("qrcodeBox");
+            qrBox.innerHTML = "";
+            new QRCode(qrBox, {
+                text: `CMM-TECMEC|PROT:${a.protocolo}|PLACA:${a.placa}|OPM:${a.opm}|DATA:${a.dataCalculada}`,
+                width: 70, height: 70
+            });
+
+            document.getElementById("stepCardConfirmacao").style.display = "block";
+            showToast("Agendamento concluído com sucesso!", "success");
+        }
+
+        function reimprimirGuia(protocolo) {
+            const item = state.agendamentos.find(a => a.protocolo === protocolo);
+            if (!item) return;
+            abrirAreaSolicitante();
+            exibirGuiaOficial(item);
+        }
+
+        // ====================================================================
+        // MODAL DE CONSULTA DE PROTOCOLO
+        // ====================================================================
+        function abrirModalConsulta() {
+            document.getElementById("modalConsulta").style.display = "flex";
+        }
+        function fecharModalConsulta() {
+            document.getElementById("modalConsulta").style.display = "none";
+        }
+
+        function executarBuscaModalConsulta() {
+            const query = document.getElementById("inputModalConsulta").value.trim().toUpperCase();
+            const box = document.getElementById("resultadoModalConsulta");
+            if (!query) return;
+
+            const item = state.agendamentos.find(a => a.protocolo === query || a.placa === query);
+            if (!item) {
+                box.innerHTML = `<div style="color: #f87171; text-align: center; padding: 10px;">Nenhum registro encontrado para '${query}'.</div>`;
+                box.style.display = "block";
+                return;
+            }
+
+            box.innerHTML = `
+                <div style="background: var(--bg-surface); padding: 14px; border-radius: var(--radius-sm); border: 1px solid var(--border);">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                        <strong style="color: var(--accent-cyan); font-family: monospace;">${item.protocolo}</strong>
+                        <span class="badge-status ${item.status.includes('CONCLUÍDO') ? 'operacao' : 'descarga'}">${item.status}</span>
+                    </div>
+                    <p><strong>VTR:</strong> ${item.placa} (${item.prefixo || ''}) | <strong>OPM:</strong> ${item.opm}</p>
+                    <p><strong>DATA DO PARECER:</strong> ${item.dataParecer || 'AGUARDANDO EMISSÃO'}</p>
+                    <div style="display: flex; justify-content: flex-end; margin-top: 10px;">
+                        <button class="btn btn-primary" style="height: 30px; font-size: 10px;" onclick="fecharModalConsulta(); reimprimirGuia('${item.protocolo}')">
+                            <i class="fa-solid fa-print"></i> VER GUIA
+                        </button>
+                    </div>
+                </div>
+            `;
+            box.style.display = "block";
+        }
+
+        // ====================================================================
+        // STORAGE E UTILITÁRIOS
+        // ====================================================================
+        function carregarStorage() {
+            try {
+                const raw = localStorage.getItem(CONFIG.STORAGE_KEY);
+                state.agendamentos = raw ? JSON.parse(raw) : [];
+            } catch (e) {
+                state.agendamentos = [];
+            }
+        }
+
+        function salvarStorage() {
+            try {
+                localStorage.setItem(CONFIG.STORAGE_KEY, JSON.stringify(state.agendamentos));
+            } catch (e) {
+                console.error("Erro storage:", e);
+            }
+        }
+
+        function showToast(msg, type = "info") {
+            const t = document.getElementById("toastMsg");
+            t.textContent = msg;
+            t.className = `toast show ${type}`;
+            setTimeout(() => { t.className = "toast"; }, 4000);
+        }
+    </script>
+</body>
+</html>

@@ -901,7 +901,7 @@
                 <div class="legend-chip chip-0" onclick="selectStamp('0', this)">"0" - INF. 8H (0 PT)</div>
                 <div class="legend-chip chip-3" onclick="selectStamp('3', this)">"3" - 18H A 24H (3 PTS)</div>
                 <div class="legend-chip chip-a" onclick="selectStamp('A', this)">A - FOLGA / AFASTADO</div>
-                <div class="legend-chip chip-f" onclick="selectStamp('FE', this)">FE / F - FÉRIAS</div>
+                <div class="legend-chip chip-f" onclick="selectStamp('F', this)">F - FÉRIAS</div>
                 <div class="legend-chip chip-lp" onclick="selectStamp('LP', this)">LP - LICENÇA PRÊMIO</div>
                 <div class="legend-chip chip-fs" onclick="selectStamp('FS', this)">FS - FALTA AO SERVIÇO</div>
             </div>
@@ -1460,7 +1460,9 @@
             const alt = findAlteracaoForDateAndMilitar(reCode, dateObj);
             if (alt) {
                 if (alt.freq) {
-                    return String(alt.freq).toUpperCase().trim();
+                    const fVal = String(alt.freq).toUpperCase().trim();
+                    if (fVal === 'FE' || fVal === 'F') return 'F';
+                    return fVal;
                 }
                 if (alt.sigla) {
                     const s = alt.sigla.toUpperCase();
@@ -1469,7 +1471,7 @@
                         if (grupo.includes('08H ÀS 18H') || grupo.includes('08H AS 18H')) return '1';
                         return '2';
                     }
-                    if (s === 'FE' || s === 'FÉRIAS' || s === 'FERIAS') return 'FE';
+                    if (s === 'FE' || s === 'FÉRIAS' || s === 'FERIAS') return 'F';
                     if (s === 'LP') return 'LP';
                     if (s === 'FS') return 'FS';
                     if (s === 'F' || s === 'FOLGA') return 'A';
@@ -1491,7 +1493,7 @@
                         if (grupo.includes('08H ÀS 18H') || grupo.includes('08H AS 18H')) return '1';
                         return '2';
                     }
-                    if (siglaScale === 'FE' || siglaScale === 'FÉRIAS') return 'FE';
+                    if (siglaScale === 'FE' || siglaScale === 'FÉRIAS') return 'F';
                     if (siglaScale === 'LP') return 'LP';
                     if (siglaScale === 'FS') return 'FS';
                     if (siglaScale === 'M' || siglaScale === 'T') return '1';
@@ -1512,7 +1514,7 @@
 
             if (sit && sit.ativa && isDateWithinRange(dateObj, sit.data_inicio, sit.data_fim)) {
                 const s = (sit.sigla || '').toUpperCase();
-                if (s === 'FE' || s === 'F') return 'FE';
+                if (s === 'FE' || s === 'F') return 'F';
                 if (s === 'LP') return 'LP';
                 if (s === 'FS') return 'FS';
                 if (s === 'EAP') return '1';
@@ -1603,7 +1605,9 @@
                         for (let d = 1; d <= 31; d++) {
                             const key = `${cleanRe}_${d}`;
                             if (savedFreq.edicoes_manuais[key] !== undefined) {
-                                m.days[d] = savedFreq.edicoes_manuais[key];
+                                let manualVal = savedFreq.edicoes_manuais[key];
+                                if (manualVal === 'FE') manualVal = 'F';
+                                m.days[d] = manualVal;
                             }
                         }
                     });
