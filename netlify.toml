@@ -12,3 +12,9 @@
   # local (netlify dev) — não deixa o esbuild tentar empacotar ele junto
   # na publicação, onde é inútil e só pesaria o pacote da função à toa.
   external_node_modules = ["puppeteer"]
+
+# Plugin local que guarda, entre deploys, o dist/ já compilado de cada
+# pasta — usado pelo scripts/build-webapps.sh para pular a recompilação de
+# pastas sem alterações (economiza minutos de build).
+[[plugins]]
+  package = "./netlify/plugins/skip-unchanged"

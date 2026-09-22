@@ -93,18 +93,22 @@ function construirMioloParecer(a) {
     const procTipo = a.tipo_procedimento === 'IPM' ? 'IPM' : 'sindicância';
     const veiculoDesc = `${a.modelo || ''}, ano ${a.ano || ''}, VIN ${a.chassi || ''}, placas ${a.placa || ''}, prefixo ${a.prefixo || ''}, patrimônio ${a.patrimonio || ''}`.replace(/\s+/g, ' ').trim();
     let fotoContador = 0;
-    const origin = window.location.origin;
+    // URL absoluta até a PASTA onde o app está publicado (funciona tanto na
+    // raiz local — http://localhost:8888/ — quanto em qualquer subcaminho
+    // de produção — ex.: https://cmmpaineldebordo.netlify.app/tecmec-webapp/
+    // — sem precisar hardcodar o nome da pasta). Necessário porque este
+    // HTML também é renderizado fora da página (na função de PDF, pelo
+    // Puppeteer), onde um caminho relativo "/imagem.png" não resolveria.
+    const baseUrl = window.location.origin + window.location.pathname.replace(/[^/]*$/, "");
 
     let html = "";
 
     // Cabeçalho: brasão de SP à esquerda, brasão do CMM à direita, títulos
-    // centralizados entre os dois — igual ao modelo Word. Usa URL absoluta
-    // (origin) porque este HTML também é renderizado fora da página (na
-    // função de PDF), onde um caminho relativo "/imagem.png" não resolveria.
+    // centralizados entre os dois — igual ao modelo Word.
     html += `
         <div style="display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom: 20px; border-bottom: 2px solid #000; padding-bottom: 10px; page-break-inside: avoid; break-inside: avoid;">
             <div style="width: 120px; text-align: center; font-size: 7px; line-height: 1.4; flex-shrink: 0;">
-                <img src="${origin}/brasao_sp.png" style="width: 68px; height: auto; margin-bottom: 4px;">
+                <img src="${baseUrl}brasao_sp.png" style="width: 68px; height: auto; margin-bottom: 4px;">
                 <div>www.policiamilitar.sp.gov.br</div>
                 <div>cmmtecmec@policiamilitar.sp.gov.br</div>
             </div>
@@ -115,7 +119,7 @@ function construirMioloParecer(a) {
                 <div style="font-size: 13px; font-weight: bold; text-decoration: underline;">PARECER TÉCNICO Nº ${numParecer}</div>
             </div>
             <div style="width: 120px; text-align: center; flex-shrink: 0;">
-                <img src="${origin}/cmmlogo.png" style="width: 62px; height: auto;">
+                <img src="${baseUrl}cmmlogo.png" style="width: 62px; height: auto;">
             </div>
         </div>
     `;
