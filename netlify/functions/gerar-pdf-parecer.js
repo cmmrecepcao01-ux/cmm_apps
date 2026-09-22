@@ -1,3 +1,4 @@
+// v2 — força novo deploy após ajuste da env var AWS_LAMBDA_JS_RUNTIME.
 // Função Netlify (roda como AWS Lambda em produção) que recebe o HTML já
 // pronto do parecer técnico e devolve um PDF de verdade, gerado por um Chrome
 // headless (Puppeteer) — não é mais uma "foto" da tela (html2canvas): é a
