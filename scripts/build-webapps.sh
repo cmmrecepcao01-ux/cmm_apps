@@ -4,7 +4,14 @@
 # dist/ no lugar da pasta original. Pastas sem package.json (a maioria,
 # HTML/JS puro) não são tocadas — zero configuração manual no Netlify para
 # cada novo webapp criado no futuro.
-set -e
+#
+# Importante: um erro de build EM UMA pasta (ex.: bug de TypeScript no
+# código daquele webapp) NÃO pode derrubar o deploy inteiro e tirar do ar
+# as outras ~20 ferramentas que já funcionam. Por isso não usamos "set -e"
+# no laço principal — cada pasta é tentada de forma isolada; se falhar,
+# fica um aviso no log e a pasta é publicada como estava (sem build novo),
+# e o script segue para as próximas.
+FALHOU=0
 
 for dir in */ ; do
     pasta="${dir%/}"
@@ -20,17 +27,26 @@ for dir in */ ; do
         # npm install restaura os arquivos sem permissão de execução
         # (ex.: quando node_modules já veio commitado no git sem esse bit),
         # o que quebra "npm run build" com "vite: Permission denied".
-        (cd "$pasta" && npm install && (chmod +x node_modules/.bin/* 2>/dev/null || true) && npm run build)
-
-        if [ -d "$pasta/dist" ]; then
-            echo ">>> Publicando build de $pasta..."
-            rm -rf "${pasta}__publish_tmp"
-            mkdir "${pasta}__publish_tmp"
-            cp -r "$pasta/dist/." "${pasta}__publish_tmp/"
-            rm -rf "$pasta"
-            mv "${pasta}__publish_tmp" "$pasta"
+        if (cd "$pasta" && npm install && (chmod +x node_modules/.bin/* 2>/dev/null || true) && npm run build); then
+            if [ -d "$pasta/dist" ]; then
+                echo ">>> Publicando build de $pasta..."
+                rm -rf "${pasta}__publish_tmp"
+                mkdir "${pasta}__publish_tmp"
+                cp -r "$pasta/dist/." "${pasta}__publish_tmp/"
+                rm -rf "$pasta"
+                mv "${pasta}__publish_tmp" "$pasta"
+            else
+                echo ">>> AVISO: $pasta tem script build mas não gerou pasta dist/ — pulando."
+            fi
         else
-            echo ">>> AVISO: $pasta tem script build mas não gerou pasta dist/ — pulando."
+            echo ">>> ERRO: falha ao compilar $pasta — pasta mantida como estava (sem build novo), demais pastas continuam normalmente."
+            FALHOU=1
         fi
     fi
 done
+
+if [ "$FALHOU" = "1" ]; then
+    echo ">>> Uma ou mais pastas falharam ao compilar (veja os erros acima). O restante do site foi publicado normalmente."
+fi
+
+exit 0
