@@ -1,6 +1,6 @@
 [build]
-  command = "npm run build"
-  publish = "dist"
+  command = "bash scripts/build-webapps.sh"
+  publish = "."
   functions = "netlify/functions"
 
 [functions]
@@ -12,8 +12,3 @@
   # local (netlify dev) — não deixa o esbuild tentar empacotar ele junto
   # na publicação, onde é inútil e só pesaria o pacote da função à toa.
   external_node_modules = ["puppeteer"]
-
-[[redirects]]
-  from = "/*"
-  to = "/index.html"
-  status = 200

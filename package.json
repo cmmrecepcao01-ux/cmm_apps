@@ -1,0 +1,13 @@
+{
+  "name": "cmm-apps-root",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Dependências da(s) função(ões) Netlify compartilhadas do projeto cmm_app.",
+  "dependencies": {
+    "@sparticuz/chromium": "^123.0.1",
+    "puppeteer-core": "^22.13.1"
+  },
+  "devDependencies": {
+    "puppeteer": "^22.13.1"
+  }
+}
