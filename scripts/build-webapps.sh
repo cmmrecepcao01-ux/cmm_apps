@@ -16,7 +16,11 @@ for dir in */ ; do
 
     if [ -f "$pasta/package.json" ] && grep -q '"build"' "$pasta/package.json"; then
         echo ">>> Compilando $pasta..."
-        (cd "$pasta" && npm install && npm run build)
+        # chmod +x nos binários do node_modules/.bin: em algumas pastas o
+        # npm install restaura os arquivos sem permissão de execução
+        # (ex.: quando node_modules já veio commitado no git sem esse bit),
+        # o que quebra "npm run build" com "vite: Permission denied".
+        (cd "$pasta" && npm install && (chmod +x node_modules/.bin/* 2>/dev/null || true) && npm run build)
 
         if [ -d "$pasta/dist" ]; then
             echo ">>> Publicando build de $pasta..."
