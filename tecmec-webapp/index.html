@@ -1,0 +1,823 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CENTRO DE MOTOMECANIZAÇÃO - AGENDAMENTO DE ANÁLISE TÉCNICA | PMESP</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome 6 -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <!-- QRCode Generator CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <!-- PDF do parecer agora é gerado no servidor (Netlify Function + Puppeteer),
+         não mais no navegador — html2pdf.js removido. -->
+    <!-- marker.js 2 CDN (editor de anotações sobre fotos: setas, círculos, texto) -->
+    <script src="https://cdn.jsdelivr.net/npm/markerjs2/markerjs2.js"></script>
+    <!-- Base de dados SIPL e OPMs -->
+    <script src="frota_data.js"></script>
+</head>
+<body>
+
+    <!-- CABEÇALHO DO SISTEMA -->
+    <header>
+        <div class="header-wrap">
+            <div class="brand" onclick="abrirPortalCapa()">
+                <div class="brand-logos">
+                    <img src="brasao_pmesp.png" alt="Brasão PMESP" class="logo-img" onerror="this.style.display='none'">
+                    <img src="cmmasa.png" alt="CMM ASA" class="logo-img" onerror="this.style.display='none'">
+                </div>
+                <div class="brand-text">
+                    <h1>CENTRO DE MOTOMECANIZAÇÃO - AGENDAMENTO DE ANÁLISE TÉCNICA</h1>
+                    <p>SETOR TÉCNICO</p>
+                </div>
+            </div>
+            <div class="header-right">
+                <button class="nav-btn" onclick="abrirModalConsulta()">
+                    <i class="fa-solid fa-magnifying-glass"></i> CONSULTAR SOLICITAÇÃO / PLACA
+                </button>
+                <button class="nav-btn" id="btnNavPortal" onclick="abrirPortalCapa()">
+                    <i class="fa-solid fa-house"></i> INÍCIO
+                </button>
+                <button class="nav-btn" id="btnNavSolicitante" onclick="abrirModalAcessoSolicitante()">
+                    <i class="fa-solid fa-calendar-plus"></i> AGENDAR ANÁLISE
+                </button>
+                <button class="nav-btn" id="btnNavOperador" onclick="abrirModalLogin()">
+                    <i class="fa-solid fa-shield-halved"></i> PAINEL DO GESTOR
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <!-- ====================================================================
+             TELA 1: CAPA DO PORTAL (ACESSO COM 2 GRANDES BOTÕES)
+             ==================================================================== -->
+        <div id="viewPortalCapa">
+            <div class="portal-hero" style="margin-bottom: 24px;">
+                <img src="/cmmlogo.png" alt="Brasão CMM" style="width: 120px; height: 120px; object-fit: contain; display: block; margin: 0 auto 16px auto;">
+                <h1 style="font-size: 24px; font-weight: 900; letter-spacing: 1px;">CENTRO DE MOTOMECANIZAÇÃO - PMESP</h1>
+            </div>
+
+            <div class="portal-access-grid">
+                <!-- CARD 1: AGENDAR ANÁLISE -->
+                <div class="portal-card" onclick="abrirModalAcessoSolicitante()">
+                    <div>
+                        <div class="portal-card-icon">
+                            <i class="fa-solid fa-calendar-check"></i>
+                        </div>
+                        <h2>AGENDAR ANÁLISE</h2>
+                    </div>
+                    <div>
+                        <button class="btn btn-primary" style="width: 100%; height: 48px; font-size: 13px; font-weight: 800; cursor: pointer;">
+                            <i class="fa-solid fa-arrow-right"></i> INICIAR AGENDAMENTO (OPM)
+                        </button>
+                    </div>
+                </div>
+
+                <!-- CARD 2: PAINEL DO GESTOR -->
+                <div class="portal-card card-operator" onclick="abrirModalLogin()">
+                    <div>
+                        <div class="portal-card-icon">
+                            <i class="fa-solid fa-user-shield"></i>
+                        </div>
+                        <h2>PAINEL DO GESTOR</h2>
+                    </div>
+                    <div>
+                        <button class="btn btn-success" style="width: 100%; height: 48px; font-size: 13px; font-weight: 800; cursor: pointer;">
+                            <i class="fa-solid fa-right-to-bracket"></i> ACESSAR PAINEL CMM
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+        </div>
+
+        <!-- ====================================================================
+             TELA 2: WIZARD DO SOLICITANTE (5 ETAPAS)
+             ==================================================================== -->
+        <div id="viewSolicitante" style="display: none;">
+            <!-- INDICADOR DE ETAPAS -->
+            <div class="wizard-steps non-printable">
+                <div class="step-item active" id="stepIndicator1">
+                    <div class="step-num">1</div>
+                    <div class="step-info"><span class="step-title">ETAPA 1</span><span class="step-sub">Dados & IPM</span></div>
+                </div>
+                <div class="step-item" id="stepIndicator2">
+                    <div class="step-num">2</div>
+                    <div class="step-info"><span class="step-title">ETAPA 2</span><span class="step-sub">Viatura</span></div>
+                </div>
+                <div class="step-item" id="stepIndicator3">
+                    <div class="step-num">3</div>
+                    <div class="step-info"><span class="step-title">ETAPA 3</span><span class="step-sub">Documentos</span></div>
+                </div>
+                <div class="step-item" id="stepIndicator4">
+                    <div class="step-num">4</div>
+                    <div class="step-info"><span class="step-title">ETAPA 4</span><span class="step-sub">Quesitos</span></div>
+                </div>
+                <div class="step-item" id="stepIndicator5">
+                    <div class="step-num">5</div>
+                    <div class="step-info"><span class="step-title">ETAPA 5</span><span class="step-sub">Confirmação</span></div>
+                </div>
+            </div>
+
+            <!-- ETAPA 1: INSERÇÃO DE DADOS -->
+            <div class="card" id="stepCard1">
+                <div class="card-header">
+                    <div class="card-header-title">
+                        <i class="fa-solid fa-file-signature"></i>
+                        <div>
+                            <h2>ETAPA 1: INSERÇÃO DE DADOS</h2>
+                            <p>Procedimento apuratório oficial da OPM</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="background: rgba(239, 68, 68, 0.15); border: 1px solid #ef4444; color: #fca5a5; padding: 14px 18px; border-radius: 8px; font-weight: 800; font-size: 13px; margin-bottom: 20px; text-align: center;">
+                    ⚠️ É OBRIGATÓRIO INFORMAR O NÚMERO DE SIND/IPM E O NÚMERO DO OFÍCIO PARA PROSSEGUIR ⚠️
+                </div>
+
+                <div class="form-grid">
+                    <div class="col-4 form-group">
+                        <label>TIPO DE PROCEDIMENTO <span class="required">*</span></label>
+                        <select id="tipoProcedimento" class="form-control">
+                            <option value="SINDICÂNCIA" selected>SINDICÂNCIA</option>
+                            <option value="IPM">INQUÉRITO POLICIAL MILITAR (IPM)</option>
+                        </select>
+                    </div>
+
+                    <div class="col-8 form-group">
+                        <label>NÚMERO DA SINDICÂNCIA OU IPM <span class="required">*</span></label>
+                        <input type="text" id="numSindicancia" class="form-control" placeholder="EX: X.BPMM-00X/XX/XX (EX: 18BPMM-13/70/26)">
+                    </div>
+
+                    <div class="col-12 form-group">
+                        <label>NÚMERO DO OFÍCIO <span class="required">*</span></label>
+                        <input type="text" id="numeroOficio" class="form-control" placeholder="EX: OFÍCIO Nº 123/CMM/26">
+                    </div>
+
+                    <div class="col-3 form-group">
+                        <label>POSTO / GRADUAÇÃO <span class="required">*</span></label>
+                        <select id="postoGrad" class="form-control">
+                            <option value="CAP PM" selected>CAP PM</option>
+                            <option value="1º TEN PM">1º TEN PM</option>
+                            <option value="2º TEN PM">2º TEN PM</option>
+                            <option value="SUBTEN PM">SUBTEN PM</option>
+                            <option value="1º SGT PM">1º SGT PM</option>
+                            <option value="2º SGT PM">2º SGT PM</option>
+                            <option value="3º SGT PM">3º SGT PM</option>
+                            <option value="CB PM">CB PM</option>
+                            <option value="SD PM">SD PM</option>
+                        </select>
+                    </div>
+
+                    <div class="col-3 form-group">
+                        <label>RE MILITAR <span class="required">*</span></label>
+                        <input type="text" id="militarRe" class="form-control" placeholder="EX: 112233" maxlength="8">
+                    </div>
+
+                    <div class="col-6 form-group">
+                        <label>NOME COMPLETO DO SOLICITANTE <span class="required">*</span></label>
+                        <input type="text" id="militarNome" class="form-control" placeholder="EX: JOSÉ MAYCON DE PAIVA HONORATO">
+                    </div>
+
+                    <div class="col-4 form-group">
+                        <label>TELEFONE DE CONTATO <span class="required">*</span></label>
+                        <input type="text" id="militarTelefone" class="form-control" placeholder="EX: (11) 98765-4321">
+                    </div>
+
+                    <div class="col-8 form-group">
+                        <label>E-MAIL INSTITUCIONAL <span class="required">* (@policiamilitar.sp.gov.br)</span></label>
+                        <input type="email" id="militarEmail" class="form-control" placeholder="EX: usuario@policiamilitar.sp.gov.br">
+                    </div>
+
+                    <div class="col-6 form-group">
+                        <label>CONDIÇÃO DE CHEGADA AO CMM <span class="required">*</span></label>
+                        <select id="condicaoVeiculo" class="form-control">
+                            <option value="RODANDO POR MEIOS PRÓPRIOS">RODANDO POR MEIOS PRÓPRIOS</option>
+                            <option value="TRANSPORTADO POR GUINCHO / REBOQUE" selected>TRANSPORTADO POR GUINCHO / REBOQUE</option>
+                        </select>
+                    </div>
+
+                    <div class="col-6 form-group">
+                        <label>KM ATUAL DO VEÍCULO <span class="required">*</span></label>
+                        <input type="text" id="kmAtual" class="form-control" placeholder="EX: 5257">
+                    </div>
+
+                    <div class="col-12 form-group">
+                        <label>MOTIVO DA ANÁLISE TÉCNICA / AVARIAS <span class="required">* (MÍNIMO 20 CARACTERES)</span></label>
+                        <textarea id="motivoVistoria" class="form-control" rows="3" placeholder="DESCREVA O MOTIVO E AS AVARIAS CONSTATADAS NA VIATURA (MÍNIMO 20 CARACTERES)..."></textarea>
+                    </div>
+                </div>
+
+                <div class="btn-group">
+                    <button class="btn btn-secondary" disabled>VOLTAR</button>
+                    <button class="btn btn-primary" onclick="irParaEtapa(2)">AVANÇAR <i class="fa-solid fa-arrow-right"></i></button>
+                </div>
+            </div>
+
+            <!-- ETAPA 2: DADOS DA VIATURA IDENTIFICADA -->
+            <div class="card" id="stepCard2" style="display: none;">
+                <div class="card-header">
+                    <div class="card-header-title">
+                        <i class="fa-solid fa-car-burst"></i>
+                        <div>
+                            <h2>ETAPA 2: DADOS DA VIATURA IDENTIFICADA</h2>
+                            <p>Especificações do veículo registradas no SIPL/PMESP</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="background: var(--bg-card); border: 1px solid var(--border-focus); border-radius: var(--radius-md); padding: 20px; margin-bottom: 20px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                        <span id="cardVtrPlaca" style="font-family: monospace; font-size: 22px; font-weight: 900; color: var(--accent-cyan);">UDD9H03</span>
+                        <span id="cardVtrPrefixo" class="badge-status operacao" style="font-size: 13px;">PREFIXO: M-18262</span>
+                    </div>
+
+                    <div class="form-grid">
+                        <div class="col-4"><strong style="color:var(--text-muted); font-size:11px;">MODELO:</strong> <span id="cardVtrModelo" style="color:#fff; font-weight:700;">HYUNDAI CRETA 2025</span></div>
+                        <div class="col-4"><strong style="color:var(--text-muted); font-size:11px;">ANO:</strong> <span id="cardVtrAno" style="color:#fff; font-weight:700;">2025</span></div>
+                        <div class="col-4"><strong style="color:var(--text-muted); font-size:11px;">OPM:</strong> <span id="cardVtrOpm" style="color:#fff; font-weight:700;">18.BPM/M</span></div>
+                        <div class="col-4"><strong style="color:var(--text-muted); font-size:11px;">CHASSI:</strong> <span id="cardVtrChassi" style="color:#fff; font-weight:700; font-family:monospace;">BHPE81FGTP260603</span></div>
+                        <div class="col-4"><strong style="color:var(--text-muted); font-size:11px;">MOTOR:</strong> <span id="cardVtrMotor" style="color:#fff; font-weight:700; font-family:monospace;">G4NLNU98231</span></div>
+                        <div class="col-4"><strong style="color:var(--text-muted); font-size:11px;">PATRIMÔNIO:</strong> <span id="cardVtrPatrimonio" style="color:#fff; font-weight:700;">225033962-A</span></div>
+                    </div>
+                </div>
+
+                <div class="btn-group">
+                    <button class="btn btn-secondary" onclick="irParaEtapa(1)"><i class="fa-solid fa-arrow-left"></i> VOLTAR</button>
+                    <button class="btn btn-primary" onclick="irParaEtapa(3)">AVANÇAR <i class="fa-solid fa-arrow-right"></i></button>
+                </div>
+            </div>
+
+            <!-- ETAPA 3: ANEXO DE DOCUMENTOS PDF -->
+            <div class="card" id="stepCard3" style="display: none;">
+                <div class="card-header">
+                    <div class="card-header-title">
+                        <i class="fa-solid fa-folder-open"></i>
+                        <div>
+                            <h2>ETAPA 3: ANEXO DE DOCUMENTOS (PDF)</h2>
+                            <p>Upload obrigatório dos documentos instrutórios do procedimento</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="display: flex; flex-direction: column; gap: 12px; margin-bottom: 20px;">
+                    <div class="upload-item" id="uploadCard1">
+                        <div>
+                            <strong>1. OFÍCIO DE APRESENTAÇÃO DO VEÍCULO (OBRIGATÓRIO)</strong>
+                            
+                        </div>
+                        <input type="file" id="docFile1" accept=".pdf" style="display:none;" onchange="atualizarStatusDoc(1, this)">
+                        <button class="btn btn-secondary" onclick="document.getElementById('docFile1').click()"><i class="fa-solid fa-upload"></i> SELECIONAR PDF</button>
+                    </div>
+
+                    <div class="upload-item" id="uploadCard2">
+                        <div>
+                            <strong>2. PORTARIA DE SINDICÂNCIA OU IPM (OBRIGATÓRIO)</strong>
+                            
+                        </div>
+                        <input type="file" id="docFile2" accept=".pdf" style="display:none;" onchange="atualizarStatusDoc(2, this)">
+                        <button class="btn btn-secondary" onclick="document.getElementById('docFile2').click()"><i class="fa-solid fa-upload"></i> SELECIONAR PDF</button>
+                    </div>
+
+                    <div class="upload-item" id="uploadCard3">
+                        <div>
+                            <strong>3. CÓPIA DE OITIVA DO CONDUTOR (OBRIGATÓRIO)</strong>
+                            
+                        </div>
+                        <input type="file" id="docFile3" accept=".pdf" style="display:none;" onchange="atualizarStatusDoc(3, this)">
+                        <button class="btn btn-secondary" onclick="document.getElementById('docFile3').click()"><i class="fa-solid fa-upload"></i> SELECIONAR PDF</button>
+                    </div>
+
+                    <div class="upload-item" id="uploadCard4">
+                        <div>
+                            <strong>4. TRANSCRIÇÃO DE VÍDEO DA COP / CÂMERA DE SEGURANÇA (OPCIONAL)</strong>
+                            
+                        </div>
+                        <input type="file" id="docFile4" accept=".pdf" style="display:none;" onchange="atualizarStatusDoc(4, this)">
+                        <button class="btn btn-secondary" onclick="document.getElementById('docFile4').click()"><i class="fa-solid fa-upload"></i> SELECIONAR PDF</button>
+                    </div>
+
+                    <div class="upload-item" id="uploadCard5">
+                        <div>
+                            <strong>5. DEMAIS DOCUMENTOS COMPROBATÓRIOS (OPCIONAL - UPLOAD EM BULK)</strong>
+                            
+                        </div>
+                        <input type="file" id="docFile5" accept=".pdf" multiple style="display:none;" onchange="atualizarStatusDoc(5, this)">
+                        <button class="btn btn-secondary" onclick="document.getElementById('docFile5').click()"><i class="fa-solid fa-layer-group"></i> SELECIONAR ARQUIVOS (BULK)</button>
+                        <div style="color: #fbbf24; font-size: 10px; font-weight: 800; margin-top: 6px;">* PODE SELECIONAR VÁRIOS ARQUIVOS DE UMA VEZ (SEGURE CTRL PARA MARCAR MAIS DE UM)</div>
+                    </div>
+                </div>
+
+                <div class="btn-group">
+                    <button class="btn btn-secondary" onclick="irParaEtapa(2)"><i class="fa-solid fa-arrow-left"></i> VOLTAR</button>
+                    <button class="btn btn-primary" onclick="irParaEtapa(4)">AVANÇAR <i class="fa-solid fa-arrow-right"></i></button>
+                </div>
+            </div>
+
+            <!-- ETAPA 4: QUESITOS DO ENCARREGADO -->
+            <div class="card" id="stepCard4" style="display: none;">
+                <div class="card-header">
+                    <div class="card-header-title">
+                        <i class="fa-solid fa-clipboard-question"></i>
+                        <div>
+                            <h2>ETAPA 4: OBJETIVO E QUESITOS DO ENCARREGADO</h2>
+                            <p>Perguntas técnicas a serem respondidas no Parecer Técnico pelo MEMBRO TÉCNICO</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group" style="margin-bottom: 20px;">
+                    <label>OBJETIVO DA ANÁLISE TÉCNICA <span class="required">*</span></label>
+                    <textarea id="objetivoAnalise" class="form-control" rows="3" placeholder="DESCREVA O OBJETIVO DA ANÁLISE TÉCNICA TÉCNICA..."></textarea>
+                    <button type="button" class="btn btn-secondary" style="margin-top: 8px; height: 30px; font-size: 10px;" onclick="preencherObjetivoExemplo()">
+                        <i class="fa-solid fa-wand-magic-sparkles"></i> PREENCHER OBJETIVO MODELO
+                    </button>
+                </div>
+
+                <div class="form-group" style="margin-bottom: 20px;">
+                    <label style="font-size: 12px; font-weight: 800; color: #fff;">
+                        <input type="checkbox" id="chkPossuiPerguntas" onchange="toggleSecaoPerguntas(this.checked)"> POSSUI PERGUNTAS ESPECÍFICAS DO PRESIDENTE DO IPM/SINDICÂNCIA?
+                    </label>
+                </div>
+
+                <div id="secaoPerguntasDinamicas" style="display: none; background: var(--bg-card); padding: 16px; border-radius: 8px; border: 1px solid var(--border); margin-bottom: 20px;">
+                    <div id="listaPerguntasContainer"></div>
+                    <button type="button" class="btn btn-secondary" style="margin-top: 10px;" onclick="adicionarNovaPergunta()">
+                        <i class="fa-solid fa-plus"></i> ADICIONAR NOVA PERGUNTA
+                    </button>
+                </div>
+
+                <div class="btn-group">
+                    <button class="btn btn-secondary" onclick="irParaEtapa(3)"><i class="fa-solid fa-arrow-left"></i> VOLTAR</button>
+                    <button class="btn btn-primary" onclick="irParaEtapa(5)">AVANÇAR <i class="fa-solid fa-arrow-right"></i></button>
+                </div>
+            </div>
+
+            <!-- ETAPA 5: AGENDAMENTO E CONFIRMAÇÃO -->
+            <div class="card" id="stepCard5" style="display: none;">
+                <div class="card-header">
+                    <div class="card-header-title">
+                        <i class="fa-solid fa-calendar-check"></i>
+                        <div>
+                            <h2>ETAPA 5: ESCOLHA DA SEMANA E CONFIRMAÇÃO</h2>
+                            <p>Definição do período de entrega da viatura no pátio do CMM</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="background: rgba(245, 158, 11, 0.18); border: 2px solid #f59e0b; color: #fbbf24; padding: 20px 24px; border-radius: 10px; font-size: 18px; font-weight: 900; margin-bottom: 24px; line-height: 1.4; text-align: center; box-shadow: 0 4px 20px rgba(245, 158, 11, 0.25);">
+    ⚠️ A ESCOLHA DA SEMANA NÃO IMPLICA OBRIGATORIEDADE DE ATENDIMENTO, O CMM PODE ALTERAR ESTA PREFERÊNCIA EM RAZÃO DO SERVIÇO E DISPONIBILIDADE DO PÁTIO.<br>
+    <span style="font-size: 14px; color: #ffffff; margin-top: 6px; display: block; font-weight: 800;">DIAS DE ATENDIMENTO NO CMM: TERÇA-FEIRA, QUARTA-FEIRA E QUINTA-FEIRA.</span>
+</div>
+
+                <div class="form-group" style="margin-bottom: 20px;">
+                    <label>SELEÇÃO DO MÊS PREFERENCIAL <span class="required">*</span></label>
+                    <select id="selectMesAgendamento" class="form-control" onchange="renderizarSemanasMes(this.value)">
+                        <!-- Populado via JS -->
+                    </select>
+                </div>
+
+                <div id="gridSemanasMes" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 24px;">
+                    <!-- Populado via JS -->
+                </div>
+
+                <!-- CHECKLIST FÍSICO DA OPM -->
+                <div style="background: rgba(245, 158, 11, 0.18); border: 2px solid #f59e0b; color: #fbbf24; padding: 14px 18px; border-radius: 8px; font-size: 16px; font-weight: 900; margin-bottom: 14px; text-align: center;">
+                    ⚠️ ATENÇÃO, SEM OS ITENS ABAIXO O VEÍCULO NÃO SERÁ RECEBIDO PELO CMM.
+                </div>
+                <div style="background: var(--bg-card); padding: 18px; border-radius: 8px; border: 1px solid var(--border); margin-bottom: 20px;">
+                    <h4 style="font-size: 12px; font-weight: 800; color: #fff; margin-bottom: 12px;">CONFERÊNCIA DE ITENS OBRIGATÓRIOS NA ENTRADA NO CMM:</h4>
+                    <div style="display: flex; flex-direction: column; gap: 10px; font-size: 20px;">
+                        <label><input type="checkbox" id="chkDoc6" checked> RIV (Registro Individual de Viatura)</label>
+                        <label><input type="checkbox" id="chkDoc7" checked> Chave original do veículo</label>
+                        <label><input type="checkbox" id="chkDoc8" checked> Componentes completos da viatura (bateria, peças integras e avariadas)</label>
+                    </div>
+                </div>
+
+                <div style="margin-bottom: 20px;">
+                    <label style="font-size: 11px; font-weight: 700; color: #fff;">
+                        <input type="checkbox" id="checkFinalTermo"> DECLARO QUE ANEXEI OS DOCUMENTOS EXIGIDOS E QUE ENVIAREI O RIV FÍSICO JUNTAMENTE COM A CHAVE DO VEÍCULO E COMPONENTES COMPLETOS.
+                    </label>
+                </div>
+
+                <div class="btn-group">
+                    <button class="btn btn-secondary" onclick="irParaEtapa(4)"><i class="fa-solid fa-arrow-left"></i> VOLTAR</button>
+                    <button id="btnConfirmarAgendamento" class="btn btn-success" style="height: 44px; font-size: 13px;" onclick="finalizarAgendamento()">
+                        <i class="fa-solid fa-check"></i> CONFIRMAR AGENDAMENTO
+                    </button>
+                </div>
+            </div>
+
+            <!-- TELA DE CONFIRMAÇÃO DO SOLICITANTE -->
+            <div class="card" id="stepCardConfirmacao" style="display: none; text-align: center; padding: 40px 24px;">
+                <div style="width: 64px; height: 64px; border-radius: 50%; background: rgba(16,185,129,0.15); color: var(--accent-green); display: flex; align-items: center; justify-content: center; font-size: 32px; margin: 0 auto 16px auto;">
+                    <i class="fa-solid fa-circle-check"></i>
+                </div>
+                <h2 style="font-size: 22px; font-weight: 900; color: #fff; margin-bottom: 6px;">AGENDAMENTO CONFIRMADO!</h2>
+                <h3 id="receiptProtocolo" style="font-size: 18px; font-weight: 800; color: var(--accent-cyan); font-family: monospace; margin-bottom: 16px;">SOLICITAÇÃO Nº 001</h3>
+
+                <p id="recDataHora" style="font-size: 13px; color: var(--text-muted); margin-bottom: 24px;"></p>
+
+                <div class="btn-group" style="justify-content: center; border: none;">
+                    <button class="btn btn-primary" onclick="abrirModalConsulta()"><i class="fa-solid fa-magnifying-glass"></i> CONSULTAR SOLICITAÇÃO/PLACA</button>
+                    <button class="btn btn-secondary" onclick="abrirPortalCapa()"><i class="fa-solid fa-house"></i> VOLTAR AO INÍCIO</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ====================================================================
+             TELA 3: PAINEL DO GESTOR CMM (OPERADOR)
+             ==================================================================== -->
+        <div id="viewOperador" style="display: none;">
+            <!-- CABEÇALHO DO GESTOR -->
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px;">
+                <div>
+                    <h2 style="font-size: 20px; font-weight: 900; color: #ffffff; display: flex; align-items: center; gap: 10px;">
+                        <i class="fa-solid fa-user-shield" style="color: var(--accent-cyan);"></i> PAINEL DE GESTÃO E PARECERES TÉCNICOS - CMM
+                    </h2>
+                    <p style="font-size: 11px; color: var(--text-muted); margin-top: 2px;">Seção de Manutenção de Frota | Controle do Pátio e Emissão de Documentos</p>
+                </div>
+                <div style="display: flex; gap: 10px;">
+                    <button class="nav-btn" onclick="abrirPortalCapa()"><i class="fa-solid fa-right-from-bracket"></i> SAIR DO PAINEL</button>
+                </div>
+            </div>
+
+            <!-- CARDS DE ESTATÍSTICAS / KPI DO PÁTIO -->
+            <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 20px;">
+                <div style="background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 16px;">
+                    <div style="font-size: 11px; font-weight: 800; color: var(--text-muted); text-transform: uppercase;">TOTAL DE SOLICITAÇÕES</div>
+                    <div id="gestorStatTotal" style="font-size: 24px; font-weight: 900; color: var(--accent-cyan); margin-top: 4px;">0</div>
+                </div>
+                <div style="background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 16px;">
+                    <div style="font-size: 11px; font-weight: 800; color: var(--text-muted); text-transform: uppercase;">AGUARDANDO ANÁLISE / PÁTIO</div>
+                    <div id="gestorStatAguardando" style="font-size: 24px; font-weight: 900; color: var(--accent-amber); margin-top: 4px;">0</div>
+                </div>
+                <div style="background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 16px;">
+                    <div style="font-size: 11px; font-weight: 800; color: var(--text-muted); text-transform: uppercase;">PARECERES EMITIDOS</div>
+                    <div id="gestorStatEmitidos" style="font-size: 24px; font-weight: 900; color: var(--accent-green); margin-top: 4px;">0</div>
+                </div>
+                <div style="background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 16px;">
+                    <div style="font-size: 11px; font-weight: 800; color: var(--text-muted); text-transform: uppercase;">VAGAS NO PÁTIO (MÁX 8)</div>
+                    <div id="gestorStatPatio" style="font-size: 24px; font-weight: 900; color: #ffffff; margin-top: 4px;">8 / 8 DISPONÍVEIS</div>
+                </div>
+            </div>
+
+            <!-- BARRA DE PESQUISA E FILTROS -->
+            <div style="display: flex; gap: 12px; margin-bottom: 16px; align-items: center; background: var(--bg-card); padding: 12px 16px; border-radius: var(--radius-md); border: 1px solid var(--border);">
+                <div style="flex: 1; position: relative;">
+                    <i class="fa-solid fa-magnifying-glass" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--text-muted);"></i>
+                    <input type="text" id="gestorSearchInput" class="form-control" placeholder="Buscar por Protocolo, OPM, Placa, Prefixo ou Sindicância..." style="padding-left: 36px; width: 100%;" oninput="atualizarTabelaGestaoOperador()">
+                </div>
+                <div style="width: 220px;">
+                    <select id="gestorFilterStatus" class="form-control" onchange="atualizarTabelaGestaoOperador()">
+                        <option value="TODOS">TODOS OS STATUS</option>
+                        <option value="EM CONFECÇÃO">EM CONFECÇÃO</option>
+                        <option value="NO PÁTIO">NO PÁTIO</option>
+                        <option value="PRONTO">PRONTO</option>
+                        <option value="NA OPM">NA OPM</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- TABELA DE GESTÃO DO OPERADOR -->
+            <div class="card">
+                <div class="table-responsive">
+                    <table class="custom-table">
+                        <thead>
+                            <tr>
+                                <th>SOLICITAÇÃO</th>
+                                <th>DATA REGISTRO</th>
+                                <th>DATA ENTRADA</th>
+                                <th>STATUS</th>
+                                <th>OPM</th>
+                                <th>VTR</th>
+                                <th>PROCEDIMENTO</th>
+                                <th>SINDICÂNCIA / IPM</th>
+                                <th>DATA PARECER</th>
+                                <th style="text-align: center;">AÇÕES DO GESTOR</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabelaAgendamentosBody">
+                            <!-- Populado via JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- ====================================================================
+             TELA 4: SUB-DASHBOARD DO PARECER TÉCNICO OFICIAL CMM (TEMPLATE WORD)
+             ==================================================================== -->
+        <div id="viewParecerSubdashboard" style="display: none;">
+            <!-- CABEÇALHO DO SUB-DASHBOARD -->
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; background: var(--bg-surface); padding: 16px 20px; border-radius: var(--radius-lg); border: 1px solid var(--border);">
+                <div>
+                    <h2 style="font-size: 18px; font-weight: 900; color: #ffffff; display: flex; align-items: center; gap: 10px;">
+                        <i class="fa-solid fa-file-signature" style="color: var(--accent-cyan);"></i> SUB-DASHBOARD: CONFECÇÃO DO PARECER TÉCNICO OFICIAL
+                    </h2>
+                    <p style="font-size: 11px; color: var(--text-muted); margin-top: 2px;">Template Oficial CMM PMESP | Comissão Técnica de Motomecanização</p>
+                </div>
+                <div style="display: flex; gap: 10px;">
+                    <button class="btn btn-secondary" onclick="voltarAoPainelGestorFromSubdashboard()"><i class="fa-solid fa-arrow-left"></i> VOLTAR AO PAINEL</button>
+                    <button id="btnSalvarProgressoParecer" class="btn btn-secondary" onclick="salvarProgressoParecer()" title="Salva o progresso atual sem fechar o parecer"><i class="fa-solid fa-cloud-arrow-up"></i> SALVAR PROGRESSO</button>
+                    <button id="btnSalvarEmitirParecer" class="btn btn-primary" onclick="salvarEEmitirParecerSubdashboard()"><i class="fa-solid fa-floppy-disk"></i> SALVAR & EMITIR PARECER</button>
+                </div>
+            </div>
+
+            <!-- CARD DE INFORMAÇÕES DA SOLICITAÇÃO & VIATURA -->
+            <div class="card" style="margin-bottom: 20px;">
+                <div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; font-size: 12px;">
+                    <div><strong style="color:var(--text-muted);">SOLICITAÇÃO:</strong> <br><span id="subdashSolicNum" style="color:var(--accent-cyan); font-family:monospace; font-size:14px; font-weight:800;">001</span></div>
+                    <div><strong style="color:var(--text-muted);">OPM SOLICITANTE:</strong> <br><span id="subdashOpm" style="font-weight:800; color:#fff;">18.BPM/M</span></div>
+                    <div><strong style="color:var(--text-muted);">PLACA DA VTR:</strong> <br><span id="subdashPlaca" style="font-family:monospace; font-size:14px; font-weight:800; color:#fff;">UDD9H03</span></div>
+                    <div><strong style="color:var(--text-muted);">PREFIXO / MODELO:</strong> <br><span id="subdashPrefixoModelo" style="font-weight:700; color:#fff;">M-18262 (CRETA 2025)</span></div>
+                    <div><strong style="color:var(--text-muted);">SINDICÂNCIA / IPM:</strong> <br><span id="subdashSindIpm" style="font-weight:800; color:var(--accent-amber);">18BPMM-13/70/26</span></div>
+                </div>
+            </div>
+
+            <!-- SEÇÃO 1: GALERIA DE FOTOS EM BULK (TOPO DO SUB-DASHBOARD) -->
+            <div class="card" style="margin-bottom: 20px; border: 2px dashed var(--accent-cyan); background: rgba(6, 182, 212, 0.04);">
+                <div class="card-header" style="border-bottom: 1px solid var(--border); padding-bottom: 10px; margin-bottom: 14px;">
+                    <div class="card-header-title">
+                        <i class="fa-solid fa-images" style="color: var(--accent-cyan);"></i>
+                        <h2>1. GALERIA DE FOTOS EM BULK (UPLOAD ÚNICO DO PARECER)</h2>
+                    </div>
+                    <div>
+                        <input type="file" id="subdashBulkFileInput" multiple accept="image/*,.pdf" style="display: none;" onchange="processarBulkFotosSubdashboard(this)">
+                        <button class="btn btn-primary" onclick="document.getElementById('subdashBulkFileInput').click()">
+                            <i class="fa-solid fa-cloud-arrow-up"></i> SELEÇÃO BULK DE TODAS AS FOTOS
+                        </button>
+                    </div>
+                </div>
+
+                <div id="subdashBulkGallery" style="display: grid; grid-template-columns: repeat(6, 1fr); gap: 12px; margin-top: 10px;">
+                    <div style="grid-column: span 6; text-align: center; color: var(--text-dim); padding: 20px; font-size: 12px; font-weight: 700;">
+                        NENHUMA FOTO NO BULK. CLIQUE NO BOTÃO ACIMA PARA CARREGAR TODAS AS FOTOS DA ANÁLISE DE UMA SÓ VEZ.
+                    </div>
+                </div>
+            </div>
+
+            <!-- SEÇÃO 2: DADOS DA COMISSÃO E NÚMERO DO PARECER -->
+            <div class="card" style="margin-bottom: 20px;">
+                <div class="card-header">
+                    <div class="card-header-title">
+                        <i class="fa-solid fa-award"></i>
+                        <h2>2. IDENTIFICAÇÃO E COMISSÃO TÉCNICA DO CMM</h2>
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; margin-bottom: 18px;">
+                    <div>
+                        <label style="display:block; font-size:11px; font-weight:700; color:var(--text-muted); margin-bottom:4px;">NÚMERO DO PARECER TÉCNICO</label>
+                        <input type="text" id="subdashNumParecer" class="form-control" value="CMM-24/30.3/26" style="text-transform: uppercase; font-weight:800; color:var(--accent-cyan);">
+                    </div>
+                    <div>
+                        <label style="display:block; font-size:11px; font-weight:700; color:var(--text-muted); margin-bottom:4px;">DATA DA REUNIÃO DA COMISSÃO</label>
+                        <input type="date" id="subdashDataComissao" class="form-control">
+                    </div>
+                </div>
+
+                <label style="display:block; font-size:11px; font-weight:800; color:var(--text-muted); margin-bottom:8px; text-transform:uppercase;">MEMBROS DA COMISSÃO TÉCNICA (ASSINATURAS DO PARECER):</label>
+                <div id="subdashComissaoContainer" style="display: flex; flex-direction: column; gap: 10px;">
+                    <!-- 3 linhas geradas via JS: subdashComissaoNome_N / subdashComissaoPosto_N / subdashComissaoPapel_N -->
+                </div>
+            </div>
+
+            <!-- SEÇÃO 3: ETAPAS DA ANÁLISE TÉCNICA (DINÂMICAS + VINCULO DE FOTOS DO BULK) -->
+            <div class="card" style="margin-bottom: 20px;">
+                <div class="card-header">
+                    <div class="card-header-title">
+                        <i class="fa-solid fa-list-check"></i>
+                        <h2>3. ETAPAS DA ANÁLISE TÉCNICA (TEXTO + VÍNCULO DE ATÉ 4 FOTOS DO BULK)</h2>
+                    </div>
+                    <button class="btn btn-secondary" onclick="adicionarNovaEtapaSubdashboard()">
+                        <i class="fa-solid fa-plus"></i> + ADICIONAR NOVA ETAPA / CAIXA DE TEXTO
+                    </button>
+                </div>
+
+                <!-- PRESETS RÁPIDOS -->
+                <div style="margin-bottom: 16px; padding: 12px; background: rgba(15,23,42,0.6); border-radius: var(--radius-md); border: 1px solid var(--border);">
+                    <label style="display:block; font-size:10px; font-weight:800; color:var(--text-muted); margin-bottom:8px; text-transform:uppercase;">INSERÇÃO RÁPIDA DE FRASES TÉCNICAS PRÉ-PROGRAMADAS:</label>
+                    <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                        <button class="btn btn-secondary" style="height: 28px; font-size: 10px; padding: 0 8px;" onclick="inserirFrasePreset('SISTEMA DE FREIOS EM CONDIÇÃO REGULAR, SEM ANOMALIAS OU VAZAMENTOS.')">⚡ FREIOS REGULARES</button>
+                        <button class="btn btn-secondary" style="height: 28px; font-size: 10px; padding: 0 8px;" onclick="inserirFrasePreset('VARREDURA ELETRÔNICA COM SCANNER RASTHER III S NÃO APONTOU DEFEITOS NO MOTOR.')">⚡ SCANNER OK</button>
+                        <button class="btn btn-secondary" style="height: 28px; font-size: 10px; padding: 0 8px;" onclick="inserirFrasePreset('FALHAS ELETRÔNICAS DETECTADAS LIGADAS AO ASSISTENTE DE PONTO CEGO E FRENAGEM AUTOMÁTICA.')">⚡ FALHAS ABS/CAN</button>
+                        <button class="btn btn-secondary" style="height: 28px; font-size: 10px; padding: 0 8px;" onclick="inserirFrasePreset('NÃO FOI POSSÍVEL REALIZAR TESTE DINÂMICO E/OU ESTÁTICO DEVIDO ÀS AVARIAS NO VEÍCULO.')">⚡ SEM TESTE DINÂMICO</button>
+                        <button class="btn btn-secondary" style="height: 28px; font-size: 10px; padding: 0 8px;" onclick="inserirFrasePreset('NÃO FOI APRESENTADO O REGISTRO INDIVIDUAL DE VIATURA (R.I.V.).')">⚡ SEM R.I.V.</button>
+                    </div>
+                </div>
+
+                <div id="subdashEtapasContainer">
+                    <!-- Gerado Dinamicamente via JS -->
+                </div>
+            </div>
+
+            <!-- SEÇÃO 4: RESPOSTA AOS QUESITOS SOLICITADOS PELO PRESIDENTE DA SINDICÂNCIA/IPM -->
+            <div class="card" style="margin-bottom: 20px; border: 1px solid var(--accent-amber);">
+                <div class="card-header" style="border-bottom: 1px solid var(--border); padding-bottom: 10px; margin-bottom: 14px;">
+                    <div class="card-header-title">
+                        <i class="fa-solid fa-circle-question" style="color: var(--accent-amber);"></i>
+                        <h2 style="color: var(--accent-amber);">4. RESPOSTAS AOS QUESITOS DO SOLICITANTE (PUXADOS AUTOMATICAMENTE)</h2>
+                    </div>
+                </div>
+
+                <div id="subdashQuesitosContainer">
+                    <!-- Puxado da Solicitação do Solicitante -->
+                </div>
+            </div>
+
+            <!-- BOTÕES FINAIS -->
+            <div style="display: flex; justify-content: flex-end; gap: 12px; margin-bottom: 40px;">
+                <button class="btn btn-secondary" onclick="voltarAoPainelGestorFromSubdashboard()">CANCELAR E VOLTAR</button>
+                <button class="btn btn-success" style="height: 48px; font-size: 13px; font-weight: 800; padding: 0 24px;" onclick="salvarEEmitirParecerSubdashboard()">
+                    <i class="fa-solid fa-check-double"></i> CONCLUIR E EMITIR PARECER TÉCNICO
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <!-- ====================================================================
+         MODAIS GLOBAIS DA APLICAÇÃO
+         ==================================================================== -->
+
+    <!-- MODAL 1: ACESSO SOLICITANTE (OPM + PLACA) -->
+    <div class="modal-overlay" id="modalAcessoSolicitante" style="display: none;">
+        <div class="modal-container">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid var(--border); padding-bottom: 12px;">
+                <h3 style="font-size: 15px; font-weight: 800; color: #ffffff; display: flex; align-items: center; gap: 10px;">
+                    <i class="fa-solid fa-id-card-clip" style="color: var(--accent-cyan);"></i> ACESSO AO AGENDAMENTO (SOLICITANTE)
+                </h3>
+                <button onclick="fecharModalAcessoSolicitante()" style="background: none; border: none; color: var(--text-muted); cursor: pointer; font-size: 18px;">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            
+            <div style="margin-bottom: 16px;">
+                <label style="display: block; margin-bottom: 6px; font-weight: 700; color: var(--text-muted); font-size: 11px;">ORGANIZAÇÃO POLICIAL MILITAR (OPM)</label>
+                <input type="text" id="acessoOpm" class="form-control" list="opmList" placeholder="DIGITE OU SELECIONE A OPM (EX: 18.BPM/M)" style="width: 100%;">
+            </div>
+            
+            <div style="margin-bottom: 20px;">
+                <label style="display: block; margin-bottom: 6px; font-weight: 700; color: var(--text-muted); font-size: 11px;">PLACA DA VIATURA (SENHA DE ACESSO SISTÊMICA)</label>
+                <input type="text" id="acessoPlaca" class="form-control" placeholder="EX: ABC1234" maxlength="8" style="width: 100%; font-family: monospace; font-size: 16px; font-weight: 800; letter-spacing: 2px;">
+            </div>
+            
+            <div id="acessoErroMsg" style="display: none; background: rgba(239, 68, 68, 0.15); border: 1px solid #ef4444; color: #fca5a5; padding: 12px; border-radius: 6px; font-size: 12px; font-weight: 700; margin-bottom: 16px; text-align: center;"></div>
+            
+            <div style="display: flex; justify-content: flex-end; gap: 10px;">
+                <button class="btn btn-secondary" onclick="fecharModalAcessoSolicitante()">CANCELAR</button>
+                <button class="btn btn-primary" onclick="confirmarAcessoSolicitante()" style="cursor: pointer;">
+                    <i class="fa-solid fa-arrow-right"></i> ACESSAR AGENDAMENTO
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL 2: LOGIN OPERADOR -->
+    <div class="modal-overlay" id="modalLoginOperador" style="display: none;">
+        <div class="modal-container">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid var(--border); padding-bottom: 12px;">
+                <h3 style="font-size: 15px; font-weight: 800; color: #ffffff; display: flex; align-items: center; gap: 10px;">
+                    <i class="fa-solid fa-shield-halved" style="color: var(--accent-cyan);"></i> ACESSO RESTRITO - PAINEL DO GESTOR CMM
+                </h3>
+                <button onclick="fecharModalLogin()" style="background: none; border: none; color: var(--text-muted); cursor: pointer; font-size: 18px;">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            
+            <div style="margin-bottom: 14px;">
+                <label style="display: block; margin-bottom: 6px; font-weight: 700; color: var(--text-muted); font-size: 11px;">USUÁRIO DE ACESSO</label>
+                <input type="text" id="loginUser" class="form-control" placeholder="DIGITE O USUÁRIO (EX: cmm)" style="width: 100%;">
+            </div>
+            
+            <div style="margin-bottom: 20px;">
+                <label style="display: block; margin-bottom: 6px; font-weight: 700; color: var(--text-muted); font-size: 11px;">SENHA DO SETOR TÉCNICO</label>
+                <input type="password" id="loginPass" class="form-control" placeholder="DIGITE A SENHA (EX: cmmtecmec)" style="width: 100%;">
+            </div>
+            
+            <div id="loginErroMsg" style="display: none; background: rgba(239, 68, 68, 0.15); border: 1px solid #ef4444; color: #fca5a5; padding: 12px; border-radius: 6px; font-size: 12px; font-weight: 700; margin-bottom: 16px; text-align: center;"></div>
+            
+            <div style="display: flex; justify-content: flex-end; gap: 10px;">
+                <button class="btn btn-secondary" onclick="fecharModalLogin()">CANCELAR</button>
+                <button class="btn btn-primary" onclick="confirmarLoginOperador()" style="cursor: pointer;">
+                    <i class="fa-solid fa-right-to-bracket"></i> ACESSAR PAINEL
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL 3: IDENTIFICAR OPERADOR -->
+    
+
+    <!-- MODAL 4: NOTIFICAR POR E-MAIL -->
+    <div class="modal-overlay" id="modalEmail" style="display: none;">
+        <div class="modal-container" style="max-width: 650px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; border-bottom: 1px solid var(--border); padding-bottom: 12px;">
+                <h3 style="font-size: 15px; font-weight: 800; color: #ffffff; display: flex; align-items: center; gap: 10px;">
+                    <i class="fa-solid fa-envelope" style="color: var(--accent-cyan);"></i> NOTIFICAÇÃO DE RETIRADA POR E-MAIL
+                </h3>
+                <button onclick="fecharModalEmail()" style="background: none; border: none; color: var(--text-muted); cursor: pointer; font-size: 18px;">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            
+            <div style="margin-bottom: 12px;">
+                <label style="display: block; margin-bottom: 6px; font-weight: 700; color: var(--text-muted); font-size: 11px;">DESTINATÁRIO (E-MAIL INSTITUCIONAL DA OPM)</label>
+                <input type="email" id="emailDestinatario" class="form-control" style="width: 100%; font-family: monospace;">
+            </div>
+            
+            <div style="margin-bottom: 12px;">
+                <label style="display: block; margin-bottom: 6px; font-weight: 700; color: var(--text-muted); font-size: 11px;">ASSUNTO DO E-MAIL</label>
+                <input type="text" id="emailAssunto" class="form-control" style="width: 100%; font-weight: 700;">
+            </div>
+            
+            <div style="margin-bottom: 16px;">
+                <label style="display: block; margin-bottom: 6px; font-weight: 700; color: var(--text-muted); font-size: 11px;">CORPO DA MENSAGEM (EDITÁVEL)</label>
+                <textarea id="emailCorpo" class="form-control" rows="8" style="width: 100%; font-family: sans-serif; text-transform: none; font-size: 13px; line-height: 1.5;"></textarea>
+            </div>
+
+            <div style="margin-bottom: 16px; text-align: center;">
+                <img src="carimbo_tecmec.png" alt="Carimbo TECMEC" style="height: 60px; object-fit: contain;">
+            </div>
+            
+            <div style="display: flex; justify-content: flex-end; gap: 10px;">
+                <button class="btn btn-secondary" onclick="fecharModalEmail()">CANCELAR</button>
+                <button class="btn btn-success" onclick="dispararEnvioEmailNotificacao()" style="background: #10b981; border: none; color: #fff; font-weight: 800; padding: 10px 20px; border-radius: 6px; cursor: pointer;">
+                    <i class="fa-solid fa-paper-plane"></i> ENVIAR E-MAIL AGORA
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL 5: CONSULTA POR SOLICITAÇÃO OU PLACA -->
+    <div class="modal-overlay" id="modalConsulta" style="display: none;">
+        <div class="modal-container">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; border-bottom: 1px solid var(--border); padding-bottom: 12px;">
+                <h3 style="font-size: 15px; font-weight: 800; color: #ffffff; display: flex; align-items: center; gap: 10px;">
+                    <i class="fa-solid fa-magnifying-glass" style="color: var(--accent-cyan);"></i> CONSULTAR SOLICITAÇÃO / PLACA
+                </h3>
+                <button onclick="fecharModalConsulta()" style="background: none; border: none; color: var(--text-muted); cursor: pointer; font-size: 18px;">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <div style="margin-bottom: 16px;">
+                <label style="display: block; margin-bottom: 6px; font-weight: 700; color: var(--text-muted); font-size: 11px;">DIGITE O NÚMERO DA SOLICITAÇÃO (EX: SOLICITAÇÃO Nº 001) OU A PLACA</label>
+                <input type="text" id="inputModalConsulta" class="form-control" placeholder="EX: SOLICITAÇÃO Nº 001 OU UDD9H03" style="width: 100%;">
+            </div>
+
+            <button class="btn btn-primary" style="width: 100%; margin-bottom: 16px;" onclick="executarBuscaModalConsulta()">
+                <i class="fa-solid fa-search"></i> BUSCAR REGISTRO
+            </button>
+
+            <div id="resultadoModalConsulta" style="display: none;"></div>
+        </div>
+    </div>
+
+    <!-- MODAL FOLHA DE PAINEL (IMPRESSÃO DE ANÁLISE TÉCNICA NA VIATURA) -->
+    <div class="modal-overlay" id="modalFolhaPainel" style="display: none;">
+        <div class="modal-container" style="max-width: 850px; background: #ffffff; color: #000000; padding: 40px; border-radius: 8px;">
+            <div class="non-printable" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; border-bottom: 2px solid #cbd5e1; padding-bottom: 12px;">
+                <h3 style="font-size: 16px; font-weight: 800; color: #1e293b; display: flex; align-items: center; gap: 8px;">
+                    <i class="fa-solid fa-id-card" style="color: #0284c7;"></i> FOLHA DE PAINEL DA VIATURA (TAMANHO A4)
+                </h3>
+                <div style="display: flex; gap: 10px;">
+                    <button class="btn btn-success" onclick="baixarPdfFolhaPainel()"><i class="fa-solid fa-file-pdf"></i> BAIXAR PDF (DOWNLOAD)</button>
+                    <button class="btn btn-secondary" onclick="fecharModalFolhaPainel()">FECHAR</button>
+                </div>
+            </div>
+
+            <div id="printableFolhaArea" style="text-align: center; font-family: Arial, sans-serif; color: #000000; padding: 40px 10px;">
+                <div id="folhaStatusTxt" style="font-size: 48px; font-weight: 900; margin-bottom: 50px; text-transform: uppercase;">EM CONFECÇÃO DE PARECER</div>
+                <div style="font-size: 44px; font-weight: bold; margin-bottom: 50px;">DATA DE ENTRADA: <span id="folhaDataEntrada">18/09/2026</span></div>
+                <div style="font-size: 44px; font-weight: bold;">SIND/IPM Nº: <span id="folhaSindIpm">18BPMM-13/70/26</span></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL PREVIEW DO PARECER TÉCNICO (GERADO DINAMICAMENTE, SEGUE TEMPLATE) -->
+    <div class="modal-overlay" id="modalPreviewParecer" style="display: none;">
+        <div class="modal-container" style="max-width: 850px; background: #ffffff; color: #000000; padding: 40px; border-radius: 8px; max-height: 90vh; overflow-y: auto;">
+            <div class="non-printable" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; border-bottom: 2px solid #cbd5e1; padding-bottom: 12px;">
+                <h3 style="font-size: 16px; font-weight: 800; color: #1e293b; display: flex; align-items: center; gap: 8px;">
+                    <i class="fa-solid fa-file-pdf" style="color: #0284c7;"></i> PRÉVIA DO PARECER TÉCNICO OFICIAL
+                </h3>
+                <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                    <button class="btn btn-success" onclick="baixarPdfPreviewParecer()"><i class="fa-solid fa-file-pdf"></i> BAIXAR PDF</button>
+                    <button class="btn btn-primary" onclick="finalizarEnviarEmailParecer()"><i class="fa-solid fa-paper-plane"></i> EMITIR E ENVIAR E-MAIL</button>
+                    <button class="btn btn-secondary" onclick="document.getElementById('modalPreviewParecer').style.display='none';">FECHAR</button>
+                </div>
+            </div>
+
+            <div id="previewParecerContainer"></div>
+        </div>
+    </div>
+
+    <div class="toast" id="toastMsg"></div>
+    <datalist id="opmList"></datalist>
+
+    <script type="module" src="/src/main.js"></script>
+</body>
+</html>

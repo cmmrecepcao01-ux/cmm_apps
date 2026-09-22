@@ -1,0 +1,20 @@
+{
+  "name": "tecmec-cmm-pmesp",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Sistema de Agendamento de Análise Técnica - Centro de Motomecanização (CMM) PMESP",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.45.4",
+    "@sparticuz/chromium": "^123.0.1",
+    "puppeteer-core": "^22.13.1"
+  },
+  "devDependencies": {
+    "vite": "^5.4.0",
+    "puppeteer": "^22.13.1"
+  }
+}
