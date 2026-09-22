@@ -212,18 +212,32 @@ export async function salvarParecerSupabase({ parecerId, solicitacaoId, parecer,
 
     // Fotos em bulk do parecer, uma a uma (falha isolada não derruba o resto).
     // Fotos que já foram salvas antes (jaSalva=true, recarregadas do Storage
-    // ao reabrir o parecer) NÃO são reenviadas — só as novas, senão duplica
-    // registros em "documentos" a cada clique em "Salvar Progresso".
+    // ao reabrir o parecer) NÃO são reenviadas — só as novas ou as reeditadas
+    // (anotadas de novo), senão duplica registros em "documentos" a cada
+    // clique em "Salvar Progresso".
     const falhas = [];
     for (const [idx, foto] of (fotosBulk || []).entries()) {
         if (!foto || !foto.base64 || foto.jaSalva) continue;
         try {
-            const caminho = `${parecerRow.id}/foto_${idx + 1}_${(foto.name || "foto.jpg").replace(/[^\w.\-]/g, "_")}`;
+            const nomeSeguro = (foto.name || "foto.jpg").replace(/[^\w.\-]/g, "_");
+            // Sufixo com timestamp: se a mesma foto for reenviada (reeditada com
+            // anotações), o caminho no Storage muda por completo, em vez de
+            // sobrescrever o arquivo anterior no mesmo caminho. Sobrescrever com
+            // upsert funciona no banco, mas a URL assinada às vezes ainda serve a
+            // versão antiga (cache do CDN de Storage) — por isso as anotações
+            // "somiam" ao recarregar a página mesmo depois de salvar.
+            const caminho = `${parecerRow.id}/foto_${idx + 1}_${Date.now()}_${nomeSeguro}`;
             await uploadArquivoStorage("documentos-parecer", caminho, foto);
-            // Se essa foto já tinha um registro (ex.: foi reeditada com anotações
-            // e reenviada por cima), remove o registro antigo antes de gravar o
-            // novo — evita duplicar linha em "documentos" para o mesmo arquivo.
-            await supabase.from("documentos").delete().eq("parecer_id", parecerRow.id).eq("storage_path", caminho);
+
+            // Remove o registro (e o arquivo antigo, se houver) desta mesma foto
+            // — evita duplicar linha em "documentos" e não deixa lixo no Storage.
+            if (foto.storagePath) {
+                await supabase.storage.from("documentos-parecer").remove([foto.storagePath]);
+                await supabase.from("documentos").delete().eq("parecer_id", parecerRow.id).eq("storage_path", foto.storagePath);
+            } else {
+                await supabase.from("documentos").delete().eq("parecer_id", parecerRow.id).eq("storage_path", caminho);
+            }
+
             const { error: errDoc } = await supabase.from("documentos").insert({
                 solicitacao_id: solicitacaoId,
                 parecer_id: parecerRow.id,
@@ -235,6 +249,12 @@ export async function salvarParecerSupabase({ parecerId, solicitacaoId, parecer,
                 mime_type: foto.mimeType || "image/jpeg"
             });
             if (errDoc) throw errDoc;
+
+            // Atualiza o objeto em memória (mesma referência de state.subdashFotosBulk)
+            // para não reenviar de novo em um próximo "Salvar Progresso" nesta mesma
+            // sessão, e para saber qual caminho antigo apagar numa próxima reedição.
+            foto.storagePath = caminho;
+            foto.jaSalva = true;
         } catch (e) {
             console.error("Falha ao enviar foto do parecer " + idx, e);
             falhas.push(idx);
@@ -270,7 +290,8 @@ export async function buscarFotosParecerSupabase(parecerId) {
             name: doc.nome_arquivo,
             mimeType: doc.mime_type,
             base64: assinada?.signedUrl || "",
-            jaSalva: true
+            jaSalva: true,
+            storagePath: doc.storage_path
         });
     }
     return resultados;
@@ -293,4 +314,15 @@ export async function salvarPdfParecerSupabase(parecerId, solicitacaoId, dataUrl
 
     await supabase.from("parecer_tecnico").update({ pdf_storage_path: caminho }).eq("id", parecerId);
     await supabase.from("solicitacoes").update({ status: "PRONTO" }).eq("id", solicitacaoId);
+}
+
+// Marca a solicitação como concluída (viatura PRONTA) sem precisar de um PDF
+// em bytes — usado desde que o PDF passou a ser gerado por impressão nativa
+// do navegador (window.print()), onde o JavaScript não tem acesso ao arquivo
+// gerado (o próprio navegador cuida de salvar, por segurança). O
+// salvarPdfParecerSupabase acima fica mantido caso algum dia se volte a ter
+// os bytes do PDF disponíveis no cliente.
+export async function marcarParecerConcluidoSupabase(parecerId, solicitacaoId) {
+    const { error } = await supabase.from("solicitacoes").update({ status: "PRONTO" }).eq("id", solicitacaoId);
+    if (error) throw error;
 }

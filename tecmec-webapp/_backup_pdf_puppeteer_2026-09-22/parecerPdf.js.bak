@@ -1,20 +1,17 @@
 // Módulo gerado a partir do index.html original do TECMEC (CMM PMESP).
 // Geração do PDF do parecer técnico.
 //
-// Histórico: tentamos html2pdf.js/html2canvas (tirar um "print" da tela) —
-// cortava página e esmagava foto. Depois tentamos gerar o PDF no servidor via
-// Netlify Function + Chrome headless (Puppeteer) — funcionava localmente,
-// mas o ambiente de funções do Netlify faltava bibliotecas de sistema que o
-// Chromium precisa (erro "libnspr4.so"/"libnss3.so", sem solução confiável).
-// A solução definitiva, usada com sucesso no projeto irmão 21_manut_escala
-// (feito no Antigravity/Gemini): impressão NATIVA do navegador (window.print()
-// + CSS @media print no index.html). O operador escolhe "Salvar como PDF" na
-// caixa de impressão do Chrome — sem servidor, sem função, sem binário de
-// Chromium pra quebrar. Ver o <style> de @media print no <head> do index.html.
+// A geração deixou de usar html2pdf.js/html2canvas (tirar um "print" da tela
+// e montar páginas em cima disso) — essa abordagem é frágil por natureza:
+// qualquer mudança de conteúdo podia cortar página ou esmagar foto. Agora o
+// MESMO HTML do preview é mandado para uma função Netlify (netlify/functions/
+// gerar-pdf-parecer.js) que roda um Chrome headless (Puppeteer) de verdade e
+// usa a função de impressão nativa dele — paginação, fotos e nitidez saem
+// corretas porque é um PDF nativo, não uma foto da tela.
 import { CONFIG, state } from "./state.js";
 import { showToast } from "./utils.js";
 import { voltarAoPainelGestorFromSubdashboard } from "./parecerSubdashboard.js";
-import { marcarParecerConcluidoSupabase } from "./api.js";
+import { salvarPdfParecerSupabase } from "./api.js";
 
 let parecerAtual = null;
 
@@ -251,48 +248,114 @@ export function gerarEPreverParecerPdf(a) {
     document.getElementById("modalPreviewParecer").style.display = "flex";
 }
 
-// Abre a caixa de impressão nativa do navegador com SÓ o conteúdo do
-// parecer visível (o CSS @media print no <head> do index.html esconde todo
-// o resto da página — menus, botões, overlay do modal). O operador escolhe
-// "Salvar como PDF" (ou imprime de verdade, se preferir) na própria caixa
-// de diálogo do Chrome.
-function imprimirParecer() {
-    window.print();
+// Monta o documento HTML completo e independente (doctype próprio) mandado
+// para a função Netlify — o Chrome headless não tem a página do app aberta,
+// então esse HTML precisa trazer tudo que precisa (fonte, tamanho, cores).
+function montarDocumentoParaPdf(a) {
+    const { html: miolo } = construirMioloParecer(a);
+    return `<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<style>
+    * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; background: #ffffff; color: #000000; }
+    body { font-family: 'Times New Roman', Times, serif; font-size: 12px; line-height: 1.5; }
+    img { max-width: 100%; }
+</style>
+</head>
+<body>
+${miolo}
+</body>
+</html>`;
 }
 
-export function baixarPdfPreviewParecer() {
+// Chama a função Netlify que roda o Chrome headless (Puppeteer) e devolve o
+// PDF pronto em base64. Ver netlify/functions/gerar-pdf-parecer.js.
+async function gerarPdfViaFuncaoNetlify(a) {
+    const numParecer = a.parecerDados?.numParecer || 'S/N';
+    const html = montarDocumentoParaPdf(a);
+
+    const res = await fetch("/.netlify/functions/gerar-pdf-parecer", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ html, numParecer })
+    });
+
+    if (!res.ok) {
+        let detalhe = "";
+        try { detalhe = (await res.json())?.error || ""; } catch (_e) { /* ignora */ }
+        throw new Error(`Falha ao gerar PDF (${res.status}). ${detalhe}`);
+    }
+
+    const { pdfBase64 } = await res.json();
+    if (!pdfBase64) throw new Error("A função de PDF não devolveu o arquivo.");
+    return pdfBase64;
+}
+
+function base64ParaBlobPdf(base64) {
+    const bin = atob(base64);
+    const bytes = new Uint8Array(bin.length);
+    for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+    return new Blob([bytes], { type: "application/pdf" });
+}
+
+export async function baixarPdfPreviewParecer() {
     if (!parecerAtual) return;
-    imprimirParecer();
+    showToast("Gerando PDF...", "info");
+    try {
+        const pdfBase64 = await gerarPdfViaFuncaoNetlify(parecerAtual);
+        const blob = base64ParaBlobPdf(pdfBase64);
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = `Parecer_Tecnico_${parecerAtual.protocolo}.pdf`;
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        URL.revokeObjectURL(url);
+        showToast("Parecer baixado!", "success");
+    } catch (e) {
+        console.error("Erro ao gerar PDF do parecer:", e);
+        showToast("Não foi possível gerar o PDF do parecer.", "error");
+    }
 }
 
 export async function finalizarEnviarEmailParecer() {
     if (!parecerAtual) return;
-    showToast("Emitindo parecer...", "info");
+    showToast("Gerando anexo e enviando e-mail...", "info");
 
-    if (parecerAtual.parecerId && parecerAtual.id) {
-        try {
-            await marcarParecerConcluidoSupabase(parecerAtual.parecerId, parecerAtual.id);
-        } catch (e) {
-            console.error("Erro ao marcar parecer como concluído no Supabase:", e);
-            showToast("Erro ao emitir o parecer. Tente novamente.", "error");
-            return;
-        }
+    let base64Pdf = "";
+    try {
+        const pdfBase64 = await gerarPdfViaFuncaoNetlify(parecerAtual);
+        base64Pdf = `data:application/pdf;base64,${pdfBase64}`;
+    } catch (e) {
+        console.error("Erro gerando base64 do parecer", e);
+        showToast("Não foi possível gerar o PDF do parecer.", "error");
     }
 
-    // Abre a impressão AINDA com o modal aberto (senão o conteúdo do
-    // parecer não estaria visível pro navegador imprimir).
-    imprimirParecer();
+    parecerAtual.parecerPdfBase64 = base64Pdf;
+
+    if (base64Pdf && parecerAtual.parecerId && parecerAtual.id) {
+        try {
+            await salvarPdfParecerSupabase(
+                parecerAtual.parecerId,
+                parecerAtual.id,
+                base64Pdf,
+                `Parecer_Tecnico_${parecerAtual.protocolo}.pdf`
+            );
+        } catch (e) {
+            console.error("Erro ao salvar PDF do parecer no Supabase:", e);
+            showToast("Parecer emitido, mas houve falha ao salvar o PDF no Supabase.", "warning");
+        }
+    }
 
     document.getElementById("modalPreviewParecer").style.display = "none";
     voltarAoPainelGestorFromSubdashboard();
     showToast(`PARECER TÉCNICO OFICIAL EMITIDO! Viatura PRONTA.`, "success");
 
-    // O e-mail de notificação agora vai sem o PDF anexado (a geração de PDF
-    // deixou de ser automática/servidor — ver comentário no topo do
-    // arquivo). O parecer em si o operador salva na hora, pela caixa de
-    // impressão que acabou de abrir.
     if (window.dispararEnvioEmailNotificacaoWrapper) {
-        window.dispararEnvioEmailNotificacaoWrapper(parecerAtual.protocolo);
+        window.dispararEnvioEmailNotificacaoWrapper(parecerAtual.protocolo, base64Pdf);
     }
 }
 
