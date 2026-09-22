@@ -11,7 +11,16 @@
   # "puppeteer" (completo, com Chromium para Windows) só é usado rodando
   # local (netlify dev) — não deixa o esbuild tentar empacotar ele junto
   # na publicação, onde é inútil e só pesaria o pacote da função à toa.
-  external_node_modules = ["puppeteer"]
+  #
+  # "@sparticuz/chromium" e "puppeteer-core" também precisam ficar de fora
+  # do empacotamento do esbuild: o @sparticuz/chromium usa o caminho da
+  # própria pasta (__dirname) em tempo de execução pra achar seus arquivos
+  # internos (a pasta "bin/"); se o esbuild "achata" tudo dentro de um
+  # único arquivo da função, esse caminho quebra e dá erro
+  # 'The input directory ".../bin" does not exist.' ao tentar abrir o
+  # Chrome. Mantendo-os externos, o Node carrega eles do jeito normal
+  # (via node_modules) e o caminho interno funciona certo.
+  external_node_modules = ["puppeteer", "@sparticuz/chromium", "puppeteer-core"]
 
 # Plugin local que guarda, entre deploys, o dist/ já compilado de cada
 # pasta — usado pelo scripts/build-webapps.sh para pular a recompilação de
