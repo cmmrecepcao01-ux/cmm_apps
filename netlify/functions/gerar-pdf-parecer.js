@@ -20,12 +20,34 @@ async function abrirNavegador() {
         const puppeteerCompleto = require("puppeteer");
         return puppeteerCompleto.launch({ headless: true });
     }
+    const path = require("path");
     const chromium = require("@sparticuz/chromium");
     const puppeteer = require("puppeteer-core");
+
+    const executablePath = await chromium.executablePath();
+
+    // Erro conhecido do Node 22 em ambientes Lambda/serverless (Netlify,
+    // Vercel etc.) com @sparticuz/chromium: o binário do Chrome não acha
+    // as próprias bibliotecas (.so) que vêm junto dele, porque a pasta
+    // onde elas ficam não está no caminho de busca do sistema — dá erro
+    // "libnspr4.so: cannot open shared object file". Setar o
+    // LD_LIBRARY_PATH pra pasta do próprio executável resolve, porque é
+    // ali que essas bibliotecas ficam extraídas junto com o Chrome.
+    process.env.LD_LIBRARY_PATH = path.dirname(executablePath);
+
+    // Evita travamentos relacionados a aceleração gráfica em ambiente
+    // serverless (sem GPU de verdade) — só chama se a função existir
+    // nessa versão do pacote.
+    if (typeof chromium.setGraphicsMode === "function") {
+        try { chromium.setGraphicsMode(false); } catch (_e) { /* ignora */ }
+    } else if ("graphicsMode" in chromium) {
+        try { chromium.graphicsMode = false; } catch (_e) { /* ignora */ }
+    }
+
     return puppeteer.launch({
         args: chromium.args,
         defaultViewport: chromium.defaultViewport,
-        executablePath: await chromium.executablePath(),
+        executablePath,
         headless: chromium.headless
     });
 }

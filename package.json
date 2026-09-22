@@ -4,10 +4,10 @@
   "version": "1.0.0",
   "description": "Dependências da(s) função(ões) Netlify compartilhadas do projeto cmm_app.",
   "dependencies": {
-    "@sparticuz/chromium": "121.0.0",
-    "puppeteer-core": "^21.9.0"
+    "@sparticuz/chromium": "^131.0.1",
+    "puppeteer-core": "^24.15.0"
   },
   "devDependencies": {
-    "puppeteer": "^22.13.1"
+    "puppeteer": "^24.15.0"
   }
 }
