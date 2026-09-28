@@ -1334,6 +1334,18 @@
             return target >= start && target <= end;
         }
 
+        // LISTA DE AFASTAMENTOS DO MILITAR (situacao_especial.lista; compatível com o formato antigo de item único)
+        function getListaSituacoes(sit) {
+            if (!sit) return [];
+            if (Array.isArray(sit.lista)) {
+                return sit.lista.filter(i => i && i.sigla && i.data_inicio);
+            }
+            if (sit.ativa && sit.sigla && sit.data_inicio) {
+                return [{ sigla: sit.sigla, data_inicio: sit.data_inicio, data_fim: sit.data_fim || '', detalhes: sit.detalhes || '' }];
+            }
+            return [];
+        }
+
         // CÁLCULO DA SEMANA SEQUENCIAL DO ANO
         function getWeekOfYear(dateObj) {
             const d = new Date(Date.UTC(dateObj.getFullYear(), dateObj.getMonth(), dateObj.getDate()));
@@ -1512,8 +1524,9 @@
                 } catch(e) {}
             }
 
-            if (sit && sit.ativa && isDateWithinRange(dateObj, sit.data_inicio, sit.data_fim)) {
-                const s = (sit.sigla || '').toUpperCase();
+            const sitDia = getListaSituacoes(sit).find(i => isDateWithinRange(dateObj, i.data_inicio, i.data_fim));
+            if (sitDia) {
+                const s = (sitDia.sigla || '').toUpperCase();
                 if (s === 'FE' || s === 'F') return 'F';
                 if (s === 'LP') return 'LP';
                 if (s === 'FS') return 'FS';
@@ -1668,16 +1681,20 @@
                     } catch(e) {}
                 }
 
-                if (sit && sit.ativa && sit.data_inicio) {
-                    const sigla = (sit.sigla || '').toUpperCase();
+                // Todos os afastamentos que tocam o mês de referência
+                const mesIni = `${year}-${String(month).padStart(2, '0')}-01`;
+                const mesFim = `${year}-${String(month).padStart(2, '0')}-${String(daysInMonth).padStart(2, '0')}`;
+                getListaSituacoes(sit).forEach(it => {
+                    if (it.data_inicio > mesFim || (it.data_fim && it.data_fim < mesIni)) return;
+                    const sigla = (it.sigla || '').toUpperCase();
                     if (sigla === 'FE' || sigla === 'F') {
-                        obsVersoParts.push(`FÉRIAS DE ${formatDateBr(sit.data_inicio)} A ${formatDateBr(sit.data_fim)}`);
+                        obsVersoParts.push(`FÉRIAS DE ${formatDateBr(it.data_inicio)} A ${formatDateBr(it.data_fim)}`);
                     } else if (sigla === 'LP') {
-                        obsVersoParts.push(`LICENÇA PRÊMIO DE ${formatDateBr(sit.data_inicio)} A ${formatDateBr(sit.data_fim)}`);
+                        obsVersoParts.push(`LICENÇA PRÊMIO DE ${formatDateBr(it.data_inicio)} A ${formatDateBr(it.data_fim)}`);
                     } else if (sigla !== 'EAP') {
-                        obsVersoParts.push(`${sigla} DE ${formatDateBr(sit.data_inicio)} A ${formatDateBr(sit.data_fim)}`);
+                        obsVersoParts.push(`${sigla} DE ${formatDateBr(it.data_inicio)} A ${formatDateBr(it.data_fim)}`);
                     }
-                }
+                });
 
                 // Anexa alterações do militar no mês (ex: FM, LTS, DS)
                 const cleanRe = (m.re || '').replace(/\D/g, '');

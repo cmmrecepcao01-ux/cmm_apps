@@ -1736,6 +1736,13 @@
             color: #450a0a !important;
         }
 
+        /* DIA SEM NENHUM SARGENTO ESCALADO NA SEÇÃO */
+        .visual-table th.th-dia-sem-sgt {
+            background: #dc2626 !important;
+            color: #ffffff !important;
+            border-color: #991b1b !important;
+        }
+
         .visual-cell-red .visual-names-list,
         .visual-cell-red .visual-count-line {
             color: #450a0a !important;
@@ -1861,6 +1868,11 @@
             body.printing-visual .visual-cell-red {
                 background-color: #f87171 !important;
                 color: #450a0a !important;
+            }
+
+            body.printing-visual .visual-table th.th-dia-sem-sgt {
+                background: #dc2626 !important;
+                color: #ffffff !important;
             }
         }
 
@@ -2587,36 +2599,8 @@
                             </div>
 
                             <div id="militarSituacaoFields" style="display: none;">
-                                <div class="form-grid" style="margin-bottom: 8px;">
-                                    <div class="form-group full-width">
-                                        <label>TIPO DE SITUAÇÃO / SIGLA *</label>
-                                        <select id="militarSituacaoSigla" class="form-select">
-                                            <option value="FE">FE - FÉRIAS</option>
-                                            <option value="AG">AG - AGREGADO</option>
-                                            <option value="LP">LP - LICENÇA PRÊMIO</option>
-                                            <option value="LTS">LTS - LICENÇA TRATAMENTO DE SAÚDE</option>
-                                            <option value="DS">DS - DISPENSA DO SERVIÇO</option>
-                                            <option value="FM">FM - FOLGA MENSAL</option>
-                                            <option value="FR">FR - FERIADO</option>
-                                            <option value="CV">CV - CONVALESCENÇA</option>
-                                            <option value="LSV">LSV - LICENÇA SEM VENCIMENTOS</option>
-                                            <option value="EAP">EAP - ESTÁGIO ATUALIZAÇÃO PROFISSIONAL</option>
-                                            <option value="CS">CS - CURSO</option>
-                                        </select>
-                                    </div>
-                                    <div class="form-group">
-                                        <label>DATA DE INÍCIO *</label>
-                                        <input type="date" id="militarSituacaoDataInicio" class="form-input" style="text-transform: none;">
-                                    </div>
-                                    <div class="form-group">
-                                        <label>DATA DE TÉRMINO (OPCIONAL / INDETERMINADO)</label>
-                                        <input type="date" id="militarSituacaoDataFim" class="form-input" style="text-transform: none;">
-                                    </div>
-                                    <div class="form-group full-width">
-                                        <label>DETALHES / DOE / DOCUMENTO (OPCIONAL)</label>
-                                        <input type="text" id="militarSituacaoDetalhes" class="form-input" placeholder="EX: DOE SP 169, DE 03SET24 OU 30 DIAS">
-                                    </div>
-                                </div>
+                                <div id="militarSituacoesLista"></div>
+                                <button type="button" class="btn btn-secondary" onclick="addSituacaoRow()" style="width: 100%; justify-content: center; margin-top: 4px;"><i class="fa-solid fa-plus"></i> ADICIONAR AFASTAMENTO</button>
                             </div>
                         </div>
                     </div>
@@ -3220,14 +3204,7 @@ CREATE POLICY "Permissao Total Escalas" ON public.escalas_manutencao FOR ALL USI
             }
 
             // 4. APLICAÇÃO AUTOMÁTICA DA SITUAÇÃO / AFASTAMENTO PROGRAMADO NO INTERVALO DE DATAS
-            const sit = m.situacao_especial;
-            if (sit && sit.ativa && sit.sigla && sit.data_inicio && semObj && semObj.daysList) {
-                semObj.daysList.forEach(dObj => {
-                    if (isDateWithinRange(dObj.dateObj, sit.data_inicio, sit.data_fim)) {
-                        dias[dObj.dayKey] = sit.sigla.toUpperCase();
-                    }
-                });
-            }
+            aplicarSituacoesNaSemana(dias, m.situacao_especial, semObj);
 
             return dias;
         }
@@ -3440,6 +3417,149 @@ CREATE POLICY "Permissao Total Escalas" ON public.escalas_manutencao FOR ALL USI
         function toggleSituacaoFields(isShown) {
             const f = document.getElementById('militarSituacaoFields');
             if (f) f.style.display = isShown ? 'block' : 'none';
+            const lista = document.getElementById('militarSituacoesLista');
+            if (isShown && lista && lista.children.length === 0) addSituacaoRow();
+        }
+
+        // =========================================================================
+        // MÚLTIPLOS AFASTAMENTOS POR MILITAR
+        // situacao_especial.lista guarda todos os afastamentos; os campos antigos
+        // (ativa, sigla, data_inicio, data_fim, detalhes) espelham o 1º item.
+        // =========================================================================
+        const SITUACAO_SIGLAS_OPCOES = [
+            ['FE', 'FE - FÉRIAS'],
+            ['AG', 'AG - AGREGADO'],
+            ['LP', 'LP - LICENÇA PRÊMIO'],
+            ['LTS', 'LTS - LICENÇA TRATAMENTO DE SAÚDE'],
+            ['DS', 'DS - DISPENSA DO SERVIÇO'],
+            ['FM', 'FM - FOLGA MENSAL'],
+            ['FR', 'FR - FERIADO'],
+            ['CV', 'CV - CONVALESCENÇA'],
+            ['LSV', 'LSV - LICENÇA SEM VENCIMENTOS'],
+            ['EAP', 'EAP - ESTÁGIO ATUALIZAÇÃO PROFISSIONAL'],
+            ['CS', 'CS - CURSO']
+        ];
+
+        function getListaSituacoes(sit) {
+            if (!sit) return [];
+            if (Array.isArray(sit.lista)) {
+                return sit.lista.filter(i => i && i.sigla && i.data_inicio);
+            }
+            if (sit.ativa && sit.sigla && sit.data_inicio) {
+                return [{ sigla: sit.sigla, data_inicio: sit.data_inicio, data_fim: sit.data_fim || '', detalhes: sit.detalhes || '' }];
+            }
+            return [];
+        }
+
+        function buildSituacaoObj(lista) {
+            const itens = (lista || []).filter(i => i && i.sigla && i.data_inicio)
+                .sort((a, b) => String(a.data_inicio).localeCompare(String(b.data_inicio)));
+            const first = itens[0] || null;
+            return {
+                ativa: itens.length > 0,
+                sigla: first ? first.sigla : 'FE',
+                data_inicio: first ? first.data_inicio : '',
+                data_fim: first ? (first.data_fim || '') : '',
+                detalhes: first ? (first.detalhes || '') : '',
+                lista: itens
+            };
+        }
+
+        // Aplica todos os afastamentos cujo período cobre os dias da semana
+        function aplicarSituacoesNaSemana(dias, sit, semObj) {
+            if (!dias || !semObj || !semObj.daysList) return;
+            getListaSituacoes(sit).forEach(item => {
+                semObj.daysList.forEach(dObj => {
+                    if (isDateWithinRange(dObj.dateObj, item.data_inicio, item.data_fim)) {
+                        dias[dObj.dayKey] = item.sigla.toUpperCase();
+                    }
+                });
+            });
+        }
+
+        // Localiza o afastamento de uma das siglas informadas que cobre a data
+        function findSituacaoNaData(sit, siglas, dateObj) {
+            const item = getListaSituacoes(sit).find(i =>
+                siglas.includes((i.sigla || '').toUpperCase()) && (!dateObj || isDateWithinRange(dateObj, i.data_inicio, i.data_fim))
+            );
+            return item ? Object.assign({ ativa: true }, item) : null;
+        }
+
+        function addSituacaoRow(item) {
+            const lista = document.getElementById('militarSituacoesLista');
+            if (!lista) return;
+            const it = item || { sigla: 'FE', data_inicio: '', data_fim: '', detalhes: '' };
+            const row = document.createElement('div');
+            row.className = 'situacao-row';
+            row.style.cssText = 'border: 1px solid rgba(59, 130, 246, 0.35); border-radius: 8px; padding: 10px; margin-bottom: 8px; background: rgba(15, 23, 42, 0.4);';
+            const opts = SITUACAO_SIGLAS_OPCOES.map(([v, l]) => `<option value="${v}">${l}</option>`).join('');
+            row.innerHTML = `
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                    <span class="situacao-row-titulo" style="font-size: 0.72rem; font-weight: 800; color: #93c5fd;">AFASTAMENTO</span>
+                    <button type="button" class="btn-icon-sm delete" onclick="removeSituacaoRow(this)" title="Remover este afastamento"><i class="fa-solid fa-trash-can"></i></button>
+                </div>
+                <div class="form-grid">
+                    <div class="form-group full-width">
+                        <label>TIPO DE SITUAÇÃO / SIGLA *</label>
+                        <select class="form-select sit-sigla">${opts}</select>
+                    </div>
+                    <div class="form-group">
+                        <label>DATA DE INÍCIO *</label>
+                        <input type="date" class="form-input sit-inicio" style="text-transform: none;">
+                    </div>
+                    <div class="form-group">
+                        <label>DATA DE TÉRMINO (OPCIONAL / INDETERMINADO)</label>
+                        <input type="date" class="form-input sit-fim" style="text-transform: none;">
+                    </div>
+                    <div class="form-group full-width">
+                        <label>DETALHES / DOE / DOCUMENTO (OPCIONAL)</label>
+                        <input type="text" class="form-input sit-detalhes" placeholder="EX: DOE SP 169, DE 03SET24 OU 30 DIAS" oninput="this.value = this.value.toUpperCase()">
+                    </div>
+                </div>
+            `;
+            row.querySelector('.sit-sigla').value = it.sigla || 'FE';
+            row.querySelector('.sit-inicio').value = it.data_inicio || '';
+            row.querySelector('.sit-fim').value = it.data_fim || '';
+            row.querySelector('.sit-detalhes').value = it.detalhes || '';
+            lista.appendChild(row);
+            renumerarSituacaoRows();
+        }
+
+        function removeSituacaoRow(btn) {
+            const row = btn.closest('.situacao-row');
+            if (row) row.remove();
+            renumerarSituacaoRows();
+        }
+
+        function renumerarSituacaoRows() {
+            document.querySelectorAll('#militarSituacoesLista .situacao-row').forEach((row, i) => {
+                const t = row.querySelector('.situacao-row-titulo');
+                if (t) t.textContent = `AFASTAMENTO ${i + 1}`;
+            });
+        }
+
+        function preencherSituacoesModal(sit) {
+            const lista = document.getElementById('militarSituacoesLista');
+            if (lista) lista.innerHTML = '';
+            const itens = getListaSituacoes(sit);
+            itens.forEach(i => addSituacaoRow(i));
+            document.getElementById('militarHasSituacao').checked = itens.length > 0;
+            toggleSituacaoFields(itens.length > 0);
+        }
+
+        function lerSituacoesModal() {
+            const itens = [];
+            document.querySelectorAll('#militarSituacoesLista .situacao-row').forEach(row => {
+                const inicio = row.querySelector('.sit-inicio').value;
+                if (!inicio) return;
+                itens.push({
+                    sigla: row.querySelector('.sit-sigla').value || 'FE',
+                    data_inicio: inicio,
+                    data_fim: row.querySelector('.sit-fim').value || '',
+                    detalhes: (row.querySelector('.sit-detalhes').value || '').trim().toUpperCase()
+                });
+            });
+            return itens;
         }
 
         const DEFAULT_RESTRICOES_MAP = {
@@ -3643,13 +3763,9 @@ CREATE POLICY "Permissao Total Escalas" ON public.escalas_manutencao FOR ALL USI
 
                 // Aplica imediatamente a situação programada aos dias que caem no intervalo desta semana
                 const sit = m.situacao_especial;
-                if (sit && sit.ativa && sit.sigla && sit.data_inicio && semObj && semObj.daysList) {
+                if (getListaSituacoes(sit).length > 0 && semObj && semObj.daysList) {
                     if (!m.dias) m.dias = getDefaultDaysForMilitar(m, wYear, semObj);
-                    semObj.daysList.forEach(dObj => {
-                        if (isDateWithinRange(dObj.dateObj, sit.data_inicio, sit.data_fim)) {
-                            m.dias[dObj.dayKey] = sit.sigla.toUpperCase();
-                        }
-                    });
+                    aplicarSituacoesNaSemana(m.dias, sit, semObj);
                 }
             });
 
@@ -3798,6 +3914,9 @@ CREATE POLICY "Permissao Total Escalas" ON public.escalas_manutencao FOR ALL USI
             }
         }
 
+        // Marcador gravado em observacoes_editadas para observações automáticas excluídas pelo operador
+        const OBS_AUTO_REMOVIDA = '__REMOVIDA__';
+
         function syncAutomaticObservacoes() {
             if (!currentScaleData || !currentScaleData.grid) return;
             const semObj = currentMonthWeeks[selectedWeekIndex];
@@ -3884,20 +4003,22 @@ CREATE POLICY "Permissao Total Escalas" ON public.escalas_manutencao FOR ALL USI
                     const lastDayKey = specialDays.FE[specialDays.FE.length - 1];
                     const dataIni = semObj.daysMap[firstDayKey].formatted;
                     const dataFim = semObj.daysMap[lastDayKey].formatted;
+                    const sitFE = findSituacaoNaData(sitGlobal, ['FE', 'F'], semObj.daysMap[firstDayKey].dateObj) || sitGlobal;
                     autoAfast.push({
                         num: m.num,
                         situacao: 'FÉRIAS',
                         nome: `${m.grad} ${m.re} ${m.nome}`,
-                        periodo: getPeriodoCompleto(sitGlobal, specialDays.FE.length, dataIni, dataFim)
+                        periodo: getPeriodoCompleto(sitFE, specialDays.FE.length, dataIni, dataFim)
                     });
                 }
 
                 if (specialDays.AG && specialDays.AG.length > 0) {
+                    const sitAG = findSituacaoNaData(sitGlobal, ['AG'], null) || sitGlobal;
                     autoAfast.push({
                         num: m.num,
                         situacao: 'AGREGADO',
                         nome: `${m.grad} ${m.re} ${m.nome}`,
-                        periodo: (sitGlobal && sitGlobal.detalhes) ? sitGlobal.detalhes : 'A CONTAR DE DOE'
+                        periodo: (sitAG && sitAG.detalhes) ? sitAG.detalhes : 'A CONTAR DE DOE'
                     });
                 }
 
@@ -3906,11 +4027,12 @@ CREATE POLICY "Permissao Total Escalas" ON public.escalas_manutencao FOR ALL USI
                     const lastDayKey = specialDays.LP[specialDays.LP.length - 1];
                     const dataIni = semObj.daysMap[firstDayKey].formatted;
                     const dataFim = semObj.daysMap[lastDayKey].formatted;
+                    const sitLP = findSituacaoNaData(sitGlobal, ['LP'], semObj.daysMap[firstDayKey].dateObj) || sitGlobal;
                     autoAfast.push({
                         num: m.num,
                         situacao: 'LP - LICENÇA PRÊMIO',
                         nome: `${m.grad} ${m.re} ${m.nome}`,
-                        periodo: getPeriodoCompleto(sitGlobal, specialDays.LP.length, dataIni, dataFim)
+                        periodo: getPeriodoCompleto(sitLP, specialDays.LP.length, dataIni, dataFim)
                     });
                 }
 
@@ -3927,21 +4049,9 @@ CREATE POLICY "Permissao Total Escalas" ON public.escalas_manutencao FOR ALL USI
                     });
                 }
 
-                if (specialDays.LTS && specialDays.LTS.length > 0) {
-                    const firstDayKey = specialDays.LTS[0];
-                    const lastDayKey = specialDays.LTS[specialDays.LTS.length - 1];
-                    const dataIni = semObj.daysMap[firstDayKey].formatted;
-                    const dataFim = semObj.daysMap[lastDayKey].formatted;
-                    const textoPeriodo = (firstDayKey === lastDayKey) ? `em ${dataIni}` : `no período de ${dataIni} a ${dataFim}`;
-                    const key = `LTS_${m.re}`;
-                    const defaultText = `${milDesc} LICENÇA TRATAMENTO DE SAÚDE ${textoPeriodo}.`;
-                    const finalText = currentScaleData.observacoes_editadas[key] || defaultText;
-                    autoObs.push({ key: key, text: finalText });
-                }
-
-                // DS, M, T e FERIADO não geram observações (condições normais de rotina)
+                // Siglas que não geram observação: LP, S, F, FE, LTS, DS, AG, FR, LG, EF, PF (além de EAP, M, T)
                 Object.keys(specialDays).forEach(sig => {
-                    if (!['FE', 'AG', 'LP', 'FM', 'LTS', 'DS', 'EAP', 'M', 'T', 'FER', 'FERIADO', 'S', 'F'].includes(sig)) {
+                    if (!['FE', 'AG', 'LP', 'FM', 'LTS', 'DS', 'EAP', 'M', 'T', 'FER', 'FERIADO', 'FR', 'LG', 'EF', 'PF', 'S', 'F'].includes(sig)) {
                         const sigObj = TODAS_SIGLAS_PMESP.find(s => s.sigla === sig);
                         const desc = sigObj ? sigObj.desc : sig;
                         specialDays[sig].forEach(dayKey => {
@@ -3987,6 +4097,7 @@ CREATE POLICY "Permissao Total Escalas" ON public.escalas_manutencao FOR ALL USI
             }
 
             autoObs.forEach(obsItem => {
+                if (obsItem.text === OBS_AUTO_REMOVIDA) return;
                 finais.push({
                     id: count,
                     tipo: 'auto',
@@ -4200,7 +4311,20 @@ CREATE POLICY "Permissao Total Escalas" ON public.escalas_manutencao FOR ALL USI
                         <th class="th-dept">Departamento <i class="fa-solid fa-caret-down" style="font-size: 11px; opacity: 0.7;"></i></th>
             `;
             days.forEach(d => {
-                html += `<th>${d.label} <i class="fa-solid fa-caret-down" style="font-size: 11px; opacity: 0.7;"></i></th>`;
+                // Dia com militares em serviço (S) mas nenhum SGT escalado: cabeçalho do dia em vermelho
+                let totalServico = 0;
+                let temSgt = false;
+                if (currentScaleData.grid && Array.isArray(currentScaleData.grid)) {
+                    currentScaleData.grid.forEach(m => {
+                        if (m.dias && (m.dias[d.key] === 'S' || m.dias[d.key] === 's')) {
+                            totalServico++;
+                            if ((m.grad || '').toUpperCase().includes('SGT')) temSgt = true;
+                        }
+                    });
+                }
+                const semSgt = totalServico > 0 && !temSgt;
+                const thAttr = semSgt ? ` class="th-dia-sem-sgt" title="NENHUM SARGENTO ESCALADO NESTE DIA"` : '';
+                html += `<th${thAttr}>${d.label} <i class="fa-solid fa-caret-down" style="font-size: 11px; opacity: 0.7;"></i></th>`;
             });
             html += `
                     </tr>
@@ -4699,7 +4823,7 @@ CREATE POLICY "Permissao Total Escalas" ON public.escalas_manutencao FOR ALL USI
                 const editBtnHtml = `<button class="btn-icon-sm" onclick="openEditObsModal(${idx})" title="Editar texto desta observação"><i class="fa-solid fa-pen-to-square"></i></button>`;
                 
                 const deleteBtnHtml = obsObj.isAuto 
-                    ? `<span title="Gerado automaticamente pela grade" style="color: var(--accent-blue); font-size: 0.7rem; margin-left: 6px;"><i class="fa-solid fa-bolt"></i> AUTO</span>` 
+                    ? `<button class="btn-icon-sm delete" onclick="deleteObsItem(${idx})" title="Excluir observação automática"><i class="fa-solid fa-trash-can"></i></button><span title="Gerado automaticamente pela grade" style="color: var(--accent-blue); font-size: 0.7rem; margin-left: 6px;"><i class="fa-solid fa-bolt"></i> AUTO</span>` 
                     : `<button class="btn-icon-sm delete" onclick="deleteObsItem(${idx})" title="Excluir observação"><i class="fa-solid fa-trash-can"></i></button>`;
 
                 item.innerHTML = `
@@ -4755,6 +4879,10 @@ CREATE POLICY "Permissao Total Escalas" ON public.escalas_manutencao FOR ALL USI
                     currentScaleData.observacoes_padrao.splice(obsObj.padraoIndex, 1);
                 } else if (obsObj.tipo === 'manual' && typeof obsObj.manualIndex === 'number') {
                     currentScaleData.observacoes_manuais.splice(obsObj.manualIndex, 1);
+                } else if (obsObj.isAuto && obsObj.key) {
+                    // Marca a observação automática como removida nesta semana (não é regerada)
+                    if (!currentScaleData.observacoes_editadas) currentScaleData.observacoes_editadas = {};
+                    currentScaleData.observacoes_editadas[obsObj.key] = OBS_AUTO_REMOVIDA;
                 }
                 syncAutomaticObservacoes();
                 renderObservacoes();
@@ -4992,13 +5120,8 @@ CREATE POLICY "Permissao Total Escalas" ON public.escalas_manutencao FOR ALL USI
             toggleRestricaoFields(false);
             document.querySelectorAll('#restrChipsContainer .restr-toggle-chip').forEach(c => c.classList.remove('active'));
             
-            document.getElementById('militarHasSituacao').checked = false;
-            toggleSituacaoFields(false);
-            document.getElementById('militarSituacaoSigla').value = 'FE';
-            document.getElementById('militarSituacaoDataInicio').value = '';
-            document.getElementById('militarSituacaoDataFim').value = '';
-            document.getElementById('militarSituacaoDetalhes').value = '';
-            
+            preencherSituacoesModal(null);
+
             openModal('militarModal');
         }
 
@@ -5039,21 +5162,7 @@ CREATE POLICY "Permissao Total Escalas" ON public.escalas_manutencao FOR ALL USI
             });
 
             // Carrega dados da Situação Programada
-            const sit = m.situacao_especial;
-            const hasSit = !!(sit && sit.ativa);
-            document.getElementById('militarHasSituacao').checked = hasSit;
-            toggleSituacaoFields(hasSit);
-            if (hasSit) {
-                document.getElementById('militarSituacaoSigla').value = sit.sigla || 'FE';
-                document.getElementById('militarSituacaoDataInicio').value = sit.data_inicio || '';
-                document.getElementById('militarSituacaoDataFim').value = sit.data_fim || '';
-                document.getElementById('militarSituacaoDetalhes').value = sit.detalhes || '';
-            } else {
-                document.getElementById('militarSituacaoSigla').value = 'FE';
-                document.getElementById('militarSituacaoDataInicio').value = '';
-                document.getElementById('militarSituacaoDataFim').value = '';
-                document.getElementById('militarSituacaoDetalhes').value = '';
-            }
+            preencherSituacoesModal(m.situacao_especial);
 
             openModal('militarModal');
         }
@@ -5085,13 +5194,7 @@ CREATE POLICY "Permissao Total Escalas" ON public.escalas_manutencao FOR ALL USI
                 };
 
                 const hasSit = document.getElementById('militarHasSituacao') ? document.getElementById('militarHasSituacao').checked : false;
-                const situacaoObj = {
-                    ativa: hasSit && !!(document.getElementById('militarSituacaoDataInicio') && document.getElementById('militarSituacaoDataInicio').value),
-                    sigla: document.getElementById('militarSituacaoSigla') ? document.getElementById('militarSituacaoSigla').value : 'FE',
-                    data_inicio: document.getElementById('militarSituacaoDataInicio') ? document.getElementById('militarSituacaoDataInicio').value : '',
-                    data_fim: document.getElementById('militarSituacaoDataFim') ? document.getElementById('militarSituacaoDataFim').value : '',
-                    detalhes: document.getElementById('militarSituacaoDetalhes') ? document.getElementById('militarSituacaoDetalhes').value.trim().toUpperCase() : ''
-                };
+                const situacaoObj = buildSituacaoObj(hasSit ? lerSituacoesModal() : []);
 
                 const eqChoice = document.getElementById('selectedEquipeOption') ? document.getElementById('selectedEquipeOption').value : 'SEM_EQUIPE';
                 let secaoFinal = (document.getElementById('militarSecaoBase').value || 'MANUTENÇÃO DE FROTA').trim().toUpperCase();
@@ -5136,12 +5239,8 @@ CREATE POLICY "Permissao Total Escalas" ON public.escalas_manutencao FOR ALL USI
                     militarData.num = prevM ? prevM.num : (editIdx + 1);
 
                     const sit = militarData.situacao_especial;
-                    if (sit && sit.ativa && sit.sigla && sit.data_inicio && semObj && semObj.daysList) {
-                        semObj.daysList.forEach(dObj => {
-                            if (isDateWithinRange(dObj.dateObj, sit.data_inicio, sit.data_fim)) {
-                                militarData.dias[dObj.dayKey] = sit.sigla.toUpperCase();
-                            }
-                        });
+                    if (sit && sit.ativa && semObj && semObj.daysList) {
+                        aplicarSituacoesNaSemana(militarData.dias, sit, semObj);
                     } else if (sit && !sit.ativa) {
                         militarData.dias = getDefaultDaysForMilitar(militarData, wYear, semObj);
                     }
@@ -5379,28 +5478,7 @@ CREATE POLICY "Permissao Total Escalas" ON public.escalas_manutencao FOR ALL USI
                 localStorage.setItem('CMM_ALTERACOES_GLOBAIS', JSON.stringify(globais));
             } catch(e) {}
 
-            // Se pertencer à semana visível, restaura o padrão original da escala
-            const semObj = currentMonthWeeks[selectedWeekIndex];
-            if (semObj && currentScaleData.grid) {
-                const cleanAltRe = (alt.re || '').replace(/\D/g, '');
-                const milTarget = currentScaleData.grid.find(m => {
-                    const mCleanRe = (m.re || '').replace(/\D/g, '');
-                    return mCleanRe === cleanAltRe || `${m.grad} ${m.re} ${m.nome}` === alt.militar;
-                });
-
-                if (milTarget) {
-                    const defaultDays = getDefaultDaysForMilitar(milTarget, semObj.weekOfYear, semObj);
-                    DIAS_KEYS.forEach(dayKey => {
-                        const dObj = semObj.daysMap[dayKey];
-                        if (dObj) {
-                            const curIso = getLocalDateIso(dObj.dateObj);
-                            if (curIso === alt.dateIso || dObj.formatted === alt.data) {
-                                milTarget.dias[dayKey] = defaultDays[dayKey] || 'F';
-                            }
-                        }
-                    });
-                }
-            }
+            // Exclusão não altera a grade de escala (alterações só afetam a Frequência)
 
             // Remove da lista
             currentScaleData.alteracoes.splice(index, 1);
@@ -5498,19 +5576,8 @@ CREATE POLICY "Permissao Total Escalas" ON public.escalas_manutencao FOR ALL USI
                 localStorage.setItem('CMM_ALTERACOES_GLOBAIS', JSON.stringify(globais));
             } catch(e) {}
 
-            // Aplica na semana atual se a data estiver visível na escala
-            const semObj = currentMonthWeeks[selectedWeekIndex];
-            if (semObj && milTarget) {
-                DIAS_KEYS.forEach(dayKey => {
-                    const dObj = semObj.daysMap[dayKey];
-                    if (dObj) {
-                        const curIso = getLocalDateIso(dObj.dateObj);
-                        if (curIso === dataIso || dObj.formatted === dataFmt) {
-                            milTarget.dias[dayKey] = sigla;
-                        }
-                    }
-                });
-            }
+            // Alterações diárias afetam somente a Frequência (via CMM_ALTERACOES_GLOBAIS);
+            // a grade de escala e as observações permanecem intactas.
 
             closeModal('alterModal');
             renderAll();

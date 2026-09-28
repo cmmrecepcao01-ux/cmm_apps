@@ -1,2 +1,5 @@
 # Local Netlify folder
 .netlify
+
+# Backups locais do app de escala (não publicar)
+_BACKUP/
