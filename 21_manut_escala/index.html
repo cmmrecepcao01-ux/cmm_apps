@@ -4138,6 +4138,11 @@ CREATE POLICY "Permissao Total Escalas" ON public.escalas_manutencao FOR ALL USI
 
             if (nome.includes('FABIANO')) return 'CMD FORÇA';
 
+            // Departamentos fixos: Cb Tiburcio no Grafismo e Cb Santos na Recepção
+            const reNum = (m.re || '').replace(/\D/g, '');
+            if (nome.trim() === 'TIBURCIO' || reNum === '1429604') return 'GRAFISMO';
+            if (nome.trim() === 'SANTOS' || reNum === '1446436') return 'RECEPÇÃO';
+
             if (nome.includes('AUGUSTO') || nome.includes('CLEBER') || nome.includes('ANDREA') || nome.includes('JULIANA')) {
                 return 'ALMOXARIFADO';
             }
