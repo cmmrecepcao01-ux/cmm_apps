@@ -944,6 +944,47 @@
             return (txt.includes("TRIUMPH") || txt.includes("SCRAMB")) ? "Triumph" : "";
         }
 
+        // Abreviações usadas no banco de dados (GM/CHEV = CHEVROLET)
+        const ALIASES_MARCA = { "GM": "Chevrolet", "CHEV": "Chevrolet", "CHEVROLET": "Chevrolet", "VW": "Volkswagen", "MMC": "Mitsubishi" };
+
+        // Corrige Marca/Modelo vindos do banco de dados para casar com o select de Marca:
+        // - "TRAILBLAZER LT 2.8L" (sem marca e sem "/") -> Chevrolet / TRAILBLAZER LT 2.8L
+        // - "I/TOYOTA HILUX" (importado) -> Toyota / TOYOTA HILUX
+        // - "TOYOTA", "CHEV", "GM", "VW" -> Toyota, Chevrolet, Chevrolet, Volkswagen
+        function detectarMarcaModelo(placaObj) {
+            let marca = (placaObj.marca || "").toString().trim();
+            let modelo = (placaObj.modelo || "").toString().trim();
+            const marcasValidas = Object.keys(MARCAS_MODELOS);
+            const acharMarca = (txt) => {
+                const t = (txt || "").toString().toUpperCase().trim();
+                if (!t) return "";
+                if (ALIASES_MARCA[t]) return ALIASES_MARCA[t];
+                return marcasValidas.find(m => m.toUpperCase() === t) || "";
+            };
+
+            // Importado: "I/TOYOTA HILUX" -> a marca é a 1ª palavra do modelo
+            if (marca.toUpperCase() === "I" && modelo) {
+                marca = modelo.split(/\s+/)[0];
+            }
+
+            let marcaValida = acharMarca(marca);
+
+            // Só o modelo, sem marca (ex: "TRAILBLAZER LT 2.8L"): descobre a marca pelo modelo
+            if (!marcaValida && !modelo && marca) {
+                const t = marca.toUpperCase();
+                const encontrada = marcasValidas.find(m => MARCAS_MODELOS[m].some(mod => new RegExp("(^|\\W)" + mod.toUpperCase().replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + "(\\W|$)").test(t)));
+                if (encontrada) {
+                    modelo = marca;
+                    marcaValida = encontrada;
+                }
+            }
+
+            return {
+                marca: detectarMarcaTriumph({ marca: marca, modelo: modelo }) || marcaValida || marca,
+                modelo: modelo
+            };
+        }
+
         // VARIÁVEIS DE CONFIGURAÇÃO E CACHE
         const API_URL = "https://script.google.com/macros/s/AKfycbxPloG_YjMC01xXQnTUsiTpBd7dcPxairGe9_i2DUzRiY59nuMl6eGsITtke5cjOAdb/exec";
         let placasBancoDados = [];
@@ -1195,21 +1236,31 @@
                     opmSelect.disabled = true;
                 }
 
-                const marcaDetectada = detectarMarcaTriumph(placaObj) || placaObj.marca;
+                const corrigido = detectarMarcaModelo(placaObj);
+                const marcaDetectada = corrigido.marca;
+                const modeloDetectado = corrigido.modelo;
                 if (marcaDetectada) {
+                    // Se a marca não estiver na lista (ex: BMW, YAMAHA), adiciona dinamicamente
+                    let matchedMarca = Array.from(marcaSelect.options).some(o => o.value === marcaDetectada);
+                    if (!matchedMarca) {
+                        const opt = document.createElement("option");
+                        opt.value = marcaDetectada;
+                        opt.textContent = marcaDetectada;
+                        marcaSelect.appendChild(opt);
+                    }
                     marcaSelect.value = marcaDetectada;
                     updateModelOptions(); // Carrega modelos da marca selecionada
-                    
-                    if (placaObj.modelo) {
+
+                    if (modeloDetectado) {
                         // Se o modelo não estiver na lista padrão, adiciona dinamicamente
-                        let matchedModel = Array.from(modeloSelect.options).some(o => o.value === placaObj.modelo);
+                        let matchedModel = Array.from(modeloSelect.options).some(o => o.value === modeloDetectado);
                         if (!matchedModel) {
                             const opt = document.createElement("option");
-                            opt.value = placaObj.modelo;
-                            opt.textContent = placaObj.modelo;
+                            opt.value = modeloDetectado;
+                            opt.textContent = modeloDetectado;
                             modeloSelect.appendChild(opt);
                         }
-                        modeloSelect.value = placaObj.modelo;
+                        modeloSelect.value = modeloDetectado;
                     }
                     
                     marcaSelect.disabled = true;

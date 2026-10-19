@@ -809,8 +809,58 @@ function limparDados(linha) {
   if (linha[4]) linha[4] = normalizarModelo(linha[4]); // Coluna E: Modelo
   if (linha[5]) linha[5] = normalizarAno(linha[5]);    // Coluna F: Ano
   if (linha[6]) linha[6] = normalizarKM(linha[6]);     // Coluna G: KM
+  if (linha[2] && (!linha[3] || !linha[4])) {          // Colunas D/E vazias: busca Marca/Modelo no banco_dados pela placa
+    const info = carregarMarcaModeloPorPlaca()[linha[2]];
+    if (info) {
+      if (!linha[3]) linha[3] = info.marca;
+      if (!linha[4]) linha[4] = info.modelo;
+    }
+  }
   if (ehScrambler(linha[4])) linha[3] = "TRIUMPH";     // Coluna D: SCRAMBLER 400X é sempre TRIUMPH (mesmo com marca vazia ou "I")
   return linha;
+}
+
+/**
+ * Lê a aba 'banco_dados' e monta { PLACA: { marca, modelo } } já padronizados.
+ * Usado SÓ para preencher Marca/Modelo vazios (nunca sobrescreve o que já foi gravado).
+ * Formatos tratados: "CHEV/TRAILBLAZER", "I/TOYOTA HILUX" (importado), "TRAILBLAZER LT 2.8L" (só o modelo, sem "/").
+ */
+function carregarMarcaModeloPorPlaca() {
+  const mapa = {};
+  const sh = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("banco_dados");
+  if (!sh) return mapa;
+  const data = sh.getDataRange().getValues();
+  if (data.length <= 1) return mapa;
+  const headers = data[0].map(h => h.toString().toLowerCase().trim());
+  const placaIdx = headers.indexOf("placa");
+  const marcaModIdx = headers.indexOf("marca/modelo");
+  if (placaIdx === -1 || marcaModIdx === -1) return mapa;
+
+  for (let i = 1; i < data.length; i++) {
+    const placa = normalizarPlaca(data[i][placaIdx]);
+    const raw = (data[i][marcaModIdx] || "").toString().trim();
+    if (!placa || !raw || mapa[placa]) continue;
+
+    let marca = "";
+    let modelo = "";
+    if (raw.includes("/")) {
+      const parts = raw.split("/");
+      marca = parts[0].trim();
+      modelo = parts.slice(1).join("/").trim();
+      if (marca.toUpperCase() === "I" && modelo) marca = modelo.split(/\s+/)[0]; // Importado: marca é a 1ª palavra do modelo
+    } else {
+      marca = raw;  // Só o modelo (ex: "TRAILBLAZER LT 2.8L"): normalizarMarca descobre a marca
+      modelo = raw;
+    }
+
+    marca = normalizarMarca(marca);
+    modelo = normalizarModelo(modelo);
+    if (!raw.includes("/") && marca === modelo) modelo = ""; // Texto sem "/" que não é modelo conhecido: fica só como marca
+    if (ehScrambler(modelo)) marca = "TRIUMPH";
+
+    mapa[placa] = { marca: marca, modelo: modelo };
+  }
+  return mapa;
 }
 
 /**
@@ -831,6 +881,7 @@ function padronizarTodaAPlanilha() {
   // C: Placa | D: Marca | E: Modelo | F: Ano | G: KM
   const range = sh.getRange(2, 3, lr - 1, 5);
   const vals = range.getValues();
+  const mapaBanco = carregarMarcaModeloPorPlaca(); // Para preencher Marca/Modelo vazios pela placa
   let totalProcessado = 0;
   for (let i = 0; i < vals.length; i++) {
     vals[i][0] = normalizarPlaca(vals[i][0]);  // C: Placa
@@ -838,6 +889,11 @@ function padronizarTodaAPlanilha() {
     vals[i][2] = normalizarModelo(vals[i][2]); // E: Modelo
     vals[i][3] = normalizarAno(vals[i][3]);    // F: Ano
     vals[i][4] = normalizarKM(vals[i][4]);     // G: KM
+    const info = mapaBanco[vals[i][0]];
+    if (info) {
+      if (!vals[i][1]) vals[i][1] = info.marca;  // D vazia: marca do banco_dados
+      if (!vals[i][2]) vals[i][2] = info.modelo; // E vazia: modelo do banco_dados
+    }
     if (ehScrambler(vals[i][2])) vals[i][1] = "TRIUMPH"; // D: SCRAMBLER 400X é sempre TRIUMPH
     totalProcessado++;
   }
