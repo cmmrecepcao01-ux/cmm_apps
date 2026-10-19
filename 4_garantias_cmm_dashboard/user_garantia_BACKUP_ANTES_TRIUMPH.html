@@ -1,0 +1,1836 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CMM - Registro de Garantias e Baixas</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #050505;
+            --card-bg: #121212;
+            --border-color: #222;
+            --accent-green: #00ff90;
+            --accent-blue: #00aaff;
+            --accent-red: #ff4d6d;
+            --accent-orange: #ff8c00;
+            --text-color: #f0f0f0;
+            --text-muted: #aaa;
+            --input-bg: #1a1a1a;
+            --input-border: #333;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            padding-bottom: 40px;
+        }
+
+        header {
+            background-color: var(--card-bg);
+            border-bottom: 1px solid rgba(0, 255, 144, 0.15);
+            padding: 20px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .header-title span {
+            color: var(--accent-green);
+        }
+
+        main {
+            padding: 24px;
+            max-width: 900px;
+            margin: 0 auto;
+            width: 100%;
+            flex: 1;
+        }
+
+        /* NAVIGATION TABS */
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 25px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 10px;
+        }
+
+        .tab-btn {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            font-weight: 600;
+            padding: 10px 20px;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+            position: relative;
+        }
+
+        .tab-btn:hover {
+            color: #fff;
+            background: rgba(255, 255, 255, 0.03);
+        }
+
+        .tab-btn.active {
+            color: #fff;
+            background: rgba(0, 255, 144, 0.1);
+        }
+
+        .tab-btn.active::after {
+            content: '';
+            position: absolute;
+            bottom: -11px;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background-color: var(--accent-green);
+            border-radius: 3px 3px 0 0;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* CARDS AND FORMS */
+        .card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+            margin-bottom: 20px;
+        }
+
+        .form-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            border-left: 4px solid var(--accent-green);
+            padding-left: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+
+        @media (max-width: 600px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .full-width {
+            grid-column: span 2;
+        }
+
+        @media (max-width: 600px) {
+            .full-width {
+                grid-column: span 1;
+            }
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            position: relative;
+        }
+
+        .form-group label {
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            letter-spacing: 0.5px;
+        }
+
+        .form-group input, 
+        .form-group select, 
+        .form-group textarea {
+            width: 100%;
+            padding: 12px 14px;
+            background-color: var(--input-bg);
+            border: 1px solid var(--input-border);
+            color: #fff;
+            border-radius: 8px;
+            outline: none;
+            font-size: 0.95rem;
+            font-family: inherit;
+            transition: all 0.2s ease;
+        }
+
+        /* DESTACAR ÍCONE DO CALENDÁRIO */
+        input[type="date"]::-webkit-calendar-picker-indicator {
+            filter: invert(58%) sepia(91%) saturate(1512%) hue-rotate(113deg) brightness(103%) contrast(103%);
+            cursor: pointer;
+        }
+
+        .form-group input:focus, 
+        .form-group select:focus, 
+        .form-group textarea:focus {
+            border-color: var(--accent-green);
+            box-shadow: 0 0 8px rgba(0, 255, 144, 0.15);
+        }
+
+        /* AUTOCOMPLETE / PLACA SEARCH STYLE */
+        .autocomplete-container {
+            position: relative;
+        }
+
+        .autocomplete-list {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background-color: #1a1a1a;
+            border: 1px solid #333;
+            border-radius: 8px;
+            max-height: 180px;
+            overflow-y: auto;
+            z-index: 1000;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.6);
+            display: none;
+            margin-top: 4px;
+        }
+
+        .autocomplete-item {
+            padding: 10px 14px;
+            cursor: pointer;
+            border-bottom: 1px solid #262626;
+            font-size: 0.95rem;
+            font-weight: 500;
+        }
+
+        .autocomplete-item:hover {
+            background-color: #262626;
+            color: var(--accent-green);
+        }
+
+        .selected-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background-color: rgba(0, 255, 144, 0.15);
+            border: 1px solid var(--accent-green);
+            color: var(--accent-green);
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-top: 5px;
+            align-self: flex-start;
+        }
+
+        .clear-btn {
+            background: none;
+            border: none;
+            color: var(--accent-red);
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 1rem;
+            padding: 0 4px;
+        }
+
+        /* DESCRICAO TAGS */
+        .tag-container {
+            display: flex;
+            gap: 10px;
+            margin-top: 5px;
+        }
+
+        .tag-btn {
+            background-color: #222;
+            border: 1px solid #444;
+            color: var(--text-muted);
+            padding: 6px 14px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            text-transform: uppercase;
+            transition: all 0.2s ease;
+        }
+
+        .tag-btn:hover {
+            border-color: var(--accent-blue);
+            color: #fff;
+        }
+
+        .tag-btn.active {
+            background-color: rgba(0, 170, 255, 0.15);
+            border-color: var(--accent-blue);
+            color: #fff;
+        }
+
+        .char-counter {
+            font-size: 0.7rem;
+            align-self: flex-end;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+
+        .address-helper {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-top: 4px;
+            line-height: 1.3;
+        }
+
+        /* SUBMIT BUTTON */
+        .submit-btn {
+            background: linear-gradient(135deg, #00ff90 0%, #00b365 100%);
+            color: #000;
+            border: none;
+            padding: 14px 28px;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            transition: all 0.2s ease-in-out;
+            box-shadow: 0 4px 15px rgba(0, 255, 144, 0.2);
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 255, 144, 0.35);
+        }
+
+        .submit-btn:active {
+            transform: translateY(0);
+        }
+
+        .submit-btn:disabled {
+            background: #222;
+            color: #555;
+            border: 1px solid #333;
+            cursor: not-allowed;
+            box-shadow: none;
+            transform: none !important;
+        }
+
+        /* OPTIONAL SECTIONS */
+        .hidden-section {
+            display: none;
+        }
+
+        .file-upload-wrapper {
+            border: 1px dashed var(--input-border);
+            border-radius: 8px;
+            padding: 16px;
+            text-align: center;
+            background-color: var(--input-bg);
+            cursor: pointer;
+            position: relative;
+            transition: border-color 0.2s ease;
+        }
+
+        .file-upload-wrapper:hover {
+            border-color: var(--accent-blue);
+        }
+
+        .file-upload-wrapper input[type="file"] {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        .upload-icon {
+            font-size: 1.5rem;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        .upload-filename {
+            font-size: 0.85rem;
+            color: var(--accent-blue);
+            margin-top: 5px;
+            font-weight: 500;
+        }
+
+        /* TAB 2: UPDATE STATUS */
+        .search-row {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 25px;
+        }
+
+        .search-btn {
+            background-color: var(--accent-blue);
+            color: #000;
+            border: none;
+            padding: 0 24px;
+            border-radius: 8px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .search-btn:hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
+        }
+
+        .ticket-item {
+            background-color: #161616;
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .ticket-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #222;
+            padding-bottom: 10px;
+        }
+
+        .ticket-plate {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--accent-blue);
+        }
+
+        .ticket-date {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        .ticket-details {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px 20px;
+            font-size: 0.9rem;
+        }
+
+        .detail-row {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .detail-row span:first-child {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+
+        .detail-row span:last-child {
+            color: #fff;
+        }
+
+        .ticket-action {
+            display: grid;
+            grid-template-columns: auto 1fr auto;
+            align-items: center;
+            gap: 15px;
+            background-color: #1e1e1e;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #2d2d2d;
+            margin-top: 5px;
+        }
+
+        @media (max-width: 500px) {
+            .ticket-action {
+                grid-template-columns: 1fr;
+                gap: 12px;
+            }
+        }
+
+        .checkbox-container {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 600;
+            user-select: none;
+        }
+
+        .checkbox-container input {
+            width: 18px;
+            height: 18px;
+            accent-color: var(--accent-green);
+        }
+
+        .action-save-btn {
+            background-color: var(--accent-green);
+            color: #000;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-weight: 700;
+            font-size: 0.85rem;
+            cursor: pointer;
+            text-transform: uppercase;
+            transition: all 0.2s ease;
+        }
+
+        .action-save-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 10px rgba(0, 255, 144, 0.2);
+        }
+
+        /* LOADING AND STATUS MESSAGES */
+        .overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0,0,0,0.85);
+            z-index: 10000;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid rgba(0, 255, 144, 0.1);
+            border-top: 4px solid var(--accent-green);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .overlay-text {
+            font-weight: bold;
+            letter-spacing: 1px;
+            color: var(--accent-green);
+        }
+
+        /* CONFIG BUTTON FOR API URL */
+        .config-bar {
+            background-color: #111;
+            padding: 12px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            border-top: 1px solid #222;
+            margin-top: auto;
+        }
+
+        .config-btn {
+            background: none;
+            border: 1px solid #444;
+            color: var(--text-muted);
+            padding: 4px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .config-btn:hover {
+            color: #fff;
+            border-color: #666;
+        }
+
+        #configModal {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 90%;
+            max-width: 500px;
+            background-color: #1a1a1a;
+            border: 2px solid var(--accent-blue);
+            border-radius: 12px;
+            padding: 24px;
+            z-index: 20000;
+            box-shadow: 0 0 30px rgba(0, 170, 255, 0.4);
+        }
+
+        #modalOverlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0,0,0,0.8);
+            z-index: 19999;
+        }
+
+        .disabled-section,
+        .disabled-section > * {
+            opacity: 0.3;
+            pointer-events: none;
+            user-select: none;
+            transition: all 0.3s ease;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="header-title">CMM — Portal de Garantias e Baixas <span>[Usuário]</span></div>
+    </header>
+
+    <main>
+        <div class="tabs">
+            <button class="tab-btn active" onclick="switchTab('tab-cadastrar', this)">Cadastrar Acionamento</button>
+            <button class="tab-btn" onclick="switchTab('tab-status', this)">Informar se foi Resolvido</button>
+        </div>
+
+        <!-- ABA 1: CADASTRAR ACIONAMENTO -->
+        <div id="tab-cadastrar" class="tab-content active">
+            <div class="card">
+                <div class="form-title">Cadastrar Acionamento de Garantia</div>
+                <form id="formAcionamento" onsubmit="submitAcionamento(event)">
+                    <div class="form-grid">
+                        
+                        <!-- Placa do Veículo -->
+                        <div class="form-group autocomplete-container">
+                            <label for="placaInput">Placa do Veículo *</label>
+                            <input type="text" id="placaInput" placeholder="Busque a placa digitando..." oninput="filterPlacas()" autocomplete="off">
+                            <div id="placaSuggestions" class="autocomplete-list"></div>
+                            <div id="selectedPlacaBadge" class="selected-badge hidden-section">
+                                <span id="selectedPlacaText"></span>
+                                <button type="button" class="clear-btn" onclick="clearSelectedPlaca()">✕</button>
+                            </div>
+                            <span id="placaErrorLabel" style="font-size: 0.75rem; color: var(--accent-orange); display: none; margin-top: 4px; font-weight: 500;"></span>
+                        </div>
+
+                        <!-- Unidade (OPM) -->
+                        <div class="form-group">
+                            <label for="opmSelect">Unidade (OPM) *</label>
+                            <select id="opmSelect" disabled required>
+                                <option value="">Selecione a OPM...</option>
+                            </select>
+                        </div>
+
+                        <!-- Marca -->
+                        <div class="form-group">
+                            <label for="marcaSelect">Marca do Veículo *</label>
+                            <select id="marcaSelect" onchange="updateModelOptions()" disabled required>
+                                <option value="">Selecione...</option>
+                                <option value="Toyota">Toyota</option>
+                                <option value="Chevrolet">Chevrolet</option>
+                                <option value="Ford">Ford</option>
+                                <option value="Mitsubishi">Mitsubishi</option>
+                                <option value="Volkswagen">Volkswagen</option>
+                                <option value="Renault">Renault</option>
+                                <option value="Fiat">Fiat</option>
+                                <option value="Iveco">Iveco</option>
+                                <option value="Hyundai">Hyundai</option>
+                            </select>
+                        </div>
+
+                        <!-- Modelo -->
+                        <div class="form-group">
+                            <label for="modeloSelect">Modelo do Veículo *</label>
+                            <select id="modeloSelect" disabled required>
+                                <option value="">Selecione a Marca primeiro...</option>
+                            </select>
+                        </div>
+
+                        <!-- Ano de Fabricação -->
+                        <div class="form-group">
+                            <label for="anoSelect">Ano de Fabricação *</label>
+                            <select id="anoSelect" disabled required>
+                                <option value="">Selecione...</option>
+                            </select>
+                        </div>
+
+                        <!-- Quilometragem Atual -->
+                        <div class="form-group">
+                            <label for="kmInput">Quilometragem Atual (números apenas) *</label>
+                            <input type="text" id="kmInput" placeholder="Ex: 10325" oninput="cleanKMInput(this)" required>
+                        </div>
+
+                        <!-- Checkbox Confirmação -->
+                        <div class="form-group full-width" style="display: flex; align-items: center; gap: 10px; padding: 15px 0; border-top: 1px solid #222; margin-top: 10px;">
+                            <input type="checkbox" id="confirmOpmVehicle" onchange="toggleServiceSection(this.checked)" style="width: 20px; height: 20px; cursor: pointer;">
+                            <label for="confirmOpmVehicle" style="font-weight: 600; cursor: pointer; color: var(--accent-green);">Confirmo que este é o veículo de minha OPM que desejo cadastrar *</label>
+                        </div>
+
+                    </div>
+
+                    <!-- SEÇÃO DE SERVIÇOS (DESABILITADA POR PADRÃO) -->
+                    <div id="serviceDetailsSection" class="disabled-section" style="margin-top: 20px;">
+                        <div class="form-grid">
+                            
+                            <!-- Razão do Acionamento -->
+                            <div class="form-group full-width">
+                                <label for="razaoSelect">Razão do Acionamento *</label>
+                                <select id="razaoSelect" onchange="handleRazaoChange(this.value)" required>
+                                    <option value="">Selecione...</option>
+                                    <option value="Item de Fábrica (mecânico/ elétrico/ estrutura)">Item de Fábrica (mecânico / elétrico / estrutural)</option>
+                                    <option value="Item de Adaptação (sonoros e luminosos, rádio, grafismo, blindagem)">Item de Adaptação (sonoros, luminosos, grafismo, rádio, câmeras, blindagem, etc)</option>
+                                    <option value="revisão (troca de óleo, filtros, etc)">Revisão (troca de óleo, filtros, etc)</option>
+                                </select>
+                            </div>
+
+                            <!-- Descrição Curta -->
+                            <div class="form-group full-width">
+                                <label for="descricaoInput">Descrição Curta do Serviço/Problema *</label>
+                                <textarea id="descricaoInput" rows="3" placeholder="⚠️ Selecione a razão do acionamento acima primeiro..." oninput="checkDescPrefix()" disabled required></textarea>
+                                <span id="charCountLabel" class="char-counter">0 caracteres (mínimo 10 adicionais)</span>
+                            </div>
+
+                            <!-- Endereço da Concessionária -->
+                            <div class="form-group full-width">
+                                <label for="enderecoInput">Endereço da Concessionária *</label>
+                                <input type="text" id="enderecoInput" placeholder="Copie o endereço do Google Maps..." required>
+                                <span class="address-helper">Ex: Av. General Pedro Leon Schneider, 59 - Santana, São Paulo - SP, 02012-110</span>
+                            </div>
+
+                            <!-- Veículo permaneceu baixado? -->
+                            <div class="form-group">
+                                <label for="baixadoSelect">Veículo permaneceu baixado? *</label>
+                                <select id="baixadoSelect" required>
+                                    <option value="NÃO">NÃO</option>
+                                    <option value="SIM">SIM</option>
+                                </select>
+                            </div>
+
+                            <!-- Houve Negativa da Concessionária? -->
+                            <div class="form-group">
+                                <label for="negativaSelect">Houve Negativa da Concessionária? *</label>
+                                <select id="negativaSelect" required>
+                                    <option value="NÃO">NÃO</option>
+                                    <option value="SIM">SIM</option>
+                                </select>
+                            </div>
+
+                            <!-- Pergunta de Resolução -->
+                            <div class="form-group full-width" style="text-align: center; padding: 15px 0; border-top: 1px solid #222; margin-top: 15px;">
+                                <label style="font-weight: bold; color: var(--accent-blue); display: block; margin-bottom: 12px; font-size: 0.95rem;">
+                                    ⚠️ O PROBLEMA/SERVIÇO FOI RESOLVIDO HOJE? ⚠️
+                                </label>
+                                <div style="display: flex; justify-content: center; gap: 30px;">
+                                    <!-- Opção SIM -->
+                                    <div style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                                        <input type="checkbox" id="resolveSimCheckbox" onchange="handleResolveOptionChange('SIM')" style="width: 22px; height: 22px; cursor: pointer; accent-color: var(--accent-green);">
+                                        <label for="resolveSimCheckbox" style="font-weight: 700; color: var(--accent-green); cursor: pointer; font-size: 1rem;">SIM</label>
+                                    </div>
+                                    <!-- Opção NÃO -->
+                                    <div style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                                        <input type="checkbox" id="resolveNaoCheckbox" onchange="handleResolveOptionChange('NÃO')" style="width: 22px; height: 22px; cursor: pointer; accent-color: var(--accent-red);">
+                                        <label for="resolveNaoCheckbox" style="font-weight: 700; color: var(--accent-red); cursor: pointer; font-size: 1rem;">NÃO</label>
+                                    </div>
+                                </div>
+                                <!-- Input real oculto que envia os dados para a planilha -->
+                                <input type="checkbox" id="markAsResolvedCheckbox" style="display: none;">
+                            </div>
+
+                            <!-- Observações -->
+                            <div class="form-group full-width">
+                                <label for="observacaoInput">Observações (opcional)</label>
+                                <textarea id="observacaoInput" rows="2" placeholder="Ex: ACIDENTE, SINDICÂNCIA, OUTROS..." oninput="handleObservacaoInput()"></textarea>
+                            </div>
+
+                            <!-- Seção de Dados do Preenchedor (Bloqueada por padrão) -->
+                            <div id="preenchedorSection" class="disabled-section" style="width: 100%; display: contents;">
+                                <!-- Dados do Preenchedor -->
+                                <div class="form-group full-width" style="border-top: 1px solid #222; padding-top: 20px; margin-top: 10px;">
+                                    <h3 style="color: var(--accent-green); font-size: 1.1rem; margin-bottom: 5px;">DADOS DO PREENCHEDOR</h3>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="preenchedorPosto">Posto/Graduação *</label>
+                                    <select id="preenchedorPosto" required>
+                                        <option value="">Selecione...</option>
+                                        <option value="Sd PM">Sd PM</option>
+                                        <option value="Cb PM">Cb PM</option>
+                                        <option value="3º Sgt PM">3º Sgt PM</option>
+                                        <option value="2º Sgt PM">2º Sgt PM</option>
+                                        <option value="1º Sgt PM">1º Sgt PM</option>
+                                        <option value="Subten PM">Subten PM</option>
+                                        <option value="2º Ten PM">2º Ten PM</option>
+                                        <option value="1º Ten PM">1º Ten PM</option>
+                                        <option value="Cap PM">Cap PM</option>
+                                        <option value="Maj PM">Maj PM</option>
+                                        <option value="Ten Cel PM">Ten Cel PM</option>
+                                        <option value="Cel PM">Cel PM</option>
+                                    </select>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="preenchedorRE">RE *</label>
+                                    <input type="text" id="preenchedorRE" placeholder="Ex: 123456-7" required>
+                                </div>
+
+                                <div class="form-group full-width">
+                                    <label for="preenchedorNome">Nome Completo *</label>
+                                    <input type="text" id="preenchedorNome" placeholder="Ex: JOÃO SILVA" oninput="this.value = this.value.toUpperCase();" required>
+                                </div>
+
+                                <!-- Checkbox de Confirmação Final -->
+                                <div class="form-group full-width" style="display: flex; flex-direction: column; align-items: center; gap: 8px; text-align: center; padding: 15px 0; border-top: 1px solid #222; margin-top: 15px;">
+                                    <input type="checkbox" id="confirmCorrectData" onchange="handleConfirmCorrectDataChange(this)" style="width: 20px; height: 20px; cursor: pointer;">
+                                    <label for="confirmCorrectData" style="font-weight: 600; cursor: pointer; color: var(--accent-green);">CONFIRMO QUE AS INFORMAÇÕES PRESTADAS ESTÃO CORRETAS *</label>
+                                </div>
+                            </div>
+
+                        </div>
+                        <button type="submit" id="submitBtnAcionamento" class="submit-btn" style="margin-top: 30px;" disabled>Enviar Acionamento</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- ABA 2: INFORMAR SE FOI RESOLVIDO -->
+        <div id="tab-status" class="tab-content">
+            <div class="card">
+                <div class="form-title">Informar se foi Resolvido</div>
+                
+                <div class="search-row" style="display: flex; gap: 15px; flex-wrap: wrap; margin-bottom: 25px;">
+                    <div class="form-group" style="flex: 1; min-width: 200px; margin-bottom: 0;">
+                        <label for="searchOpmStatus" style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 4px; display: block;">Filtrar por Unidade (OPM)</label>
+                        <select id="searchOpmStatus" style="width: 100%; height: 45px; background-color: var(--input-bg); border: 1px solid var(--border-color); color: #fff; border-radius: 8px; padding: 0 12px; font-size: 0.9rem; outline: none; transition: border-color 0.2s;">
+                            <option value="">Todas as Unidades (OPM)...</option>
+                        </select>
+                    </div>
+                    <div class="form-group" style="flex: 1; min-width: 200px; margin-bottom: 0;">
+                        <label for="searchPlateStatus" style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 4px; display: block;">Filtrar por Placa</label>
+                        <input type="text" id="searchPlateStatus" placeholder="Buscar por placa..." style="text-transform: uppercase; height: 45px; width: 100%; margin-bottom: 0;">
+                    </div>
+                    <div class="form-group" style="display: flex; align-items: flex-end; min-width: 120px; margin-bottom: 0;">
+                        <button type="button" class="search-btn" onclick="buscarTicketsAtivos()" style="height: 45px; width: 100%;">Buscar</button>
+                    </div>
+                </div>
+
+                <div id="ticketsListContainer">
+                    <div style="text-align: center; color: var(--text-muted); font-style: italic; padding: 20px 0;">
+                        Selecione a OPM ou digite a placa acima para carregar as garantias pendentes.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- CONFIGURATION FOOTER -->
+    <div class="config-bar">
+        <span>CMM Frota &copy; 2026</span>
+    </div>
+
+    <!-- LOADING OVERLAY -->
+    <div class="overlay" id="loadingOverlay">
+        <div class="spinner"></div>
+        <div class="overlay-text" id="overlayText">ENVIANDO DADOS...</div>
+    </div>
+
+    <!-- CONFIG MODAL OVERLAY -->
+    <div id="modalOverlay" style="display:none; position:fixed; top:0; left:0; right:0; bottom:0; background-color:rgba(0,0,0,0.8); z-index:19999;"></div>
+
+    <!-- SUCCESS MODAL FOR OPTION 3 -->
+    <div id="successModal" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 90%; max-width: 500px; background-color: #1a1a1a; border: 2px solid var(--accent-green); border-radius: 12px; padding: 30px; z-index: 20000; box-shadow: 0 0 40px rgba(0, 255, 144, 0.4); text-align: center;">
+        <span style="font-size: 3rem; display: block; margin-bottom: 15px;">✓</span>
+        <h3 style="color: var(--accent-green); margin-bottom: 15px; font-size: 1.4rem;">Acionamento Registrado!</h3>
+        <p style="color: #ccc; font-size: 0.95rem; line-height: 1.6; margin-bottom: 25px;" id="successModalText">
+            Os dados do acionamento foram salvos no Google Sheets.
+        </p>
+        <div id="whatsappActionContainer" style="display: none; background-color: #222; border: 1px dashed var(--accent-green); border-radius: 8px; padding: 15px; margin-bottom: 20px;">
+            <p id="whatsWarningText" style="color: var(--accent-orange); font-size: 0.85rem; font-weight: 700; margin-bottom: 10px;">
+                ⚠️ ATENÇÃO: Envie o documento da OS/Negativa!
+            </p>
+            <p id="whatsHelperText" style="color: #bbb; font-size: 0.8rem; line-height: 1.4; margin-bottom: 15px;">
+                Clique no botão abaixo para abrir o WhatsApp e enviar o arquivo PDF/Imagem da negativa para a equipe responsável.
+            </p>
+            <a id="whatsappBtn" href="#" target="_blank" class="submit-btn" style="background-color: #25D366; color: #fff; text-decoration: none; display: inline-flex; align-items: center; justify-content: center; gap: 10px; font-weight: bold; width: 100%; height: 45px; border-radius: 6px;">
+                💬 Enviar OS / Negativa por WhatsApp
+            </a>
+        </div>
+        <button type="button" class="config-btn" onclick="closeSuccessModal()" style="margin-top: 10px; width: 100%; height: 40px; font-weight: 600;">Fechar e Voltar</button>
+    </div>
+
+    <!-- MODAL DE ALERTA DE DUPLO NÃO -->
+    <div id="doubleNoModal" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 90%; max-width: 500px; background-color: #1a1a1a; border: 2px solid var(--accent-red); border-radius: 12px; padding: 30px; z-index: 20000; box-shadow: 0 0 40px rgba(255, 60, 172, 0.4); text-align: center;">
+        <span style="font-size: 3.5rem; display: block; margin-bottom: 15px; color: var(--accent-red);">⚠️</span>
+        <h3 style="color: var(--accent-red); margin-bottom: 20px; font-size: 1.6rem; font-weight: 800; letter-spacing: 1px;">ATENÇÃO!</h3>
+        <p style="color: #fff; font-size: 1.05rem; line-height: 1.6; margin-bottom: 30px; font-weight: 600; text-align: center;">
+            Você marcou que o veículo <span style="color: var(--accent-red); font-weight: bold;">NÃO ESTÁ BAIXADO</span>, e que <span style="color: var(--accent-red); font-weight: bold;">não houve NEGATIVA DE ATENDIMENTO</span>.<br><br>
+            O veículo realmente <span style="text-decoration: underline; font-weight: bold; color: #fff;">NÃO FOI RESOLVIDO</span>?
+        </p>
+        
+        <div style="display: flex; gap: 15px; justify-content: space-between;">
+            <button type="button" onclick="cancelDoubleNo()" style="flex: 1; background-color: var(--accent-red); color: #fff; border: none; height: 45px; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 0.9rem; transition: background 0.2s; outline: none;">
+                VOLTAR E CORRIGIR
+            </button>
+            <button type="button" onclick="confirmDoubleNo()" style="flex: 1; background-color: var(--accent-green); color: #000; border: none; height: 45px; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 0.9rem; transition: background 0.2s; outline: none;">
+                PROSSEGUIR
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // LISTA DE OPMS
+        const OPMS = ["1.BAEP","1.BPAMB","1.BPCHQ","1.BPM/I","1.BPM/M","1.BPRV","1.BPTRAN","1.EM/PM","10.BAEP","10.BPM/I","10.BPM/M","11.BAEP","11.BPM/I","11.BPM/M","12.BAEP","12.BPM/I","12.BPM/M","13.BAEP","13.BPM/I","13.BPM/M","14.BAEP","14.BPM/I","14.BPM/M","15.BAEP","15.BPM/I","15.BPM/M","16.BPM/I","16.BPM/M","17.BPM/I","17.BPM/M","18.BPM/I","18.BPM/M","19.BPM/I","19.BPM/M","2.BAEP","2.BPAMB","2.BPCHQ","2.BPM/I","2.BPM/M","2.BPRV","2.BPTRAN","20.BPM/I","20.BPM/M","21.BPM/I","21.BPM/M","22.BPM/I","22.BPM/M","23.BPM/I","23.BPM/M","24.BPM/I","24.BPM/M","25.BPM/I","25.BPM/M","26.BPM/I","26.BPM/M","27.BPM/I","27.BPM/M","28.BPM/I","28.BPM/M","29.BPM/I","29.BPM/M","3.BAEP","3.BPAMB","3.BPCHQ","3.BPM/I","3.BPM/M","3.BPRV","3.EM/PM","30.BPM/I","30.BPM/M","31.BPM/I","31.BPM/M","32.BPM/I","32.BPM/M","33.BPM/I","33.BPM/M","34.BPM/I","34.BPM/M","35.BPM/I","35.BPM/M","36.BPM/I","36.BPM/M","37.BPM/I","37.BPM/M","38.BPM/I","38.BPM/M","39.BPM/I","39.BPM/M","4.BAEP","4.BPAMB","4.BPCHQ","4.BPM/I","4.BPM/M","4.BPRV","4.EM/PM","40.BPM/I","40.BPM/M","41.BPM/I","42.BPM/I","43.BPM/I","43.BPM/M","44.BPM/I","45.BPM/I","46.BPM/I","46.BPM/M","47.BPM/I","48.BPM/I","48.BPM/M","49.BPM/I","49.BPM/M","5.BAEP","5.BPAMB","5.BPCHQ","5.BPM/I","5.BPM/M","5.BPRV","50.BPM/I","51.BPM/I","52.BPM/I","53.BPM/I","54.BPM/I","55.BPM/I","6.BAEP","6.BPM/I","6.BPM/M","6.BPRV","6.EM/PM","7.BAEP","7.BPM/I","7.BPM/M","8.BAEP","8.BPM/I","8.BPM/M","9.BAEP","9.BPM/I","9.BPM/M","APMAL","APMBB","APMCGE","APMCMSP","APMPGJ","APMPMSP","APMSAP","APMSSP","APMTCE","APMTJ","APMTJM","C COM SOC","C MED","C MIL","C MUS","C ODONT","CAES","CAJ","CAPS","CAVPM","CIAF","CIAP","CIPM","CMB","CMM","CMT GERAL","COORD OP PM","COPOM","CORREG PM","CPA/M-1","CPA/M-10","CPA/M-11","CPA/M-12","CPA/M-2","CPA/M-3","CPA/M-4","CPA/M-5","CPA/M-6","CPA/M-7","CPA/M-8","CPA/M-9","CPAMB","CPC","CPCHQ","CPI-1","CPI-10","CPI-2","CPI-3","CPI-4","CPI-5","CPI-6","CPI-7","CPI-8","CPI-9","CPM","CPRV","CPTRAN","CRPM","DEC","DF","DL","DP","DPCDH","DS","DSA/CG","DTIC","EEF","EM/PM","ESSD","ESSGT","GAB CMT G","PMRG","RPMON"];
+        
+        // DICIONÁRIO DE MARCA E MODELOS
+        const MARCAS_MODELOS = {
+            "Toyota": ["Corolla Cross", "Corolla", "Hilux", "Yaris", "Etios"],
+            "Chevrolet": ["Spin", "S-10", "Trailblazer", "Cruze", "Onix"],
+            "Ford": ["Ranger", "Territory", "Transit"],
+            "Mitsubishi": ["L200", "Pajero", "Outlander", "ASX"],
+            "Volkswagen": ["Virtus", "Gol", "T-Cross", "Amarok", "Polo"],
+            "Renault": ["Duster", "Logan", "Sandero", "Kwid", "Master"],
+            "Fiat": ["Scudo", "Cronos", "Toro", "Strada", "Fiorino", "Ducato"],
+            "Iveco": ["Daily"],
+            "Hyundai": ["Creta", "HB20", "Tucson"]
+        };
+
+        // VARIÁVEIS DE CONFIGURAÇÃO E CACHE
+        const API_URL = "https://script.google.com/macros/s/AKfycbxPloG_YjMC01xXQnTUsiTpBd7dcPxairGe9_i2DUzRiY59nuMl6eGsITtke5cjOAdb/exec";
+        let placasBancoDados = [];
+        let selectedPlaca = "";
+        let dbPlacasCarregado = false;
+        
+        // INICIALIZAÇÃO
+        function initPage() {
+            // Preenche OPMs de cadastro
+            const opmSelect = document.getElementById("opmSelect");
+            OPMS.forEach(opm => {
+                const opt = document.createElement("option");
+                opt.value = opm;
+                opt.textContent = opm;
+                opmSelect.appendChild(opt);
+            });
+
+            // Preenche OPMs de busca
+            const searchOpmSelect = document.getElementById("searchOpmStatus");
+            OPMS.forEach(opm => {
+                const opt = document.createElement("option");
+                opt.value = opm;
+                opt.textContent = opm;
+                searchOpmSelect.appendChild(opt);
+            });
+
+            // Preenche anos de 2020 a 2030
+            const anoSelect = document.getElementById("anoSelect");
+            for (let ano = 2020; ano <= 2030; ano++) {
+                const opt = document.createElement("option");
+                opt.value = ano;
+                opt.textContent = ano;
+                anoSelect.appendChild(opt);
+            }
+
+            // Baixa placas automaticamente
+            baixarPlacas();
+        }
+
+        // BAIXAR PLACAS DO BANCO DE DADOS (ULTRA-RÁPIDO COM CACHE LOCAL)
+        const URL_BANCO_DADOS = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSwYd0zPPCAVAWrx2XMWfPNY1ko6UGt9--kHygtU-UpVGVRGQUyirFry2CSmU7MB6on-R0nwt3LStbl/pub?gid=971139551&single=true&output=csv";
+        
+        function liberarCampoPlaca() {
+            const input = document.getElementById("placaInput");
+            if (input) {
+                input.disabled = false;
+                input.placeholder = "Busque a placa digitando (ex: EBA1234)...";
+                input.focus();
+            }
+        }
+
+        function travarCampoPlaca() {
+            const input = document.getElementById("placaInput");
+            if (input) {
+                input.disabled = true;
+                input.placeholder = "⏳ Carregando frota de viaturas, aguarde um segundo...";
+            }
+        }
+
+        function baixarPlacas() {
+            // 1. Tenta carregar do Cache Local Instantâneo (0 ms)
+            try {
+                const cached = localStorage.getItem("cmm_placas_cache");
+                if (cached) {
+                    const parsed = JSON.parse(cached);
+                    if (Array.isArray(parsed) && parsed.length > 0) {
+                        placasBancoDados = parsed;
+                        dbPlacasCarregado = true;
+                        liberarCampoPlaca();
+                        console.log("✓ Placas carregadas instantaneamente do Cache Local:", placasBancoDados.length);
+                    }
+                }
+            } catch (e) {
+                console.warn("Erro ao ler cache local:", e);
+            }
+
+            if (!dbPlacasCarregado) {
+                travarCampoPlaca();
+            }
+            
+            // 2. Baixa a versão mais recente em segundo plano via CSV
+            if (typeof Papa !== 'undefined') {
+                Papa.parse(URL_BANCO_DADOS, {
+                    download: true,
+                    header: true,
+                    skipEmptyLines: true,
+                    complete(results) {
+                        try {
+                            const data = results.data;
+                            placasBancoDados = data.map(r => {
+                                const placaKey = Object.keys(r).find(k => k.toLowerCase().includes("placa")) || "PLACA";
+                                const btlKey = Object.keys(r).find(k => k.toLowerCase().includes("btl")) || "BTL";
+                                const marcaModKey = Object.keys(r).find(k => k.toLowerCase().includes("marca")) || "MARCA/MODELO";
+                                const anoKey = Object.keys(r).find(k => k.toLowerCase().includes("ano")) || "ANO";
+                                
+                                const brandModelRaw = r[marcaModKey] ? r[marcaModKey].toString().trim() : "";
+                                let brand = "";
+                                let model = "";
+                                if (brandModelRaw.includes("/")) {
+                                    const parts = brandModelRaw.split("/");
+                                    brand = parts[0].trim();
+                                    model = parts[1].trim();
+                                } else {
+                                    brand = brandModelRaw;
+                                }
+                                
+                                return {
+                                    placa: (r[placaKey] || "").toString().toUpperCase().trim(),
+                                    opm: (r[btlKey] || "").toString().trim(),
+                                    marca: brand,
+                                    modelo: model,
+                                    ano: (r[anoKey] || "").toString().trim()
+                                };
+                            }).filter(p => p.placa.length > 3);
+                            
+                            dbPlacasCarregado = true;
+                            liberarCampoPlaca();
+                            try {
+                                localStorage.setItem("cmm_placas_cache", JSON.stringify(placasBancoDados));
+                            } catch(e) {}
+                            console.log("✓ Placas sincronizadas com sucesso:", placasBancoDados.length);
+                        } catch (e) {
+                            console.error("Erro ao processar CSV de placas:", e);
+                            liberarCampoPlaca();
+                        }
+                    },
+                    error(err) {
+                        console.error("Erro ao baixar CSV de placas, tentando API:", err);
+                        fetchPlacasApi();
+                    }
+                });
+            } else {
+                fetchPlacasApi();
+            }
+        }
+
+        function fetchPlacasApi() {
+            if (!API_URL) {
+                liberarCampoPlaca();
+                return;
+            }
+            fetch(API_URL + "?action=getPlacas")
+                .then(res => res.json())
+                .then(data => {
+                    if (Array.isArray(data)) {
+                        placasBancoDados = data;
+                        dbPlacasCarregado = true;
+                        liberarCampoPlaca();
+                        try {
+                            localStorage.setItem("cmm_placas_cache", JSON.stringify(placasBancoDados));
+                        } catch(e) {}
+                    }
+                })
+                .catch(err => {
+                    console.error("Erro ao baixar placas da API:", err);
+                    liberarCampoPlaca();
+                });
+        }
+
+        // BUSCA E FILTRAGEM DE PLACAS
+        function filterPlacas() {
+            const input = document.getElementById("placaInput");
+            const filter = input.value.toUpperCase().replace(/[^A-Z0-9]/g, "");
+            input.value = filter;
+            
+            selectedPlaca = filter;
+            document.getElementById("opmSelect").disabled = false;
+            document.getElementById("marcaSelect").disabled = false;
+            document.getElementById("modeloSelect").disabled = false;
+            document.getElementById("anoSelect").disabled = false;
+            
+            if (!dbPlacasCarregado || placasBancoDados.length === 0) {
+                return;
+            }
+            
+            const listDiv = document.getElementById("placaSuggestions");
+            listDiv.innerHTML = "";
+            
+            if (filter.length < 2) {
+                listDiv.style.display = "none";
+                return;
+            }
+            
+            const filtered = placasBancoDados.filter(p => p.placa.includes(filter));
+            
+            if (filtered.length === 0) {
+                const item = document.createElement("div");
+                item.className = "autocomplete-item";
+                item.textContent = "placa não encontrada";
+                item.style.cursor = "default";
+                item.style.color = "#aaa";
+                listDiv.appendChild(item);
+                listDiv.style.display = "block";
+                return;
+            }
+            
+            filtered.slice(0, 10).forEach(pObj => {
+                const item = document.createElement("div");
+                item.className = "autocomplete-item";
+                item.textContent = pObj.placa;
+                item.onclick = function() {
+                    selectPlaca(pObj);
+                };
+                listDiv.appendChild(item);
+            });
+            
+            listDiv.style.display = "block";
+        }
+
+        function selectPlaca(placaObj) {
+            selectedPlaca = placaObj.placa;
+            document.getElementById("placaInput").classList.add("hidden-section");
+            document.getElementById("placaSuggestions").style.display = "none";
+            
+            const badge = document.getElementById("selectedPlacaBadge");
+            const textSpan = document.getElementById("selectedPlacaText");
+            textSpan.textContent = selectedPlaca;
+            badge.classList.remove("hidden-section");
+
+            // Auto-preenche OPM, Marca, Modelo, Ano se vier do banco com lógica defensiva
+            if (dbPlacasCarregado) {
+                const opmSelect = document.getElementById("opmSelect");
+                const marcaSelect = document.getElementById("marcaSelect");
+                const modeloSelect = document.getElementById("modeloSelect");
+                const anoSelect = document.getElementById("anoSelect");
+
+                if (placaObj.opm) {
+                    // Normalização fuzzy de OPM (ex: "3º BPM/M" -> "3.BPM/M")
+                    const normOpm = placaObj.opm.toUpperCase().replace(/[ºº°ª]/g, ".").replace(/\s+/g, "").trim();
+                    let matchedOpmValue = "";
+                    
+                    Array.from(opmSelect.options).forEach(opt => {
+                        const normOpt = opt.value.toUpperCase().replace(/[ºº°ª]/g, ".").replace(/\s+/g, "").trim();
+                        if (normOpt && normOpt === normOpm) {
+                            matchedOpmValue = opt.value;
+                        }
+                    });
+
+                    if (matchedOpmValue) {
+                        opmSelect.value = matchedOpmValue;
+                    } else {
+                        // Se não encontrar na lista, adiciona dinamicamente a opção correspondente
+                        const opt = document.createElement("option");
+                        opt.value = placaObj.opm;
+                        opt.textContent = placaObj.opm;
+                        opmSelect.appendChild(opt);
+                        opmSelect.value = placaObj.opm;
+                    }
+                    opmSelect.disabled = true;
+                }
+
+                if (placaObj.marca) {
+                    marcaSelect.value = placaObj.marca;
+                    updateModelOptions(); // Carrega modelos da marca selecionada
+                    
+                    if (placaObj.modelo) {
+                        // Se o modelo não estiver na lista padrão, adiciona dinamicamente
+                        let matchedModel = Array.from(modeloSelect.options).some(o => o.value === placaObj.modelo);
+                        if (!matchedModel) {
+                            const opt = document.createElement("option");
+                            opt.value = placaObj.modelo;
+                            opt.textContent = placaObj.modelo;
+                            modeloSelect.appendChild(opt);
+                        }
+                        modeloSelect.value = placaObj.modelo;
+                    }
+                    
+                    marcaSelect.disabled = true;
+                    modeloSelect.disabled = true;
+                }
+
+                if (placaObj.ano) {
+                    // Se o ano do banco não estiver no dropdown 2020-2030, adiciona
+                    let matchedAno = Array.from(anoSelect.options).some(o => o.value === placaObj.ano);
+                    if (!matchedAno) {
+                        const opt = document.createElement("option");
+                        opt.value = placaObj.ano;
+                        opt.textContent = placaObj.ano;
+                        anoSelect.appendChild(opt);
+                    }
+                    anoSelect.value = placaObj.ano;
+                    anoSelect.disabled = true;
+                }
+            }
+        }
+
+        function clearSelectedPlaca() {
+            selectedPlaca = "";
+            const input = document.getElementById("placaInput");
+            input.value = "";
+            input.classList.remove("hidden-section");
+            
+            const badge = document.getElementById("selectedPlacaBadge");
+            badge.classList.add("hidden-section");
+
+            // Limpa e desabilita campos por padrão
+            const opmSelect = document.getElementById("opmSelect");
+            const marcaSelect = document.getElementById("marcaSelect");
+            const modeloSelect = document.getElementById("modeloSelect");
+            const anoSelect = document.getElementById("anoSelect");
+
+            opmSelect.value = "";
+            opmSelect.disabled = true;
+            marcaSelect.value = "";
+            marcaSelect.disabled = true;
+            modeloSelect.innerHTML = "<option value=''>Selecione a Marca primeiro...</option>";
+            modeloSelect.disabled = true;
+            anoSelect.value = "";
+            anoSelect.disabled = true;
+
+            // Desmarca a confirmação e resolvido
+            const chk = document.getElementById("confirmOpmVehicle");
+            chk.checked = false;
+            document.getElementById("resolveSimCheckbox").checked = false;
+            document.getElementById("resolveNaoCheckbox").checked = false;
+            document.getElementById("markAsResolvedCheckbox").checked = false;
+            
+            const obsInput = document.getElementById("observacaoInput");
+            const obsLabel = document.querySelector('label[for="observacaoInput"]');
+            if (obsInput && obsLabel) {
+                obsInput.required = false;
+                obsLabel.innerHTML = 'Observações (opcional)';
+                obsLabel.style.color = '';
+                obsInput.placeholder = "Ex: ACIDENTE, SINDICÂNCIA, OUTROS...";
+            }
+            document.getElementById("preenchedorSection").classList.add("disabled-section");
+            toggleServiceSection(false);
+
+            input.focus();
+        }
+
+        // FECHAR DROPDOWNS AO CLICAR FORA
+        document.addEventListener("click", function(e) {
+            if (!e.target.closest(".autocomplete-container")) {
+                document.getElementById("placaSuggestions").style.display = "none";
+            }
+        });
+
+        // POPULAR MODELOS DINAMICAMENTE
+        function updateModelOptions() {
+            const marca = document.getElementById("marcaSelect").value;
+            const modeloSelect = document.getElementById("modeloSelect");
+            modeloSelect.innerHTML = "";
+
+            if (!marca || !MARCAS_MODELOS[marca]) {
+                const opt = document.createElement("option");
+                opt.value = "";
+                opt.textContent = "Selecione a Marca primeiro...";
+                modeloSelect.appendChild(opt);
+                return;
+            }
+
+            const optDefault = document.createElement("option");
+            optDefault.value = "";
+            optDefault.textContent = "Selecione o Modelo...";
+            modeloSelect.appendChild(optDefault);
+
+            MARCAS_MODELOS[marca].forEach(modelo => {
+                const opt = document.createElement("option");
+                opt.value = modelo;
+                opt.textContent = modelo;
+                modeloSelect.appendChild(opt);
+            });
+            
+            const optOutro = document.createElement("option");
+            optOutro.value = "OUTRO";
+            optOutro.textContent = "Outro modelo...";
+            modeloSelect.appendChild(optOutro);
+        }
+
+        // LIMPAR KM INPUT (APENAS NÚMEROS)
+        function cleanKMInput(el) {
+            el.value = el.value.replace(/[^0-9]/g, "");
+        }
+
+        // PREFIXO DA DESCRIÇÃO E BOTÃO DE VALIDAÇÃO
+        function toggleServiceSection(checked) {
+            const section = document.getElementById("serviceDetailsSection");
+            if (checked) {
+                section.classList.remove("disabled-section");
+            } else {
+                section.classList.add("disabled-section");
+            }
+        }
+
+        function toggleSubmitButton(checked) {
+            document.getElementById("submitBtnAcionamento").disabled = !checked;
+        }
+
+        // VALIDAÇÃO E MODAL DE DUPLO NÃO ("NÃO BAIXADO" E "SEM NEGATIVA")
+        function handleConfirmCorrectDataChange(checkboxEl) {
+            const checked = checkboxEl.checked;
+            if (checked) {
+                const baixado = document.getElementById("baixadoSelect").value;
+                const negativa = document.getElementById("negativaSelect").value;
+                const resolvido = document.getElementById("markAsResolvedCheckbox").checked;
+                
+                // Se baixado == NÃO, negativa == NÃO, e o veículo NÃO foi resolvido
+                if (baixado === "NÃO" && negativa === "NÃO" && !resolvido) {
+                    showDoubleNoModal();
+                    return;
+                }
+            }
+            toggleSubmitButton(checked);
+        }
+
+        function showDoubleNoModal() {
+            document.getElementById("modalOverlay").style.display = "block";
+            document.getElementById("doubleNoModal").style.display = "block";
+        }
+
+        function confirmDoubleNo() {
+            document.getElementById("modalOverlay").style.display = "none";
+            document.getElementById("doubleNoModal").style.display = "none";
+            document.getElementById("confirmCorrectData").checked = true;
+            toggleSubmitButton(true);
+        }
+
+        function cancelDoubleNo() {
+            document.getElementById("modalOverlay").style.display = "none";
+            document.getElementById("doubleNoModal").style.display = "none";
+            document.getElementById("confirmCorrectData").checked = false;
+            toggleSubmitButton(false);
+        }
+
+        // ALTERAÇÃO DE OPÇÃO DE RESOLUÇÃO (SIM/NÃO)
+        function handleResolveOptionChange(option) {
+            const simChk = document.getElementById("resolveSimCheckbox");
+            const naoChk = document.getElementById("resolveNaoCheckbox");
+            const realChk = document.getElementById("markAsResolvedCheckbox");
+            const obsInput = document.getElementById("observacaoInput");
+            const obsLabel = document.querySelector('label[for="observacaoInput"]');
+            const preenchedorSection = document.getElementById("preenchedorSection");
+            
+            if (option === 'SIM') {
+                if (simChk.checked) {
+                    naoChk.checked = false;
+                    realChk.checked = true;
+                    
+                    // Observações opcional
+                    obsInput.required = false;
+                    obsLabel.innerHTML = 'Observações (opcional)';
+                    obsLabel.style.color = '';
+                    obsInput.placeholder = "Ex: ACIDENTE, SINDICÂNCIA, OUTROS...";
+                    
+                    // Desbloqueia Preenchedor
+                    preenchedorSection.classList.remove("disabled-section");
+                } else {
+                    realChk.checked = false;
+                    preenchedorSection.classList.add("disabled-section");
+                }
+            } else if (option === 'NÃO') {
+                if (naoChk.checked) {
+                    simChk.checked = false;
+                    realChk.checked = false;
+                    
+                    // Observações obrigatório (10 caracteres)
+                    obsInput.required = true;
+                    obsLabel.innerHTML = 'Observações (OBRIGATÓRIO - MÍNIMO 10 CARACTERES) *';
+                    obsLabel.style.color = 'var(--accent-red)';
+                    obsInput.placeholder = "Descreva detalhadamente por que o veículo não foi resolvido (mínimo 10 caracteres)...";
+                    
+                    // Verifica comprimento da observação para liberação
+                    handleObservacaoInput();
+                } else {
+                    obsInput.required = false;
+                    obsLabel.innerHTML = 'Observações (opcional)';
+                    obsLabel.style.color = '';
+                    obsInput.placeholder = "Ex: ACIDENTE, SINDICÂNCIA, OUTROS...";
+                    preenchedorSection.classList.add("disabled-section");
+                }
+            }
+            
+            // Reseta a confirmação final para garantir revalidação das regras
+            document.getElementById("confirmCorrectData").checked = false;
+            toggleSubmitButton(false);
+        }
+
+        function handleObservacaoInput() {
+            const naoChecked = document.getElementById("resolveNaoCheckbox").checked;
+            const obsInput = document.getElementById("observacaoInput");
+            const obsVal = obsInput.value.trim();
+            const preenchedorSection = document.getElementById("preenchedorSection");
+            
+            if (naoChecked) {
+                if (obsVal.length >= 10) {
+                    preenchedorSection.classList.remove("disabled-section");
+                } else {
+                    preenchedorSection.classList.add("disabled-section");
+                }
+            }
+        }
+
+        let activePrefix = "";
+        function handleRazaoChange(val) {
+            if (!val) {
+                activePrefix = "";
+                const textarea = document.getElementById("descricaoInput");
+                textarea.value = "";
+                textarea.disabled = true;
+                textarea.placeholder = "⚠️ Selecione a razão do acionamento acima primeiro...";
+                updateCharCount();
+                return;
+            }
+
+            if (val.toLowerCase().includes("revisão")) {
+                applyDescPrefix("REVISÃO");
+            } else {
+                applyDescPrefix("GARANTIA");
+            }
+        }
+
+        function applyDescPrefix(type) {
+            const textarea = document.getElementById("descricaoInput");
+            textarea.disabled = false;
+            textarea.placeholder = "Descreva com detalhes o problema ou serviço realizado...";
+            
+            const prefix = `[${type}] `;
+            let currentText = textarea.value;
+            if (currentText.startsWith("[REVISÃO] ")) {
+                currentText = currentText.substring(10);
+            } else if (currentText.startsWith("[GARANTIA] ")) {
+                currentText = currentText.substring(11);
+            }
+
+            textarea.value = prefix + currentText;
+            activePrefix = prefix;
+            updateCharCount();
+            textarea.focus();
+        }
+
+        function checkDescPrefix() {
+            const textarea = document.getElementById("descricaoInput");
+            if (activePrefix && !textarea.value.startsWith(activePrefix)) {
+                textarea.value = activePrefix + textarea.value.replace(/^\[.*?\]\s*/, "");
+            }
+            updateCharCount();
+        }
+
+        function updateCharCount() {
+            const textarea = document.getElementById("descricaoInput");
+            const label = document.getElementById("charCountLabel");
+            const content = textarea.value;
+            
+            let userLength = content.length;
+            if (activePrefix && content.startsWith(activePrefix)) {
+                userLength = content.length - activePrefix.length;
+            }
+
+            label.textContent = `${userLength} caracteres digitados (mínimo 10 adicionais)`;
+        }
+
+        // ENVIAR FORMULÁRIO DE ACIONAMENTO
+        function submitAcionamento(e) {
+            e.preventDefault();
+
+            if (!API_URL) {
+                alert("Erro: URL do Web App não configurada!");
+                return;
+            }
+
+            const chk = document.getElementById("confirmOpmVehicle");
+            if (!chk.checked) {
+                alert("Erro: Você deve confirmar que este é o veículo de sua OPM marcando a caixa de seleção!");
+                chk.focus();
+                return;
+            }
+
+            // Validar Placa
+            let placaFinal = "";
+            if (dbPlacasCarregado) {
+                if (!selectedPlaca) {
+                    alert("Erro: Escolha uma placa válida a partir da lista de buscas!");
+                    document.getElementById("placaInput").focus();
+                    return;
+                }
+                placaFinal = selectedPlaca;
+            } else {
+                const typedPlaca = document.getElementById("placaInput").value.trim().toUpperCase();
+                const regexPlaca = /^[A-Z]{3}[0-9][A-Z0-9][0-9]{2}$/;
+                if (!regexPlaca.test(typedPlaca)) {
+                    alert("Erro: Informe uma placa válida no padrão nacional (ex: ABC1D23 ou ABC1234, sem hífen).");
+                    document.getElementById("placaInput").focus();
+                    return;
+                }
+                placaFinal = typedPlaca;
+            }
+
+            // Validar Endereço
+            const endereco = document.getElementById("enderecoInput").value.trim();
+            const regexEndereco = /.+,.+-\s*[A-Z]{2}/i;
+            if (!regexEndereco.test(endereco)) {
+                alert("Erro no Endereço: Por favor, siga o formato padrão esperado (Ex: Av. Paulista, 1000 - São Paulo - SP). Certifique-se de incluir vírgula e a sigla do estado.");
+                document.getElementById("enderecoInput").focus();
+                return;
+            }
+
+            // Validação da descrição
+            const descValue = document.getElementById("descricaoInput").value;
+            let userLength = descValue.length;
+            if (activePrefix && descValue.startsWith(activePrefix)) {
+                userLength = descValue.length - activePrefix.length;
+            }
+
+            if (userLength < 10) {
+                alert("Erro: Descreva detalhadamente o problema com no mínimo 10 caracteres adicionais!");
+                document.getElementById("descricaoInput").focus();
+                return;
+            }
+
+            const negativaVal = document.getElementById("negativaSelect").value;
+            const baixadoVal = document.getElementById("baixadoSelect").value;
+            const resolvidoVal = document.getElementById("markAsResolvedCheckbox").checked ? "SIM" : "NÃO";
+
+            showLoading("CADASTRANDO ACIONAMENTO...");
+
+            const preenchedorPosto = document.getElementById("preenchedorPosto").value;
+            const preenchedorRE = document.getElementById("preenchedorRE").value.trim();
+            const preenchedorNome = document.getElementById("preenchedorNome").value.trim().toUpperCase();
+
+            const payload = {
+                action: "criarAcionamento",
+                opm: document.getElementById("opmSelect").value,
+                placa: placaFinal,
+                marca: document.getElementById("marcaSelect").value,
+                modelo: document.getElementById("modeloSelect").value,
+                ano: document.getElementById("anoSelect").value,
+                km: document.getElementById("kmInput").value,
+                razao: document.getElementById("razaoSelect").value,
+                descricao: descValue,
+                endereco: endereco,
+                baixado: baixadoVal,
+                negativa: negativaVal,
+                resolvido: resolvidoVal,
+                observacao: document.getElementById("observacaoInput").value,
+                preenchedorPosto: preenchedorPosto,
+                preenchedorRE: preenchedorRE,
+                preenchedorNome: preenchedorNome,
+                fotoFile: null,
+                negativaFile: null
+            };
+
+            fetch(API_URL, {
+                method: "POST",
+                mode: "no-cors",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload)
+            })
+            .then(() => {
+                hideLoading();
+                const opm = document.getElementById("opmSelect").value;
+                const marca = document.getElementById("marcaSelect").value;
+                const modelo = document.getElementById("modeloSelect").value;
+                showSuccessModal(placaFinal, opm, marca, modelo, (negativaVal === "SIM"), preenchedorPosto, preenchedorRE, preenchedorNome, baixadoVal, negativaVal);
+            })
+            .catch(err => {
+                hideLoading();
+                alert("Erro ao enviar dados. Verifique a URL do Web App ou sua conexão.");
+            });
+        }
+
+        function showSuccessModal(placa, opm, marca, modelo, hasNegativa, posto, re, nome, baixado, negativa) {
+            document.getElementById("modalOverlay").style.display = "block";
+            const modal = document.getElementById("successModal");
+            modal.style.display = "block";
+            
+            const textEl = document.getElementById("successModalText");
+            const whatsContainer = document.getElementById("whatsappActionContainer");
+            const whatsBtn = document.getElementById("whatsappBtn");
+            const warningEl = document.getElementById("whatsWarningText");
+            const helperEl = document.getElementById("whatsHelperText");
+            
+            // Mensagem formatada do WhatsApp com quebras de linhas duplas conforme solicitado e removida a sigla PM duplicada
+            const textMsg = `Acionamento de revisão/garantia.\n\nOPM: ${opm}\n\nVeículo: ${marca}/${modelo}\n\nPLACA: ${placa}\nVTR PERMANECEU BAIXADA: ${baixado}\nHOUVE NEGATIVA DE ATENDIMENTO: ${negativa}\n\nPREENCHEDOR: ${posto} RE ${re} ${nome}`;
+            
+            whatsBtn.href = `https://api.whatsapp.com/send?text=${encodeURIComponent(textMsg)}`;
+            whatsContainer.style.display = "block";
+            
+            if (hasNegativa) {
+                textEl.innerHTML = `O acionamento para o veículo <b>${placa}</b> foi registrado com sucesso na planilha.<br><br>Para anexar o Formulário de Negativa, envie o arquivo pelo WhatsApp ao seu Oficial Subfrota/Motomec.`;
+                if (warningEl) warningEl.style.display = "block";
+                if (helperEl) {
+                    helperEl.textContent = "Clique no botão abaixo para abrir o WhatsApp e enviar o arquivo PDF/Imagem da negativa para a equipe responsável.";
+                }
+                whatsBtn.innerHTML = "💬 Enviar OS / Negativa por WhatsApp";
+                whatsBtn.style.background = "#25D366";
+            } else {
+                textEl.innerHTML = `O acionamento para o veículo <b>${placa}</b> foi registrado com sucesso na planilha.`;
+                if (warningEl) warningEl.style.display = "none";
+                if (helperEl) {
+                    helperEl.textContent = "Clique no botão abaixo para notificar o seu Oficial Subfrota/Motomec sobre este acionamento no WhatsApp.";
+                }
+                whatsBtn.innerHTML = "💬 Notificar por WhatsApp";
+                whatsBtn.style.background = "#007BFF";
+            }
+        }
+
+        function closeSuccessModal() {
+            document.getElementById("modalOverlay").style.display = "none";
+            document.getElementById("successModal").style.display = "none";
+            resetForm();
+        }
+
+        function resetForm() {
+            document.getElementById("formAcionamento").reset();
+            clearSelectedPlaca();
+            activePrefix = "";
+            
+            const descArea = document.getElementById("descricaoInput");
+            descArea.disabled = true;
+            descArea.placeholder = "⚠️ Selecione a razão do acionamento acima primeiro...";
+            
+            document.getElementById("searchPlateStatus").value = "";
+            document.getElementById("searchOpmStatus").value = "";
+            document.getElementById("ticketsListContainer").innerHTML = `<div style="text-align: center; color: var(--text-muted); font-style: italic; padding: 20px 0;">Selecione a OPM ou digite a placa acima para carregar as garantias pendentes.</div>`;
+            
+            document.getElementById("markAsResolvedCheckbox").checked = false;
+            updateCharCount();
+            document.getElementById("submitBtnAcionamento").disabled = true;
+        }
+
+        // TABS NAVIGATION LÓGICA
+        function switchTab(tabId, btnEl) {
+            document.querySelectorAll(".tab-content").forEach(c => c.classList.remove("active"));
+            document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+
+            document.getElementById(tabId).classList.add("active");
+            btnEl.classList.add("active");
+            
+            if (tabId === "tab-status") {
+                document.getElementById("searchPlateStatus").focus();
+            }
+        }
+
+        // ABA 2: BUSCA DE ACIONAMENTOS ATIVOS (PENDENTES)
+        function buscarTicketsAtivos() {
+            const opmSelect = document.getElementById("searchOpmStatus");
+            const opmVal = opmSelect.value;
+            const input = document.getElementById("searchPlateStatus");
+            const filterPlaca = input.value.trim().toUpperCase();
+            
+            if (!API_URL) {
+                alert("Erro: URL do Web App não configurada!");
+                return;
+            }
+
+            if (!opmVal && !filterPlaca) {
+                alert("Por favor, selecione uma Unidade (OPM) ou informe uma placa para buscar.");
+                return;
+            }
+
+            const container = document.getElementById("ticketsListContainer");
+            container.innerHTML = `<div style="text-align: center; color: var(--accent-blue); font-weight: 500; padding: 20px 0;">
+                Buscando garantias ativas... ⏳
+            </div>`;
+
+            // Chama doGet no Web App com os filtros
+            const url = `${API_URL}?action=getTicketsAtivos&placa=${encodeURIComponent(filterPlaca)}&opm=${encodeURIComponent(opmVal)}`;
+
+            fetch(url)
+                .then(res => res.json())
+                .then(tickets => {
+                    if (tickets.error) {
+                        container.innerHTML = `<div style="color: var(--accent-red); font-weight: 500; text-align: center; padding: 20px 0;">
+                            ❌ Erro: ${tickets.error}
+                        </div>`;
+                        return;
+                    }
+
+                    // Filtro estrito secundário no frontend para evitar problemas de cache/versões antigas do script do Apps Script
+                    if (opmVal) {
+                        const normQuery = opmVal.toUpperCase().replace(/[º°ª]/g, ".").replace(/\s+/g, "").trim();
+                        tickets = tickets.filter(ticket => {
+                            const normTicket = (ticket.opm || "").toUpperCase().replace(/[º°ª]/g, ".").replace(/\s+/g, "").trim();
+                            return normTicket === normQuery;
+                        });
+                    }
+
+                    if (!Array.isArray(tickets) || tickets.length === 0) {
+                        const descFiltro = filterPlaca ? `para a placa ${filterPlaca}` : `para a OPM ${opmVal}`;
+                        container.innerHTML = `<div style="color: var(--accent-green); font-weight: 500; text-align: center; padding: 20px 0;">
+                            ✅ Nenhuma garantia pendente aberta ${descFiltro}.
+                        </div>`;
+                        return;
+                    }
+
+                    let html = "";
+                    tickets.forEach(ticket => {
+                        const hoje = new Date().toISOString().split('T')[0];
+                        html += `
+                            <div class="ticket-item">
+                                <div class="ticket-header">
+                                    <span class="ticket-plate">${ticket.placa}</span>
+                                    <span class="ticket-date">Aberto em: ${ticket.data}</span>
+                                </div>
+                                <div class="ticket-details">
+                                    <div class="detail-row">
+                                        <span>Unidade OPM</span>
+                                        <span>${ticket.opm}</span>
+                                    </div>
+                                    <div class="detail-row">
+                                        <span>Veículo</span>
+                                        <span>${ticket.marca} - ${ticket.modelo}</span>
+                                    </div>
+                                    <div class="detail-row" style="grid-column: span 2;">
+                                        <span>Problema / Descrição</span>
+                                        <span>${ticket.descricao}</span>
+                                    </div>
+                                </div>
+                                <div class="ticket-action">
+                                    <label class="checkbox-container">
+                                        <input type="checkbox" id="check_resolvido_${ticket.rowNum}" onchange="toggleDateInput(${ticket.rowNum})">
+                                        Marcar como Resolvido
+                                    </label>
+                                    <div class="form-group" style="margin-bottom: 0;">
+                                        <input type="date" id="date_resolvido_${ticket.rowNum}" value="${hoje}" style="padding: 8px 12px; font-size: 0.85rem;">
+                                    </div>
+                                    <button class="action-save-btn" onclick="salvarStatusTicket(${ticket.rowNum}, '${ticket.placa}')">Salvar</button>
+                                </div>
+                            </div>
+                        `;
+                    });
+                    container.innerHTML = html;
+                })
+                .catch(err => {
+                    container.innerHTML = `<div style="color: var(--accent-red); font-weight: 500; text-align: center; padding: 20px 0;">
+                        ❌ Erro ao conectar com o servidor. Verifique o URL cadastrado na API.
+                    </div>`;
+                    console.error("Erro ao buscar tickets:", err);
+                });
+        }
+
+        function toggleDateInput(rowNum) {
+            // Mantido habilitado sempre para permitir seleção de datas retroativas
+        }
+
+        // SALVAR A ATUALIZAÇÃO DO STATUS
+        function salvarStatusTicket(rowNum, placa) {
+            const checkbox = document.getElementById(`check_resolvido_${rowNum}`);
+            const dateInput = document.getElementById(`date_resolvido_${rowNum}`);
+
+            if (!checkbox.checked) {
+                alert("Erro: Para salvar a atualização, você deve marcar a caixa 'Marcar como Resolvido' primeiro.");
+                return;
+            }
+
+            if (!dateInput.value) {
+                alert("Erro: Informe a data em que o problema do veículo foi resolvido.");
+                dateInput.focus();
+                return;
+            }
+
+            showLoading("ATUALIZANDO STATUS...");
+
+            const payload = {
+                action: "atualizarStatus",
+                placa: placa,
+                rowNum: rowNum,
+                dataSolucao: dateInput.value
+            };
+
+            fetch(API_URL, {
+                method: "POST",
+                mode: "no-cors",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(payload)
+            })
+            .then(() => {
+                hideLoading();
+                alert(`Garantia do veículo ${placa} marcada como resolvida com sucesso no Sheets!`);
+                buscarTicketsAtivos(); // Recarrega a busca para remover o item resolvido
+            })
+            .catch(err => {
+                hideLoading();
+                alert("Erro ao gravar dados no Sheets.");
+                console.error(err);
+            });
+        }
+
+        // CONFIG LÓGICA DESATIVADA (URL FIXADA NO CÓDIGO)
+
+        // LOADING OVERLAYS
+        function showLoading(msg) {
+            document.getElementById("overlayText").textContent = msg;
+            document.getElementById("loadingOverlay").style.display = "flex";
+        }
+
+        function hideLoading() {
+            document.getElementById("loadingOverlay").style.display = "none";
+        }
+
+        // Inicializa a página ao carregar
+        window.onload = initPage;
+    </script>
+</body>
+</html>

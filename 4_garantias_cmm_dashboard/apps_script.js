@@ -1,6 +1,6 @@
 /**
  * Google Apps Script - SISTEMA INTEGRADO CMM FROTA (GESTÃO E PORTAL DO USUÁRIO)
- * 
+ *
  * Este arquivo unifica o backend da API do Portal de Garantias com todas as regras
  * de padronização, envio de e-mails, processamento em massa e gatilhos existentes.
  */
@@ -23,7 +23,7 @@ const CFG_GARANTIA = {
  */
 function onOpen(e) {
   verificarVeiculosSemBaixa();
-  
+
   // Criar menu personalizado direto na interface do Google Sheets
   SpreadsheetApp.getUi()
     .createMenu("📌 CMM Frota")
@@ -51,22 +51,22 @@ function executarSincronizacaoManualDrive() {
  */
 function onEdit(e) {
   const sh = e.range.getSheet();
-  if (sh.getName() !== "dados_garantia") return; 
+  if (sh.getName() !== "dados_garantia") return;
   const range = e.range;
   const startRow = range.getRow();
   const numRows = range.getNumRows();
   const startCol = range.getColumn();
   const numCols = range.getNumCols();
-  
+
   if (startRow + numRows - 1 <= 1) return;
   // Processa cada linha alterada na colagem/edição
   for (let r = 0; r < numRows; r++) {
     const row = startRow + r;
     if (row <= 1) continue;
-    const cellL = sh.getRange(row, 12); 
-    const cellM = sh.getRange(row, 13); 
-    const cellR = sh.getRange(row, 18); 
-    const cellS = sh.getRange(row, 19); 
+    const cellL = sh.getRange(row, 12);
+    const cellM = sh.getRange(row, 13);
+    const cellR = sh.getRange(row, 18);
+    const cellS = sh.getRange(row, 19);
     // Se a coluna R (Resolvido) foi editada/colada
     if (startCol <= 18 && startCol + numCols - 1 >= 18) {
       const marcado = cellR.getValue();
@@ -103,7 +103,7 @@ function aoEnviarFormulario(e) {
   var sheet = e.range.getSheet();
   var row = e.range.getRow();
   var values = e.range.getValues()[0];
-  
+
   var dadosLimpos = limparDados(values);
   sheet.getRange(row, 1, 1, dadosLimpos.length).setValues([dadosLimpos]);
 
@@ -123,7 +123,7 @@ function aoEnviarFormulario(e) {
         var cellM = shGarantia.getRange(row, 13);
         var cellR = shGarantia.getRange(row, 18);
         var cellS = shGarantia.getRange(row, 19);
-        
+
         var hoje = new Date();
         hoje.setHours(0, 0, 0, 0);
 
@@ -169,19 +169,19 @@ function aoEnviarFormulario(e) {
  */
 function doGet(e) {
   const action = e.parameter.action;
-  
+
   if (action === "getPlacas") {
     return handleGetPlacas();
   }
-  
+
   if (action === "getTicketsAtivos") {
     return handleGetTicketsAtivos(e.parameter.opm, e.parameter.placa);
   }
-  
+
   if (action === "getProvidencias") {
     return handleGetProvidencias();
   }
-  
+
   if (action === "sincronizarDrive") {
     try {
       const novos = monitorarPastaDriveEPreencherPlanilha();
@@ -190,7 +190,7 @@ function doGet(e) {
       return jsonResponse({ error: err.toString() });
     }
   }
-  
+
   return ContentService.createTextOutput(JSON.stringify({ error: "Ação inválida ou não especificada." }))
                        .setMimeType(ContentService.MimeType.JSON);
 }
@@ -202,12 +202,12 @@ function handleGetProvidencias() {
   if (!sheet) {
     return jsonResponse({ error: "Aba 'providencias_adm' não encontrada." });
   }
-  
+
   const data = sheet.getDataRange().getValues();
   if (data.length <= 1) {
     return jsonResponse([]);
   }
-  
+
   function normalizeHeader(str) {
     if (!str) return "";
     return str.toString()
@@ -216,31 +216,31 @@ function handleGetProvidencias() {
               .replace(/[\u0300-\u036f]/g, "") // remove acentos
               .trim();
   }
-  
+
   const headers = data[0].map(normalizeHeader);
-  
+
   const dataIdx = headers.indexOf("data");
   const contratadaIdx = headers.indexOf("contratada");
-  
+
   // Localizacao flexivel para providencia
   let providenciaIdx = headers.indexOf("providencia (nº documento)");
   if (providenciaIdx === -1) providenciaIdx = headers.indexOf("providencia");
   if (providenciaIdx === -1) {
     providenciaIdx = headers.findIndex(h => h.indexOf("providencia") !== -1 || h.indexOf("documento") !== -1);
   }
-  
+
   const assuntoIdx = headers.indexOf("assunto");
   const respondidoIdx = headers.findIndex(h => h.indexOf("respondido") !== -1);
   const observacoesIdx = headers.findIndex(h => h.indexOf("observaco") !== -1);
-  
+
   const providencias = [];
   for (let i = 1; i < data.length; i++) {
     const row = data[i];
     const contratadaVal = contratadaIdx !== -1 ? row[contratadaIdx] : "";
     const providenciaVal = providenciaIdx !== -1 ? row[providenciaIdx] : "";
-    
+
     if (!contratadaVal && !providenciaVal) continue;
-    
+
     let dataFormatada = "";
     if (dataIdx !== -1 && row[dataIdx]) {
       if (row[dataIdx] instanceof Date) {
@@ -249,7 +249,7 @@ function handleGetProvidencias() {
         dataFormatada = row[dataIdx].toString().trim();
       }
     }
-    
+
     providencias.push({
       data: dataFormatada,
       contratada: contratadaVal.toString().trim(),
@@ -259,7 +259,7 @@ function handleGetProvidencias() {
       observacoes: observacoesIdx !== -1 ? row[observacoesIdx].toString().trim() : ""
     });
   }
-  
+
   return jsonResponse(providencias);
 }
 
@@ -278,17 +278,17 @@ function doPost(e) {
     } else {
       postData = e.parameter;
     }
-    
+
     const action = postData ? postData.action : null;
-    
+
     if (action === "criarAcionamento") {
       return handleCriarAcionamento(postData);
     }
-    
+
     if (action === "atualizarStatus") {
       return handleAtualizarStatus(postData);
     }
-    
+
     return jsonResponse({ success: false, error: "Ação POST inválida." });
   } catch (error) {
     return jsonResponse({ success: false, error: error.toString() });
@@ -302,22 +302,22 @@ function handleGetPlacas() {
   if (!sheet) {
     return jsonResponse({ error: "Aba 'banco_dados' não encontrada." });
   }
-  
+
   const data = sheet.getDataRange().getValues();
   if (data.length <= 1) {
     return jsonResponse([]);
   }
-  
+
   const headers = data[0].map(h => h.toString().toLowerCase().trim());
   const placaIdx = headers.indexOf("placa");
   const btlIdx = headers.indexOf("btl");
   const marcaModIdx = headers.indexOf("marca/modelo");
   const anoIdx = headers.indexOf("ano");
-  
+
   if (placaIdx === -1) {
     return jsonResponse({ error: "Coluna 'PLACA' não encontrada na aba banco_dados." });
   }
-  
+
   const placasObj = [];
   for (let i = 1; i < data.length; i++) {
     const row = data[i];
@@ -333,7 +333,7 @@ function handleGetPlacas() {
       } else {
         brand = brandModelRaw;
       }
-      
+
       // Normalização de marcas para corresponder aos selects do HTML
       const uBrand = brand.toUpperCase();
       if (uBrand === "GM" || uBrand === "CHEVROLET") {
@@ -355,7 +355,7 @@ function handleGetPlacas() {
       } else if (uBrand === "IVECO") {
         brand = "Iveco";
       }
-      
+
       placasObj.push({
         placa: val.toString().toUpperCase().trim(),
         opm: btlIdx !== -1 ? row[btlIdx].toString().trim() : "",
@@ -365,7 +365,7 @@ function handleGetPlacas() {
       });
     }
   }
-  
+
   // Ordena por placa
   placasObj.sort((a, b) => a.placa.localeCompare(b.placa));
   return jsonResponse(placasObj);
@@ -378,29 +378,29 @@ function handleGetTicketsAtivos(opm, placa) {
   if (!sheet) {
     return jsonResponse({ error: "Aba 'dados_garantia' não encontrada." });
   }
-  
+
   const data = sheet.getDataRange().getValues();
   if (data.length <= 1) {
     return jsonResponse([]);
   }
-  
+
   const headers = data[0].map(h => h.toString().toLowerCase().trim());
-  
+
   // Índices importantes
   const placaIdx = headers.findIndex(h => h.includes("placa"));
   const unidadeIdx = headers.findIndex(h => h.includes("unidade") || h.includes("opm"));
   const situacaoIdx = 17; // Coluna R (index 17 em 0-based) como padrão para "Foi resolvido?"
-  
+
   const tickets = [];
-  
+
   for (let i = 1; i < data.length; i++) {
     const row = data[i];
     const ticketPlaca = placaIdx !== -1 ? row[placaIdx].toString().toUpperCase().trim() : "";
     const ticketOpm = unidadeIdx !== -1 ? row[unidadeIdx].toString().trim() : "";
-    
+
     // Coluna R (resolvido): Se for checkbox, o Sheets lê como true/false
     const resolvido = row[situacaoIdx] === true || String(row[situacaoIdx]).toUpperCase() === "SIM" || String(row[situacaoIdx]).toUpperCase() === "TRUE";
-    
+
     if (!resolvido && ticketPlaca) {
       // Filtragem opcional no servidor para economizar banda
       if (placa && ticketPlaca !== placa.toUpperCase().trim()) continue;
@@ -409,7 +409,7 @@ function handleGetTicketsAtivos(opm, placa) {
         const normTicket = ticketOpm.toUpperCase().replace(/[º°ª]/g, ".").replace(/\s+/g, "").trim();
         if (normQuery !== normTicket) continue;
       }
-      
+
       const ticket = {
         rowNum: i + 1, // Guarda o número físico da linha (1-based)
         data: row[0] ? Utilities.formatDate(new Date(row[0]), Session.getScriptTimeZone(), "dd/MM/yyyy HH:mm") : "",
@@ -422,7 +422,7 @@ function handleGetTicketsAtivos(opm, placa) {
       tickets.push(ticket);
     }
   }
-  
+
   return jsonResponse(tickets);
 }
 
@@ -444,9 +444,9 @@ function handleCriarAcionamento(postData) {
   if (!sheet) {
     return jsonResponse({ success: false, error: "Aba 'dados_preenchimento' não encontrada." });
   }
-  
+
   const timestamp = new Date();
-  
+
   // Monta a linha com os dados básicos e os dados do preenchedor (Colunas P, Q, R)
   const newRow = [
     timestamp,                                   // Col A: Carimbo de data/hora
@@ -468,21 +468,21 @@ function handleCriarAcionamento(postData) {
     postData.preenchedorRE || "",                // Col Q: RE
     postData.preenchedorNome ? postData.preenchedorNome.toString().toUpperCase().trim() : "" // Col R: Nome do Preenchedor (Auto uppercase backend)
   ];
-  
+
   const cleanedRow = limparDados(newRow);
   const targetRow = getFirstEmptyRow(sheet);
   sheet.getRange(targetRow, 1, 1, cleanedRow.length).setValues([cleanedRow]);
-  
+
   // Se foi marcado como resolvido na criação, atualiza diretamente a aba dados_garantia
   if (postData.resolvido === "SIM") {
     const shGarantia = ss.getSheetByName("dados_garantia");
     if (shGarantia) {
       shGarantia.getRange(targetRow, 18).setValue(true); // Coluna R (Resolvido)
       shGarantia.getRange(targetRow, 19).setValue(timestamp); // Coluna S (Data Resolução)
-      
+
       const cellL = shGarantia.getRange(targetRow, 12); // Coluna L (data_baixa)
       const cellM = shGarantia.getRange(targetRow, 13); // Coluna M (tempo_baixa)
-      
+
       // Se houver data de baixa, calcula os dias. Senão, calcula com base no Carimbo (A)
       let dataBaixaVal = cellL.getValue();
       let d1 = dataBaixaVal ? new Date(dataBaixaVal) : timestamp;
@@ -498,7 +498,7 @@ function handleCriarAcionamento(postData) {
       cellM.setValue(diff >= 0 ? diff : 0);
     }
   }
-  
+
   return jsonResponse({ success: true, message: "Acionamento de garantia cadastrado com sucesso!" });
 }
 
@@ -509,18 +509,18 @@ function handleAtualizarStatus(postData) {
   if (!sheet) {
     return jsonResponse({ success: false, error: "Aba 'dados_garantia' não encontrada." });
   }
-  
+
   const placa = (postData.placa || "").toUpperCase().trim();
   const rowNum = Number(postData.rowNum);
   const dataSolucao = postData.dataSolucao || ""; // Formato "yyyy-MM-dd" vindo do input do HTML
-  
+
   if (!placa) {
     return jsonResponse({ success: false, error: "Placa não informada." });
   }
-  
+
   let targetRow = -1;
   const data = sheet.getDataRange().getValues();
-  
+
   // Se recebemos a linha física recomendada no get, validamos se a placa bate
   if (rowNum && rowNum <= data.length) {
     const headers = data[0].map(h => h.toString().toLowerCase().trim());
@@ -529,13 +529,13 @@ function handleAtualizarStatus(postData) {
       targetRow = rowNum;
     }
   }
-  
+
   // Fallback: Varre a planilha buscando a última ocorrência pendente daquela placa
   if (targetRow === -1) {
     const headers = data[0].map(h => h.toString().toLowerCase().trim());
     const placaIdx = headers.findIndex(h => h.includes("placa"));
     const situacaoIdx = 17; // Coluna R
-    
+
     if (placaIdx !== -1) {
       for (let i = data.length - 1; i >= 1; i--) {
         if (data[i][placaIdx].toString().toUpperCase().trim() === placa) {
@@ -548,14 +548,14 @@ function handleAtualizarStatus(postData) {
       }
     }
   }
-  
+
   if (targetRow === -1) {
     return jsonResponse({ success: false, error: "Nenhum acionamento ativo encontrado para a placa " + placa });
   }
-  
+
   // Coluna R (18): Marca como RESOLVIDO (true/checkbox)
   sheet.getRange(targetRow, 18).setValue(true);
-  
+
   let dataFim = new Date();
   if (dataSolucao) {
     // Converte de "yyyy-MM-dd" para objeto Date para que o Sheets reconheça nativamente o calendário
@@ -565,7 +565,7 @@ function handleAtualizarStatus(postData) {
     }
   }
   dataFim.setHours(0, 0, 0, 0);
-  
+
   // Coluna S (19): Data de solução
   sheet.getRange(targetRow, 19).setValue(dataFim);
 
@@ -573,7 +573,7 @@ function handleAtualizarStatus(postData) {
   const cellL = sheet.getRange(targetRow, 12); // Coluna L: data_baixa
   const cellM = sheet.getRange(targetRow, 13); // Coluna M: tempo_baixa
   congelarDias(cellL, cellM, dataFim);
-  
+
   return jsonResponse({ success: true, message: "Status do veículo atualizado com sucesso!" });
 }
 
@@ -613,7 +613,7 @@ function verificarVeiculosSemBaixa() {
 
   const lrGarantia = shGarantia.getLastRow();
   const lrPreenchimento = shPreenchimento.getLastRow();
-  
+
   const lr = Math.min(lrGarantia, lrPreenchimento);
   if (lr < 2) return;
 
@@ -658,7 +658,7 @@ function verificarVeiculosSemBaixa() {
       if (alterou) {
         const cellL = shGarantia.getRange(linhaReal, 12);
         const cellM = shGarantia.getRange(linhaReal, 13);
-        
+
         let dataFim = valS || hoje;
         if (dataFim instanceof Date) {
           dataFim.setHours(0, 0, 0, 0);
@@ -708,7 +708,7 @@ function verificarVeiculosSemBaixa() {
           }
         }
       }
-      continue; 
+      continue;
     }
 
     const rDesmarcado = (valR === false || valR === "");
@@ -746,9 +746,16 @@ function verificarVeiculosSemBaixa() {
 // MÓDULO DE SANITIZAÇÃO E PADRONIZAÇÃO AUTOMÁTICA DE DADOS (CMM)
 // ================================================================
 
+// Motos SCRAMBLER 400X: todas são da marca TRIUMPH (na frota aparecem como "TRIUMPH/SCRAMBLER 400X" ou "I/TRIUMPH SCRAMBLER")
+function ehScrambler(txt) {
+  if (!txt) return false;
+  return txt.toString().toUpperCase().indexOf("SCRAMB") !== -1;
+}
+
 function normalizarMarca(txt) {
   if (!txt) return "";
   let t = txt.toString().toUpperCase().trim();
+  if (t.includes("TRIUMPH") || t.includes("SCRAMB")) return "TRIUMPH";
   if (t.includes("REN") || t.includes("DUST")) return "RENAULT";
   if (t.includes("TOY") || t.includes("CORO")) return "TOYOTA";
   if (t.includes("HYU") || t.includes("CRET")) return "HYUNDAI";
@@ -761,6 +768,7 @@ function normalizarMarca(txt) {
 function normalizarModelo(txt) {
   if (!txt) return "";
   let t = txt.toString().toUpperCase().trim();
+  if (t.includes("SCRAMB")) return "SCRAMBLER 400X";
   if (t.includes("DUST") || t.includes("DUTER")) return "DUSTER ZEN 1.6";
   if (t.includes("CORO") || t.includes("CROSS")) return "COROLLA CROSS";
   if (t.includes("CRET")) return "CRETA";
@@ -801,6 +809,7 @@ function limparDados(linha) {
   if (linha[4]) linha[4] = normalizarModelo(linha[4]); // Coluna E: Modelo
   if (linha[5]) linha[5] = normalizarAno(linha[5]);    // Coluna F: Ano
   if (linha[6]) linha[6] = normalizarKM(linha[6]);     // Coluna G: KM
+  if (ehScrambler(linha[4])) linha[3] = "TRIUMPH";     // Coluna D: SCRAMBLER 400X é sempre TRIUMPH (mesmo com marca vazia ou "I")
   return linha;
 }
 
@@ -815,7 +824,7 @@ function padronizarTodaAPlanilha() {
     SpreadsheetApp.getUi().alert('Erro: A aba "dados_preenchimento" não foi encontrada!');
     return;
   }
-  
+
   const lr = sh.getLastRow();
   if (lr < 2) return;
   // Pega exatamente as colunas C, D, E, F e G da aba dados_preenchimento
@@ -829,6 +838,7 @@ function padronizarTodaAPlanilha() {
     vals[i][2] = normalizarModelo(vals[i][2]); // E: Modelo
     vals[i][3] = normalizarAno(vals[i][3]);    // F: Ano
     vals[i][4] = normalizarKM(vals[i][4]);     // G: KM
+    if (ehScrambler(vals[i][2])) vals[i][1] = "TRIUMPH"; // D: SCRAMBLER 400X é sempre TRIUMPH
     totalProcessado++;
   }
   range.setValues(vals);
@@ -857,7 +867,7 @@ function limparGuiaBancoDados() {
   SpreadsheetApp.getUi().alert('CMM GESTÃO FROTA: Banco de dados padronizado!');
 }
 
-/** 
+/**
  * FUNÇÃO PARA O BOTÃO: PROCESSAR ENVIOS DE GARANTIA CONSOLIDADO
  */
 function processarEnviosGarantia() {
@@ -869,92 +879,92 @@ function processarEnviosGarantia() {
   }
   const lr = sh.getLastRow();
   if (lr < 2) return;
-  
-  const dados = sh.getRange(1, 1, lr, 16).getValues(); 
+
+  const dados = sh.getRange(1, 1, lr, 16).getValues();
   let pacotesDeEnvio = {};
   let totalSelecionado = 0;
-  
+
   for (let i = 1; i < lr; i++) {
     const rowNum = i + 1;
     if (dados[i][15] === true) {
-      const emailDest = dados[i][14] ? dados[i][14].toString().trim() : ""; 
+      const emailDest = dados[i][14] ? dados[i][14].toString().trim() : "";
       if (!emailDest) continue;
-      
-      const placa = dados[i][2];  
-      const chassi = dados[i][3]; 
-      const km = dados[i][7];     
-      const defeito = dados[i][9]; 
-      const endereco = dados[i][10]; 
-      
-      const dataBaixaRaw = dados[i][11]; 
+
+      const placa = dados[i][2];
+      const chassi = dados[i][3];
+      const km = dados[i][7];
+      const defeito = dados[i][9];
+      const endereco = dados[i][10];
+
+      const dataBaixaRaw = dados[i][11];
       const dataBaixa = dataBaixaRaw instanceof Date ? Utilities.formatDate(dataBaixaRaw, "GMT-3", "dd/MM/yyyy") : dataBaixaRaw;
-      const tempoBaixa = dados[i][12]; 
-      const textoEmail = dados[i][13]; 
-      
+      const tempoBaixa = dados[i][12];
+      const textoEmail = dados[i][13];
+
       if (!pacotesDeEnvio[emailDest]) {
         pacotesDeEnvio[emailDest] = {
           linhasPlanilha: [],
           viaturas: []
         };
       }
-      
+
       pacotesDeEnvio[emailDest].linhasPlanilha.push(rowNum);
       pacotesDeEnvio[emailDest].viaturas.push({
         placa: placa, chassi: chassi, km: km, dataBaixa: dataBaixa,
         tempoBaixa: tempoBaixa, defeito: defeito, endereco: endereco, textoEmail: textoEmail
       });
-      
+
       totalSelecionado++;
     }
   }
-  
+
   if (totalSelecionado === 0) {
     SpreadsheetApp.getUi().alert('Aviso: Marque os checkboxes na coluna P para enviar.');
     return;
   }
-  
+
   const blobAssinatura = DriveApp.getFileById(CFG_GARANTIA.SIGNATURE_FILE_ID).getBlob();
   const assunto = "CMM - Solicitação de Manutenção e Garantia de Frota — PMESP";
   const copiaPara = "cmmrecepcao@policiamilitar.sp.gov.br, josemaycon@policiamilitar.sp.gov.br";
   const agora = Utilities.formatDate(new Date(), "GMT-3", "dd/MM/yyyy HH:mm");
   let emailsEnviadosContador = 0;
-  
+
   for (const emailDest in pacotesDeEnvio) {
     const pacote = pacotesDeEnvio[emailDest];
-    
+
     let corpoHtml = `
       <div style="font-size:16px; font-family:Arial; color: #000; line-height: 1.5;">
         Prezado,<br><br>
         O Centro de Motomecanização (CMM) da PMESP solicita vossa análise, suporte e providências quanto às pendências do(s) veículo(s) listado(s) abaixo (viaturas oficiais da Polícia Militar de São Paulo).<br><br>
         <hr style="border: 0; border-top: 1px solid #ccc; margin-bottom: 20px;">
     `;
-    
+
     pacote.viaturas.forEach((v, index) => {
       corpoHtml += `
         <div style="margin-bottom: 30px; padding: 15px; background-color: #fcfcfc; border: 1px solid #d3d3d3; border-left: 5px solid #0056b3; border-radius: 4px;">
           <strong style="font-size: 18px; color: #0056b3;">VEÍCULO #${index + 1} — PLACA: ${v.placa}</strong><br><br>
-          
+
           <b>DADOS DO VEÍCULO:</b><br>
           - <b>Placa:</b> ${v.placa};<br>
           - <b>Chassi:</b> ${v.chassi};<br>
           - <b>KM Atual:</b> ${v.km}.<br><br>
-          
+
           <b>INFORMAÇÕES DE BAIXA:</b><br>
           - <b>Data da Baixa:</b> ${v.dataBaixa};<br>
           - <b>Tempo Total em Baixa:</b> ${v.tempoBaixa} dias.<br><br>
-          
+
           <b>ENDEREÇO DA CONCESSIONÁRIA LOCAL:</b><br>
           ${v.endereco || "-"}<br><br>
 
           <b>DESCRIÇÃO DO PROBLEMA / DEFEITO alegado:</b><br>
           <span style="color: #c00; font-weight: bold;">${v.defeito}</span><br><br>
-          
+
           <b>MENSAGEM ADICIONAL:</b><br>
           <i>${v.textoEmail || "Sem observações adicionais."}</i>
         </div>
       `;
     });
-    
+
     corpoHtml += `
         <hr style="border: 0; border-top: 1px solid #ccc; margin-top: 20px;">
         Atenciosamente,<br><br>
@@ -963,21 +973,21 @@ function processarEnviosGarantia() {
         Polícia Militar de São Paulo
       </div>
     `;
-    
+
     GmailApp.sendEmail(emailDest, assunto, "", {
       htmlBody: corpoHtml,
       inlineImages: { assinaturaCMM: blobAssinatura },
       cc: copiaPara
     });
-    
+
     pacote.linhasPlanilha.forEach(row => {
-      sh.getRange(row, 16).setValue(false); 
-      sh.getRange(row, 17).setValue(agora); 
+      sh.getRange(row, 16).setValue(false);
+      sh.getRange(row, 17).setValue(agora);
     });
-    
+
     emailsEnviadosContador++;
   }
-  
+
   SpreadsheetApp.getUi().alert(`✅ Processamento Concluído!\n\nViaturas processadas: ${totalSelecionado}\nE-mail(s) unificado(s) disparado(s): ${emailsEnviadosContador}`);
 }
 
@@ -1013,7 +1023,7 @@ function abrirCaixaBaixaMassa() {
   `)
   .setWidth(400)
   .setHeight(300);
-  
+
   SpreadsheetApp.getUi().showModalDialog(html, 'CMM - Baixa em Massa de VTRs');
 }
 
@@ -1027,7 +1037,7 @@ function processarBaixaEmMassa(texto) {
   placasEncontradas = placasEncontradas.map(p => p.replace(/[^A-Z0-9]/gi, '').toUpperCase());
 
   const ss = SpreadsheetApp.getActiveSpreadsheet();
-  const sh = ss.getSheetByName("dados_garantia"); 
+  const sh = ss.getSheetByName("dados_garantia");
   if (!sh) return "Erro: Aba 'dados_garantia' não encontrada.";
 
   const ultimaLinha = sh.getLastRow();
@@ -1039,13 +1049,13 @@ function processarBaixaEmMassa(texto) {
   dataHoje.setHours(0,0,0,0);
 
   for (let i = 0; i < dados.length; i++) {
-    let placaLinha = String(dados[i][2]).replace(/[^A-Z0-9]/gi, '').toUpperCase(); 
+    let placaLinha = String(dados[i][2]).replace(/[^A-Z0-9]/gi, '').toUpperCase();
     if (placasEncontradas.includes(placaLinha)) {
-      let linhaReal = i + 2; 
-      
-      let dataBaixaVal = dados[i][11]; 
+      let linhaReal = i + 2;
+
+      let dataBaixaVal = dados[i][11];
       let d1 = new Date(dataBaixaVal);
-      
+
       if (isNaN(d1.getTime()) && dataBaixaVal) {
         let partes = dataBaixaVal.toString().split(" ")[0].split("/");
         d1 = new Date(partes[2], partes[1] - 1, partes[0]);
@@ -1058,9 +1068,9 @@ function processarBaixaEmMassa(texto) {
         if (diff < 0) diff = 0;
       }
 
-      sh.getRange(linhaReal, 18).setValue(true);      
-      sh.getRange(linhaReal, 19).setValue(dataHoje);  
-      sh.getRange(linhaReal, 13).setValue(diff);      
+      sh.getRange(linhaReal, 18).setValue(true);
+      sh.getRange(linhaReal, 19).setValue(dataHoje);
+      sh.getRange(linhaReal, 13).setValue(diff);
       contadorSucesso++;
     }
   }
@@ -1072,51 +1082,62 @@ function processarBaixaEmMassa(texto) {
 /**
  * Classifica o motivo da baixa em REVISÃO ou GARANTIA.
  * Suporta tanto células individuais quanto intervalos inteiros (ArrayFormula).
- * 
+ *
  * @param {string|Array} motivo O motivo ou intervalo de motivos da baixa.
  * @return {string|Array} A classificação ("REVISÃO" ou "GARANTIA").
  * @customfunction
  */
 function CLASSIFICAR_MOTIVO(motivo) {
   if (!motivo && motivo !== 0) return "";
-  
+
   // Suporte a ArrayFormula / Intervalos (Passados como matrizes no Google Sheets)
   if (Array.isArray(motivo)) {
     return motivo.map(row => row.map(cell => CLASSIFICAR_MOTIVO(cell)));
   }
-  
+
   var txt = motivo.toString().toLowerCase().trim();
   if (!txt) return "";
-  
+
+  // 0. Etiquetas padronizadas no início da descrição: [REVISÃO], [GARANTIA] ou as duas juntas
+  //    (ex.: "[REVISÃO][GARANTIA] ..." ou "[REVISÃO] [GARANTIA] ..."). Têm prioridade sobre as palavras-chave.
+  var etiquetas = txt.match(/^(\s*\[\s*(revis[aã]o|garantia)\s*\])+/);
+  if (etiquetas) {
+    var temRevisao = /\[\s*revis[aã]o\s*\]/.test(etiquetas[0]);
+    var temGarantia = /\[\s*garantia\s*\]/.test(etiquetas[0]);
+    if (temRevisao && temGarantia) return "REVISÃO E GARANTIA";
+    if (temRevisao) return "REVISÃO";
+    if (temGarantia) return "GARANTIA";
+  }
+
   // Termos que determinam classificação como REVISÃO
   var termosRevisao = [
-    "revisao", "revisão", "revis", "rev", 
-    "troca de óleo", "troca de oleo", "troca do óleo", "troca do oleo", 
+    "revisao", "revisão", "revis", "rev",
+    "troca de óleo", "troca de oleo", "troca do óleo", "troca do oleo",
     "troca de filtro", "troca do filtro", "manutencao de 40mil", "manutenção de 40mil",
     "troca de pastilhas de freio"
   ];
-  
+
   // Termos que anulam a revisão e caracterizam defeitos/problemas (GARANTIA)
   var termosExclusao = [
-    "falta de óleo", "falta de oleo", "baixando óleo", "baixando oleo", 
-    "consumo de óleo", "consumo de oleo", "alto consumo", "vazamento", 
+    "falta de óleo", "falta de oleo", "baixando óleo", "baixando oleo",
+    "consumo de óleo", "consumo de oleo", "alto consumo", "vazamento",
     "nível de óleo baixo", "nivel de oleo baixo", "óleo baixo", "oleo baixo", "baixo óleo"
   ];
-  
+
   // 1. Verifica se contém termos de exclusão (Garantia)
   for (var i = 0; i < termosExclusao.length; i++) {
     if (txt.indexOf(termosExclusao[i]) !== -1) {
       return "GARANTIA";
     }
   }
-  
+
   // 2. Verifica se contém termos de revisão
   for (var i = 0; i < termosRevisao.length; i++) {
     if (txt.indexOf(termosRevisao[i]) !== -1) {
       return "REVISÃO";
     }
   }
-  
+
   // 3. Caso padrão (Problemas mecânicos/elétricos em geral)
   return "GARANTIA";
 }
@@ -1137,7 +1158,7 @@ function extrairDataNomeArquivo(fileName) {
     'MAI': '05', 'MAY': '05', 'JUN': '06', 'JUL': '07', 'AGO': '08', 'AUG': '08',
     'SET': '09', 'SETEMBRO': '09', 'OUT': '10', 'NOV': '11', 'DEZ': '12'
   };
-  
+
   // Ex: 20AGO26 ou 08JUL26
   var match = fileName.match(/(\d{1,2})([A-Za-z]{3})(\d{2,4})/);
   if (match) {
@@ -1150,7 +1171,7 @@ function extrairDataNomeArquivo(fileName) {
       return ("0" + dia).slice(-2) + "/" + mes + "/" + ano;
     }
   }
-  
+
   // Ex: 10/03/2025 ou 10-03-2025 ou 10.03.2025
   match = fileName.match(/(\d{1,2})[\/\.-](\d{1,2})[\/\.-](\d{2,4})/);
   if (match) {
@@ -1160,23 +1181,23 @@ function extrairDataNomeArquivo(fileName) {
     if (ano.length == 2) ano = "20" + ano;
     return ("0" + dia).slice(-2) + "/" + ("0" + mes).slice(-2) + "/" + ano;
   }
-  
+
   return null;
 }
 
 function extrairDadosNomeArquivo(fileName) {
   var nameWithoutExt = fileName.replace(/\.[^/.]+$/, "").trim();
-  
+
   // Remove prefixo de ordem tipo "01) " ou "02.1) " ou "23.2) "
   var cleanName = nameWithoutExt.replace(/^[\d\.\s\)\-_]+/, "").trim();
-  
+
   // Divide por " - " (espaço hífen espaço)
   var partes = cleanName.split(/\s+-\s+/);
-  
+
   var providencia = "";
   var contratada = "";
   var assunto = "";
-  
+
   if (partes.length >= 3) {
     providencia = partes[0].trim();
     contratada = partes[1].trim().toUpperCase();
@@ -1188,7 +1209,7 @@ function extrairDadosNomeArquivo(fileName) {
     providencia = cleanName;
     assunto = "Documento Geral";
   }
-  
+
   // Normaliza e valida a Contratada
   var cUpper = (contratada + " " + fileName).toUpperCase();
   if (cUpper.indexOf("TOYOTA") !== -1) contratada = "TOYOTA";
@@ -1196,7 +1217,7 @@ function extrairDadosNomeArquivo(fileName) {
   else if (cUpper.indexOf("CHEVROLET") !== -1 || cUpper.indexOf("GM") !== -1 || cUpper.indexOf("TRAILBLAZER") !== -1) contratada = "CHEVROLET";
   else if (cUpper.indexOf("HYUNDAI") !== -1 || cUpper.indexOf("CRETA") !== -1) contratada = "HYUNDAI";
   else if (!contratada) contratada = "OUTROS";
-  
+
   return {
     contratada: contratada,
     providencia: providencia,
@@ -1212,9 +1233,9 @@ function monitorarPastaDriveEPreencherPlanilha() {
     sheet = ss.insertSheet("providencias_adm");
     sheet.appendRow(["DATA", "CONTRATADA", "PROVIDÊNCIA (Nº DOCUMENTO)", "ASSUNTO", "RESPONDIDO?", "OBSERVAÇÕES"]);
   }
-  
+
   const data = sheet.getDataRange().getValues();
-  
+
   // Função de normalização para ignorar acentos e caracteres especiais nos cabeçalhos
   function normalizarHeader(str) {
     if (!str) return "";
@@ -1225,17 +1246,17 @@ function monitorarPastaDriveEPreencherPlanilha() {
               .replace(/[^A-Z0-9]/g, "") // remove espaços e caracteres especiais
               .trim();
   }
-  
+
   let dataIdx = -1;
   let contratadaIdx = -1;
   let providenciaIdx = -1;
   let assuntoIdx = -1;
   let respondidoIdx = -1;
   let observacoesIdx = -1;
-  
+
   if (data.length > 0 && data[0].length >= 6) {
     const headersNorm = data[0].map(normalizarHeader);
-    
+
     dataIdx = headersNorm.indexOf("DATA");
     contratadaIdx = headersNorm.indexOf("CONTRATADA");
     providenciaIdx = headersNorm.findIndex(h => h.indexOf("PROVIDENCIA") !== -1 || h.indexOf("DOCUMENTO") !== -1);
@@ -1243,12 +1264,12 @@ function monitorarPastaDriveEPreencherPlanilha() {
     respondidoIdx = headersNorm.findIndex(h => h.indexOf("RESPONDIDO") !== -1);
     observacoesIdx = headersNorm.findIndex(h => h.indexOf("OBSERVACO") !== -1);
   }
-  
+
   // Se algum cabeçalho essencial não foi mapeado, recria a estrutura na planilha e define índices fixos
   if (dataIdx === -1 || contratadaIdx === -1 || providenciaIdx === -1 || assuntoIdx === -1 || respondidoIdx === -1 || observacoesIdx === -1) {
     Logger.log("Aviso: Estrutura de cabeçalhos inválida. Gravando cabeçalhos padrão na primeira linha...");
     sheet.getRange(1, 1, 1, 6).setValues([["DATA", "CONTRATADA", "PROVIDÊNCIA (Nº DOCUMENTO)", "ASSUNTO", "RESPONDIDO?", "OBSERVAÇÕES"]]);
-    
+
     // Define posições fixas padrão para evitar loop recursivo
     dataIdx = 0;
     contratadaIdx = 1;
@@ -1257,7 +1278,7 @@ function monitorarPastaDriveEPreencherPlanilha() {
     respondidoIdx = 4;
     observacoesIdx = 5;
   }
-  
+
   // Mapeia os IDs de arquivos do Drive já importados
   const importedIds = new Set();
   for (let i = 1; i < data.length; i++) {
@@ -1267,7 +1288,7 @@ function monitorarPastaDriveEPreencherPlanilha() {
       importedIds.add(matchId[1].trim());
     }
   }
-  
+
   let folder;
   try {
     folder = DriveApp.getFolderById(PASTA_ID);
@@ -1275,20 +1296,20 @@ function monitorarPastaDriveEPreencherPlanilha() {
     Logger.log("Erro ao acessar a pasta do Google Drive: " + e.toString());
     return;
   }
-  
+
   // 1. Mapeia todos os arquivos reais existentes no Drive
   const allFiles = [];
   obterTodosArquivosRecursivo(folder, allFiles);
   Logger.log("Total de arquivos mapeados nas pastas principais: " + allFiles.length);
-  
+
   const activeValidFilesMap = new Map();
   const activeDriveIds = new Set();
-  
+
   for (var f = 0; f < allFiles.length; f++) {
     const file = allFiles[f];
     const fileName = file.getName();
     var nomeNormalizado = fileName.toUpperCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-    
+
     // Filtro 1: Extensões permitidas (ignora m4a, mp4, ps1, txt, jpeg, png, kmz, pptx)
     var extMatch = fileName.match(/\.([0-9a-z]+)$/i);
     var ext = extMatch ? extMatch[1].toUpperCase() : "";
@@ -1296,7 +1317,7 @@ function monitorarPastaDriveEPreencherPlanilha() {
     if (extensoesValidas.indexOf(ext) === -1) {
       continue;
     }
-    
+
     // Filtro 2: Termos expressamente ignorados (modelos, templates, rascunhos, excluídos, lixeira, backups, segundas vias)
     var termosIgnorados = ["MODELO", "TEMPLATE", "EXCLUIDO", "RASCUNHO", "SEGUNDA VIA", "2A VIA", "2ª VIA", "BKP", "~$", "(1)", "(2)", "(3)"];
     var ehIgnorado = false;
@@ -1309,13 +1330,13 @@ function monitorarPastaDriveEPreencherPlanilha() {
     if (ehIgnorado) {
       continue;
     }
-    
+
     // Filtro 3: Critério Estrito de Padronização Oficial (Exige padrão ' - ' OU início numerado)
     var ehPadronizado = fileName.indexOf(" - ") !== -1 || /^\d+[\d\.\s\)\-_]+/.test(fileName);
     if (!ehPadronizado) {
       continue;
     }
-    
+
     // Filtro 4: Aceita apenas documentos que sejam providências oficiais
     var termosPermitidos = ["NOTIFICACAO", "ATA", "MENSAGEM", "MSG", "OFICIO", "RESPOSTA", "DEFESA", "RELATORIO", "TR", "PARTE", "PUBLICACAO", "PLANILHA", "ORCAMENTO", "ORDEM DE SERVICO", "MANUAL", "NORMA", "PORTARIA", "DIVISOR"];
     var ehValido = false;
@@ -1325,23 +1346,23 @@ function monitorarPastaDriveEPreencherPlanilha() {
         break;
       }
     }
-    
+
     if (ehValido) {
       activeValidFilesMap.set(file.getId(), file);
       activeDriveIds.add(file.getId());
     }
   }
-  
+
   // 2. Analisa as linhas existentes na planilha e remove órfãos (arquivos excluídos do Drive)
   const linhasMantidas = [];
   const idsJaProcessados = new Set();
   var orfaosRemovidos = 0;
-  
+
   for (let i = 1; i < data.length; i++) {
     const row = data[i];
     const obsVal = row[observacoesIdx] ? row[observacoesIdx].toString() : "";
     const matchId = obsVal.match(/\[ID_DRIVE:\s*([^\]]+)\]/);
-    
+
     if (matchId) {
       const driveId = matchId[1].trim();
       if (activeDriveIds.has(driveId)) {
@@ -1358,35 +1379,35 @@ function monitorarPastaDriveEPreencherPlanilha() {
       }
     }
   }
-  
+
   // 3. Processa novos arquivos do Drive que ainda não estão na planilha
   var novosArquivos = 0;
   for (const [fileId, file] of activeValidFilesMap.entries()) {
     if (idsJaProcessados.has(fileId)) {
       continue;
     }
-    
+
     const fileName = file.getName();
     const fileUrl = file.getUrl();
     const dateCreated = file.getDateCreated();
-    
+
     var dataDoc = extrairDataNomeArquivo(fileName);
     if (!dataDoc) {
       dataDoc = Utilities.formatDate(dateCreated, Session.getScriptTimeZone(), "dd/MM/yyyy");
     }
-    
+
     var extractions = extrairDadosNomeArquivo(fileName);
     var contratada = extractions.contratada;
     var providencia = extractions.providencia;
     var assunto = extractions.assunto;
-    
+
     // Regra da coluna RESPONDIDO?: Notificações começam com NÃO, os demais com NÃO SE APLICA
     var statusRespondido = "NÃO SE APLICA";
     var provNorm = (providencia + " " + fileName).toUpperCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
     if (provNorm.indexOf("NOTIFICACAO") !== -1) {
       statusRespondido = "NÃO";
     }
-    
+
     const newRow = ["", "", "", "", "", ""];
     newRow[dataIdx] = dataDoc;
     newRow[contratadaIdx] = contratada;
@@ -1394,12 +1415,12 @@ function monitorarPastaDriveEPreencherPlanilha() {
     newRow[assuntoIdx] = assunto;
     newRow[respondidoIdx] = statusRespondido;
     newRow[observacoesIdx] = "Arquivo importado do Google Drive em " + Utilities.formatDate(new Date(), Session.getScriptTimeZone(), "dd/MM/yyyy") + ". Link: " + fileUrl + " [ID_DRIVE: " + fileId + "]";
-    
+
     linhasMantidas.push(newRow);
     novosArquivos++;
     Logger.log("✓ Novo documento oficial importado: " + fileName);
   }
-  
+
   // 4. Sanitiza todas as linhas para garantir que a Contratada seja estritamente válida
   const marcasPermitidas = ["TOYOTA", "RENAULT", "CHEVROLET", "HYUNDAI", "OUTROS"];
   for (let r = 0; r < linhasMantidas.length; r++) {
@@ -1416,18 +1437,18 @@ function monitorarPastaDriveEPreencherPlanilha() {
       linhasMantidas[r][contratadaIdx] = "OUTROS";
     }
   }
-  
+
   // 5. Limpeza total da aba (remove formatações e regras antigas de validação que travavam o Sheets)
   sheet.clear();
   sheet.getRange("A:Z").clearDataValidations();
-  
+
   const cabecalho = [["DATA", "CONTRATADA", "PROVIDÊNCIA (Nº DOCUMENTO)", "ASSUNTO", "RESPONDIDO?", "OBSERVAÇÕES"]];
   sheet.getRange(1, 1, 1, 6).setValues(cabecalho);
-  
+
   if (linhasMantidas.length > 0) {
     sheet.getRange(2, 1, linhasMantidas.length, 6).setValues(linhasMantidas);
   }
-  
+
   // 6. Aplica novas validações de dados (dropdowns) com permissão suave
   const totalRows = sheet.getLastRow();
   if (totalRows >= 2) {
@@ -1438,7 +1459,7 @@ function monitorarPastaDriveEPreencherPlanilha() {
                                          .setAllowInvalid(true)
                                          .build();
     rangeContratada.setDataValidation(ruleContratada);
-    
+
     // Dropdown na coluna E (RESPONDIDO?)
     const rangeRespondido = sheet.getRange(2, 5, totalRows - 1, 1);
     const ruleRespondido = SpreadsheetApp.newDataValidation()
@@ -1448,7 +1469,7 @@ function monitorarPastaDriveEPreencherPlanilha() {
     rangeRespondido.setDataValidation(ruleRespondido);
     Logger.log("✓ Validações de dropdowns atualizadas com sucesso.");
   }
-  
+
   Logger.log("Sincronização concluída com sucesso! Novos inseridos: " + novosArquivos + " | Órfãos removidos: " + orfaosRemovidos + " | Total ativo: " + linhasMantidas.length);
   return novosArquivos;
 }
@@ -1470,7 +1491,7 @@ function gatilhoMonitoramentoDrive10s() {
 // Configura o gatilho para rodar uma vez por dia, às 08h00 (horário de Brasília)
 function criarGatilhoMonitoramentoDrive() {
   removerGatilhoMonitoramentoDrive();
-  
+
   ScriptApp.newTrigger("monitorarPastaDriveEPreencherPlanilha")
     .timeBased()
     .everyDays(1)
@@ -1478,7 +1499,7 @@ function criarGatilhoMonitoramentoDrive() {
     .nearMinute(0)
     .inTimezone("America/Sao_Paulo")
     .create();
-    
+
   Logger.log("✓ Gatilho diário de monitoramento do Google Drive configurado para rodar às 08:00h (Horário de Brasília).");
 }
 
@@ -1498,7 +1519,7 @@ function removerGatilhoMonitoramentoDrive() {
 function obterTodosArquivosRecursivo(folder, list) {
   try {
     const folderName = folder.getName().toUpperCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-    
+
     // Ignora pastas de modelos, rascunhos, lixeiras, fotos e conversas
     var pastasIgnoradas = ["MODELO", "RASCUNHO", "FOTO", "WHATSAPP", "ANTIGRAVITY", ".AGENTS"];
     for (var p = 0; p < pastasIgnoradas.length; p++) {
@@ -1507,7 +1528,7 @@ function obterTodosArquivosRecursivo(folder, list) {
         return;
       }
     }
-    
+
     const files = folder.getFiles();
     while (files.hasNext()) {
       list.push(files.next());

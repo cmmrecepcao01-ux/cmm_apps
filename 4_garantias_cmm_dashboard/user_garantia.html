@@ -678,6 +678,7 @@
                                 <option value="Fiat">Fiat</option>
                                 <option value="Iveco">Iveco</option>
                                 <option value="Hyundai">Hyundai</option>
+                                <option value="Triumph">Triumph</option>
                             </select>
                         </div>
 
@@ -933,8 +934,15 @@
             "Renault": ["Duster", "Logan", "Sandero", "Kwid", "Master"],
             "Fiat": ["Scudo", "Cronos", "Toro", "Strada", "Fiorino", "Ducato"],
             "Iveco": ["Daily"],
-            "Hyundai": ["Creta", "HB20", "Tucson"]
+            "Hyundai": ["Creta", "HB20", "Tucson"],
+            "Triumph": ["Scrambler 400X", "Tiger XCX"]
         };
+
+        // Motos TRIUMPH: na frota aparecem como "TRIUMPH/SCRAMBLER 400X", "TRIUMPH/TIGER XCX" ou "I/TRIUMPH SCRAMBLER"
+        function detectarMarcaTriumph(placaObj) {
+            const txt = ((placaObj.marca || "") + " " + (placaObj.modelo || "")).toUpperCase();
+            return (txt.includes("TRIUMPH") || txt.includes("SCRAMB")) ? "Triumph" : "";
+        }
 
         // VARIÁVEIS DE CONFIGURAÇÃO E CACHE
         const API_URL = "https://script.google.com/macros/s/AKfycbxPloG_YjMC01xXQnTUsiTpBd7dcPxairGe9_i2DUzRiY59nuMl6eGsITtke5cjOAdb/exec";
@@ -1187,8 +1195,9 @@
                     opmSelect.disabled = true;
                 }
 
-                if (placaObj.marca) {
-                    marcaSelect.value = placaObj.marca;
+                const marcaDetectada = detectarMarcaTriumph(placaObj) || placaObj.marca;
+                if (marcaDetectada) {
+                    marcaSelect.value = marcaDetectada;
                     updateModelOptions(); // Carrega modelos da marca selecionada
                     
                     if (placaObj.modelo) {
