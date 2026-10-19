@@ -1,5 +1,6 @@
 // Módulo gerado a partir do index.html original do TECMEC (CMM PMESP).
 // Extraído automaticamente preservando o código original função por função.
+import { jsPDF } from "jspdf";
 import { state } from "./state.js";
 import { showToast } from "./utils.js";
 
@@ -35,52 +36,36 @@ export function fecharModalFolhaPainel() {
             document.getElementById("modalFolhaPainel").style.display = "none";
         }
 
+// Antes usava html2pdf()/html2canvas (tirar um "print" da tela) — só que a
+// lib nunca chegou a ser carregada no projeto (sem <script> nem import
+// nenhum), então isso sempre dava erro e caía no fallback window.print(),
+// que abre a caixa de impressão do navegador com o cabeçalho/rodapé feio.
+// Agora é PDF vetorial direto com jsPDF — mesmo esquema usado no parecer
+// técnico (ver src/pdfBuilder.js) — sem servidor, sem screenshot, sem
+// depender de nenhuma caixa de diálogo.
 export function baixarPdfFolhaPainel() {
             const statusTxt = document.getElementById("folhaStatusTxt")?.textContent || "PARECER EM CONFECÇÃO";
             const dataEntrada = document.getElementById("folhaDataEntrada")?.textContent || "18/09/2026";
             const sindIpm = document.getElementById("folhaSindIpm")?.textContent || "18BPMM-13/70/26";
 
-            // Criar contêiner temporário limpo para renderização A4 sem ruído visual de modal
-            const tempDiv = document.createElement("div");
-            tempDiv.style.width = "750px";
-            tempDiv.style.padding = "60px 40px";
-            tempDiv.style.background = "#ffffff";
-            tempDiv.style.color = "#000000";
-            tempDiv.style.fontFamily = "Arial, sans-serif";
-            tempDiv.style.textAlign = "center";
-            tempDiv.style.boxSizing = "border-box";
-            // Fica dentro da área visível (por trás do modal aberto, z-index -1) em vez de
-            // "-9999px": alguns navegadores/versões do html2canvas geram PDF em branco
-            // quando o elemento capturado está fora da área de rolagem da página.
-            tempDiv.style.position = "fixed";
-            tempDiv.style.left = "0";
-            tempDiv.style.top = "0";
-            tempDiv.style.zIndex = "-1";
+            try {
+                const doc = new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
+                const pageW = 210, centerX = pageW / 2;
 
-            tempDiv.innerHTML = `
-                <div style="font-size: 48px; font-weight: 900; margin-bottom: 60px; text-transform: uppercase; line-height: 1.2; color: #000;">${statusTxt}</div>
-                <div style="font-size: 44px; font-weight: bold; margin-bottom: 60px; color: #000;">DATA DE ENTRADA: ${dataEntrada}</div>
-                <div style="font-size: 44px; font-weight: bold; color: #000;">SIND/IPM Nº: ${sindIpm}</div>
-            `;
+                doc.setFont("helvetica", "bold");
+                doc.setFontSize(30);
+                const linhasStatus = doc.splitTextToSize(statusTxt.toUpperCase(), 180);
+                doc.text(linhasStatus, centerX, 90, { align: "center" });
 
-            document.body.appendChild(tempDiv);
+                doc.setFontSize(24);
+                doc.text(`DATA DE ENTRADA: ${dataEntrada}`, centerX, 150, { align: "center", maxWidth: 180 });
+                doc.text(`SIND/IPM Nº: ${sindIpm}`, centerX, 175, { align: "center", maxWidth: 180 });
 
-            const cleanName = sindIpm.replace(/[^a-zA-Z0-9]/g, '_');
-            const opt = {
-                margin: 10,
-                filename: `Folha_Painel_${cleanName}.pdf`,
-                image: { type: 'jpeg', quality: 0.98 },
-                html2canvas: { scale: 2, logging: false, useCORS: true },
-                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-            };
-
-            showToast("Gerando PDF da Folha de Painel...", "info");
-            html2pdf().set(opt).from(tempDiv).save().then(() => {
-                document.body.removeChild(tempDiv);
+                const cleanName = sindIpm.replace(/[^a-zA-Z0-9]/g, "_");
+                doc.save(`Folha_Painel_${cleanName}.pdf`);
                 showToast("Download da Folha de Painel concluído!", "success");
-            }).catch(err => {
-                console.error("Erro no html2pdf:", err);
-                if (document.body.contains(tempDiv)) document.body.removeChild(tempDiv);
-                window.print();
-            });
+            } catch (err) {
+                console.error("Erro ao gerar o PDF da Folha de Painel:", err);
+                showToast("Erro ao gerar o PDF. Tente novamente.", "error");
+            }
         }

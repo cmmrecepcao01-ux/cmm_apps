@@ -15,6 +15,7 @@ import { CONFIG, state } from "./state.js";
 import { showToast } from "./utils.js";
 import { voltarAoPainelGestorFromSubdashboard } from "./parecerSubdashboard.js";
 import { marcarParecerConcluidoSupabase } from "./api.js";
+import { baixarPdfParecerVetorial } from "./pdfBuilder.js";
 
 let parecerAtual = null;
 
@@ -74,6 +75,10 @@ function dataCurta(d) {
     const mes = MESES_EXTENSO[d.getMonth()];
     return `${dia} de ${mes} de ${d.getFullYear()}`;
 }
+
+// Exportadas pro pdfBuilder.js reaproveitar (mesma lógica de data/boletim
+// usada tanto no preview em tela quanto no PDF vetorial final).
+export { BOLETIM_INTERNO_NOMEACAO, dataExtenso, dataCurta };
 
 // Parágrafo numerado (item ou subitem) com recuo de primeira linha de 2cm,
 // fiel ao template Word — usado tanto para os itens 1./2. quanto para os
@@ -251,18 +256,23 @@ export function gerarEPreverParecerPdf(a) {
     document.getElementById("modalPreviewParecer").style.display = "flex";
 }
 
-// Abre a caixa de impressão nativa do navegador com SÓ o conteúdo do
-// parecer visível (o CSS @media print no <head> do index.html esconde todo
-// o resto da página — menus, botões, overlay do modal). O operador escolhe
-// "Salvar como PDF" (ou imprime de verdade, se preferir) na própria caixa
-// de diálogo do Chrome.
-function imprimirParecer() {
-    window.print();
+// Gera o PDF do parecer 100% no navegador (pdfBuilder.js, texto vetorial
+// real) e já dispara o download — sem window.print(), sem caixa de diálogo
+// do Chrome, então sem o cabeçalho/rodapé automático (URL, data/hora,
+// "n/total") que nenhum CSS conseguia tirar. Ver src/pdfBuilder.js.
+async function gerarEBaixarParecer() {
+    if (!parecerAtual) return;
+    try {
+        showToast("Gerando PDF...", "info");
+        await baixarPdfParecerVetorial(parecerAtual);
+    } catch (e) {
+        console.error("Erro ao gerar o PDF do parecer:", e);
+        showToast("Erro ao gerar o PDF. Tente novamente.", "error");
+    }
 }
 
-export function baixarPdfPreviewParecer() {
-    if (!parecerAtual) return;
-    imprimirParecer();
+export async function baixarPdfPreviewParecer() {
+    await gerarEBaixarParecer();
 }
 
 export async function finalizarEnviarEmailParecer() {
@@ -279,9 +289,9 @@ export async function finalizarEnviarEmailParecer() {
         }
     }
 
-    // Abre a impressão AINDA com o modal aberto (senão o conteúdo do
-    // parecer não estaria visível pro navegador imprimir).
-    imprimirParecer();
+    // Gera e baixa o PDF vetorial (não depende mais do modal estar visível
+    // na tela — o pdfBuilder.js lê os dados direto do objeto, não do DOM).
+    await gerarEBaixarParecer();
 
     document.getElementById("modalPreviewParecer").style.display = "none";
     voltarAoPainelGestorFromSubdashboard();

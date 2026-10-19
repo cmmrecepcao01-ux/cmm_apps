@@ -10,37 +10,14 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <!-- QRCode Generator CDN -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-    <!-- PDF do parecer é gerado com a impressão nativa do navegador
-         (window.print() + CSS @media print abaixo) — o operador escolhe
-         "Salvar como PDF" na caixa de impressão do Chrome. Mesmo esquema
-         usado com sucesso no projeto 21_manut_escala: sem servidor, sem
-         Netlify Function, sem binário de Chromium pra dar problema. -->
-    <style>
-        @media print {
-            /* Some tudo da página, exceto o conteúdo do parecer — o resto
-               (menus, botões, overlay do modal) não deve ir pro papel. */
-            body * { visibility: hidden !important; }
-            #previewParecerContainer, #previewParecerContainer * { visibility: visible !important; }
-            #previewParecerContainer {
-                position: absolute !important;
-                left: 0 !important;
-                top: 0 !important;
-                width: 100% !important;
-            }
-            .modal-overlay, .modal-container {
-                position: static !important;
-                background: #ffffff !important;
-                box-shadow: none !important;
-                max-height: none !important;
-                overflow: visible !important;
-                padding: 0 !important;
-            }
-            @page {
-                size: A4 portrait;
-                margin: 14mm 12mm 18mm 12mm;
-            }
-        }
-    </style>
+    <!-- PDF do parecer: gerado 100% client-side em vetor (jsPDF), sem
+         window.print() e sem depender de nenhuma configuração do navegador
+         — ver src/pdfBuilder.js. O antigo esquema de impressão nativa
+         (window.print() + CSS @media print aqui no <head>) foi abandonado
+         porque o cabeçalho/rodapé automático do Chrome (URL, data/hora,
+         "n/total") não é controlável por CSS, só manualmente na caixa de
+         diálogo de impressão — inviável com vários operadores em máquinas
+         diferentes. -->
     <!-- marker.js 2 CDN (editor de anotações sobre fotos: setas, círculos, texto) -->
     <script src="https://cdn.jsdelivr.net/npm/markerjs2/markerjs2.js"></script>
     <!-- Base de dados SIPL e OPMs -->
